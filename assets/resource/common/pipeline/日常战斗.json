@@ -4,7 +4,7 @@
             "type": "Custom",
             "param": {
                 "custom_action": "ExecuteSequentialTasks",
-                "custom_action_param": "回主界面,队伍选择,章节导航,队伍配置"
+                "custom_action_param": "回主界面,队伍选择,章节导航,bbc战斗"
             }
         }
     }
