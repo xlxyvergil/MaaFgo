@@ -1,0 +1,159 @@
+name: install
+
+on:
+  push:
+    tags:
+      - "v*"
+    branches:
+      - "**"
+    paths:
+      - ".github/workflows/install.yml"
+      - "assets/**"
+      - "**.py"
+  pull_request:
+    branches:
+      - "**"
+    paths:
+      - ".github/workflows/install.yml"
+      - "assets/**"
+      - "**.py"
+  workflow_dispatch:
+
+jobs:
+  meta:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - id: set_tag
+        run: |
+          # 检查标签格式
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
+            is_release=true
+            tag=${GITHUB_REF#refs/tags/}
+            echo "Release tag format is valid: $tag"
+          else
+            is_release=false
+            # 获取最新的发布标签
+            tag=$(curl -sX GET "https://api.github.com/repos/${{ github.repository }}/releases/latest" --header 'authorization: Bearer ${{ secrets.GITHUB_TOKEN }}' | awk '/tag_name/{print $4}' FS='["]')
+            if [[ ! $tag =~ ^v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9]+)?$ ]]; then
+              echo "No valid release tag found, using v0.0.0"
+              tag="v0.0.0"
+            fi
+            tag=$(date "+$tag-%y%m%d-$(git rev-parse --short HEAD)")
+          fi
+
+          if ! $($is_release) ; then
+            prefix=${tag%-*-*}
+            suffix=${tag#$prefix-}
+            tag="$prefix-ci.$suffix"
+          fi
+
+          # 检查是否为预发布版本
+          is_prerelease=false
+          if [[ $tag =~ .*alpha.* || $tag =~ .*beta.* || $tag =~ .*rc.* || $tag =~ .*dev.* || $tag =~ .*-ci.* ]]; then
+            is_prerelease=true
+            echo "This is a pre-release version"
+          fi
+
+          echo tag=$tag | tee -a $GITHUB_OUTPUT
+          echo is_release=$is_release | tee -a $GITHUB_OUTPUT
+          echo is_prerelease=$is_prerelease | tee -a $GITHUB_OUTPUT
+    outputs:
+      tag: ${{ steps.set_tag.outputs.tag }}
+      is_release: ${{ steps.set_tag.outputs.is_release }}
+      is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
+
+  install:
+    needs: meta
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [win, macos, linux, android]
+        arch: [aarch64, x86_64]
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Download MaaFramework
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: MaaXYZ/MaaFramework
+          fileName: "MAA-${{ matrix.os }}-${{ matrix.arch }}*"
+          latest: true
+          out-file-path: "deps"
+          extract: true
+
+      - name: Download MFW-CA
+        if: matrix.os != 'android'
+        id : download_mfw-ca
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: overflow65537/MFW-PyQt6
+          fileName: "MFW-PyQt6-${{ matrix.os }}-${{ matrix.arch }}*"
+          latest: true
+          out-file-path: "MFW"
+          extract: true
+
+      - name: Clean up mfw-ca archive
+        if: matrix.os != 'android'
+        shell: bash
+        run: |
+          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mfw-ca.outputs.downloaded_files)[0] }}"
+          rm -f "${ARCHIVE_FILE_PATH}"
+          echo "Archive cleanup command executed for mfw-ca."
+
+      - name: Install
+        shell: bash
+        run: |
+          python ./install.py ${{ needs.meta.outputs.tag }}
+
+          if [[ "${{ matrix.os }}" != "android" ]]; then
+            if [ -d "MFW" ]; then
+              echo "Copying MFW files to install directory..."
+              mkdir -p install
+              rsync -av --ignore-existing MFW/ install/
+            else
+              echo "MFW directory not found, skipping copy."
+            fi
+          else
+            echo "Skipping copy MFW for Android."
+          fi
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MaaXXX-${{ matrix.os }}-${{ matrix.arch }}
+          path: "install"
+
+  release:
+    if: ${{ needs.meta.outputs.is_release == 'true' }}
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: assets
+
+      - run: |
+          cd assets
+          for f in *; do
+            if [[ $f == *"macos"* ]]; then
+              find $f -type f -name "maapicli" -exec chmod +x {} \; 2>/dev/null || true
+              find $f -type f -name "MFW" -exec chmod +x {} \; 2>/dev/null || true
+              find $f -type f -name "MFWUpdater" -exec chmod +x {} \; 2>/dev/null || true
+              tar -cpzf $f-${{ needs.meta.outputs.tag }}.tar.gz -C $f .
+            else
+              (cd $f && zip -r ../$f-${{ needs.meta.outputs.tag }}.zip .)
+            fi
+          done
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: assets/*
+          tag_name: ${{ needs.meta.outputs.tag }}
+          generate_release_notes: true
+          prerelease: ${{ needs.meta.outputs.is_prerelease }}

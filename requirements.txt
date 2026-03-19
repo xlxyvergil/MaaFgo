@@ -1,0 +1,4 @@
+maa
+PySide6
+qfluentwidgets
+qasync
