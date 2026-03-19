@@ -417,7 +417,7 @@ FodyWeavers.xsd
 !.vscode/settings.json
 # !.vscode/tasks.json
 # !.vscode/launch.json
-!.vscode/extensions.json
+# !.vscode/extensions.json
 *.code-workspace
 
 # Local History for Visual Studio Code
@@ -440,15 +440,48 @@ enc_temp_folder/*
 .nuke/temp/*
 
 # Build
-deps/*
-!deps/tools/
-deps/tools/*
-!deps/tools/*.schema.json
+deps
 build
-install
+main.dist
+main.build
+dist
+build
 
 # Tools
 tools/ImageCropper/**/*.png
+config/*
+!config/emulator.json
+!config/custom_setting.json
+MFW.spec
+main.spec
+bundles
+hotfix
+MFWUpdater.spec
+update.zip
+k.ey
 
-config
-debug
+# VSC
+.vscode
+MFW.pid
+i18n.json
+.nicegui/storage-general.json
+interface.json
+./interface_zh.json
+./interface_en.json
+./resource/*
+interface.jsonc
+interface_en.json
+interface_zh.json
+resource
+release_notes
+runtime
+custom
+update/new_version/update_metadata.json
+update_flag.txt
+bundle/*
+MPAcustom/*
+app/i18n/i18n.zh_CN.qm
+app/i18n/i18n.zh_HK.qm
+release_notes/*
+MPA_custom/*
+tasks/*

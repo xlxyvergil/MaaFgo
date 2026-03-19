@@ -1,117 +1,196 @@
 <!-- markdownlint-disable MD033 MD041 -->
 <p align="center">
-  <img alt="LOGO" src="https://cdn.jsdelivr.net/gh/MaaAssistantArknights/design@main/logo/maa-logo_512x512.png" width="256" height="256" />
+  <img alt="LOGO" src="app\assets\icons\logo.png" width="256" height="256" />
 </p>
-
 <div align="center">
 
-# MaaPracticeBoilerplate
+# MFW-ChainFlow Assistant(链程助手)
 
+**[简体中文](./README.md) | [English](./README-en.md)**
+
+基于 **[PySide6](https://doc.qt.io/qtforpython-6)** 与 **[MaaFramework](https://github.com/MaaXYZ/MaaFramework)** 的跨平台 GUI，完整支持 interface v2 协议，开箱即用地编排、运行和扩展自动化流程。
 </div>
 
-本仓库为 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 所提供的项目模板，开发者可基于此模板直接创建自己的 MaaXXX 项目。
+<p align="center">
+  <img alt="license" src="https://img.shields.io/github/license/overflow65537/MFW-PyQt6">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
+  <img alt="platform" src="https://img.shields.io/badge/platform-Windows%20%7C%20Linux%20%7C%20macOS-blueviolet">
+  <img alt="commit" src="https://img.shields.io/github/commit-activity/m/overflow65537/MFW-PyQt6">
+</p>
 
-> **MaaFramework** 是基于图像识别技术、运用 [MAA](https://github.com/MaaAssistantArknights/MaaAssistantArknights) 开发经验去芜存菁、完全重写的新一代自动化黑盒测试框架。
-> 低代码的同时仍拥有高扩展性，旨在打造一款丰富、领先、且实用的开源库，助力开发者轻松编写出更好的黑盒测试程序，并推广普及。
+## 目录
 
-## 即刻开始
+- [简介](#简介)
+- [功能亮点](#功能亮点)
+- [速通模式](#速通模式)
+- [常用命令行参数](#常用命令行参数)
+- [外部通知](#外部通知)
+- [计划任务](#计划任务)
+- [热更新](#热更新)
+- [动态加载自定义动作/识别器](#动态加载自定义动作识别器)
+- [使用 GitHub Action 自动构建](#使用-github-action-自动构建)
+- [许可证](#许可证)
+- [致谢](#致谢)
 
-- [📄 快速开始](https://github.com/MaaXYZ/MaaFramework/blob/main/docs/zh_cn/1.1-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md)
-- [🎞️ 视频教程](https://www.bilibili.com/video/BV1yr421E7MW)
+## 简介
 
-## 如何开发
+MFW-ChainFlow Assistant 旨在为 MaaFramework 用户提供开箱即用的可视化运行器，覆盖配置管理、任务调度、通知联动以及自定义扩展，降低自动化流程的开发和运维成本。
 
-0. 使用右上角 `Use this template` - `Create a new repository` 来基于本模板创建您自己的项目。
+## 功能亮点
 
-1. 克隆本项目（地址请修改为您基于本模板创建的新项目地址）。
+- 完整支持 [interface v2 协议](https://github.com/MaaXYZ/MaaFramework/blob/main/docs/zh_cn/3.3-ProjectInterfaceV2%E5%8D%8F%E8%AE%AE.md)
+- 跨平台支持：Windows / Linux / macOS
+- 可带参数启动：指定配置 ID 与自动执行任务
+- 外部通知：钉钉、飞书、SMTP、WxPusher、企业微信机器人、Gotify
+- 内置计划任务：单次 / 每日 / 每周 / 每月，多策略执行
+- 动态加载自定义动作与识别器的同时支持Agent，适配个性化流程
+- 嵌入式 Agent：在 agent 字段中启用内置模式，自动转换为 custom 加载方式，使用 UI 内部环境，更小更轻盈
+- 速通模式：按日 / 周 / 月限制运行次数与最小间隔，避免重复执行
+- 热更新：资源仓库与本地 update_flag.txt 一致时自动启用，速度更快且无需重启
 
-    ```bash
-    git clone https://github.com/MaaXYZ/MaaPracticeBoilerplate.git
-    ```
+## 速通模式
 
-2. 下载 MaaFramework 的 [Release 包](https://github.com/MaaXYZ/MaaFramework/releases)，解压到 `deps` 文件夹中。
+- 在 `interface.json` 的任务节点下添加 `speedrun` 块定义周期与次数控制，并在 UI/CLI 打开 speedrun 模式后生效。
+- 支持 daily / weekly / monthly，配置运行次数与最小间隔，超限时自动跳过。
+- 详细字段与示例见 [docs/speedrun_mode.md](docs/speedrun_mode.md)。
 
-3. 下载 OCR（文字识别）资源文件 [ppocr_v5.zip](https://download.maafw.xyz/MaaCommonAssets/OCR/ppocr_v5/ppocr_v5-zh_cn.zip) 解压到 `assets/resource/model/ocr/` 目录下，确保路径如下：
+## 常用命令行参数
 
-    ```tree
-    assets/resource/model/ocr/
-    ├── det.onnx
-    ├── keys.txt
-    └── rec.onnx
-    ```
+- `-c <config_id>`：使用指定配置 ID 启动（可用于 `python main.py` 或打包后的 `MFW.exe`）
+- `-d`：启动后直接运行任务（同样适用于 `MFW.exe`）
+- `-dev` ：启用调试模式
 
-    _请注意，您不需要将 OCR 资源文件上传到您的代码仓库中。`.gitignore` 已经忽略了 `assets/resource/model/ocr/` 目录，且 GitHub workflow 在发布版本时会自动配置这些资源文件。_
+## 外部通知
 
-4. 进行开发工作，按您的业务需求修改 `assets` 中的资源文件，请参考 [MaaFramework 相关文档](https://github.com/MaaXYZ/MaaFramework/blob/main/docs/zh_cn/1.1-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md#%E8%B5%84%E6%BA%90%E5%87%86%E5%A4%87)。
+当前支持：钉钉、飞书、SMTP、WxPusher、企业微信机器人、Gotify，可按需在配置中启用。
 
-5. 完成开发后，上传您的代码并发布版本。
+## 计划任务
 
-    ```bash
-    # 配置 git 信息（仅第一次需要，后续不用再配置）
-    git config user.name "您的 GitHub 昵称"
-    git config user.email "您的 GitHub 邮箱"
-    
-    # 提交修改
-    git add .
-    git commit -m "XX 新功能"
-    git push origin HEAD -u
-    ```
+支持单次、每日、每周、每月的定时运行，可选择强制启动或按队列执行，列表中可直接启用/禁用或删除计划。
 
-6. 发布您的版本
+## 热更新
 
-    需要**先**修改仓库设置 `Settings` - `Actions` - `General` - `Read and write permissions` - `Save`
+当资源仓库中包含的 `update_flag.txt` 文件内容和本地的 `update_flag.txt` 内容不一致的时候，会启动热更新模式，速度更快并且无需重启。
 
-    ```bash
-    # CI 检测到 tag 会自动进行发版
-    git tag v1.0.0
-    git push origin v1.0.0
-    ```
+## 动态加载自定义动作/识别器
 
-7. 更多操作，请参考 [个性化配置](./docs/zh_cn/个性化配置.md)（可选）
+参考 MaaFramework 的[自定义动作/识别器说明](https://github.com/MaaXYZ/MaaFramework/blob/main/docs/zh_cn/1.1-%E5%BF%AB%E9%80%9F%E5%BC%80%E5%A7%8B.md#%E4%BD%BF%E7%94%A8-json-%E4%BD%8E%E4%BB%A3%E7%A0%81%E7%BC%96%E7%A8%8B%E4%BD%86%E5%AF%B9%E5%A4%8D%E6%9D%82%E4%BB%BB%E5%8A%A1%E4%BD%BF%E7%94%A8%E8%87%AA%E5%AE%9A%E4%B9%89%E9%80%BB%E8%BE%91)：
 
-## 生态共建
+1. 自定义动作/识别器需使用 Python 3.12。
+2. 若包含第三方库，请将依赖安装到 `_internal` 目录。
+3. 在 `custom.json` 中声明自定义对象，并在 `interface.json` 的 `custom` 键指出 `custom.json` 路径（`{custom_path}` 默认为仓库根目录下的 `custom/`）。
+4. Pipeline 中通过名字引用自定义动作/识别器。
 
-MAA 正计划建设为一类项目，而非舟的单一软件。
+示例 `custom.json` 片段：
 
-若您的项目依赖于 MaaFramework，我们欢迎您将它命名为 MaaXXX, MXA, MAX 等等。当然，这是许可而不是限制，您也可以自由选择其他与 MAA 无关的名字，完全取决于您自己的想法！
+```json
+{
+  "动作名字1": {
+    "file_path": "{custom_path}/任意位置/任意名字_动作1.py",
+    "class": "动作对象1",
+    "type": "action"
+  },
+  "识别器名字1": {
+    "file_path": "{custom_path}/任意位置/任意名字_识别器1.py",
+    "class": "识别器对象1",
+    "type": "recognition"
+  }
+}
+```
 
-同时，我们也非常欢迎您提出 PR，在 [社区项目列表](https://github.com/MaaXYZ/MaaFramework#%E7%A4%BE%E5%8C%BA%E9%A1%B9%E7%9B%AE) 中添加上您的项目！
+在 pipeline 中引用：
 
-## FAQ
+```json
+"我的自定义任务": {
+  "recognition": "Custom",
+  "custom_recognition": "识别器名字1",
+  "action": "Custom",
+  "custom_action": "动作名字1"
+}
+```
 
-### 0. 我是第一次使用 git，这是什么？视频演示中那个黑框框命令行哪来的？
+自定义类示例：
 
-黑框框是 git bash，几乎任何现代软件的开发都离不开 git，建议先参考 [菜鸟教程](https://www.runoob.com/git/git-install-setup.html) 或搜索一些视频，学习完 git 后再来进行后续开发工作。
+```python
+class 动作对象1(CustomAction):
+    def apply(self, context, ...):
+        image = context.tasker.controller.cached_image
+        # 在此处进行图像处理并返回结果
+```
 
-### 1. 我是第一次使用 Python，在命令行输入 `python ./configure.py` 或 `python -m pip install MaaFW` 之后没有反应？没有报错，也没有提示成功，什么都没有
+更多示例可参考仓库：[MAA_Punish/assets](https://github.com/overflow65537/MAA_Punish/tree/main/assets)。
 
-Win10 或者 Win11 系统自带了一份 "Python"，但它其实只是一个安装器，是没法用的。  
-你需要做的是关闭它或者删除它的环境变量，然后自己去 Python 官网下载并安装一份 Python。  
-[参考方法](https://www.bilibili.com/read/cv24692025/)
+### 嵌入式 Agent
 
-### 2. 使用 MaaDebugger 或 MaaPicli 时弹窗报错，应用程序错误：应用程序无法正常启动
+在 `interface.json` 的 `agent` 字段中设置 `embedded: true`，系统会自动将 agent 转换为 custom 加载方式。这种方式使用 UI 内部环境运行，无需独立进程，资源占用更小、启动更快。
 
-![缺少运行库](https://github.com/user-attachments/assets/942df84b-f47d-4bb5-98b5-ab5d44bc7c2a)
+示例 `interface.json` 片段：
 
-一般是电脑缺少某些运行库，请安装一下 [vc_redist](https://aka.ms/vs/17/release/vc_redist.x64.exe) 。
+```json
+{
+  "agent": {
+    "embedded": true,
+    "child_args": ["{PROJECT_DIR}/agent/main.py"]
+  }
+}
+```
 
-### 3. 我在这个仓库里提了 Issue 很久没人回复
+启用内置模式后，系统会自动：
 
-这里是《项目模板》仓库，它仅仅是一个模板，一般很少会修改，开发者也较少关注。  
-在此仓库请仅提问模板相关问题，其他问题最好前往对应的仓库提出，如果有 log，最好也带上它（`debug/maa.log` 文件）
+1. 复制 agent 入口目录
+2. 自动生成对应的 `custom.json` 配置
+3. 移除 `agent` 字段，改用 `custom` 字段加载
 
-- MaaFW 本身及 MaaPiCli 的问题：[MaaFramework/issues](https://github.com/MaaXYZ/MaaFramework/issues)
-- MaaDebugger 的问题：[MaaDebugger/issues](https://github.com/MaaXYZ/MaaDebugger/issues)
-- 不知道算是哪里的、其他疑问等：[讨论区](https://github.com/MaaXYZ/MaaFramework/discussions)
+## 使用 GitHub Action 自动构建
 
-### 4. OCR 文字识别一直没有识别结果，报错 "Failed to load det or rec", "ocrer_ is null"
+0. 注意:此方案只适用于使用maafw模板构建的项目
+1. 将 `deploy/install.yml` 中的 `MaaXXX` 替换为你的项目名。
+2. 提交并推送到 GitHub 仓库的 `.github/workflows` 目录。
+3. 推送新版本后，GitHub Action 会自动构建发布。
 
-**请仔细阅读文档**，你无视了前面步骤的报错。我不想解释了，请再把本文档仔细阅读一遍！
+## 自行打包
 
-## 鸣谢
+1. 根据自身需求下载对应系统和架构的项目资产
+2. 将`interface.json`,maafw资源等代码或者描述文件放入资产根目录(MFW执行方式同级)
+3. 运行
 
-本项目由 **[MaaFramework](https://github.com/MaaXYZ/MaaFramework)** 强力驱动！
+## 许可证
 
-感谢以下开发者对本项目作出的贡献（下面链接改成你自己的项目地址）:
+**MFW-PyQt6** 使用 **[GPL-3.0 许可证](./LICENSE)** 开源。
 
-[![Contributors](https://contrib.rocks/image?repo=MaaXYZ/MaaFramework&max=1000)](https://github.com/MaaXYZ/MaaFramework/graphs/contributors)
+## 致谢
+
+### 开源项目
+
+- [PyQt-Fluent-Widgets](https://github.com/zhiyiYo/PyQt-Fluent-Widgets)\
+    A fluent design widgets library based on C++ Qt/PyQt/PySide. Make Qt Great Again.
+- [MaaFramework](https://github.com/MaaAssistantArknights/MaaFramework)\
+    基于图像识别的自动化黑盒测试框架。
+- [MaaDebugger](https://github.com/MaaXYZ/MaaDebugger)\
+    基于 MaaFramework 的调试器，用于查看和分析 MaaFramework 运行时的状态。
+- [AutoMAA](https://github.com/DLmaster361/AUTO_MAA)\
+    明日方舟 MAA 插件，多账号管理与自动化工具。
+
+### 思路灵感
+
+- [MFAAvalonia](https://github.com/SweetSmellFox/MFAAvalonia)\
+    基于 Avalonia 的 MAAFramework 通用 GUI 项目 | A universal GUI project for MAAFramework based on Avalonia\
+  **MFW-ChainFlow Assistant 参考了 MFAAvalonia 的布局,但未使用其任何源代码。**
+
+- [MFWPH](https://github.com/TanyaShue/MFWPH)\
+    基于 MaaFramework 的 UI 启动器，可加载与管理多种自动化资源脚本\
+  **MFW-ChainFlow Assistant 参考了 MFWPH 的布局,但未使用其任何源代码。**
+
+### 其他支持
+
+- [MirrorChyan](https://github.com/MirrorChyan/docs)\
+    Mirror酱更新服务\
+  **MFW-ChainFlow Assistant 使用了 MirrorChyan 的更新服务。**
+
+### 开发者
+
+感谢所有为 **MFW-PyQt6** 做出贡献的开发者。
+
+<a href="https://github.com/overflow65537/PYQT-MAA/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=overflow65537/PYQT-MAA&max=1000" alt="Contributors to MFW-PyQt6"/>
+</a>

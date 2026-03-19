@@ -1,0 +1,15 @@
+numpy 
+qasync
+asyncify
+requests
+MaaFw == v5.8.1
+psutil
+PySide6-Fluent-Widgets
+keyboard
+wmi
+cryptography
+markdown
+chardet
+pyperclip
+pillow
+json-with-comments

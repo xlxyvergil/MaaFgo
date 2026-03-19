@@ -258,8 +258,17 @@ class NavigateChapterQuest(CustomAction):
     
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         params = json.loads(argv.custom_action_param) if argv.custom_action_param else {}
-        chapter = params.get("chapter", "")
-        quest = params.get("quest", "")
+        
+        # 获取章节值（可能有 children 子选项）
+        chapter_data = params.get("chapter", {})
+        if isinstance(chapter_data, dict):
+            chapter = chapter_data.get("value", "")
+            # 从 children 中获取关卡值
+            children = chapter_data.get("children", {})
+            quest = children.get(chapter, {}).get("value", "") if chapter else ""
+        else:
+            chapter = chapter_data
+            quest = ""
         
         if not chapter:
             print("章节参数为空")
