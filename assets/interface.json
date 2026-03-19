@@ -71,17 +71,38 @@
                 {
                     "name": "第一章",
                     "label": "第一章",
-                    "option": ["quest_chapter1"]
+                    "option": ["quest_chapter1"],
+                    "pipeline_override": {
+                        "Navigation": {
+                            "custom_action_param": {
+                                "chapter": "第一章"
+                            }
+                        }
+                    }
                 },
                 {
                     "name": "第二章",
                     "label": "第二章",
-                    "option": ["quest_chapter2"]
+                    "option": ["quest_chapter2"],
+                    "pipeline_override": {
+                        "Navigation": {
+                            "custom_action_param": {
+                                "chapter": "第二章"
+                            }
+                        }
+                    }
                 },
                 {
                     "name": "第三章",
                     "label": "第三章",
-                    "option": ["quest_chapter3"]
+                    "option": ["quest_chapter3"],
+                    "pipeline_override": {
+                        "Navigation": {
+                            "custom_action_param": {
+                                "chapter": "第三章"
+                            }
+                        }
+                    }
                 }
             ]
         },
@@ -89,27 +110,27 @@
             "type": "select",
             "label": "关卡",
             "cases": [
-                {"name": "第一节", "label": "第一节"},
-                {"name": "第二节", "label": "第二节"},
-                {"name": "第三节", "label": "第三节"}
+                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
+                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}},
+                {"name": "第三节", "label": "第三节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第三节"}}}}
             ]
         },
         "quest_chapter2": {
             "type": "select",
             "label": "关卡",
             "cases": [
-                {"name": "第一节", "label": "第一节"},
-                {"name": "第二节", "label": "第二节"}
+                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
+                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}}
             ]
         },
         "quest_chapter3": {
             "type": "select",
             "label": "关卡",
             "cases": [
-                {"name": "第一节", "label": "第一节"},
-                {"name": "第二节", "label": "第二节"},
-                {"name": "第三节", "label": "第三节"},
-                {"name": "第四节", "label": "第四节"}
+                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
+                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}},
+                {"name": "第三节", "label": "第三节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第三节"}}}},
+                {"name": "第四节", "label": "第四节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第四节"}}}}
             ]
         },
         "team_index": {

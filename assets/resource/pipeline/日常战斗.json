@@ -1,19 +1,12 @@
 {
   "主任务": {
-    "next": "导航章节关卡",
+    "next": "Navigation",
     "action": "DoNothing"
   },
-  "导航章节关卡": {
-    "action": {
-      "type": "Custom",
-      "param": {
-        "custom_action": "navigate_chapter_quest",
-        "custom_action_param": {
-          "chapter": "${chapter}",
-          "quest": "${quest}"
-        }
-      }
-    },
+  "Navigation": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "ExecuteNavigation",
     "next": "选择队伍"
   },
   "选择队伍": {

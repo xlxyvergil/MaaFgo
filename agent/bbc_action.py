@@ -252,56 +252,30 @@ class ExecuteBbcTask(CustomAction):
         time.sleep(1)
 
 
-@AgentServer.custom_action("navigate_chapter_quest")
-class NavigateChapterQuest(CustomAction):
-    """导航到指定章节和关卡"""
+@AgentServer.custom_action("ExecuteNavigation")
+class ExecuteNavigation(CustomAction):
+    """执行章节和关卡导航"""
     
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         params = json.loads(argv.custom_action_param) if argv.custom_action_param else {}
+        chapter = params.get("chapter", "")
+        stage = params.get("stage", "")
         
-        # 获取章节值（可能有 children 子选项）
-        chapter_data = params.get("chapter", {})
-        if isinstance(chapter_data, dict):
-            chapter = chapter_data.get("value", "")
-            # 从 children 中获取关卡值
-            children = chapter_data.get("children", {})
-            quest = children.get(chapter, {}).get("value", "") if chapter else ""
-        else:
-            chapter = chapter_data
-            quest = ""
-        
-        if not chapter:
-            print("章节参数为空")
+        # 1. 先执行章节导航
+        chapter_result = context.run_task(chapter)
+        if not chapter_result:
+            print(f"章节导航失败: {chapter}")
             return CustomAction.RunResult(success=False)
+        print(f"章节导航完成: {chapter}")
         
-        try:
-            # 1. 先执行章节导航（直接使用章节名）
-            chapter_detail = context.run_task(chapter)
-            
-            if not chapter_detail:
-                print(f"章节导航失败: {chapter}")
-                return CustomAction.RunResult(success=False)
-            
-            print(f"章节导航完成: {chapter}")
-            
-            # 2. 再执行关卡导航（如果提供了关卡，直接使用关卡名）
-            if quest:
-                quest_detail = context.run_task(quest)
-                
-                if not quest_detail:
-                    print(f"关卡导航失败: {quest}")
-                    return CustomAction.RunResult(success=False)
-                
-                print(f"关卡导航完成: {quest}")
-                print(f"已执行导航: {chapter} - {quest}")
-            else:
-                print(f"已执行章节导航: {chapter}（无关卡）")
-            
-            return CustomAction.RunResult(success=True)
-            
-        except Exception as e:
-            print(f"执行导航失败: {e}")
+        # 2. 再执行关卡导航
+        stage_result = context.run_task(stage)
+        if not stage_result:
+            print(f"关卡导航失败: {stage}")
             return CustomAction.RunResult(success=False)
+        print(f"关卡导航完成: {stage}")
+        
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("select_team_action")
