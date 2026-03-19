@@ -1,0 +1,28 @@
+{
+  "file": {
+    "exclude": [
+      "node_modules",
+      ".git",
+      "dist",
+      "build"
+    ],
+    "extensions": [
+      ".json",
+      ".jsonc"
+    ]
+  },
+  "log": {
+    "dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\logs",
+    "level": "INFO",
+    "push_to_client": true
+  },
+  "maafw": {
+    "enabled": true,
+    "lib_dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\resources\\maafw\\bin",
+    "resource_dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\resources\\resource"
+  },
+  "server": {
+    "host": "localhost",
+    "port": 9066
+  }
+}

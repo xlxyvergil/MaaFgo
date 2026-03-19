@@ -1,0 +1,13 @@
+{
+  "name": "chapter_第一章_quest_第一节_navigation",
+  "tasks": [
+    {
+      "name": "导航到第一章第一节",
+      "type": "Click",
+      "params": {
+        "x": 600,
+        "y": 400
+      }
+    }
+  ]
+}

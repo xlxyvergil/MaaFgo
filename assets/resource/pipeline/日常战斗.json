@@ -1,0 +1,71 @@
+{
+  "主任务": {
+    "next": "导航章节关卡",
+    "action": "DoNothing"
+  },
+  "导航章节关卡": {
+    "action": {
+      "type": "Custom",
+      "param": {
+        "custom_action": "navigate_chapter_quest",
+        "custom_action_param": {
+          "chapter": "${chapter}",
+          "quest": "${quest}"
+        }
+      }
+    },
+    "next": "选择队伍"
+  },
+  "选择队伍": {
+    "action": {
+      "type": "Custom",
+      "param": {
+        "custom_action": "select_team_action",
+        "custom_action_param": {
+          "team_index": "${team_index}"
+        }
+      }
+    },
+    "next": "启动BBC"
+  },
+  "启动BBC": {
+    "recognition": {
+      "type": "DirectHit",
+      "param": {
+        "roi": [0, 0, 0, 0]
+      }
+    },
+    "action": {
+      "type": "Custom",
+      "param": {
+        "custom_action": "execute_bbc_task",
+        "custom_action_param": {
+          "bbc_team_config": "${bbc_team_config}",
+          "bbc_run_count": "${bbc_run_count}",
+          "apple_type": "${apple_type}",
+          "autoBG": "${autoBG}",
+          "effect": "${effect}",
+          "showAssistSettingBeforeStart": "${showAssistSettingBeforeStart}",
+          "autoConnect": "${autoConnect}",
+          "capMethod": "${capMethod}",
+          "adbori": "${adbori}",
+          "adbtouch": "${adbtouch}",
+          "maxtouch": "${maxtouch}"
+        }
+      }
+    },
+    "next": "BBC成功",
+    "on_error": "BBC失败"
+  },
+  "BBC成功": {
+    "action": "DoNothing",
+    "next": "完成"
+  },
+  "BBC失败": {
+    "action": "DoNothing",
+    "next": "完成"
+  },
+  "完成": {
+    "action": "DoNothing"
+  }
+}

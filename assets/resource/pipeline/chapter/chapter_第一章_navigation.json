@@ -1,0 +1,13 @@
+{
+  "name": "chapter_第一章_navigation",
+  "tasks": [
+    {
+      "name": "导航到第一章",
+      "type": "Click",
+      "params": {
+        "x": 500,
+        "y": 300
+      }
+    }
+  ]
+}

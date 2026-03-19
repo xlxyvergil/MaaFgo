@@ -1,38 +1,27 @@
 {
-    // 本文件主要定义了通用 UI 的行为和显示内容
-    // 可参考文档和示例添加更多您需要的功能
-    // 文档：https://maafw.xyz/docs/3.3-ProjectInterfaceV2
-    // 示例：https://github.com/MaaXYZ/MaaFramework/blob/main/sample/interface.json
     "interface_version": 2,
-    "name": "MaaXXX",
-    "description": "这是一个使用 MaaFramework 创建的新项目。",
+    "name": "MaaFgo",
+    "description": "FGO自动战斗工具",
     "contact": "QQ群: 123456789",
     "license": "MIT",
-    "welcome": "首次使用！欢迎使用 MAA!",
-    // 填写项目地址和版本号可实现自动更新功能
+    "welcome": "首次使用！欢迎使用 MaaFgo!",
     "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
     "version": "1.0.0",
-    // Mirror酱为第三方分发服务，新项目默认关闭
-    // 若有需要请联系 Mirror酱 开通，直接自行开启是无法使用的
-    // "mirrorchyan_rid": "MaaXXX",
-    // "mirrorchyan_multiplatform": true,
     "controller": [
         {
-            "name": "安卓端",
+            "name": "安卓设备",
             "type": "Adb",
-            "display_short_side": 720 // 默认缩放分辨率的短边长度
+            "display_short_side": 720
         },
         {
-            "name": "桌面端",
+            "name": "BBC窗口",
             "type": "Win32",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "Visual Studio",
-                // 截图及控制方式，请根据项目实际情况修改
-                // 文档: https://maafw.xyz/docs/2.4-ControlMethods
-                "screencap": "PrintWindow", // 截图方式
-                "mouse": "PostMessageWithCursorPos", // 鼠标控制方式
-                "keyboard": "PostMessageWithCursorPos" // 键盘控制方式
+                "window_regex": "BBchannel",
+                "screencap": "PrintWindow",
+                "mouse": "PostMessageWithCursorPos",
+                "keyboard": "PostMessageWithCursorPos"
             }
         }
     ],
@@ -42,68 +31,183 @@
             "path": [
                 "./resource"
             ]
-        },
-        {
-            "name": "B 服",
-            "path": [
-                "./resource",
-                "./resource_bilibili"
-            ]
         }
     ],
-    // 可选的 agent 示例
-    // "agent": {
-    //     "child_exec": "python",
-    //     "child_args": [
-    //         "./agent/main.py"
-    //     ]
-    // },
+    "agent": {
+        "child_exec": "python",
+        "child_args": [
+            "./agent/main.py"
+        ]
+    },
     "task": [
         {
-            "name": "普通任务",
-            "entry": "MyTask1"
-        },
-        {
-            "name": "选项任务",
-            "entry": "MyTask2",
+            "name": "日常战斗",
+            "entry": "日常战斗",
             "option": [
-                "任务选项1"
+                "chapter",
+                "quest",
+                "team_index",
+                "bbc_team_config",
+                "bbc_run_count",
+                "apple_type",
+                "autoBG",
+                "effect",
+                "showAssistSettingBeforeStart",
+                "autoConnect",
+                "capMethod",
+                "adbori",
+                "adbtouch",
+                "maxtouch"
             ]
-        },
-        {
-            "name": "参数任务",
-            "entry": "MyTask3",
-            "option": [
-                "任务选项1"
-            ],
-            "pipeline_override": {}
-        },
-        {
-            "name": "带Custom的任务",
-            "entry": "MyTask4"
         }
     ],
     "option": {
-        "任务选项1": {
+        "chapter": {
             "type": "select",
+            "label": "章节",
             "cases": [
                 {
-                    "name": "文本1",
-                    "pipeline_override": {
-                        "OcrTask": {
-                            "text": "文本1"
-                        }
-                    }
+                    "name": "第一章",
+                    "label": "第一章"
                 },
                 {
-                    "name": "文本2",
-                    "pipeline_override": {
-                        "OcrTask": {
-                            "text": "文本2"
-                        }
-                    }
+                    "name": "第二章",
+                    "label": "第二章"
+                },
+                {
+                    "name": "第三章",
+                    "label": "第三章"
                 }
             ]
+        },
+        "team_index": {
+            "type": "select",
+            "label": "队伍编号",
+            "cases": [
+                {"name": "1", "label": "队伍1"},
+                {"name": "2", "label": "队伍2"},
+                {"name": "3", "label": "队伍3"},
+                {"name": "4", "label": "队伍4"},
+                {"name": "5", "label": "队伍5"},
+                {"name": "6", "label": "队伍6"},
+                {"name": "7", "label": "队伍7"},
+                {"name": "8", "label": "队伍8"},
+                {"name": "9", "label": "队伍9"},
+                {"name": "10", "label": "队伍10"},
+                {"name": "11", "label": "队伍11"},
+                {"name": "12", "label": "队伍12"},
+                {"name": "13", "label": "队伍13"},
+                {"name": "14", "label": "队伍14"},
+                {"name": "15", "label": "队伍15"}
+            ],
+            "default": "1"
+        },
+        "quest": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "第一节",
+                    "label": "第一节"
+                },
+                {
+                    "name": "第二节",
+                    "label": "第二节"
+                },
+                {
+                    "name": "第三节",
+                    "label": "第三节"
+                }
+            ]
+        },
+        "bbc_team_config": {
+            "type": "input",
+            "label": "BBC队伍配置文件名称",
+            "default": "default"
+        },
+        "bbc_run_count": {
+            "type": "input",
+            "label": "运行次数",
+            "default": "1"
+        },
+        "apple_type": {
+            "type": "select",
+            "label": "苹果类型",
+            "cases": [
+                {
+                    "name": "copper",
+                    "label": "铜苹果"
+                },
+                {
+                    "name": "silver",
+                    "label": "银苹果"
+                },
+                {
+                    "name": "gold",
+                    "label": "金苹果"
+                },
+                {
+                    "name": "blue",
+                    "label": "蓝苹果"
+                },
+                {
+                    "name": "colorful",
+                    "label": "彩苹果"
+                }
+            ]
+        },
+        "autoBG": {
+            "type": "switch",
+            "label": "自动轮换背景",
+            "default": true
+        },
+        "effect": {
+            "type": "switch",
+            "label": "动态效果",
+            "default": false
+        },
+        "showAssistSettingBeforeStart": {
+            "type": "switch",
+            "label": "开始前显示助战设置",
+            "default": false
+        },
+        "autoConnect": {
+            "type": "switch",
+            "label": "自动连接",
+            "default": false
+        },
+        "capMethod": {
+            "type": "select",
+            "label": "截屏方式",
+            "cases": [
+                {
+                    "name": "Javacap",
+                    "label": "Javacap"
+                },
+                {
+                    "name": "Minicap",
+                    "label": "Minicap"
+                },
+                {
+                    "name": "Adbcap",
+                    "label": "Adbcap"
+                }
+            ]
+        },
+        "adbori": {
+            "type": "switch",
+            "label": "使用ADB方向",
+            "default": false
+        },
+        "adbtouch": {
+            "type": "switch",
+            "label": "使用ADB触摸",
+            "default": false
+        },
+        "maxtouch": {
+            "type": "switch",
+            "label": "使用MAX触摸",
+            "default": false
         }
     }
 }
