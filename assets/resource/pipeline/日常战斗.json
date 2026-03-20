@@ -1,52 +1,69 @@
 {
   "主任务": {
-    "next": "Navigation",
+    "next": "回主界面",
     "action": "DoNothing"
   },
-  "Navigation": {
+  "回主界面": {
+    "next": "队伍选择",
+    "action": "DoNothing"
+  },
+  "队伍选择": {
+    "next": "章节导航",
+    "action": "DoNothing"
+  },
+  "章节导航": {
+    "next": "关卡导航",
+    "action": "DoNothing"
+  },
+  "关卡导航": {
+    "next": "队伍配置",
+    "action": "DoNothing"
+  },
+  "队伍配置": {
     "recognition": "DirectHit",
     "action": "Custom",
-    "custom_action": "ExecuteNavigation",
-    "next": "选择队伍"
+    "custom_action": "setup_bbc_config",
+    "custom_action_param": "",
+    "next": "设置运行次数",
+    "on_error": "BBC失败"
   },
-  "选择队伍": {
-    "action": {
-      "type": "Custom",
-      "param": {
-        "custom_action": "select_team_action",
-        "custom_action_param": {
-          "team_index": "${team_index}"
-        }
-      }
-    },
-    "next": "启动BBC"
+  "设置运行次数": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "set_bbc_run_count",
+    "custom_action_param": "",
+    "next": "设置苹果类型",
+    "on_error": "BBC失败"
   },
-  "启动BBC": {
-    "recognition": {
-      "type": "DirectHit",
-      "param": {
-        "roi": [0, 0, 0, 0]
-      }
-    },
-    "action": {
-      "type": "Custom",
-      "param": {
-        "custom_action": "execute_bbc_task",
-        "custom_action_param": {
-          "bbc_team_config": "${bbc_team_config}",
-          "bbc_run_count": "${bbc_run_count}",
-          "apple_type": "${apple_type}",
-          "autoBG": "${autoBG}",
-          "effect": "${effect}",
-          "showAssistSettingBeforeStart": "${showAssistSettingBeforeStart}",
-          "autoConnect": "${autoConnect}",
-          "capMethod": "${capMethod}",
-          "adbori": "${adbori}",
-          "adbtouch": "${adbtouch}",
-          "maxtouch": "${maxtouch}"
-        }
-      }
-    },
+  "设置苹果类型": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "set_apple_type",
+    "custom_action_param": "",
+    "next": "启动BBC进程",
+    "on_error": "BBC失败"
+  },
+  "启动BBC进程": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "start_bbc_process",
+    "custom_action_param": "",
+    "next": "执行BBC初始化",
+    "on_error": "BBC失败"
+  },
+  "执行BBC初始化": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "execute_bbc_init",
+    "custom_action_param": "",
+    "next": "检测BBC完成",
+    "on_error": "BBC失败"
+  },
+  "检测BBC完成": {
+    "recognition": "DirectHit",
+    "action": "Custom",
+    "custom_action": "monitor_bbc_completion",
+    "custom_action_param": "",
     "next": "BBC成功",
     "on_error": "BBC失败"
   },

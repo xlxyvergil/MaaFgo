@@ -1,19 +1,4 @@
 {
-    "$__mpe_config_lgoin": {
-        "$__mpe_code": {
-            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\login.json",
-            "filename": "lgoin",
-            "isModifiedExternally": false,
-            "lastSyncTime": 1773660607231,
-            "prefix": "",
-            "savedViewport": {
-                "x": 1033,
-                "y": 171,
-                "zoom": 0.86
-            },
-            "version": "v1.3.0_beta_4"
-        }
-    },
     "关闭公告": {
         "$__mpe_code": {
             "position": {
@@ -90,19 +75,8 @@
     "登录识别": {
         "$__mpe_code": {
             "position": {
-                "x": -581,
-                "y": 274
-            }
-        },
-        "next": [
-            "阶段判断循环"
-        ]
-    },
-    "等待并重新判断": {
-        "$__mpe_code": {
-            "position": {
-                "x": 285,
-                "y": 870
+                "x": -504,
+                "y": 288
             }
         },
         "next": [
@@ -120,7 +94,7 @@
             "开始游戏",
             "登录",
             "关闭公告",
-            "等待并重新判断"
+            "[JumpBack]关闭公告"
         ]
     }
 }

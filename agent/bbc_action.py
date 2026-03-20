@@ -13,26 +13,67 @@ from maa.toolkit import Toolkit
 from maa.define import MaaWin32ScreencapMethodEnum, MaaWin32InputMethodEnum
 
 
-@AgentServer.custom_action("execute_bbc_task")
-class ExecuteBbcTask(CustomAction):
-    """执行BBC任务"""
+def _parse_single_param(argv: CustomAction.RunArg) -> str:
+    """解析单个参数值，去掉可能的引号"""
+    param = argv.custom_action_param if argv.custom_action_param else ""
+    param = param.strip()
+    while (param.startswith('"') and param.endswith('"')) or (param.startswith("'") and param.endswith("'")):
+        param = param[1:-1]
+    return param
+
+
+# 全局变量存储BBC窗口句柄和控制器
+_bbc_hwnd = None
+_bbc_controller = None
+
+# 固定BBC路径
+BBC_PATH = "./BBC/BBchannel"
+
+
+def _get_scripts_settings_path() -> str:
+    return os.path.join(BBC_PATH, 'scripts_settings.json')
+
+
+def _load_scripts_settings() -> dict:
+    path = _get_scripts_settings_path()
+    if os.path.exists(path):
+        with open(path, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+
+def _save_scripts_settings(settings: dict) -> None:
+    path = _get_scripts_settings_path()
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(settings, f, ensure_ascii=False, indent=2)
+
+
+# ==================== Action 1: 设置BBC配置 ====================
+@AgentServer.custom_action("setup_bbc_config")
+class SetupBbcConfig(CustomAction):
+    """设置BBC队伍配置 - 处理 bbc_team_config"""
     
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        # 获取参数 - 修正参数获取方式
-        params = json.loads(argv.custom_action_param) if argv.custom_action_param else {}
-        bbc_team_config = params.get("bbc_team_config", "default")
-        bbc_run_count = int(params.get("bbc_run_count", 1))
-        apple_type = params.get("apple_type", "copper")
+        print(f"[1/6] SetupBbcConfig: custom_action_param = {repr(argv.custom_action_param)}")
         
-        # 固定BBC路径
-        bbc_path = "./BBC/BBchannel"
+        bbc_team_config = _parse_single_param(argv)
         
-        # 构建配置文件路径
-        settings_dir = os.path.join(bbc_path, 'settings')
-        scripts_settings_path = os.path.join(bbc_path, 'scripts_settings.json')
+        if not bbc_team_config:
+            print("错误：未提供队伍配置文件路径")
+            return CustomAction.RunResult(success=False)
         
-        # 1. 读取队伍配置
-        team_config_path = os.path.join(settings_dir, f"{bbc_team_config}.json")
+        print(f"SetupBbcConfig: team_config={bbc_team_config}")
+        
+        settings_dir = os.path.join(BBC_PATH, 'settings')
+        
+        # 读取队伍配置
+        if os.path.isabs(bbc_team_config) or bbc_team_config.startswith('./') or bbc_team_config.startswith('../'):
+            team_config_path = bbc_team_config
+            if not team_config_path.endswith('.json'):
+                team_config_path += '.json'
+        else:
+            team_config_path = os.path.join(settings_dir, f"{bbc_team_config}.json")
+        
         if not os.path.exists(team_config_path):
             print(f"队伍配置文件不存在: {team_config_path}")
             return CustomAction.RunResult(success=False)
@@ -40,184 +81,208 @@ class ExecuteBbcTask(CustomAction):
         with open(team_config_path, 'r', encoding='utf-8') as f:
             team_config = json.load(f)
         
-        # 2. 读取当前scripts_settings
-        scripts_settings = {}
+        # 保存连接设置
         connect_settings = {}
+        scripts_settings = _load_scripts_settings()
+        for key in ["connectMode", "snapshotDevice", "operateDevice"]:
+            if key in scripts_settings:
+                connect_settings[key] = scripts_settings[key]
         
-        if os.path.exists(scripts_settings_path):
-            with open(scripts_settings_path, 'r', encoding='utf-8') as f:
-                scripts_settings = json.load(f)
-            
-            # 3. 保存连接设置（BBC的逻辑）
-            for key in ["connectMode", "snapshotDevice", "operateDevice"]:
-                if key in scripts_settings:
-                    connect_settings[key] = scripts_settings[key]
-        
-        # 4. 完全替换配置（BBC的逻辑）
+        # 替换配置并恢复连接设置
         scripts_settings = team_config
-        
-        # 5. 恢复连接设置
         scripts_settings.update(connect_settings)
         
-        # 6. 更新其他参数
-        if "bbc_run_count" in params:
-            scripts_settings["bbc_run_count"] = params["bbc_run_count"]
-        if "apple_type" in params:
-            scripts_settings["apple_type"] = params["apple_type"]
+        _save_scripts_settings(scripts_settings)
+        print(f"SetupBbcConfig: 配置已保存")
+        return CustomAction.RunResult(success=True)
+
+
+# ==================== Action 2: 设置运行次数 ====================
+@AgentServer.custom_action("set_bbc_run_count")
+class SetBbcRunCount(CustomAction):
+    """设置BBC运行次数 - 处理 bbc_run_count"""
+    
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        print(f"[2/6] SetBbcRunCount: custom_action_param = {repr(argv.custom_action_param)}")
         
-        # 7. 保存scripts_settings
-        with open(scripts_settings_path, 'w', encoding='utf-8') as f:
-            json.dump(scripts_settings, f, ensure_ascii=False, indent=2)
+        bbc_run_count_str = _parse_single_param(argv) or "1"
         
-        # 8. 更新UIsettings
-        uisettings_path = os.path.join(bbc_path, 'UIsettings.json')
-        uisettings = {}
+        try:
+            bbc_run_count = int(bbc_run_count_str)
+        except ValueError:
+            bbc_run_count = 1
         
-        if os.path.exists(uisettings_path):
-            with open(uisettings_path, 'r', encoding='utf-8') as f:
-                uisettings = json.load(f)
+        print(f"SetBbcRunCount: count={bbc_run_count}")
         
-        # 更新UI设置
-        ui_settings = [
-            "autoBG", "effect", "showAssistSettingBeforeStart", "autoConnect",
-            "capMethod", "adbori", "adbtouch", "maxtouch"
-        ]
+        scripts_settings = _load_scripts_settings()
+        scripts_settings["bbc_run_count"] = bbc_run_count
+        _save_scripts_settings(scripts_settings)
         
-        for setting in ui_settings:
-            if setting in params:
-                uisettings[setting] = params[setting]
+        print(f"SetBbcRunCount: 运行次数已设置")
+        return CustomAction.RunResult(success=True)
+
+
+# ==================== Action 3: 设置苹果类型 ====================
+@AgentServer.custom_action("set_apple_type")
+class SetAppleType(CustomAction):
+    """设置BBC苹果类型 - 处理 apple_type"""
+    
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        print(f"[3/6] SetAppleType: custom_action_param = {repr(argv.custom_action_param)}")
         
-        # 保存UIsettings
-        with open(uisettings_path, 'w', encoding='utf-8') as f:
-            json.dump(uisettings, f, ensure_ascii=False, indent=2)
+        apple_type = _parse_single_param(argv) or "copper"
         
-        # 9. 启动BBC
-        bbc_exe_path = os.path.join(bbc_path, 'dist', 'BBchannel64', 'BBchannel.exe')
+        print(f"SetAppleType: apple_type={apple_type}")
+        
+        scripts_settings = _load_scripts_settings()
+        scripts_settings["apple_type"] = apple_type
+        _save_scripts_settings(scripts_settings)
+        
+        print(f"SetAppleType: 苹果类型已设置")
+        return CustomAction.RunResult(success=True)
+
+
+# ==================== Action 4: 启动BBC进程 ====================
+@AgentServer.custom_action("start_bbc_process")
+class StartBbcProcess(CustomAction):
+    """启动BBC进程 - 无参数"""
+    
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        global _bbc_hwnd
+        
+        print(f"[4/6] StartBbcProcess: 启动BBC进程")
+        
+        bbc_exe_path = os.path.join(BBC_PATH, 'dist', 'BBchannel64', 'BBchannel.exe')
         if os.path.exists(bbc_exe_path):
             os.startfile(bbc_exe_path)
         else:
             print(f"BBC可执行文件不存在: {bbc_exe_path}")
             return CustomAction.RunResult(success=False)
         
-        # 10. 等待BBC窗口加载
+        print("等待BBC窗口加载...")
         time.sleep(3)
         
-        # 11. 创建Win32控制器连接BBC窗口 - 修正创建方式
         windows = Toolkit.find_desktop_windows()
-        bbc_hwnd = None
+        _bbc_hwnd = None
         for w in windows:
             if "BBchannel" in w.window_name:
-                bbc_hwnd = w.hwnd
+                _bbc_hwnd = w.hwnd
                 break
         
-        if not bbc_hwnd:
+        if not _bbc_hwnd:
             print("未找到BBC窗口")
             return CustomAction.RunResult(success=False)
         
-        win32_controller = Win32Controller(
-            hwnd=bbc_hwnd,
+        print(f"StartBbcProcess: BBC窗口已找到，hwnd={_bbc_hwnd}")
+        return CustomAction.RunResult(success=True)
+
+
+# ==================== Action 5: 执行BBC初始化 ====================
+@AgentServer.custom_action("execute_bbc_init")
+class ExecuteBbcInit(CustomAction):
+    """执行BBC初始化Pipeline - 无参数"""
+    
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        global _bbc_hwnd, _bbc_controller
+        
+        print(f"[5/6] ExecuteBbcInit: 连接BBC并执行初始化")
+        
+        if not _bbc_hwnd:
+            print("错误：BBC窗口句柄未设置")
+            return CustomAction.RunResult(success=False)
+        
+        _bbc_controller = Win32Controller(
+            hwnd=_bbc_hwnd,
             screencap_method=MaaWin32ScreencapMethodEnum.PrintWindow,
             mouse_method=MaaWin32InputMethodEnum.PostMessage,
             keyboard_method=MaaWin32InputMethodEnum.PostMessage,
         )
         
-        connected = win32_controller.post_connection().wait().succeeded
+        connected = _bbc_controller.post_connection().wait().succeeded
         if not connected:
             print("连接BBC窗口失败")
             return CustomAction.RunResult(success=False)
         
-        # 12. 执行BBC配置Pipeline - 使用 context.run_task 同步执行
-        # 该Pipeline用于连接模拟器、使用苹果、输入执行次数等操作
-        pipeline_args = {
-            "apple_type": apple_type,
-            "bbc_run_count": bbc_run_count,
-            "bbc_team_config": bbc_team_config
-        }
+        print("ExecuteBbcInit: 已连接到BBC窗口")
         
         try:
-            # 使用 context.run_task 同步执行，会阻塞直到完成
-            task_detail = context.run_task("bbc_config", pipeline_args)
+            task_detail = context.run_task("bbc_config")
             if not task_detail:
                 print("bbc_config pipeline 执行失败")
-                win32_controller.post_inactive().wait()
                 return CustomAction.RunResult(success=False)
         except Exception as e:
             print(f"执行 pipeline 失败: {e}")
-            win32_controller.post_inactive().wait()
             return CustomAction.RunResult(success=False)
         
-        # 13. 等待BBC执行完成
-        success = self._wait_for_bbc_completion(bbc_run_count)
-        
-        # 14. 清理资源
-        win32_controller.post_inactive().wait()
-        
-        return CustomAction.RunResult(success=success)
+        print("ExecuteBbcInit: 初始化完成")
+        return CustomAction.RunResult(success=True)
 
-    def _wait_for_bbc_completion(self, _expected_runs):
-        """等待BBC执行完成"""
-        # 无限等待直到出现弹窗
+
+# ==================== Action 6: 检测BBC完成 ====================
+@AgentServer.custom_action("monitor_bbc_completion")
+class MonitorBbcCompletion(CustomAction):
+    """检测BBC执行完成 - 无参数"""
+    
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        global _bbc_controller
+        
+        print(f"[6/6] MonitorBbcCompletion: 检测BBC执行完成")
+        
+        success = self._wait_for_bbc_completion()
+        
+        if _bbc_controller:
+            _bbc_controller.post_inactive().wait()
+        
+        print(f"MonitorBbcCompletion: 任务{'成功' if success else '失败'}")
+        return CustomAction.RunResult(success=success)
+    
+    def _wait_for_bbc_completion(self):
+        print("等待BBC执行完成...")
         while True:
-            # 检查是否出现消息框（弹窗）
             popup_hwnd = self._find_bbc_popup()
             if popup_hwnd:
                 print("检测到BBC弹窗")
-                # 捕获弹窗内容
                 popup_text = self._get_window_text(popup_hwnd)
                 print(f"弹窗内容: {popup_text}")
                 
-                # 对弹窗进行截图
                 screenshot_path = os.path.join(os.path.dirname(__file__), "..", "logs", "bbc_popup.png")
                 os.makedirs(os.path.dirname(screenshot_path), exist_ok=True)
                 self._screenshot_window(popup_hwnd, screenshot_path)
                 print(f"弹窗截图已保存至: {screenshot_path}")
                 
-                # 关闭BBC进程
                 self._click_popup_ok(popup_hwnd)
                 print("已关闭BBC进程")
-                
-                # 只要出现弹窗，就认为BBC任务已结束
                 return True
             
-            time.sleep(5)  # 每5秒检查一次
-
+            time.sleep(5)
+    
     def _find_bbc_popup(self):
-        """查找BBC的消息弹窗"""
         def callback(_hwnd, extra):
             if win32gui.IsWindowVisible(_hwnd):
                 window_title = win32gui.GetWindowText(_hwnd)
-                # BBC的所有可能弹窗标题
                 if window_title in ["脚本停止！", "自动关机中！", "助战排序不符合", "队伍配置错误！", "正在结束任务！", "其他任务运行中"]:
                     extra.append(_hwnd)
         
         popups = []
         win32gui.EnumWindows(callback, popups)
         return popups[0] if popups else None
-
+    
     def _get_window_text(self, hwnd):
-        """获取窗口文本内容"""
         return win32gui.GetWindowText(hwnd)
-
+    
     def _screenshot_window(self, hwnd, save_path):
-        """对指定窗口进行截图"""
-        # 获取窗口矩形
         left, top, right, bottom = win32gui.GetWindowRect(hwnd)
         width = right - left
         height = bottom - top
         
-        # 创建DC
         hwndDC = win32gui.GetWindowDC(hwnd)
-        mfcDC = win32gui.CreateCompatibleDC(hwndDC)
         saveDC = win32gui.CreateCompatibleDC(hwndDC)
         
-        # 创建位图
         saveBitMap = win32gui.CreateCompatibleBitmap(hwndDC, width, height)
         win32gui.SelectObject(saveDC, saveBitMap)
         
-        # 复制窗口内容到位图
         win32gui.BitBlt(saveDC, 0, 0, width, height, hwndDC, 0, 0, win32con.SRCCOPY)
         
-        # 保存位图
         from PIL import Image
         bmpinfo = saveBitMap.GetInfo()
         bmpstr = saveBitMap.GetBitmapBits(True)
@@ -232,65 +297,30 @@ class ExecuteBbcTask(CustomAction):
         )
         im.save(save_path)
         
-        # 清理资源
         win32gui.DeleteObject(saveBitMap.GetHandle())
-        win32gui.DeleteDC(mfcDC)
         win32gui.DeleteDC(saveDC)
         win32gui.ReleaseDC(hwnd, hwndDC)
-
+    
     def _click_popup_ok(self, hwnd):
-        """关闭BBC进程"""
-        # 使用taskkill命令关闭BBC进程
         try:
-            # 终止所有名为BBchannel.exe的进程
             subprocess.run(['taskkill', '/f', '/im', 'BBchannel.exe'], check=False, capture_output=True)
             print("已关闭BBC进程")
         except Exception as e:
             print(f"关闭BBC进程时出错: {e}")
-        
-        # 等待进程关闭
         time.sleep(1)
 
 
-@AgentServer.custom_action("ExecuteNavigation")
-class ExecuteNavigation(CustomAction):
-    """执行章节和关卡导航"""
-    
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        params = json.loads(argv.custom_action_param) if argv.custom_action_param else {}
-        chapter = params.get("chapter", "")
-        stage = params.get("stage", "")
-        
-        # 1. 先执行章节导航
-        chapter_result = context.run_task(chapter)
-        if not chapter_result:
-            print(f"章节导航失败: {chapter}")
-            return CustomAction.RunResult(success=False)
-        print(f"章节导航完成: {chapter}")
-        
-        # 2. 再执行关卡导航
-        stage_result = context.run_task(stage)
-        if not stage_result:
-            print(f"关卡导航失败: {stage}")
-            return CustomAction.RunResult(success=False)
-        print(f"关卡导航完成: {stage}")
-        
-        return CustomAction.RunResult(success=True)
-
-
+# ==================== 其他 Action ====================
 @AgentServer.custom_action("select_team_action")
 class SelectTeamAction(CustomAction):
     """选择队伍"""
     
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        # 获取参数
         params = json.loads(argv.custom_action_param) if argv.custom_action_param else {}
         team_index = params.get("team_index", "1")
         
-        # 构建队伍选择Pipeline名称
         pipeline_name = f"team_{team_index}"
         
-        # 执行队伍选择Pipeline - 使用 context.run_task 同步执行
         try:
             task_detail = context.run_task(pipeline_name)
             if task_detail:

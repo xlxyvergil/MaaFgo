@@ -925,9 +925,11 @@ class TaskService:
             get_pipeline_override_from_task_option,
         )
 
+        logger.debug(f"任务 {task_id} 的 task_option: {task.task_option}")
         option_pipeline_override = get_pipeline_override_from_task_option(
             self.interface, task.task_option, task.item_id
         )
+        logger.debug(f"任务 {task_id} 的 option_pipeline_override: {option_pipeline_override}")
 
         # 深度合并：任务级 pipeline_override + 选项级 pipeline_override
         merged_override = {}

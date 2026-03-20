@@ -4,6 +4,7 @@ from maa.agent.agent_server import AgentServer
 from maa.toolkit import Toolkit
 
 import bbc_action
+from navigation_action import ExecuteNavigation
 
 def main():
     Toolkit.init_option("./")
@@ -16,6 +17,9 @@ def main():
     socket_id = sys.argv[-1]
 
     AgentServer.start_up(socket_id)
+    
+    # 注册导航Action
+    AgentServer.register_custom_action("ExecuteNavigation", ExecuteNavigation())
     
     AgentServer.join()
     AgentServer.shut_down()

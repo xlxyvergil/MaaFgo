@@ -7,6 +7,9 @@
     "welcome": "首次使用！欢迎使用 MaaFgo!",
     "github": "https://github.com/MaaXYZ/MaaPracticeBoilerplate",
     "version": "1.0.0",
+    "languages": {
+        "zh_cn": "./i18n/zh_cn.json"
+    },
     "controller": [
         {
             "name": "安卓设备",
@@ -19,7 +22,7 @@
             "win32": {
                 "class_regex": ".*",
                 "window_regex": "BBchannel",
-                "screencap": "PrintWindow",
+                "screencap": "ScreenDC",
                 "mouse": "PostMessageWithCursorPos",
                 "keyboard": "PostMessageWithCursorPos"
             }
@@ -33,33 +36,17 @@
             ]
         }
     ],
-    "agent": {
-        "embedded": true,
-        "child_args": [
-            "./agent/main.py"
-        ]
-    },
     "task": [
         {
             "name": "日常战斗",
-            "entry": "日常战斗",
+            "entry": "主任务",
+            "controller": "安卓设备",
             "option": [
                 "chapter",
-                "quest_chapter1",
-                "quest_chapter2",
-                "quest_chapter3",
                 "team_index",
                 "bbc_team_config",
                 "bbc_run_count",
-                "apple_type",
-                "autoBG",
-                "effect",
-                "showAssistSettingBeforeStart",
-                "autoConnect",
-                "capMethod",
-                "adbori",
-                "adbtouch",
-                "maxtouch"
+                "apple_type"
             ]
         }
     ],
@@ -67,182 +54,3239 @@
         "chapter": {
             "type": "select",
             "label": "章节",
+            "default": "冬木",
             "cases": [
                 {
-                    "name": "第一章",
-                    "label": "第一章",
-                    "option": ["quest_chapter1"],
+                    "name": "冬木",
+                    "label": "冬木",
+                    "option": [
+                        "quest_冬木"
+                    ],
                     "pipeline_override": {
-                        "Navigation": {
-                            "custom_action_param": {
-                                "chapter": "第一章"
-                            }
+                        "章节导航": {
+                            "next": "c冬木"
                         }
                     }
                 },
                 {
-                    "name": "第二章",
-                    "label": "第二章",
-                    "option": ["quest_chapter2"],
+                    "name": "奥尔良",
+                    "label": "奥尔良",
+                    "option": [
+                        "quest_奥尔良"
+                    ],
                     "pipeline_override": {
-                        "Navigation": {
-                            "custom_action_param": {
-                                "chapter": "第二章"
-                            }
+                        "章节导航": {
+                            "next": "c奥尔良"
                         }
                     }
                 },
                 {
-                    "name": "第三章",
-                    "label": "第三章",
-                    "option": ["quest_chapter3"],
+                    "name": "七丘之城",
+                    "label": "七丘之城",
+                    "option": [
+                        "quest_七丘之城"
+                    ],
                     "pipeline_override": {
-                        "Navigation": {
-                            "custom_action_param": {
-                                "chapter": "第三章"
-                            }
+                        "章节导航": {
+                            "next": "c七丘之城"
+                        }
+                    }
+                },
+                {
+                    "name": "俄刻阿诺斯",
+                    "label": "俄刻阿诺斯",
+                    "option": [
+                        "quest_俄刻阿诺斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c俄刻阿诺斯"
+                        }
+                    }
+                },
+                {
+                    "name": "伦敦",
+                    "label": "伦敦",
+                    "option": [
+                        "quest_伦敦"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c伦敦"
+                        }
+                    }
+                },
+                {
+                    "name": "合众为一",
+                    "label": "合众为一",
+                    "option": [
+                        "quest_合众为一"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c合众为一"
+                        }
+                    }
+                },
+                {
+                    "name": "卡美洛",
+                    "label": "卡美洛",
+                    "option": [
+                        "quest_卡美洛"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c卡美洛"
+                        }
+                    }
+                },
+                {
+                    "name": "巴比伦尼亚",
+                    "label": "巴比伦尼亚",
+                    "option": [
+                        "quest_巴比伦尼亚"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c巴比伦尼亚"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿",
+                    "label": "新宿",
+                    "option": [
+                        "quest_新宿"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c新宿"
+                        }
+                    }
+                },
+                {
+                    "name": "雅戈泰",
+                    "label": "雅戈泰",
+                    "option": [
+                        "quest_雅戈泰"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c雅戈泰"
+                        }
+                    }
+                },
+                {
+                    "name": "下总国",
+                    "label": "下总国",
+                    "option": [
+                        "quest_下总国"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c下总国"
+                        }
+                    }
+                },
+                {
+                    "name": "塞勒姆",
+                    "label": "塞勒姆",
+                    "option": [
+                        "quest_塞勒姆"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c塞勒姆"
+                        }
+                    }
+                },
+                {
+                    "name": "阿纳斯塔西娅",
+                    "label": "阿纳斯塔西娅",
+                    "option": [
+                        "quest_阿纳斯塔西娅"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c阿纳斯塔西娅"
+                        }
+                    }
+                },
+                {
+                    "name": "诸神黄昏",
+                    "label": "诸神黄昏",
+                    "option": [
+                        "quest_诸神黄昏"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c诸神黄昏"
+                        }
+                    }
+                },
+                {
+                    "name": "SIN",
+                    "label": "SIN",
+                    "option": [
+                        "quest_SIN"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cSIN"
+                        }
+                    }
+                },
+                {
+                    "name": "由伽·刹多罗",
+                    "label": "由伽·刹多罗",
+                    "option": [
+                        "quest_由伽·刹多罗"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c由伽·刹多罗"
+                        }
+                    }
+                },
+                {
+                    "name": "亚特兰蒂斯",
+                    "label": "亚特兰蒂斯",
+                    "option": [
+                        "quest_亚特兰蒂斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c亚特兰蒂斯"
+                        }
+                    }
+                },
+                {
+                    "name": "奥林波斯",
+                    "label": "奥林波斯",
+                    "option": [
+                        "quest_奥林波斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c奥林波斯"
+                        }
+                    }
+                },
+                {
+                    "name": "阿瓦隆·勒·菲",
+                    "label": "阿瓦隆·勒·菲",
+                    "option": [
+                        "quest_阿瓦隆·勒·菲"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c阿瓦隆·勒·菲"
+                        }
+                    }
+                },
+                {
+                    "name": "纳维·米克特兰",
+                    "label": "纳维·米克特兰",
+                    "option": [
+                        "quest_纳维·米克特兰"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c纳维·米克特兰"
+                        }
+                    }
+                },
+                {
+                    "name": "平安京",
+                    "label": "平安京",
+                    "option": [
+                        "quest_平安京"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c平安京"
+                        }
+                    }
+                },
+                {
+                    "name": "Traum",
+                    "label": "Traum",
+                    "option": [
+                        "quest_Traum"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cTraum"
+                        }
+                    }
+                },
+                {
+                    "name": "Ordeal Call",
+                    "label": "Ordeal Call",
+                    "option": [
+                        "quest_Ordeal Call"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cOrdeal Call"
+                        }
+                    }
+                },
+                {
+                    "name": "平面之月",
+                    "label": "平面之月",
+                    "option": [
+                        "quest_平面之月"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c平面之月"
                         }
                     }
                 }
-            ]
-        },
-        "quest_chapter1": {
-            "type": "select",
-            "label": "关卡",
-            "cases": [
-                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
-                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}},
-                {"name": "第三节", "label": "第三节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第三节"}}}}
-            ]
-        },
-        "quest_chapter2": {
-            "type": "select",
-            "label": "关卡",
-            "cases": [
-                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
-                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}}
-            ]
-        },
-        "quest_chapter3": {
-            "type": "select",
-            "label": "关卡",
-            "cases": [
-                {"name": "第一节", "label": "第一节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第一节"}}}},
-                {"name": "第二节", "label": "第二节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第二节"}}}},
-                {"name": "第三节", "label": "第三节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第三节"}}}},
-                {"name": "第四节", "label": "第四节", "pipeline_override": {"Navigation": {"custom_action_param": {"stage": "第四节"}}}}
             ]
         },
         "team_index": {
             "type": "select",
             "label": "队伍编号",
             "cases": [
-                {"name": "1", "label": "队伍1"},
-                {"name": "2", "label": "队伍2"},
-                {"name": "3", "label": "队伍3"},
-                {"name": "4", "label": "队伍4"},
-                {"name": "5", "label": "队伍5"},
-                {"name": "6", "label": "队伍6"},
-                {"name": "7", "label": "队伍7"},
-                {"name": "8", "label": "队伍8"},
-                {"name": "9", "label": "队伍9"},
-                {"name": "10", "label": "队伍10"},
-                {"name": "11", "label": "队伍11"},
-                {"name": "12", "label": "队伍12"},
-                {"name": "13", "label": "队伍13"},
-                {"name": "14", "label": "队伍14"},
-                {"name": "15", "label": "队伍15"}
+                {
+                    "name": "1",
+                    "label": "队伍1",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍1"
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "队伍2",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍2"
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "队伍3",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍3"
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "队伍4",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍4"
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "队伍5",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍5"
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "队伍6",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍6"
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "队伍7",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍7"
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "队伍8",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍8"
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "队伍9",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍9"
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "队伍10",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍10"
+                        }
+                    }
+                },
+                {
+                    "name": "11",
+                    "label": "队伍11",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍11"
+                        }
+                    }
+                },
+                {
+                    "name": "12",
+                    "label": "队伍12",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍12"
+                        }
+                    }
+                },
+                {
+                    "name": "13",
+                    "label": "队伍13",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍13"
+                        }
+                    }
+                },
+                {
+                    "name": "14",
+                    "label": "队伍14",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍14"
+                        }
+                    }
+                },
+                {
+                    "name": "15",
+                    "label": "队伍15",
+                    "pipeline_override": {
+                        "队伍选择": {
+                            "next": "队伍15"
+                        }
+                    }
+                }
             ],
             "default": "1"
         },
         "bbc_team_config": {
-            "type": "input",
-            "label": "BBC队伍配置文件名称",
-            "default": "default"
+            "type": "file",
+            "label": "BBC 队伍配置",
+            "description": "选择 BBC 队伍配置文件",
+            "default": "",
+            "pipeline_override": {
+                "队伍配置": {
+                    "custom_action_param": "{bbc_team_config}"
+                }
+            }
         },
         "bbc_run_count": {
             "type": "input",
             "label": "运行次数",
-            "default": "1"
+            "description": "BBC 运行次数",
+            "inputs": [
+                {
+                    "name": "run_count",
+                    "label": "次数",
+                    "description": "运行次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "设置运行次数": {
+                    "custom_action_param": "{run_count}"
+                }
+            }
         },
         "apple_type": {
             "type": "select",
             "label": "苹果类型",
+            "default": "gold",
             "cases": [
                 {
                     "name": "copper",
-                    "label": "铜苹果"
+                    "label": "铜苹果",
+                    "pipeline_override": {
+                        "设置苹果类型": {
+                            "custom_action_param": "copper"
+                        }
+                    }
                 },
                 {
                     "name": "silver",
-                    "label": "银苹果"
+                    "label": "银苹果",
+                    "pipeline_override": {
+                        "设置苹果类型": {
+                            "custom_action_param": "silver"
+                        }
+                    }
                 },
                 {
                     "name": "gold",
-                    "label": "金苹果"
+                    "label": "金苹果",
+                    "pipeline_override": {
+                        "设置苹果类型": {
+                            "custom_action_param": "gold"
+                        }
+                    }
                 },
                 {
                     "name": "blue",
-                    "label": "蓝苹果"
+                    "label": "蓝苹果",
+                    "pipeline_override": {
+                        "设置苹果类型": {
+                            "custom_action_param": "blue"
+                        }
+                    }
                 },
                 {
                     "name": "colorful",
-                    "label": "彩苹果"
+                    "label": "彩苹果",
+                    "pipeline_override": {
+                        "设置苹果类型": {
+                            "custom_action_param": "colorful"
+                        }
+                    }
                 }
             ]
         },
-        "autoBG": {
-            "type": "switch",
-            "label": "自动轮换背景",
-            "default": true
-        },
-        "effect": {
-            "type": "switch",
-            "label": "动态效果",
-            "default": false
-        },
-        "showAssistSettingBeforeStart": {
-            "type": "switch",
-            "label": "开始前显示助战设置",
-            "default": false
-        },
-        "autoConnect": {
-            "type": "switch",
-            "label": "自动连接",
-            "default": false
-        },
-        "capMethod": {
+        "quest_冬木": {
             "type": "select",
-            "label": "截屏方式",
+            "label": "关卡",
+            "default": "未确认坐标X-A",
             "cases": [
                 {
-                    "name": "Javacap",
-                    "label": "Javacap"
+                    "name": "未确认坐标X-A",
+                    "label": "未确认坐标X-A",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-A"
+                        }
+                    }
                 },
                 {
-                    "name": "Minicap",
-                    "label": "Minicap"
+                    "name": "未确认坐标X-B",
+                    "label": "未确认坐标X-B",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-B"
+                        }
+                    }
                 },
                 {
-                    "name": "Adbcap",
-                    "label": "Adbcap"
+                    "name": "未确认坐标X-C",
+                    "label": "未确认坐标X-C",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-C"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-D",
+                    "label": "未确认坐标X-D",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-D"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-E",
+                    "label": "未确认坐标X-E",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-E"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-F",
+                    "label": "未确认坐标X-F",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-F"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-G",
+                    "label": "未确认坐标X-G",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q未确认坐标X-G"
+                        }
+                    }
+                },
+                {
+                    "name": "变动坐标点0号",
+                    "label": "变动坐标点0号",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q变动坐标点0号"
+                        }
+                    }
                 }
             ]
         },
-        "adbori": {
-            "type": "switch",
-            "label": "使用ADB方向",
-            "default": false
+        "quest_奥尔良": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "栋雷米",
+                    "label": "栋雷米",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q栋雷米"
+                        }
+                    }
+                },
+                {
+                    "name": "沃库勒尔",
+                    "label": "沃库勒尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q沃库勒尔"
+                        }
+                    }
+                },
+                {
+                    "name": "拉沙里泰",
+                    "label": "拉沙里泰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拉沙里泰"
+                        }
+                    }
+                },
+                {
+                    "name": "汝拉",
+                    "label": "汝拉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q汝拉"
+                        }
+                    }
+                },
+                {
+                    "name": "里昂",
+                    "label": "里昂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q里昂"
+                        }
+                    }
+                },
+                {
+                    "name": "蒂耶尔",
+                    "label": "蒂耶尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒂耶尔"
+                        }
+                    }
+                },
+                {
+                    "name": "奥尔良",
+                    "label": "奥尔良",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奥尔良"
+                        }
+                    }
+                },
+                {
+                    "name": "巴黎",
+                    "label": "巴黎",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q巴黎"
+                        }
+                    }
+                },
+                {
+                    "name": "马赛",
+                    "label": "马赛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q马赛"
+                        }
+                    }
+                },
+                {
+                    "name": "波尔多",
+                    "label": "波尔多",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q波尔多"
+                        }
+                    }
+                }
+            ]
         },
-        "adbtouch": {
-            "type": "switch",
-            "label": "使用ADB触摸",
-            "default": false
+        "quest_七丘之城": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "亚壁街道",
+                    "label": "亚壁街道",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚壁街道"
+                        }
+                    }
+                },
+                {
+                    "name": "罗马",
+                    "label": "罗马",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q罗马"
+                        }
+                    }
+                },
+                {
+                    "name": "佛罗伦萨",
+                    "label": "佛罗伦萨",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q佛罗伦萨"
+                        }
+                    }
+                },
+                {
+                    "name": "梅迪奥兰",
+                    "label": "梅迪奥兰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q梅迪奥兰"
+                        }
+                    }
+                },
+                {
+                    "name": "马西利亚",
+                    "label": "马西利亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q马西利亚"
+                        }
+                    }
+                },
+                {
+                    "name": "高卢",
+                    "label": "高卢",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q高卢"
+                        }
+                    }
+                },
+                {
+                    "name": "有形之岛",
+                    "label": "有形之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q有形之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "联军首都",
+                    "label": "联军首都",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q联军首都"
+                        }
+                    }
+                },
+                {
+                    "name": "埃特纳火山",
+                    "label": "埃特纳火山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q埃特纳火山"
+                        }
+                    }
+                },
+                {
+                    "name": "不列颠尼亚",
+                    "label": "不列颠尼亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q不列颠尼亚"
+                        }
+                    }
+                },
+                {
+                    "name": "日耳曼尼亚",
+                    "label": "日耳曼尼亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q日耳曼尼亚"
+                        }
+                    }
+                }
+            ]
         },
-        "maxtouch": {
-            "type": "switch",
-            "label": "使用MAX触摸",
-            "default": false
+        "quest_俄刻阿诺斯": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "海盗船",
+                    "label": "海盗船",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海盗船"
+                        }
+                    }
+                },
+                {
+                    "name": "海盗岛",
+                    "label": "海盗岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海盗岛"
+                        }
+                    }
+                },
+                {
+                    "name": "王者的居岛",
+                    "label": "王者的居岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王者的居岛"
+                        }
+                    }
+                },
+                {
+                    "name": "地图上标记的岛",
+                    "label": "地图上标记的岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地图上标记的岛"
+                        }
+                    }
+                },
+                {
+                    "name": "潮眼之海",
+                    "label": "潮眼之海",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q潮眼之海"
+                        }
+                    }
+                },
+                {
+                    "name": "翼龙之岛",
+                    "label": "翼龙之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q翼龙之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "暴风雨海域",
+                    "label": "暴风雨海域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q暴风雨海域"
+                        }
+                    }
+                },
+                {
+                    "name": "群岛·寂静的入海口",
+                    "label": "群岛·寂静的入海口",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q群岛·寂静的入海口"
+                        }
+                    }
+                },
+                {
+                    "name": "暗礁海域",
+                    "label": "暗礁海域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q暗礁海域"
+                        }
+                    }
+                },
+                {
+                    "name": "火山臼之岛",
+                    "label": "火山臼之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q火山臼之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "丰硕之海",
+                    "label": "丰硕之海",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q丰硕之海"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_伦敦": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "旧街",
+                    "label": "旧街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q旧街"
+                        }
+                    }
+                },
+                {
+                    "name": "白色教堂",
+                    "label": "白色教堂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q白色教堂"
+                        }
+                    }
+                },
+                {
+                    "name": "伦敦城",
+                    "label": "伦敦城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伦敦城"
+                        }
+                    }
+                },
+                {
+                    "name": "苏活区",
+                    "label": "苏活区",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q苏活区"
+                        }
+                    }
+                },
+                {
+                    "name": "威斯敏斯特",
+                    "label": "威斯敏斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q威斯敏斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "摄政公园",
+                    "label": "摄政公园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q摄政公园"
+                        }
+                    }
+                },
+                {
+                    "name": "克勒肯维尔",
+                    "label": "克勒肯维尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q克勒肯维尔"
+                        }
+                    }
+                },
+                {
+                    "name": "萨瑟克",
+                    "label": "萨瑟克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q萨瑟克"
+                        }
+                    }
+                },
+                {
+                    "name": "海德公园",
+                    "label": "海德公园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海德公园"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_合众为一": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "布拉克山",
+                    "label": "布拉克山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q布拉克山"
+                        }
+                    }
+                },
+                {
+                    "name": "里弗顿",
+                    "label": "里弗顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q里弗顿"
+                        }
+                    }
+                },
+                {
+                    "name": "丹佛",
+                    "label": "丹佛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q丹佛"
+                        }
+                    }
+                },
+                {
+                    "name": "德明",
+                    "label": "德明",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q德明"
+                        }
+                    }
+                },
+                {
+                    "name": "拉伯克",
+                    "label": "拉伯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拉伯克"
+                        }
+                    }
+                },
+                {
+                    "name": "达拉斯",
+                    "label": "达拉斯",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q达拉斯"
+                        }
+                    }
+                },
+                {
+                    "name": "亚历山德里亚",
+                    "label": "亚历山德里亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚历山德里亚"
+                        }
+                    }
+                },
+                {
+                    "name": "阿尔卡特拉斯岛",
+                    "label": "阿尔卡特拉斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿尔卡特拉斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "得梅因",
+                    "label": "得梅因",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q得梅因"
+                        }
+                    }
+                },
+                {
+                    "name": "卡尼",
+                    "label": "卡尼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡尼"
+                        }
+                    }
+                },
+                {
+                    "name": "蒙哥马利",
+                    "label": "蒙哥马利",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒙哥马利"
+                        }
+                    }
+                },
+                {
+                    "name": "夏洛特",
+                    "label": "夏洛特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q夏洛特"
+                        }
+                    }
+                },
+                {
+                    "name": "华盛顿",
+                    "label": "华盛顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q华盛顿"
+                        }
+                    }
+                },
+                {
+                    "name": "芝加哥",
+                    "label": "芝加哥",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q芝加哥"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_卡美洛": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "沙尘暴的沙漠",
+                    "label": "沙尘暴的沙漠",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q沙尘暴的沙漠"
+                        }
+                    }
+                },
+                {
+                    "name": "黎明的沙丘",
+                    "label": "黎明的沙丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黎明的沙丘"
+                        }
+                    }
+                },
+                {
+                    "name": "死之荒野",
+                    "label": "死之荒野",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q死之荒野"
+                        }
+                    }
+                },
+                {
+                    "name": "东之村",
+                    "label": "东之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东之村"
+                        }
+                    }
+                },
+                {
+                    "name": "圆桌要塞",
+                    "label": "圆桌要塞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圆桌要塞"
+                        }
+                    }
+                },
+                {
+                    "name": "晚钟庙",
+                    "label": "晚钟庙",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q晚钟庙"
+                        }
+                    }
+                },
+                {
+                    "name": "西之村遗迹",
+                    "label": "西之村遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西之村遗迹"
+                        }
+                    }
+                },
+                {
+                    "name": "阿特拉斯院",
+                    "label": "阿特拉斯院",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿特拉斯院"
+                        }
+                    }
+                },
+                {
+                    "name": "隐秘之村",
+                    "label": "隐秘之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐秘之村"
+                        }
+                    }
+                },
+                {
+                    "name": "大神殿",
+                    "label": "大神殿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大神殿"
+                        }
+                    }
+                },
+                {
+                    "name": "圣都正门",
+                    "label": "圣都正门",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圣都正门"
+                        }
+                    }
+                },
+                {
+                    "name": "圣都市街",
+                    "label": "圣都市街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圣都市街"
+                        }
+                    }
+                },
+                {
+                    "name": "王城",
+                    "label": "王城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王城"
+                        }
+                    }
+                },
+                {
+                    "name": "无之大地",
+                    "label": "无之大地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q无之大地"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_巴比伦尼亚": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "废都巴比伦",
+                    "label": "废都巴比伦",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q废都巴比伦"
+                        }
+                    }
+                },
+                {
+                    "name": "北之高台",
+                    "label": "北之高台",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北之高台"
+                        }
+                    }
+                },
+                {
+                    "name": "黑色杉木林",
+                    "label": "黑色杉木林",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黑色杉木林"
+                        }
+                    }
+                },
+                {
+                    "name": "高原",
+                    "label": "高原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q高原"
+                        }
+                    }
+                },
+                {
+                    "name": "湿地",
+                    "label": "湿地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q湿地"
+                        }
+                    }
+                },
+                {
+                    "name": "乌尔",
+                    "label": "乌尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q乌尔"
+                        }
+                    }
+                },
+                {
+                    "name": "埃里都",
+                    "label": "埃里都",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q埃里都"
+                        }
+                    }
+                },
+                {
+                    "name": "观测所",
+                    "label": "观测所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q观测所"
+                        }
+                    }
+                },
+                {
+                    "name": "芦苇原",
+                    "label": "芦苇原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q芦苇原"
+                        }
+                    }
+                },
+                {
+                    "name": "库撒",
+                    "label": "库撒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q库撒"
+                        }
+                    }
+                },
+                {
+                    "name": "北壁",
+                    "label": "北壁",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北壁"
+                        }
+                    }
+                },
+                {
+                    "name": "尼普尔",
+                    "label": "尼普尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q尼普尔"
+                        }
+                    }
+                },
+                {
+                    "name": "艾比夫山",
+                    "label": "艾比夫山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q艾比夫山"
+                        }
+                    }
+                },
+                {
+                    "name": "鲜血神殿",
+                    "label": "鲜血神殿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q鲜血神殿"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_新宿": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "代代木二丁目",
+                    "label": "代代木二丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q代代木二丁目"
+                        }
+                    }
+                },
+                {
+                    "name": "国道20号",
+                    "label": "国道20号",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q国道20号"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿站",
+                    "label": "新宿站",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿站"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿四丁目",
+                    "label": "新宿四丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿四丁目"
+                        }
+                    }
+                },
+                {
+                    "name": "歌舞伎町",
+                    "label": "歌舞伎町",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q歌舞伎町"
+                        }
+                    }
+                },
+                {
+                    "name": "枪身塔",
+                    "label": "枪身塔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q枪身塔"
+                        }
+                    }
+                },
+                {
+                    "name": "舞会会场",
+                    "label": "舞会会场",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q舞会会场"
+                        }
+                    }
+                },
+                {
+                    "name": "塔顶楼",
+                    "label": "塔顶楼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q塔顶楼"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿御苑",
+                    "label": "新宿御苑",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿御苑"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿二丁目",
+                    "label": "新宿二丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿二丁目"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_雅戈泰": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "地底平原",
+                    "label": "地底平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地底平原"
+                        }
+                    }
+                },
+                {
+                    "name": "野营地",
+                    "label": "野营地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q野营地"
+                        }
+                    }
+                },
+                {
+                    "name": "河边城市",
+                    "label": "河边城市",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q河边城市"
+                        }
+                    }
+                },
+                {
+                    "name": "桃源乡",
+                    "label": "桃源乡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q桃源乡"
+                        }
+                    }
+                },
+                {
+                    "name": "伊苏",
+                    "label": "伊苏",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伊苏"
+                        }
+                    }
+                },
+                {
+                    "name": "北部断崖",
+                    "label": "北部断崖",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北部断崖"
+                        }
+                    }
+                },
+                {
+                    "name": "不夜城",
+                    "label": "不夜城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q不夜城"
+                        }
+                    }
+                },
+                {
+                    "name": "山脚密林",
+                    "label": "山脚密林",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q山脚密林"
+                        }
+                    }
+                },
+                {
+                    "name": "地底大河",
+                    "label": "地底大河",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地底大河"
+                        }
+                    }
+                },
+                {
+                    "name": "龙宫城",
+                    "label": "龙宫城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q龙宫城"
+                        }
+                    }
+                },
+                {
+                    "name": "黄金国",
+                    "label": "黄金国",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黄金国"
+                        }
+                    }
+                },
+                {
+                    "name": "大地裂隙",
+                    "label": "大地裂隙",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大地裂隙"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_下总国": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "农田",
+                    "label": "农田",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q农田"
+                        }
+                    }
+                },
+                {
+                    "name": "村落",
+                    "label": "村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q村落"
+                        }
+                    }
+                },
+                {
+                    "name": "草庵",
+                    "label": "草庵",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q草庵"
+                        }
+                    }
+                },
+                {
+                    "name": "城下町",
+                    "label": "城下町",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q城下町"
+                        }
+                    }
+                },
+                {
+                    "name": "战役之地",
+                    "label": "战役之地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q战役之地"
+                        }
+                    }
+                },
+                {
+                    "name": "土气城",
+                    "label": "土气城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q土气城"
+                        }
+                    }
+                },
+                {
+                    "name": "后山·无名灵峰",
+                    "label": "后山·无名灵峰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q后山·无名灵峰"
+                        }
+                    }
+                },
+                {
+                    "name": "荒川之原",
+                    "label": "荒川之原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q荒川之原"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_塞勒姆": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "寂静之森",
+                    "label": "寂静之森",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q寂静之森"
+                        }
+                    }
+                },
+                {
+                    "name": "卡特家",
+                    "label": "卡特家",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡特家"
+                        }
+                    }
+                },
+                {
+                    "name": "公众集会堂",
+                    "label": "公众集会堂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q公众集会堂"
+                        }
+                    }
+                },
+                {
+                    "name": "码头",
+                    "label": "码头",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q码头"
+                        }
+                    }
+                },
+                {
+                    "name": "郊外的宅邸",
+                    "label": "郊外的宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q郊外的宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "维特利家",
+                    "label": "维特利家",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维特利家"
+                        }
+                    }
+                },
+                {
+                    "name": "牧草地",
+                    "label": "牧草地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q牧草地"
+                        }
+                    }
+                },
+                {
+                    "name": "加罗丘陵",
+                    "label": "加罗丘陵",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q加罗丘陵"
+                        }
+                    }
+                },
+                {
+                    "name": "隐匿处",
+                    "label": "隐匿处",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐匿处"
+                        }
+                    }
+                },
+                {
+                    "name": "空房",
+                    "label": "空房",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q空房"
+                        }
+                    }
+                },
+                {
+                    "name": "拘留所",
+                    "label": "拘留所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拘留所"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_阿纳斯塔西娅": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "锚点",
+                    "label": "锚点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q锚点"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·斯摩棱斯克",
+                    "label": "雅嘎·斯摩棱斯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·斯摩棱斯克"
+                        }
+                    }
+                },
+                {
+                    "name": "风穴冰窟",
+                    "label": "风穴冰窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q风穴冰窟"
+                        }
+                    }
+                },
+                {
+                    "name": "反叛军的堡垒",
+                    "label": "反叛军的堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q反叛军的堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·瑟乔夫卡",
+                    "label": "雅嘎·瑟乔夫卡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·瑟乔夫卡"
+                        }
+                    }
+                },
+                {
+                    "name": "烧光的村庄",
+                    "label": "烧光的村庄",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q烧光的村庄"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·维亚济马",
+                    "label": "雅嘎·维亚济马",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·维亚济马"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·杰缅斯克",
+                    "label": "雅嘎·杰缅斯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·杰缅斯克"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·图拉",
+                    "label": "雅嘎·图拉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·图拉"
+                        }
+                    }
+                },
+                {
+                    "name": "遭毁灭的村庄",
+                    "label": "遭毁灭的村庄",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q遭毁灭的村庄"
+                        }
+                    }
+                },
+                {
+                    "name": "大溪谷之堡垒",
+                    "label": "大溪谷之堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大溪谷之堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·莫斯科",
+                    "label": "雅嘎·莫斯科",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·莫斯科"
+                        }
+                    }
+                },
+                {
+                    "name": "大树根部",
+                    "label": "大树根部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大树根部"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·梁赞",
+                    "label": "雅嘎·梁赞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·梁赞"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_诸神黄昏": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "登陆点",
+                    "label": "登陆点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q登陆点"
+                        }
+                    }
+                },
+                {
+                    "name": "薄冰之丘",
+                    "label": "薄冰之丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q薄冰之丘"
+                        }
+                    }
+                },
+                {
+                    "name": "巨人的花园",
+                    "label": "巨人的花园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q巨人的花园"
+                        }
+                    }
+                },
+                {
+                    "name": "第23村落",
+                    "label": "第23村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q第23村落"
+                        }
+                    }
+                },
+                {
+                    "name": "英雄的地窖",
+                    "label": "英雄的地窖",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q英雄的地窖"
+                        }
+                    }
+                },
+                {
+                    "name": "雪与冰之城",
+                    "label": "雪与冰之城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雪与冰之城"
+                        }
+                    }
+                },
+                {
+                    "name": "通往尽头之路",
+                    "label": "通往尽头之路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q通往尽头之路"
+                        }
+                    }
+                },
+                {
+                    "name": "炎之馆",
+                    "label": "炎之馆",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q炎之馆"
+                        }
+                    }
+                },
+                {
+                    "name": "第67村落",
+                    "label": "第67村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q第67村落"
+                        }
+                    }
+                },
+                {
+                    "name": "北之境界",
+                    "label": "北之境界",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北之境界"
+                        }
+                    }
+                },
+                {
+                    "name": "被遗忘的神殿",
+                    "label": "被遗忘的神殿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q被遗忘的神殿"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_SIN": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "播种地",
+                    "label": "播种地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q播种地"
+                        }
+                    }
+                },
+                {
+                    "name": "邻村",
+                    "label": "邻村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q邻村"
+                        }
+                    }
+                },
+                {
+                    "name": "冰冷窟",
+                    "label": "冰冷窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q冰冷窟"
+                        }
+                    }
+                },
+                {
+                    "name": "芥之阵营",
+                    "label": "芥之阵营",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q芥之阵营"
+                        }
+                    }
+                },
+                {
+                    "name": "景阳原",
+                    "label": "景阳原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q景阳原"
+                        }
+                    }
+                },
+                {
+                    "name": "山阳丘",
+                    "label": "山阳丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q山阳丘"
+                        }
+                    }
+                },
+                {
+                    "name": "收容所",
+                    "label": "收容所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q收容所"
+                        }
+                    }
+                },
+                {
+                    "name": "石泉峡",
+                    "label": "石泉峡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q石泉峡"
+                        }
+                    }
+                },
+                {
+                    "name": "大坪峪",
+                    "label": "大坪峪",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大坪峪"
+                        }
+                    }
+                },
+                {
+                    "name": "咸阳",
+                    "label": "咸阳",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q咸阳"
+                        }
+                    }
+                },
+                {
+                    "name": "八门洞",
+                    "label": "八门洞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q八门洞"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_由伽刹多罗": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "起始点",
+                    "label": "起始点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q起始点"
+                        }
+                    }
+                },
+                {
+                    "name": "比丘",
+                    "label": "比丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q比丘"
+                        }
+                    }
+                },
+                {
+                    "name": "隐遁窟",
+                    "label": "隐遁窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐遁窟"
+                        }
+                    }
+                },
+                {
+                    "name": "北之灵峰",
+                    "label": "北之灵峰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北之灵峰"
+                        }
+                    }
+                },
+                {
+                    "name": "西之断层",
+                    "label": "西之断层",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西之断层"
+                        }
+                    }
+                },
+                {
+                    "name": "迪瓦尔",
+                    "label": "迪瓦尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q迪瓦尔"
+                        }
+                    }
+                },
+                {
+                    "name": "神之空岩遗迹",
+                    "label": "神之空岩遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q神之空岩遗迹"
+                        }
+                    }
+                },
+                {
+                    "name": "南之城镇",
+                    "label": "南之城镇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q南之城镇"
+                        }
+                    }
+                },
+                {
+                    "name": "无穷之地",
+                    "label": "无穷之地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q无穷之地"
+                        }
+                    }
+                },
+                {
+                    "name": "东之花园",
+                    "label": "东之花园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东之花园"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_亚特兰蒂斯": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "起航点",
+                    "label": "起航点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q起航点"
+                        }
+                    }
+                },
+                {
+                    "name": "赫斯提亚岛",
+                    "label": "赫斯提亚岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q赫斯提亚岛"
+                        }
+                    }
+                },
+                {
+                    "name": "赫卡忒岛",
+                    "label": "赫卡忒岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q赫卡忒岛"
+                        }
+                    }
+                },
+                {
+                    "name": "戴摩斯岛",
+                    "label": "戴摩斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q戴摩斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "阿斯特赖亚岛",
+                    "label": "阿斯特赖亚岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿斯特赖亚岛"
+                        }
+                    }
+                },
+                {
+                    "name": "忒提斯岛",
+                    "label": "忒提斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q忒提斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "厄里斯岛",
+                    "label": "厄里斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q厄里斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "涅墨西斯岛",
+                    "label": "涅墨西斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q涅墨西斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "塔那托斯岛",
+                    "label": "塔那托斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q塔那托斯岛"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_奥林波斯": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "滑翔点",
+                    "label": "滑翔点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q滑翔点"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市西部",
+                    "label": "星间都市西部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市西部"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市南部",
+                    "label": "星间都市南部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市南部"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市东部",
+                    "label": "星间都市东部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市东部"
+                        }
+                    }
+                },
+                {
+                    "name": "祭坛街",
+                    "label": "祭坛街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q祭坛街"
+                        }
+                    }
+                },
+                {
+                    "name": "破神同盟基地",
+                    "label": "破神同盟基地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q破神同盟基地"
+                        }
+                    }
+                },
+                {
+                    "name": "大工房",
+                    "label": "大工房",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大工房"
+                        }
+                    }
+                },
+                {
+                    "name": "空中庭园",
+                    "label": "空中庭园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q空中庭园"
+                        }
+                    }
+                },
+                {
+                    "name": "机神回廊",
+                    "label": "机神回廊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q机神回廊"
+                        }
+                    }
+                },
+                {
+                    "name": "大祭坛",
+                    "label": "大祭坛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大祭坛"
+                        }
+                    }
+                },
+                {
+                    "name": "地下机构带·外围",
+                    "label": "地下机构带·外围",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地下机构带·外围"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_阿瓦隆勒菲": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "雾之海岸",
+                    "label": "雾之海岸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雾之海岸"
+                        }
+                    }
+                },
+                {
+                    "name": "康沃尔之村",
+                    "label": "康沃尔之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q康沃尔之村"
+                        }
+                    }
+                },
+                {
+                    "name": "索尔兹伯里",
+                    "label": "索尔兹伯里",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q索尔兹伯里"
+                        }
+                    }
+                },
+                {
+                    "name": "格洛斯特",
+                    "label": "格洛斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q格洛斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "泪之河",
+                    "label": "泪之河",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q泪之河"
+                        }
+                    }
+                },
+                {
+                    "name": "诺里奇",
+                    "label": "诺里奇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q诺里奇"
+                        }
+                    }
+                },
+                {
+                    "name": "卡美洛",
+                    "label": "卡美洛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡美洛"
+                        }
+                    }
+                },
+                {
+                    "name": "伦蒂尼恩",
+                    "label": "伦蒂尼恩",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伦蒂尼恩"
+                        }
+                    }
+                },
+                {
+                    "name": "曼彻斯特",
+                    "label": "曼彻斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q曼彻斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "湖区",
+                    "label": "湖区",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q湖区"
+                        }
+                    }
+                },
+                {
+                    "name": "尽头海岸",
+                    "label": "尽头海岸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q尽头海岸"
+                        }
+                    }
+                },
+                {
+                    "name": "奥克尼",
+                    "label": "奥克尼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奥克尼"
+                        }
+                    }
+                },
+                {
+                    "name": "爱丁堡",
+                    "label": "爱丁堡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q爱丁堡"
+                        }
+                    }
+                },
+                {
+                    "name": "新达灵顿",
+                    "label": "新达灵顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新达灵顿"
+                        }
+                    }
+                },
+                {
+                    "name": "牛津",
+                    "label": "牛津",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q牛津"
+                        }
+                    }
+                },
+                {
+                    "name": "多佛宅邸",
+                    "label": "多佛宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q多佛宅邸"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_纳维米克特兰": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "奇科莫斯托克",
+                    "label": "奇科莫斯托克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奇科莫斯托克"
+                        }
+                    }
+                },
+                {
+                    "name": "贤者的隐居之所",
+                    "label": "贤者的隐居之所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q贤者的隐居之所"
+                        }
+                    }
+                },
+                {
+                    "name": "玉米地",
+                    "label": "玉米地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q玉米地"
+                        }
+                    }
+                },
+                {
+                    "name": "特拉特拉乌基",
+                    "label": "特拉特拉乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q特拉特拉乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "大平原",
+                    "label": "大平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大平原"
+                        }
+                    }
+                },
+                {
+                    "name": "奇琴伊察",
+                    "label": "奇琴伊察",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奇琴伊察"
+                        }
+                    }
+                },
+                {
+                    "name": "坠机点",
+                    "label": "坠机点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q坠机点"
+                        }
+                    }
+                },
+                {
+                    "name": "伊斯塔乌基",
+                    "label": "伊斯塔乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伊斯塔乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "墨西哥城",
+                    "label": "墨西哥城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q墨西哥城"
+                        }
+                    }
+                },
+                {
+                    "name": "烤玉米地",
+                    "label": "烤玉米地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q烤玉米地"
+                        }
+                    }
+                },
+                {
+                    "name": "卡恩的废墟",
+                    "label": "卡恩的废墟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡恩的废墟"
+                        }
+                    }
+                },
+                {
+                    "name": "索索亚乌基",
+                    "label": "索索亚乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q索索亚乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "梅兹蒂特兰",
+                    "label": "梅兹蒂特兰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q梅兹蒂特兰"
+                        }
+                    }
+                },
+                {
+                    "name": "亚亚乌基",
+                    "label": "亚亚乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚亚乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "卡拉克穆尔",
+                    "label": "卡拉克穆尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡拉克穆尔"
+                        }
+                    }
+                },
+                {
+                    "name": "蒂卡尔遗迹",
+                    "label": "蒂卡尔遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒂卡尔遗迹"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_平安京": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "七条四坊",
+                    "label": "七条四坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q七条四坊"
+                        }
+                    }
+                },
+                {
+                    "name": "七条二坊",
+                    "label": "七条二坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q七条二坊"
+                        }
+                    }
+                },
+                {
+                    "name": "六条大路",
+                    "label": "六条大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q六条大路"
+                        }
+                    }
+                },
+                {
+                    "name": "贵族宅邸",
+                    "label": "贵族宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q贵族宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "朱雀门",
+                    "label": "朱雀门",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q朱雀门"
+                        }
+                    }
+                },
+                {
+                    "name": "平安宫",
+                    "label": "平安宫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q平安宫"
+                        }
+                    }
+                },
+                {
+                    "name": "朱雀大路",
+                    "label": "朱雀大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q朱雀大路"
+                        }
+                    }
+                },
+                {
+                    "name": "稻荷神社",
+                    "label": "稻荷神社",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q稻荷神社"
+                        }
+                    }
+                },
+                {
+                    "name": "大宫大路",
+                    "label": "大宫大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大宫大路"
+                        }
+                    }
+                },
+                {
+                    "name": "赖光的宅邸",
+                    "label": "赖光的宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q赖光的宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "五条大桥",
+                    "label": "五条大桥",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q五条大桥"
+                        }
+                    }
+                },
+                {
+                    "name": "大江山",
+                    "label": "大江山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大江山"
+                        }
+                    }
+                },
+                {
+                    "name": "三条三坊",
+                    "label": "三条三坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q三条三坊"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_Traum": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "边界城镇",
+                    "label": "边界城镇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q边界城镇"
+                        }
+                    }
+                },
+                {
+                    "name": "破晓平原",
+                    "label": "破晓平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q破晓平原"
+                        }
+                    }
+                },
+                {
+                    "name": "中部森林",
+                    "label": "中部森林",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q中部森林"
+                        }
+                    }
+                },
+                {
+                    "name": "黄昏之森",
+                    "label": "黄昏之森",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黄昏之森"
+                        }
+                    }
+                },
+                {
+                    "name": "天崄山脉",
+                    "label": "天崄山脉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q天崄山脉"
+                        }
+                    }
+                },
+                {
+                    "name": "王道界域据点",
+                    "label": "王道界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王道界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "克桑滕之塔",
+                    "label": "克桑滕之塔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q克桑滕之塔"
+                        }
+                    }
+                },
+                {
+                    "name": "阿查果克堡垒",
+                    "label": "阿查果克堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿查果克堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "湖畔平原",
+                    "label": "湖畔平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q湖畔平原"
+                        }
+                    }
+                },
+                {
+                    "name": "锡尔米乌姆",
+                    "label": "锡尔米乌姆",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q锡尔米乌姆"
+                        }
+                    }
+                },
+                {
+                    "name": "复权界域据点",
+                    "label": "复权界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q复权界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "门前平原",
+                    "label": "门前平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q门前平原"
+                        }
+                    }
+                },
+                {
+                    "name": "复仇界域据点",
+                    "label": "复仇界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q复仇界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "莱辛巴赫",
+                    "label": "莱辛巴赫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q莱辛巴赫"
+                        }
+                    }
+                },
+                {
+                    "name": "止境荒野",
+                    "label": "止境荒野",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q止境荒野"
+                        }
+                    }
+                },
+                {
+                    "name": "约维努斯堡垒",
+                    "label": "约维努斯堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q约维努斯堡垒"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_Ordeal Call": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "俄罗斯区域",
+                    "label": "俄罗斯区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q俄罗斯区域"
+                        }
+                    }
+                },
+                {
+                    "name": "东欧区域",
+                    "label": "东欧区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东欧区域"
+                        }
+                    }
+                },
+                {
+                    "name": "夏威夷区域·常夏的休假",
+                    "label": "夏威夷区域·常夏的休假",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q夏威夷区域·常夏的休假"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲西部区域",
+                    "label": "美洲西部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲西部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "大洋洲北部区域",
+                    "label": "大洋洲北部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大洋洲北部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "北欧区域",
+                    "label": "北欧区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北欧区域"
+                        }
+                    }
+                },
+                {
+                    "name": "加勒比海区域",
+                    "label": "加勒比海区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q加勒比海区域"
+                        }
+                    }
+                },
+                {
+                    "name": "东亚区域",
+                    "label": "东亚区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东亚区域"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲南部区域",
+                    "label": "美洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "非洲南部区域",
+                    "label": "非洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q非洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "南亚区域",
+                    "label": "南亚区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q南亚区域"
+                        }
+                    }
+                },
+                {
+                    "name": "北大西洋区域·光之丝线引导的迷宫",
+                    "label": "北大西洋区域·光之丝线引导的迷宫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北大西洋区域·光之丝线引导的迷宫"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲东部区域",
+                    "label": "美洲东部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲东部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "大洋洲南部区域",
+                    "label": "大洋洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大洋洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "西非区域",
+                    "label": "西非区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西非区域"
+                        }
+                    }
+                }
+            ]
+        },
+        "quest_平面之月": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "修理部郊外",
+                    "label": "修理部郊外",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q修理部郊外"
+                        }
+                    }
+                },
+                {
+                    "name": "修理部本部",
+                    "label": "修理部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q修理部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "警防部本部",
+                    "label": "警防部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q警防部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "生产部农地",
+                    "label": "生产部农地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q生产部农地"
+                        }
+                    }
+                },
+                {
+                    "name": "警防部广场",
+                    "label": "警防部广场",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q警防部广场"
+                        }
+                    }
+                },
+                {
+                    "name": "维持部本部",
+                    "label": "维持部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维持部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "外围部",
+                    "label": "外围部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q外围部"
+                        }
+                    }
+                },
+                {
+                    "name": "转运部本部",
+                    "label": "转运部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q转运部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "维持部商业街",
+                    "label": "维持部商业街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维持部商业街"
+                        }
+                    }
+                },
+                {
+                    "name": "构筑部本部",
+                    "label": "构筑部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q构筑部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "生产部本部",
+                    "label": "生产部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q生产部本部"
+                        }
+                    }
+                }
+            ]
         }
-    }
+    },
+    "_agent_backup": {
+        "embedded": true,
+        "child_args": [
+            "../agent/main.py"
+        ]
+    },
+    "custom": "MaaFgo_custom/custom.json"
 }

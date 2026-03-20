@@ -281,6 +281,15 @@ class OptionService:
                 # 如果input项没有自己的 pattern_msg，则继承父级 pattern_msg
                 if "pattern_msg" not in input_item and option_pattern_msg:
                     input_item["pattern_msg"] = option_pattern_msg
+        elif option_type == "file":
+            # file 类型：文件选择
+            field_config["type"] = "file"
+            if "default" in option_def:
+                field_config["default"] = option_def["default"]
+            if "filter" in option_def:
+                field_config["filter"] = option_def["filter"]
+            if "placeholder" in option_def:
+                field_config["placeholder"] = option_def["placeholder"]
         else:
             # 默认类型为combobox；checkbox 类型也走同样的逻辑
             field_config["type"] = option_type if option_type == "checkbox" else "combobox"

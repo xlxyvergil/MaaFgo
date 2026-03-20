@@ -1,0 +1,27 @@
+{
+    "ExecuteNavigation": {
+        "type": "action",
+        "class": "ExecuteNavigation",
+        "file_path": "{custom_path}/bbc_action.py"
+    },
+    "execute_bbc_task": {
+        "type": "action",
+        "class": "ExecuteBbcTask",
+        "file_path": "{custom_path}/bbc_action.py"
+    },
+    "my_action_111": {
+        "type": "action",
+        "class": "MyCustomAction",
+        "file_path": "{custom_path}/my_action.py"
+    },
+    "my_reco_222": {
+        "type": "recognition",
+        "class": "MyRecongition",
+        "file_path": "{custom_path}/my_reco.py"
+    },
+    "select_team_action": {
+        "type": "action",
+        "class": "SelectTeamAction",
+        "file_path": "{custom_path}/bbc_action.py"
+    }
+}

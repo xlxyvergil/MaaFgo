@@ -64,7 +64,9 @@ class OptionFormWidget(QWidget):
                 logger.debug(f"选项 {key} 缺失 type，默认作为 combobox 处理")
 
             # 使用注册器创建选项项组件
+            logger.debug(f"创建选项 {key}, type={option_config.get('type')}")
             option_item = OptionItemRegistry.create(key, option_config, self)
+            logger.debug(f"选项 {key} 创建完成: {type(option_item).__name__}")
             
             # 预创建子选项（如果存在）
             if "children" in option_config:

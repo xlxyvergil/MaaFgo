@@ -13,6 +13,7 @@ from .items import (
     SwitchOptionItem,
     InputOptionItem,
     InputsOptionItem,
+    FileOptionItem,
 )
 
 __all__ = [
@@ -26,4 +27,5 @@ __all__ = [
     "SwitchOptionItem",
     "InputOptionItem",
     "InputsOptionItem",
+    "FileOptionItem",
 ]

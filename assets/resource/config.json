@@ -12,14 +12,14 @@
     ]
   },
   "log": {
-    "dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\logs",
+    "dir": "I:\\MaaPipelineExtremer-windows-amd64-v1.2.3\\logs",
     "level": "INFO",
     "push_to_client": true
   },
   "maafw": {
     "enabled": true,
-    "lib_dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\resources\\maafw\\bin",
-    "resource_dir": "H:\\下载\\MaaPipelineExtremer-windows-amd64-v1.2.3\\MaaPipelineExtremer-windows-amd64\\resources\\resource"
+    "lib_dir": "I:\\MaaPipelineExtremer-windows-amd64-v1.2.3\\resources\\maafw\\bin",
+    "resource_dir": "I:\\MaaPipelineExtremer-windows-amd64-v1.2.3\\resources\\resource"
   },
   "server": {
     "host": "localhost",

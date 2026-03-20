@@ -9,6 +9,7 @@
 未来移除旧格式支持时，只需将 _child_key_parser 替换为 ChildKeyParser() 即可。
 """
 
+import json
 from typing import Dict, Any, List, Optional
 from app.utils.logger import logger
 
@@ -190,6 +191,7 @@ def get_pipeline_override_from_task_option(
     Returns:
         Dict: 合并后的 pipeline_override
     """
+    logger.debug(f"get_pipeline_override_from_task_option: task_id={task_id}, task_options={task_options}")
     if not interface:
         logger.warning("Interface 配置为空")
         return {}
@@ -355,6 +357,18 @@ def _get_option_pipeline_override(
             logger.error(f"Input 选项值必须是字典，实际类型: {type(option_value)}")
             return {}
         return _get_input_pipeline_override(option_config, option_value)
+    elif option_type == "file":
+        # file 类型选项，值是字符串（文件路径）
+        logger.debug(f"处理 file 类型选项: {option_name}, 值: {repr(option_value)}")
+        if not isinstance(option_value, str):
+            logger.error(f"File 选项值必须是字符串，实际类型: {type(option_value)}")
+            return {}
+        # 确保 option_config 包含 name 字段
+        if "name" not in option_config:
+            option_config = {**option_config, "name": option_name}
+        result = _get_file_pipeline_override(option_config, option_value)
+        logger.debug(f"file 类型选项 {option_name} 的 pipeline_override: {result}")
+        return result
     else:
         logger.warning(f"未知的选项类型: {option_type}")
         return {}
@@ -511,6 +525,47 @@ def _convert_value_type(value, pipeline_type: str):
         return value
 
 
+def _get_file_pipeline_override(
+    option_config: Dict[str, Any], file_path: str
+) -> Dict[str, Any]:
+    """获取 file 类型选项的 pipeline_override
+    
+    file 类型与 input 类型类似，使用占位符替换机制
+    
+    Args:
+        option_config: 选项配置
+        file_path: 文件路径值
+        
+    Returns:
+        处理后的 pipeline_override
+    """
+    # 获取基础 pipeline_override
+    base_override = option_config.get("pipeline_override", {})
+    
+    # 深拷贝以避免修改原始配置
+    import copy
+    result = copy.deepcopy(base_override)
+    
+    # 替换占位符 {option_name} 为实际文件路径
+    option_name = option_config.get("name", "")
+    
+    def replace_recursive(obj):
+        """递归替换占位符"""
+        if isinstance(obj, dict):
+            return {k: replace_recursive(v) for k, v in obj.items()}
+        elif isinstance(obj, list):
+            return [replace_recursive(item) for item in obj]
+        elif isinstance(obj, str):
+            # 替换字符串中的占位符
+            placeholder = f"{{{option_name}}}"
+            return obj.replace(placeholder, str(file_path))
+        else:
+            return obj
+    
+    result = replace_recursive(result)
+    return result if isinstance(result, dict) else {}
+
+
 def _deep_merge_dict(target: Dict, source: Dict) -> None:
     """深度合并两个字典"""
     for key, value in source.items():
@@ -518,3 +573,6 @@ def _deep_merge_dict(target: Dict, source: Dict) -> None:
             _deep_merge_dict(target[key], value)
         else:
             target[key] = value
+
+
+
