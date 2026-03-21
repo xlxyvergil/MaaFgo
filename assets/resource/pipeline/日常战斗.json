@@ -1,81 +1,121 @@
 {
-  "主任务": {
-    "next": "回主界面",
-    "action": "DoNothing"
-  },
-  "回主界面": {
-    "next": "队伍选择",
-    "action": "DoNothing"
-  },
-  "队伍选择": {
-    "next": "章节导航",
-    "action": "DoNothing"
-  },
-  "章节导航": {
-    "next": "关卡导航",
-    "action": "DoNothing"
-  },
-  "关卡导航": {
-    "next": "队伍配置",
-    "action": "DoNothing"
-  },
-  "队伍配置": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "setup_bbc_config",
-    "custom_action_param": "",
-    "next": "设置运行次数",
-    "on_error": "BBC失败"
-  },
-  "设置运行次数": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "set_bbc_run_count",
-    "custom_action_param": "",
-    "next": "设置苹果类型",
-    "on_error": "BBC失败"
-  },
-  "设置苹果类型": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "set_apple_type",
-    "custom_action_param": "",
-    "next": "启动BBC进程",
-    "on_error": "BBC失败"
-  },
-  "启动BBC进程": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "start_bbc_process",
-    "custom_action_param": "",
-    "next": "执行BBC初始化",
-    "on_error": "BBC失败"
-  },
-  "执行BBC初始化": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "execute_bbc_init",
-    "custom_action_param": "",
-    "next": "检测BBC完成",
-    "on_error": "BBC失败"
-  },
-  "检测BBC完成": {
-    "recognition": "DirectHit",
-    "action": "Custom",
-    "custom_action": "monitor_bbc_completion",
-    "custom_action_param": "",
-    "next": "BBC成功",
-    "on_error": "BBC失败"
-  },
-  "BBC成功": {
-    "action": "DoNothing",
-    "next": "完成"
-  },
-  "BBC失败": {
-    "action": "DoNothing",
-    "next": "完成"
-  },
-  "完成": {
-    "action": "DoNothing"
-  }
+    "$__mpe_config_新建Pipeline5": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\日常战斗.json",
+            "filename": "新建Pipeline7",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774025592556,
+            "prefix": "",
+            "savedViewport": {
+                "x": -23,
+                "y": 472,
+                "zoom": 0.5
+            },
+            "version": "v1.3.1_beta_1"
+        }
+    },
+    "$__mpe_external_c冬木_新建Pipeline5": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1114,
+                "y": 224
+            }
+        }
+    },
+    "$__mpe_external_队伍选择_新建Pipeline5": {
+        "$__mpe_code": {
+            "position": {
+                "x": 432,
+                "y": 39
+            }
+        }
+    },
+    "BBC成功": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3532,
+                "y": 12
+            }
+        },
+        "next": [
+            "完成"
+        ]
+    },
+    "主任务": {
+        "$__mpe_code": {
+            "position": {
+                "x": 12,
+                "y": 222
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "回主界面": {
+        "$__mpe_code": {
+            "position": {
+                "x": 332,
+                "y": 222
+            }
+        },
+        "next": [
+            "队伍选择"
+        ]
+    },
+    "完成": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3852,
+                "y": 30
+            }
+        }
+    },
+    "执行BBC任务": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2586,
+                "y": 167
+            }
+        },
+        "action": {
+            "param": {
+                "custom_action": "execute_bbc_task",
+                "custom_action_param": ""
+            },
+            "type": "Custom"
+        },
+        "next": [
+            "BBC成功"
+        ]
+    },
+    "章节导航": {
+        "$__mpe_code": {
+            "position": {
+                "x": 761,
+                "y": 206
+            }
+        },
+        "next": [
+            "c冬木"
+        ]
+    },
+    "队伍配置": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1612,
+                "y": 192
+            }
+        },
+        "action": {
+            "param": {
+                "custom_action": "setup_bbc_config",
+                "custom_action_param": ""
+            },
+            "type": "Custom"
+        },
+        "next": [
+            "执行BBC任务"
+        ]
+    }
 }

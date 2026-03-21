@@ -351,136 +351,136 @@
             "label": "队伍编号",
             "cases": [
                 {
-                    "name": "1",
+                    "name": "队伍1",
                     "label": "队伍1",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍1"
                         }
                     }
                 },
                 {
-                    "name": "2",
+                    "name": "队伍2",
                     "label": "队伍2",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍2"
                         }
                     }
                 },
                 {
-                    "name": "3",
+                    "name": "队伍3",
                     "label": "队伍3",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍3"
                         }
                     }
                 },
                 {
-                    "name": "4",
+                    "name": "队伍4",
                     "label": "队伍4",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍4"
                         }
                     }
                 },
                 {
-                    "name": "5",
+                    "name": "队伍5",
                     "label": "队伍5",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍5"
                         }
                     }
                 },
                 {
-                    "name": "6",
+                    "name": "队伍6",
                     "label": "队伍6",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍6"
                         }
                     }
                 },
                 {
-                    "name": "7",
+                    "name": "队伍7",
                     "label": "队伍7",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍7"
                         }
                     }
                 },
                 {
-                    "name": "8",
+                    "name": "队伍8",
                     "label": "队伍8",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍8"
                         }
                     }
                 },
                 {
-                    "name": "9",
+                    "name": "队伍9",
                     "label": "队伍9",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍9"
                         }
                     }
                 },
                 {
-                    "name": "10",
+                    "name": "队伍10",
                     "label": "队伍10",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍10"
                         }
                     }
                 },
                 {
-                    "name": "11",
+                    "name": "队伍11",
                     "label": "队伍11",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍11"
                         }
                     }
                 },
                 {
-                    "name": "12",
+                    "name": "队伍12",
                     "label": "队伍12",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍12"
                         }
                     }
                 },
                 {
-                    "name": "13",
+                    "name": "队伍13",
                     "label": "队伍13",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍13"
                         }
                     }
                 },
                 {
-                    "name": "14",
+                    "name": "队伍14",
                     "label": "队伍14",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍14"
                         }
                     }
                 },
                 {
-                    "name": "15",
+                    "name": "队伍15",
                     "label": "队伍15",
                     "pipeline_override": {
-                        "队伍选择": {
+                        "队伍编制": {
                             "next": "队伍15"
                         }
                     }
@@ -502,7 +502,7 @@
         "bbc_run_count": {
             "type": "input",
             "label": "运行次数",
-            "description": "BBC 运行次数",
+            "description": "BBC 运行次数和苹果类型",
             "inputs": [
                 {
                     "name": "run_count",
@@ -513,9 +513,12 @@
                     "verify": "^\\d+$"
                 }
             ],
+            "option": [
+                "apple_type"
+            ],
             "pipeline_override": {
-                "设置运行次数": {
-                    "custom_action_param": "{run_count}"
+                "执行BBC任务": {
+                    "custom_action_param": "{{input.run_count}}|{{option.apple_type}}"
                 }
             }
         },
@@ -526,48 +529,23 @@
             "cases": [
                 {
                     "name": "copper",
-                    "label": "铜苹果",
-                    "pipeline_override": {
-                        "设置苹果类型": {
-                            "custom_action_param": "copper"
-                        }
-                    }
+                    "label": "铜苹果"
                 },
                 {
                     "name": "silver",
-                    "label": "银苹果",
-                    "pipeline_override": {
-                        "设置苹果类型": {
-                            "custom_action_param": "silver"
-                        }
-                    }
+                    "label": "银苹果"
                 },
                 {
                     "name": "gold",
-                    "label": "金苹果",
-                    "pipeline_override": {
-                        "设置苹果类型": {
-                            "custom_action_param": "gold"
-                        }
-                    }
+                    "label": "金苹果"
                 },
                 {
                     "name": "blue",
-                    "label": "蓝苹果",
-                    "pipeline_override": {
-                        "设置苹果类型": {
-                            "custom_action_param": "blue"
-                        }
-                    }
+                    "label": "蓝苹果"
                 },
                 {
                     "name": "colorful",
-                    "label": "彩苹果",
-                    "pipeline_override": {
-                        "设置苹果类型": {
-                            "custom_action_param": "colorful"
-                        }
-                    }
+                    "label": "彩苹果"
                 }
             ]
         },
@@ -580,7 +558,7 @@
                     "name": "未确认坐标X-A",
                     "label": "未确认坐标X-A",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-A"
                         }
                     }
@@ -589,7 +567,7 @@
                     "name": "未确认坐标X-B",
                     "label": "未确认坐标X-B",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-B"
                         }
                     }
@@ -598,7 +576,7 @@
                     "name": "未确认坐标X-C",
                     "label": "未确认坐标X-C",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-C"
                         }
                     }
@@ -607,7 +585,7 @@
                     "name": "未确认坐标X-D",
                     "label": "未确认坐标X-D",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-D"
                         }
                     }
@@ -616,7 +594,7 @@
                     "name": "未确认坐标X-E",
                     "label": "未确认坐标X-E",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-E"
                         }
                     }
@@ -625,7 +603,7 @@
                     "name": "未确认坐标X-F",
                     "label": "未确认坐标X-F",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-F"
                         }
                     }
@@ -634,7 +612,7 @@
                     "name": "未确认坐标X-G",
                     "label": "未确认坐标X-G",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q未确认坐标X-G"
                         }
                     }
@@ -643,7 +621,7 @@
                     "name": "变动坐标点0号",
                     "label": "变动坐标点0号",
                     "pipeline_override": {
-                        "关卡导航": {
+                        "冬木关卡选择": {
                             "next": "q变动坐标点0号"
                         }
                     }

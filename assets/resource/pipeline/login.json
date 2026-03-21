@@ -1,4 +1,19 @@
 {
+    "$__mpe_config_新建Pipeline2": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\login.json",
+            "filename": "新建Pipeline7",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774024932951,
+            "prefix": "",
+            "savedViewport": {
+                "x": 1123,
+                "y": 233,
+                "zoom": 1
+            },
+            "version": "v1.3.1_beta_1"
+        }
+    },
     "关闭公告": {
         "$__mpe_code": {
             "position": {
@@ -83,6 +98,17 @@
             "阶段判断循环"
         ]
     },
+    "等待并重新判断": {
+        "$__mpe_code": {
+            "position": {
+                "x": 285,
+                "y": 870
+            }
+        },
+        "next": [
+            "阶段判断循环"
+        ]
+    },
     "阶段判断循环": {
         "$__mpe_code": {
             "position": {
@@ -94,7 +120,7 @@
             "开始游戏",
             "登录",
             "关闭公告",
-            "[JumpBack]关闭公告"
+            "等待并重新判断"
         ]
     }
 }
