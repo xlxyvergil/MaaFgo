@@ -17,13 +17,15 @@
             "display_short_side": 720
         },
         {
-            "name": "FullWindowWin32",
-            "label": "完整窗口Win32控制器",
+            "name": "Win32",
+            "label": "Win32控制器",
             "type": "Win32",
-            "description": "使用自定义控制器捕获完整窗口",
+            "description": "标准Win32控制器",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "BBchannel"
+                "window_regex": "BBchannel",
+                "screenshot": "PrintWindow",
+                "input": "Seize"
             }
         }
     ],
@@ -41,15 +43,14 @@
             "entry": "主任务",
             "controller": [
                 "安卓设备",
-                "FullWindowWin32"
+                "Win32"
             ],
             "option": [
                 "chapter",
                 "team_index",
                 "bbc_team_config",
                 "bbc_run_count",
-                "apple_type",
-                "bbc_connection_type"
+                "apple_type"
             ]
         }
     ],
@@ -521,7 +522,7 @@
             ],
             "pipeline_override": {
                 "执行BBC任务": {
-                    "custom_action_param": "{{input.run_count}}|{{option.apple_type}}|{{option.bbc_connection_type}}|{{option.bbc_manual_port.input.ip_port}}"
+                    "custom_action_param": "{{input.run_count}}|{{option.apple_type}}"
                 }
             }
         },
@@ -550,47 +551,9 @@
                     "name": "colorful",
                     "label": "彩苹果"
                 }
-            ],
-            "option": [
-                "bbc_connection_type"
             ]
         },
-        "bbc_connection_type": {
-            "type": "select",
-            "label": "BBC 连接类型",
-            "default": "mumu",
-            "cases": [
-                {
-                    "name": "mumu",
-                    "label": "MuMu 高速"
-                },
-                {
-                    "name": "leidian",
-                    "label": "雷电高速"
-                },
-                {
-                    "name": "manual",
-                    "label": "手动输入端口",
-                    "option": [
-                        "bbc_manual_port"
-                    ]
-                }
-            ]
-        },
-        "bbc_manual_port": {
-            "type": "input",
-            "label": "手动输入 IP+端口",
-            "description": "格式：IP:端口，例如：127.0.0.1:5555",
-            "inputs": [
-                {
-                    "name": "ip_port",
-                    "label": "IP:端口",
-                    "description": "IP 地址和端口号",
-                    "default": "127.0.0.1:5555",
-                    "verify": "^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}:\\d{1,5}$"
-                }
-            ]
-        },
+
         "quest_冬木": {
             "type": "select",
             "label": "关卡",
