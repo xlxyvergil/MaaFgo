@@ -553,7 +553,6 @@
                 }
             ]
         },
-
         "quest_冬木": {
             "type": "select",
             "label": "关卡",
@@ -3265,10 +3264,11 @@
             ]
         }
     },
-    "agent": {
+    "_agent_backup": {
         "embedded": true,
         "child_args": [
             "../agent/main.py"
         ]
-    }
+    },
+    "custom": "MaaFgo_custom/custom.json"
 }
