@@ -9,9 +9,9 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 from maa.controller import Win32Controller
-from maa.task import Task
 from maa.toolkit import Toolkit
 from maa.define import MaaWin32ScreencapMethodEnum, MaaWin32InputMethodEnum
+from custom_win32_controller import FullWindowWin32Controller
 
 
 def _parse_single_param(argv: CustomAction.RunArg) -> str:
@@ -170,13 +170,13 @@ class ExecuteBbcTask(CustomAction):
         
         # 5. 使用自定义连接执行bbc启动流程
         print("[5/6] 执行BBC启动流程...")
-        if not self._execute_bbc_startup(bbc_hwnd, connection_type, ip_port):
+        if not self._execute_bbc_startup(context, bbc_hwnd, connection_type, ip_port):
             print("[5/6] 错误：BBC启动流程失败")
             return CustomAction.RunResult(success=False)
         
         # 6. 使用Win32Controller执行刷本次数节点并监控战斗结束
         print("[6/6] 执行刷本次数节点并监控战斗结束...")
-        if not self._execute_bbc_battle(bbc_hwnd, run_count):
+        if not self._execute_bbc_battle(context, bbc_hwnd, run_count):
             print("[6/6] 错误：BBC战斗执行失败")
             return CustomAction.RunResult(success=False)
         
@@ -204,163 +204,98 @@ class ExecuteBbcTask(CustomAction):
             return True
         return False
     
-    def _execute_bbc_startup(self, bbc_hwnd, connection_type, ip_port):
+    def _execute_bbc_startup(self, context, bbc_hwnd, connection_type, ip_port):
         """执行BBC启动流程"""
         try:
-            # 创建临时连接和task
-            from maa.controller import CustomController
-            from maa.task import Task
+            # 创建自定义控制器实例
+            from custom_win32_controller import FullWindowWin32Controller
+            controller = FullWindowWin32Controller(bbc_hwnd)
             
-            # 这里需要根据实际情况实现自定义控制器
-            # 暂时使用Win32Controller作为示例
-            controller = Win32Controller()
-            controller.connect(str(bbc_hwnd))
+            # 连接控制器
+            controller.post_connection().wait()
             
-            # 加载bbc.json配置
-            bbc_json_path = os.path.join("./assets/resource/pipeline/bbc.json")
-            if not os.path.exists(bbc_json_path):
-                print(f"bbc.json不存在: {bbc_json_path}")
-                return False
+            # 测试截图并保存
+            import cv2
+            import os
             
-            # 执行bbc启动节点
-            task = Task()
-            task.load(bbc_json_path)
-            task.set_start_node("bbc启动")
+            # 确保截图目录存在
+            screenshot_dir = "./screenshots"
+            if not os.path.exists(screenshot_dir):
+                os.makedirs(screenshot_dir)
             
-            # 根据连接类型设置next节点
+            # 执行截图
+            screenshot = controller.screencap()
+            if screenshot.size > 0:
+                # 保存截图
+                screenshot_path = os.path.join(screenshot_dir, f"bbc_screenshot_{int(time.time())}.png")
+                # 注意：screenshot 是 BGR 格式，cv2.imwrite 会自动处理
+                cv2.imwrite(screenshot_path, screenshot)
+                print(f"[ExecuteBbcTask] 截图已保存到: {screenshot_path}")
+                print(f"[ExecuteBbcTask] 截图尺寸: {screenshot.shape}")
+            else:
+                print("[ExecuteBbcTask] 截图失败，返回空数组")
+            
+            # 使用 context.run_task 执行任务
+            pipeline_override = {}
+            
             if connection_type == "mumu":
-                # 修改bbc启动的next为mumu高速
-                task.set_node_next("bbc启动", ["mumu高速"])
+                pipeline_override["bbc启动"] = {"next": ["mumu高速"]}
             elif connection_type == "ldplayer":
-                # 修改bbc启动的next为雷电高速
-                task.set_node_next("bbc启动", ["雷电高速"])
+                pipeline_override["bbc启动"] = {"next": ["雷电高速"]}
             elif connection_type == "manual":
-                # 修改bbc启动的next为手动输入端口
-                task.set_node_next("bbc启动", ["手动输入端口"])
+                pipeline_override["bbc启动"] = {"next": ["手动输入端口"]}
+                pipeline_override["输入ip"] = {
+                    "action": {"type": "InputText", "param": {"input_text": ip_port}}
+                }
             
-            # 执行任务
-            result = controller.run(task)
-            if not result:
-                print("执行bbc启动节点失败")
-                return False
+            # 使用传入的 context 执行任务
+            result = context.run_task("bbc启动", pipeline_override)
             
-            # 根据连接类型执行后续流程
-            if connection_type == "mumu":
-                # 查找MuMu高速连接窗口
-                attempt = 0
-                while True:
-                    attempt += 1
-                    mumu_window = self._find_window_by_title("MuMu高速连接")
-                    if mumu_window:
-                        print(f"找到MuMu高速连接窗口（尝试 {attempt}），执行连接")
-                        # 连接到MuMu窗口并执行mumu高速连接节点
-                        mumu_controller = Win32Controller()
-                        mumu_controller.connect(str(mumu_window))
-                        mumu_task = Task()
-                        mumu_task.load(bbc_json_path)
-                        mumu_task.set_start_node("mumu高速连接")
-                        mumu_result = mumu_controller.run(mumu_task)
-                        mumu_controller.disconnect()
-                        if not mumu_result:
-                            print("执行mumu高速连接节点失败")
-                            return False
-                        break
-                    time.sleep(1)
-            
-            elif connection_type == "ldplayer":
-                # 查找雷电高速连接窗口
-                attempt = 0
-                while True:
-                    attempt += 1
-                    ld_window = self._find_window_by_title("雷电高速连接")
-                    if ld_window:
-                        print(f"找到雷电高速连接窗口（尝试 {attempt}），执行连接")
-                        # 连接到雷电窗口并执行雷电高速连接节点
-                        ld_controller = Win32Controller()
-                        ld_controller.connect(str(ld_window))
-                        ld_task = Task()
-                        ld_task.load(bbc_json_path)
-                        ld_task.set_start_node("雷电高速连接")
-                        ld_result = ld_controller.run(ld_task)
-                        ld_controller.disconnect()
-                        if not ld_result:
-                            print("执行雷电高速连接节点失败")
-                            return False
-                        break
-                    time.sleep(1)
-            
-            elif connection_type == "manual":
-                # 执行输入ip端口节点
-                input_controller = Win32Controller()
-                input_controller.connect(str(bbc_hwnd))
-                input_task = Task()
-                input_task.load(bbc_json_path)
-                input_task.set_start_node("输入ip端口")
-                
-                # 修改输入ip节点的输入文本为用户提供的ip_port
-                input_task.set_node_param("输入ip", "action", "param", {"input_text": ip_port})
-                
-                input_result = input_controller.run(input_task)
-                input_controller.disconnect()
-                if not input_result:
-                    print("执行输入ip端口节点失败")
-                    return False
-                
-                # 查找选择连接设备窗口
-                attempt = 0
-                while True:
-                    attempt += 1
-                    select_window = self._find_window_by_title("选择连接设备")
-                    if select_window:
-                        print(f"找到选择连接设备窗口（尝试 {attempt}），执行连接")
-                        # 连接到选择连接设备窗口并执行选择连接设备ip节点
-                        select_controller = Win32Controller()
-                        select_controller.connect(str(select_window))
-                        select_task = Task()
-                        select_task.load(bbc_json_path)
-                        select_task.set_start_node("选择连接设备ip")
-                        select_result = select_controller.run(select_task)
-                        select_controller.disconnect()
-                        if not select_result:
-                            print("执行选择连接设备ip节点失败")
-                            return False
-                        break
-                    time.sleep(1)
-            
-            # 断开控制器连接
-            controller.disconnect()
-            return True
+            return bool(result)
         except Exception as e:
             print(f"执行BBC启动流程出错: {e}")
             return False
     
-    def _execute_bbc_battle(self, bbc_hwnd, run_count):
+    def _execute_bbc_battle(self, context, bbc_hwnd, run_count):
         """执行BBC战斗流程并监控结束"""
         try:
-            # 创建Win32Controller连接到BBC窗口
-            controller = Win32Controller()
-            controller.connect(str(bbc_hwnd))
+            # 创建自定义控制器实例
+            from custom_win32_controller import FullWindowWin32Controller
+            controller = FullWindowWin32Controller(bbc_hwnd)
             
-            # 加载bbc.json配置
-            bbc_json_path = os.path.join("./assets/resource/pipeline/bbc.json")
-            if not os.path.exists(bbc_json_path):
-                print(f"bbc.json不存在: {bbc_json_path}")
-                return False
+            # 连接控制器
+            controller.post_connection().wait()
             
-            # 执行点击刷本次数节点
-            task = Task()
-            task.load(bbc_json_path)
-            task.set_start_node("点击刷本次数")
+            # 测试截图并保存
+            import cv2
+            import os
             
-            # 修改输入运行次数节点的输入文本为用户提供的run_count
-            task.set_node_param("输入运行次数", "action", "param", {"input_text": str(run_count)})
+            # 确保截图目录存在
+            screenshot_dir = "./screenshots"
+            if not os.path.exists(screenshot_dir):
+                os.makedirs(screenshot_dir)
             
-            # 执行任务
-            result = controller.run(task)
-            if not result:
-                print("执行点击刷本次数节点失败")
-                controller.disconnect()
-                return False
+            # 执行截图
+            screenshot = controller.screencap()
+            if screenshot.size > 0:
+                # 保存截图
+                screenshot_path = os.path.join(screenshot_dir, f"bbc_screenshot_{int(time.time())}.png")
+                # 注意：screenshot 是 BGR 格式，cv2.imwrite 会自动处理
+                cv2.imwrite(screenshot_path, screenshot)
+                print(f"[ExecuteBbcTask] 截图已保存到: {screenshot_path}")
+                print(f"[ExecuteBbcTask] 截图尺寸: {screenshot.shape}")
+            else:
+                print("[ExecuteBbcTask] 截图失败，返回空数组")
+            
+            # 使用 context.run_task 执行任务
+            pipeline_override = {
+                "输入运行次数": {
+                    "action": {"type": "InputText", "param": {"input_text": str(run_count)}}
+                }
+            }
+            
+            # 使用传入的 context 执行任务
+            result = context.run_task("点击刷本次数", pipeline_override)
             
             # 监控战斗结束
             print("开始监控BBC战斗结束...")
@@ -374,7 +309,6 @@ class ExecuteBbcTask(CustomAction):
                         print(f"检测到战斗结束窗口: {window_title}")
                         # 强制关闭BBC
                         print("强制关闭BBC...")
-                        controller.disconnect()
                         # 关闭BBC窗口
                         win32gui.PostMessage(bbc_hwnd, win32con.WM_CLOSE, 0, 0)
                         return True
@@ -382,7 +316,6 @@ class ExecuteBbcTask(CustomAction):
             
             # 超时
             print("战斗监控超时")
-            controller.disconnect()
             return False
         except Exception as e:
             print(f"执行BBC战斗流程出错: {e}")

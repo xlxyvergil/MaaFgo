@@ -17,14 +17,13 @@
             "display_short_side": 720
         },
         {
-            "name": "BBC窗口",
+            "name": "FullWindowWin32",
+            "label": "完整窗口Win32控制器",
             "type": "Win32",
+            "description": "使用自定义控制器捕获完整窗口",
             "win32": {
                 "class_regex": ".*",
-                "window_regex": "BBchannel",
-                "screencap": "ScreenDC",
-                "mouse": "PostMessageWithCursorPos",
-                "keyboard": "PostMessageWithCursorPos"
+                "window_regex": "BBchannel"
             }
         }
     ],
@@ -40,13 +39,17 @@
         {
             "name": "日常战斗",
             "entry": "主任务",
-            "controller": "安卓设备",
+            "controller": [
+                "安卓设备",
+                "FullWindowWin32"
+            ],
             "option": [
                 "chapter",
                 "team_index",
                 "bbc_team_config",
                 "bbc_run_count",
-                "apple_type"
+                "apple_type",
+                "bbc_connection_type"
             ]
         }
     ],
@@ -3299,11 +3302,10 @@
             ]
         }
     },
-    "_agent_backup": {
+    "agent": {
         "embedded": true,
         "child_args": [
             "../agent/main.py"
         ]
-    },
-    "custom": "MaaFgo_custom/custom.json"
+    }
 }

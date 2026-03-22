@@ -17,16 +17,18 @@ class FullWindowWin32Controller(CustomController):
             hWnd: 窗口句柄
         """
         self.hWnd = hWnd
-        self.uuid = f"full_window_win32_{hWnd}"
+        self._uuid = f"full_window_win32_{hWnd}"
+        self._handle = None
+        self._own = True
         super().__init__()
-
+    
     def connect(self) -> bool:
         """连接控制器"""
         return self.hWnd is not None
 
     def request_uuid(self) -> str:
         """获取设备 UUID"""
-        return self.uuid
+        return self._uuid
 
     def start_app(self, intent: str) -> bool:
         """启动应用"""
@@ -39,7 +41,7 @@ class FullWindowWin32Controller(CustomController):
         return True
 
     def screencap(self) -> np.ndarray:
-        """捕获完整窗口截图（包括标题栏）"""
+        """捕获完整窗口截图（包括标题栏），使用 BitBlt 方法"""
         if not self.hWnd:
             return np.array([])
 
@@ -48,6 +50,8 @@ class FullWindowWin32Controller(CustomController):
         left, top, right, bottom = rect
         width = right - left
         height = bottom - top
+
+        print(f"[FullWindowWin32] 窗口区域: left={left}, top={top}, right={right}, bottom={bottom}, width={width}, height={height}")
 
         if width <= 0 or height <= 0:
             return np.array([])
@@ -61,7 +65,9 @@ class FullWindowWin32Controller(CustomController):
         win32gui.SelectObject(saveDC, saveBitMap)
 
         # 使用 BitBlt 捕获窗口
-        win32gui.BitBlt(saveDC, 0, 0, width, height, hwndDC, 0, 0, win32con.SRCCOPY)
+        import win32ui
+        success = win32gui.BitBlt(saveDC, 0, 0, width, height, hwndDC, 0, 0, win32con.SRCCOPY)
+        print(f"[FullWindowWin32] BitBlt 成功: {success}")
 
         # 将位图转换为 numpy 数组
         bmpinfo = saveBitMap.GetInfo()
@@ -76,16 +82,20 @@ class FullWindowWin32Controller(CustomController):
             1
         )
 
+        print(f"[FullWindowWin32] 捕获的图像尺寸: {im.size}")
+
         # 清理资源
         win32gui.DeleteObject(saveBitMap.GetHandle())
         win32gui.DeleteDC(saveDC)
         win32gui.ReleaseDC(self.hWnd, hwndDC)
 
         # 转换为 BGR 格式
-        return np.array(im)[:, :, ::-1]
+        result = np.array(im)[:, :, ::-1]
+        print(f"[FullWindowWin32] 返回的数组形状: {result.shape}")
+        return result
 
     def click(self, x: int, y: int) -> bool:
-        """点击窗口相对坐标"""
+        """点击窗口相对坐标，使用 seize 模式"""
         if not self.hWnd:
             return False
 
@@ -97,14 +107,65 @@ class FullWindowWin32Controller(CustomController):
         absolute_x = left + x
         absolute_y = top + y
 
-        # 执行点击
-        win32api.SetCursorPos((absolute_x, absolute_y))
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        # 使用 SendInput 发送输入事件（seize 模式）
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 设置鼠标位置
+        ctypes.windll.user32.SetCursorPos(absolute_x, absolute_y)
+
+        # 发送鼠标左键按下事件
+        inputs = (INPUT * 2)()
+        
+        # 鼠标左键按下
+        inputs[0].type = 0  # INPUT_MOUSE
+        inputs[0].union.mi.dwFlags = 0x0002  # MOUSEEVENTF_LEFTDOWN
+        
+        # 鼠标左键抬起
+        inputs[1].type = 0  # INPUT_MOUSE
+        inputs[1].union.mi.dwFlags = 0x0004  # MOUSEEVENTF_LEFTUP
+
+        ctypes.windll.user32.SendInput(2, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def swipe(self, x1: int, y1: int, x2: int, y2: int, duration: int) -> bool:
-        """滑动窗口相对坐标"""
+        """滑动窗口相对坐标，使用 seize 模式"""
         if not self.hWnd:
             return False
 
@@ -118,22 +179,75 @@ class FullWindowWin32Controller(CustomController):
         end_x = left + x2
         end_y = top + y2
 
-        # 执行滑动
-        win32api.SetCursorPos((start_x, start_y))
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, 0, 0)
+        # 使用 SendInput 发送输入事件（seize 模式）
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 设置鼠标位置到起点
+        ctypes.windll.user32.SetCursorPos(start_x, start_y)
+
+        # 发送鼠标左键按下事件
+        inputs = (INPUT * 3)()
         
-        # 简单实现，实际可以根据 duration 来控制滑动速度
-        win32api.SetCursorPos((end_x, end_y))
+        # 鼠标左键按下
+        inputs[0].type = 0  # INPUT_MOUSE
+        inputs[0].union.mi.dwFlags = 0x0002  # MOUSEEVENTF_LEFTDOWN
         
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, 0, 0)
+        # 鼠标移动到终点
+        inputs[1].type = 0  # INPUT_MOUSE
+        inputs[1].union.mi.dx = end_x - start_x
+        inputs[1].union.mi.dy = end_y - start_y
+        inputs[1].union.mi.dwFlags = 0x0001  # MOUSEEVENTF_MOVE
+        
+        # 鼠标左键抬起
+        inputs[2].type = 0  # INPUT_MOUSE
+        inputs[2].union.mi.dwFlags = 0x0004  # MOUSEEVENTF_LEFTUP
+
+        ctypes.windll.user32.SendInput(3, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def touch_down(self, contact: int, x: int, y: int, pressure: int) -> bool:
-        """触摸按下"""
+        """触摸按下，使用 seize 模式"""
         return self.click(x, y)
 
     def touch_move(self, contact: int, x: int, y: int, pressure: int) -> bool:
-        """触摸移动"""
+        """触摸移动，使用 seize 模式"""
         if not self.hWnd:
             return False
 
@@ -145,8 +259,48 @@ class FullWindowWin32Controller(CustomController):
         absolute_x = left + x
         absolute_y = top + y
 
-        # 移动鼠标
-        win32api.SetCursorPos((absolute_x, absolute_y))
+        # 使用 SendInput 发送输入事件（seize 模式）
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 设置鼠标位置
+        ctypes.windll.user32.SetCursorPos(absolute_x, absolute_y)
         return True
 
     def touch_up(self, contact: int) -> bool:
@@ -154,30 +308,266 @@ class FullWindowWin32Controller(CustomController):
         return True
 
     def click_key(self, keycode: int) -> bool:
-        """点击按键"""
-        win32api.keybd_event(keycode, 0, 0, 0)
-        win32api.keybd_event(keycode, 0, win32con.KEYEVENTF_KEYUP, 0)
+        """点击按键，使用 seize 模式"""
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 发送键盘按下和抬起事件
+        inputs = (INPUT * 2)()
+        
+        # 键盘按下
+        inputs[0].type = 1  # INPUT_KEYBOARD
+        inputs[0].union.ki.wVk = keycode
+        inputs[0].union.ki.dwFlags = 0  # 0 for key down
+        
+        # 键盘抬起
+        inputs[1].type = 1  # INPUT_KEYBOARD
+        inputs[1].union.ki.wVk = keycode
+        inputs[1].union.ki.dwFlags = 0x0002  # KEYEVENTF_KEYUP
+
+        ctypes.windll.user32.SendInput(2, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def input_text(self, text: str) -> bool:
-        """输入文本"""
+        """输入文本，使用 seize 模式"""
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
         for char in text:
-            win32api.keybd_event(ord(char), 0, 0, 0)
-            win32api.keybd_event(ord(char), 0, win32con.KEYEVENTF_KEYUP, 0)
+            # 发送键盘按下和抬起事件
+            inputs = (INPUT * 2)()
+            
+            # 键盘按下
+            inputs[0].type = 1  # INPUT_KEYBOARD
+            inputs[0].union.ki.wVk = ord(char)
+            inputs[0].union.ki.dwFlags = 0  # 0 for key down
+            
+            # 键盘抬起
+            inputs[1].type = 1  # INPUT_KEYBOARD
+            inputs[1].union.ki.wVk = ord(char)
+            inputs[1].union.ki.dwFlags = 0x0002  # KEYEVENTF_KEYUP
+
+            ctypes.windll.user32.SendInput(2, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def key_down(self, keycode: int) -> bool:
-        """按下按键"""
-        win32api.keybd_event(keycode, 0, 0, 0)
+        """按下按键，使用 seize 模式"""
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 发送键盘按下事件
+        inputs = (INPUT * 1)()
+        inputs[0].type = 1  # INPUT_KEYBOARD
+        inputs[0].union.ki.wVk = keycode
+        inputs[0].union.ki.dwFlags = 0  # 0 for key down
+
+        ctypes.windll.user32.SendInput(1, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def key_up(self, keycode: int) -> bool:
-        """抬起按键"""
-        win32api.keybd_event(keycode, 0, win32con.KEYEVENTF_KEYUP, 0)
+        """抬起按键，使用 seize 模式"""
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 发送键盘抬起事件
+        inputs = (INPUT * 1)()
+        inputs[0].type = 1  # INPUT_KEYBOARD
+        inputs[0].union.ki.wVk = keycode
+        inputs[0].union.ki.dwFlags = 0x0002  # KEYEVENTF_KEYUP
+
+        ctypes.windll.user32.SendInput(1, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
 
     def scroll(self, dx: int, dy: int) -> bool:
-        """滚动"""
-        # 实现鼠标滚轮滚动
-        win32api.mouse_event(win32con.MOUSEEVENTF_WHEEL, 0, 0, dy)
+        """滚动，使用 seize 模式"""
+        import ctypes
+        from ctypes import wintypes
+
+        # 定义 INPUT 结构
+        class INPUT(ctypes.Structure):
+            _fields_ = [
+                ('type', wintypes.DWORD),
+                ('union', ctypes.Union(
+                    _fields_=[
+                        ('mi', ctypes.Structure(
+                            _fields_=[
+                                ('dx', wintypes.LONG),
+                                ('dy', wintypes.LONG),
+                                ('mouseData', wintypes.DWORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('ki', ctypes.Structure(
+                            _fields_=[
+                                ('wVk', wintypes.WORD),
+                                ('wScan', wintypes.WORD),
+                                ('dwFlags', wintypes.DWORD),
+                                ('time', wintypes.DWORD),
+                                ('dwExtraInfo', ctypes.POINTER(wintypes.ULONG))
+                            ]
+                        )),
+                        ('hi', ctypes.Structure(
+                            _fields_=[
+                                ('uMsg', wintypes.DWORD),
+                                ('wParamL', wintypes.WORD),
+                                ('wParamH', wintypes.WORD)
+                            ]
+                        ))
+                    ]
+                ))
+            ]
+
+        # 发送鼠标滚轮事件
+        inputs = (INPUT * 1)()
+        inputs[0].type = 0  # INPUT_MOUSE
+        inputs[0].union.mi.dwFlags = 0x0800  # MOUSEEVENTF_WHEEL
+        inputs[0].union.mi.mouseData = dy * 120  # 滚动距离
+
+        ctypes.windll.user32.SendInput(1, ctypes.byref(inputs), ctypes.sizeof(INPUT))
         return True
