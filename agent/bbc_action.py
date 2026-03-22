@@ -11,7 +11,6 @@ from maa.context import Context
 from maa.controller import Win32Controller
 from maa.toolkit import Toolkit
 from maa.define import MaaWin32ScreencapMethodEnum, MaaWin32InputMethodEnum
-from custom_win32_controller import FullWindowWin32Controller
 
 
 def _parse_single_param(argv: CustomAction.RunArg) -> str:
@@ -112,23 +111,25 @@ class ExecuteBbcTask(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> bool:
         global _bbc_hwnd, _bbc_controller
         
-        # 解析参数: run_count|apple_type|connection_type|ip_port
-        param_str = _parse_single_param(argv) or "1|gold|mumu|127.0.0.1:5555"
-        parts = param_str.split("|")
-        run_count = int(parts[0]) if parts[0].isdigit() else 1
-        apple_type = parts[1] if len(parts) > 1 else "gold"
-        connection_type = parts[2] if len(parts) > 2 else "mumu"
-        ip_port = parts[3] if len(parts) > 3 else "127.0.0.1:5555"
+        # 解析JSON格式参数
+        import json
+        param_str = _parse_single_param(argv) or '{"run_count": 1, "apple_type": "gold"}'
+        try:
+            params = json.loads(param_str)
+            run_count = params.get("run_count", 1)
+            apple_type = params.get("apple_type", "gold")
+        except json.JSONDecodeError:
+            # 兼容旧格式
+            parts = param_str.split("|")
+            run_count = int(parts[0]) if parts[0].isdigit() else 1
+            apple_type = parts[1] if len(parts) > 1 else "gold"
         
-        print(f"[ExecuteBbcTask] run_count={run_count}, apple_type={apple_type}, connection_type={connection_type}, ip_port={ip_port}")
+        print(f"[ExecuteBbcTask] run_count={run_count}, apple_type={apple_type}")
         
-        # 1. 保存运行次数、苹果类型和连接类型到配置
+        # 1. 保存运行次数和苹果类型到配置
         scripts_settings = _load_scripts_settings()
         scripts_settings["bbc_run_count"] = run_count
         scripts_settings["apple_type"] = apple_type
-        scripts_settings["connection_type"] = connection_type
-        if connection_type == "manual":
-            scripts_settings["manual_ip_port"] = ip_port
         _save_scripts_settings(scripts_settings)
         print("[1/6] 配置已保存")
         
@@ -168,13 +169,13 @@ class ExecuteBbcTask(CustomAction):
                 break
             time.sleep(1)
         
-        # 5. 使用自定义连接执行bbc启动流程
+        # 5. 执行bbc启动流程
         print("[5/6] 执行BBC启动流程...")
-        if not self._execute_bbc_startup(context, bbc_hwnd, connection_type, ip_port):
+        if not self._execute_bbc_startup(context, bbc_hwnd, apple_type):
             print("[5/6] 错误：BBC启动流程失败")
             return CustomAction.RunResult(success=False)
         
-        # 6. 使用Win32Controller执行刷本次数节点并监控战斗结束
+        # 6. 执行刷本次数节点并监控战斗结束
         print("[6/6] 执行刷本次数节点并监控战斗结束...")
         if not self._execute_bbc_battle(context, bbc_hwnd, run_count):
             print("[6/6] 错误：BBC战斗执行失败")
@@ -204,54 +205,67 @@ class ExecuteBbcTask(CustomAction):
             return True
         return False
     
-    def _execute_bbc_startup(self, context, bbc_hwnd, connection_type, ip_port):
+    def _execute_bbc_startup(self, context, bbc_hwnd, apple_type):
         """执行BBC启动流程"""
         try:
-            # 创建自定义控制器实例
-            from custom_win32_controller import FullWindowWin32Controller
-            controller = FullWindowWin32Controller(bbc_hwnd)
+            from maa.controller import Win32Controller
+            from maa.tasker import Tasker
+            from maa.define import MaaWin32ScreencapMethodEnum, MaaWin32InputMethodEnum
             
-            # 连接控制器
-            controller.post_connection().wait()
+            # 连接到BBC窗口执行启动
+            print("[ExecuteBbcTask] 连接到BBC窗口执行启动")
+            # 连接到 BBC 窗口，明确配置截图和输入方式
+            bbc_controller = Win32Controller(
+                bbc_hwnd,
+                screencap_method=MaaWin32ScreencapMethodEnum.PrintWindow,
+                mouse_method=MaaWin32InputMethodEnum.Seize,
+                keyboard_method=MaaWin32InputMethodEnum.Seize
+            )
+            bbc_controller.post_connection().wait()
             
-            # 测试截图并保存
-            import cv2
-            import os
+            # 使用共享资源
+            resource = context.tasker.resource if hasattr(context, 'tasker') and context.tasker else None
+            if not resource:
+                from maa.resource import Resource
+                resource = Resource()
+                # 加载资源
+                bundle_result = resource.post_bundle("./assets/resource").wait()
+                if not bundle_result.succeeded:
+                    print("[ExecuteBbcTask] 资源加载失败")
+                    return False
             
-            # 确保截图目录存在
-            screenshot_dir = "./screenshots"
-            if not os.path.exists(screenshot_dir):
-                os.makedirs(screenshot_dir)
+            # 创建Tasker执行任务
+            tasker = Tasker()
+            # 绑定资源和控制器
+            tasker.bind(resource, bbc_controller)
             
-            # 执行截图
-            screenshot = controller.screencap()
-            if screenshot.size > 0:
-                # 保存截图
-                screenshot_path = os.path.join(screenshot_dir, f"bbc_screenshot_{int(time.time())}.png")
-                # 注意：screenshot 是 BGR 格式，cv2.imwrite 会自动处理
-                cv2.imwrite(screenshot_path, screenshot)
-                print(f"[ExecuteBbcTask] 截图已保存到: {screenshot_path}")
-                print(f"[ExecuteBbcTask] 截图尺寸: {screenshot.shape}")
-            else:
-                print("[ExecuteBbcTask] 截图失败，返回空数组")
+            # 执行启动任务 - 点击刷本次数，设置执行次数和选择苹果的节点
+            # 根据用户选择的苹果类型设置 next 节点
+            apple_type_map = {
+                "金苹果": "金苹果",
+                "彩苹果": "彩苹果",
+                "蓝苹果": "蓝苹果",
+                "银苹果": "银苹果",
+                "铜苹果": "铜苹果"
+            }
+            selected_apple = apple_type_map.get(apple_type, "金苹果")  # 默认金苹果
             
-            # 使用 context.run_task 执行任务
-            pipeline_override = {}
+            print(f"[ExecuteBbcTask] 选择的苹果类型: {selected_apple}")
             
-            if connection_type == "mumu":
-                pipeline_override["bbc启动"] = {"next": ["mumu高速"]}
-            elif connection_type == "ldplayer":
-                pipeline_override["bbc启动"] = {"next": ["雷电高速"]}
-            elif connection_type == "manual":
-                pipeline_override["bbc启动"] = {"next": ["手动输入端口"]}
-                pipeline_override["输入ip"] = {
-                    "action": {"type": "InputText", "param": {"input_text": ip_port}}
+            pipeline_override = {
+                "输入运行次数": {
+                    "action": {"type": "InputText", "param": {"input_text": "1"}},  # 默认执行1次
+                    "next": [selected_apple, "[JumpBack]选苹果"]  # 根据用户选择的苹果类型动态变更 next 节点
                 }
+            }
+            print(f"[ExecuteBbcTask] 执行 点击刷本次数 任务，pipeline_override: {pipeline_override}")
+            result = tasker.post_task("点击刷本次数", pipeline_override).wait().succeeded
+            print(f"[ExecuteBbcTask] 点击刷本次数 任务执行结果: {result}")
             
-            # 使用传入的 context 执行任务
-            result = context.run_task("bbc启动", pipeline_override)
+            # 清理资源
+            tasker = None
             
-            return bool(result)
+            return result
         except Exception as e:
             print(f"执行BBC启动流程出错: {e}")
             return False
@@ -259,9 +273,17 @@ class ExecuteBbcTask(CustomAction):
     def _execute_bbc_battle(self, context, bbc_hwnd, run_count):
         """执行BBC战斗流程并监控结束"""
         try:
-            # 创建自定义控制器实例
-            from custom_win32_controller import FullWindowWin32Controller
-            controller = FullWindowWin32Controller(bbc_hwnd)
+            from maa.controller import Win32Controller
+            from maa.tasker import Tasker
+            from maa.define import MaaWin32ScreencapMethodEnum, MaaWin32InputMethodEnum
+            
+            # 创建控制器实例，明确配置截图和输入方式
+            controller = Win32Controller(
+                bbc_hwnd,
+                screencap_method=MaaWin32ScreencapMethodEnum.PrintWindow,
+                mouse_method=MaaWin32InputMethodEnum.Seize,
+                keyboard_method=MaaWin32InputMethodEnum.Seize
+            )
             
             # 连接控制器
             controller.post_connection().wait()
@@ -287,15 +309,30 @@ class ExecuteBbcTask(CustomAction):
             else:
                 print("[ExecuteBbcTask] 截图失败，返回空数组")
             
-            # 使用 context.run_task 执行任务
+            # 使用共享资源
+            resource = context.tasker.resource if hasattr(context, 'tasker') and context.tasker else None
+            if not resource:
+                from maa.resource import Resource
+                resource = Resource()
+                # 加载资源（使用正确的资源路径）
+                resource.post_bundle("./assets/resource").wait()
+            
+            # 创建 tasker 并绑定控制器
+            tasker = Tasker()
+            tasker.bind(resource, controller)
+            
+            # 执行任务
             pipeline_override = {
                 "输入运行次数": {
                     "action": {"type": "InputText", "param": {"input_text": str(run_count)}}
                 }
             }
             
-            # 使用传入的 context 执行任务
-            result = context.run_task("点击刷本次数", pipeline_override)
+            # 执行任务
+            result = tasker.post_task("点击刷本次数", pipeline_override).wait().succeeded
+            
+            # 清理资源
+            tasker = None
             
             # 监控战斗结束
             print("开始监控BBC战斗结束...")
