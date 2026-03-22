@@ -3264,11 +3264,10 @@
             ]
         }
     },
-    "_agent_backup": {
+    "agent": {
         "embedded": true,
         "child_args": [
             "../agent/main.py"
         ]
-    },
-    "custom": "MaaFgo_custom/custom.json"
+    }
 }
