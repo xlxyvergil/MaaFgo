@@ -149,7 +149,7 @@ jobs:
         if: matrix.platform == 'win'
         shell: bash
         run: |
-          uv pip install pywin32 --target build/deps
+          uv pip install pywin32
 
       - name: Download Dependencies
         shell: bash
