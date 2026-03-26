@@ -1,7 +1,7 @@
 {
     "option": {
         "bbc_team_config": {
-            "type": "select",
+            "type": "scan_select",
             "label": "BBC 队伍配置",
             "description": "选择 BBC 队伍配置文件",
             "default": "",
