@@ -82,31 +82,37 @@ jobs:
         include:
           - os: ubuntu-24.04
             platform: linux
+            platform_filename: linux
             arch: x86_64
             arch_filename: x64
 
           - os: ubuntu-24.04-arm
             platform: linux
+            platform_filename: linux
             arch: aarch64
             arch_filename: arm64
 
           - os: macos-15-intel
             platform: macos
+            platform_filename: osx
             arch: x86_64
             arch_filename: x64
 
           - os: macos-15
             platform: macos
+            platform_filename: osx
             arch: aarch64
             arch_filename: arm64
 
           - os: windows-2025
             platform: win
+            platform_filename: win
             arch: x86_64
             arch_filename: x64
 
           - os: windows-11-arm
             platform: win
+            platform_filename: win
             arch: aarch64
             arch_filename: arm64
     runs-on: ${{ matrix.os }}
@@ -151,7 +157,7 @@ jobs:
         with:
           repository: xlxyvergil/FGO-MWU-temporary
           latest: true
-          fileName: MWU-*-${{ matrix.platform }}-${{ matrix.arch_filename }}.7z
+          fileName: MWU-*-${{ matrix.platform_filename }}-${{ matrix.arch_filename }}.7z
           out-file-path: ./
           token: ${{ secrets.GITHUB_TOKEN }}
 
