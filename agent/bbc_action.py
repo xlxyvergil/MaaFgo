@@ -286,7 +286,7 @@ class ExecuteBbcTask(CustomAction):
             return CustomAction.RunResult(success=False)
         
         print("ExecuteBbcTask: 任务已完成")
-        return True
+        return CustomAction.RunResult(success=True)
     
     def _execute_bbc_battle(self, context, run_count, apple_type, support_order_mismatch=False, team_config_error=False):
         """执行BBC战斗流程 - 使用 HTTP API 和 TCP 通信"""
