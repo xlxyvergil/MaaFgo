@@ -80,18 +80,29 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 仅保留 Windows 平台
+          - os: ubuntu-24.04
+            platform: linux
+            arch: x86_64
+
+          - os: ubuntu-24.04-arm
+            platform: linux
+            arch: aarch64
+
+          - os: macos-15-intel
+            platform: macos
+            arch: x86_64
+
+          - os: macos-15
+            platform: macos
+            arch: aarch64
+
           - os: windows-2025
             platform: win
-            platform_filename: win
             arch: x86_64
-            arch_filename: x64
 
           - os: windows-11-arm
             platform: win
-            platform_filename: win
             arch: aarch64
-            arch_filename: arm64
     runs-on: ${{ matrix.os }}
     name: Build (${{ matrix.platform }}-${{ matrix.arch }})
     needs: meta
@@ -119,31 +130,22 @@ jobs:
       - name: Copy Resources
         shell: bash
         run: |
-          curl -L https://github.com/xlxyvergil/FGO-MWU-temporary/raw/refs/heads/main/deploy/copy_resources.py -o ./copy_resources.py
+          curl -L https://github.com/ravizhan/MWU/raw/refs/heads/main/deploy/copy_resources.py -o ./copy_resources.py
           uv run ./copy_resources.py
-          cp -r assets/options build/options
-      # 注释掉 pywin32 安装 - 不再需要
-      # - name: Install pywin32
-      #   if: matrix.platform == 'win'
-      #   shell: bash
-      #   run: |
-      #     uv pip install pywin32 --system
-      #     # 复制 pywin32 相关文件到 build
-      #     python -c "import win32gui, win32con, win32api, win32process; import shutil, os, sys; site_packages = os.path.dirname(win32gui.__file__); build_deps = 'build/deps'; os.makedirs(build_deps, exist_ok=True); [shutil.copytree(os.path.join(site_packages, d), os.path.join(build_deps, d), dirs_exist_ok=True) for d in ['win32', 'win32com', 'pywin32_system32'] if os.path.exists(os.path.join(site_packages, d))]; [shutil.copy2(os.path.join(site_packages, f), build_deps) for f in os.listdir(site_packages) if f.startswith(('win32', 'pythoncom', 'pywintypes')) and f.endswith(('.pyd', '.dll')))]"
 
       - name: Download Dependencies
         shell: bash
         run: |
-          curl -L https://github.com/xlxyvergil/FGO-MWU-temporary/raw/refs/heads/main/deploy/download_deps.py -o ./download_deps.py
+          curl -L https://github.com/ravizhan/MWU/raw/refs/heads/main/deploy/download_deps.py -o ./download_deps.py
           uv run ./download_deps.py
 
       - name: Download Artifact from Release
         id: download_artifact
         uses: robinraju/release-downloader@v1
         with:
-          repository: xlxyvergil/FGO-MWU-temporary
+          repository: ravizhan/MWU
           latest: true
-          fileName: MWU-*-${{ matrix.platform_filename }}-${{ matrix.arch_filename }}.7z
+          fileName: MWU-*-${{ matrix.platform }}-${{ matrix.arch }}.7z
           out-file-path: ./
           token: ${{ secrets.GITHUB_TOKEN }}
 
