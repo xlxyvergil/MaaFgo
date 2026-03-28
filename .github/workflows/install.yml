@@ -82,27 +82,27 @@ jobs:
         include:
           - os: ubuntu-24.04
             platform: linux
-            arch: x86_64
+            arch: x64
 
           - os: ubuntu-24.04-arm
             platform: linux
-            arch: aarch64
+            arch: arm64
 
           - os: macos-15-intel
-            platform: macos
-            arch: x86_64
+            platform: osx
+            arch: x64
 
           - os: macos-15
-            platform: macos
-            arch: aarch64
+            platform: osx
+            arch: arm64
 
           - os: windows-2025
             platform: win
-            arch: x86_64
+            arch: x64
 
           - os: windows-11-arm
             platform: win
-            arch: aarch64
+            arch: arm64
     runs-on: ${{ matrix.os }}
     name: Build (${{ matrix.platform }}-${{ matrix.arch }})
     needs: meta
