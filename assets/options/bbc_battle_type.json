@@ -1,0 +1,33 @@
+{
+    "option": {
+        "bbc_battle_type": {
+            "type": "select",
+            "label": "战斗类型",
+            "default": "连续出击",
+            "cases": [
+                {
+                    "name": "连续出击",
+                    "label": "连续出击",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "battle_type": "连续出击"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "自动编队爬塔",
+                    "label": "自动编队爬塔",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "battle_type": "自动编队爬塔"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

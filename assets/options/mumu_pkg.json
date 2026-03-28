@@ -1,0 +1,23 @@
+{
+    "option": {
+        "mumu_pkg": {
+            "type": "input",
+            "label": "MuMu游戏包名",
+            "inputs": [
+                {
+                    "name": "mumu_pkg",
+                    "label": "游戏包名",
+                    "default": "com.bilibili.fatego",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "mumu_pkg": "{mumu_pkg}"
+                    }
+                }
+            }
+        }
+    }
+}

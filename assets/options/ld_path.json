@@ -1,0 +1,23 @@
+{
+    "option": {
+        "ld_path": {
+            "type": "input",
+            "label": "雷电模拟器路径",
+            "inputs": [
+                {
+                    "name": "ld_path",
+                    "label": "模拟器路径",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "ld_path": "{ld_path}"
+                    }
+                }
+            }
+        }
+    }
+}

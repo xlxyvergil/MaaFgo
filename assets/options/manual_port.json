@@ -1,0 +1,23 @@
+{
+    "option": {
+        "manual_port": {
+            "type": "input",
+            "label": "手动输入ADB端口",
+            "inputs": [
+                {
+                    "name": "manual_port",
+                    "label": "设备端口",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "manual_port": "{manual_port}"
+                    }
+                }
+            }
+        }
+    }
+}
