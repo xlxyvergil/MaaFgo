@@ -1,0 +1,87 @@
+{
+    "interface_version": 2,
+    "name": "MaaFgo",
+    "description": "FGO自动战斗工具",
+    "contact": "QQ群: 无",
+    "license": "MIT",
+    "welcome": "首次使用！欢迎使用 MaaFgo!",
+    "github": "https://github.com/xlxyvergil/MaaFgo",
+    "version": "1.0.0",
+    "languages": {
+        "zh_cn": "./i18n/zh_cn.json"
+    },
+    "controller": [
+        {
+            "name": "安卓设备",
+            "type": "Adb",
+            "display_short_side": 720
+        },
+        {
+            "name": "Win32",
+            "label": "Win32控制器",
+            "type": "Win32",
+            "description": "标准Win32控制器",
+            "win32": {
+                "class_regex": ".*",
+                "window_regex": "BBchannel",
+                "screenshot": "PrintWindow",
+                "input": "Seize"
+            }
+        }
+    ],
+    "resource": [
+        {
+            "name": "B服",
+            "path": [
+                "./resource"
+            ]
+        }
+    ],
+    "task": [],
+    "option": {
+
+    },
+    "import": [
+        "./options/登录.json",
+        "./options/种树.json",
+        "./options/日常战斗.json",
+        "./options/关闭游戏.json",
+        "./options/chapter.json",
+        "./options/team_index.json",
+        "./options/bbc_team_config.json",
+        "./options/bbc_run_count.json",
+        "./options/apple_type.json",
+        "./options/support_order_mismatch.json",
+        "./options/team_config_error.json",
+        "./options/quests/quest_冬木.json",
+        "./options/quests/quest_奥尔良.json",
+        "./options/quests/quest_七丘之城.json",
+        "./options/quests/quest_俄刻阿诺斯.json",
+        "./options/quests/quest_伦敦.json",
+        "./options/quests/quest_合众为一.json",
+        "./options/quests/quest_卡美洛.json",
+        "./options/quests/quest_巴比伦尼亚.json",
+        "./options/quests/quest_新宿.json",
+        "./options/quests/quest_雅戈泰.json",
+        "./options/quests/quest_下总国.json",
+        "./options/quests/quest_塞勒姆.json",
+        "./options/quests/quest_阿纳斯塔西娅.json",
+        "./options/quests/quest_诸神黄昏.json",
+        "./options/quests/quest_SIN.json",
+        "./options/quests/quest_由伽刹多罗.json",
+        "./options/quests/quest_亚特兰蒂斯.json",
+        "./options/quests/quest_奥林波斯.json",
+        "./options/quests/quest_阿瓦隆勒菲.json",
+        "./options/quests/quest_纳维米克特兰.json",
+        "./options/quests/quest_平安京.json",
+        "./options/quests/quest_Traum.json",
+        "./options/quests/quest_Ordeal Call.json",
+        "./options/quests/quest_平面之月.json"
+    ],
+    "agent": {
+        "child_exec": "python",
+        "child_args": [
+            "./agent/main.py"
+        ]
+    }
+}

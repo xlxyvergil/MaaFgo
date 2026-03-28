@@ -1,0 +1,24 @@
+{
+    "option": {
+        "bbc_run_count": {
+            "type": "input",
+            "label": "运行次数",
+            "inputs": [
+                {
+                    "name": "run_count",
+                    "label": "次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^\\d+$"
+                }
+            ],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "run_count": "{run_count}"
+                    }
+                }
+            }
+        }
+    }
+}

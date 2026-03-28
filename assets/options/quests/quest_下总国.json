@@ -1,0 +1,82 @@
+{
+    "option": {
+        "quest_下总国": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "农田",
+                    "label": "农田",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q农田"
+                        }
+                    }
+                },
+                {
+                    "name": "村落",
+                    "label": "村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q村落"
+                        }
+                    }
+                },
+                {
+                    "name": "草庵",
+                    "label": "草庵",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q草庵"
+                        }
+                    }
+                },
+                {
+                    "name": "城下町",
+                    "label": "城下町",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q城下町"
+                        }
+                    }
+                },
+                {
+                    "name": "战役之地",
+                    "label": "战役之地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q战役之地"
+                        }
+                    }
+                },
+                {
+                    "name": "土气城",
+                    "label": "土气城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q土气城"
+                        }
+                    }
+                },
+                {
+                    "name": "后山·无名灵峰",
+                    "label": "后山·无名灵峰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q后山·无名灵峰"
+                        }
+                    }
+                },
+                {
+                    "name": "荒川之原",
+                    "label": "荒川之原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q荒川之原"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

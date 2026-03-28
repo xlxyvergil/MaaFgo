@@ -1,0 +1,254 @@
+{
+    "$__mpe_config_新建Pipeline3": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\燃烧的冬木.json",
+            "filename": "新建Pipeline4",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774270021244,
+            "prefix": "",
+            "savedViewport": {
+                "x": -174,
+                "y": 493,
+                "zoom": 1
+            },
+            "version": "v1.2.3"
+        }
+    },
+    "q未确认坐标X-A": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2077,
+                "y": -281
+            }
+        },
+        "action": {
+            "param": {
+                "target": [
+                    449,
+                    191,
+                    2,
+                    4
+                ]
+            },
+            "type": "Click"
+        },
+        "next": [
+            "宅邸残迹"
+        ],
+        "recognition": {
+            "param": {
+                "roi": [
+                    359,
+                    82,
+                    203,
+                    173
+                ],
+                "template": [
+                    "未确认坐标X-A.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "冬木": {
+        "$__mpe_code": {
+            "position": {
+                "x": 796,
+                "y": -12
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "冬木放大"
+        ],
+        "recognition": {
+            "param": {
+                "roi": [
+                    200,
+                    100,
+                    880,
+                    600
+                ],
+                "template": [
+                    "燃烧的冬木.png"
+                ],
+                "threshold": 0.7
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "冬木关卡选择": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1746,
+                "y": 17
+            }
+        },
+        "next": [
+            "q未确认坐标X-A"
+        ]
+    },
+    "冬木向上": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1427,
+                "y": -47
+            }
+        },
+        "action": {
+            "param": {
+                "begin": [
+                    190,
+                    494,
+                    48,
+                    51
+                ],
+                "end": [
+                    [
+                        1190,
+                        21,
+                        68,
+                        52
+                    ]
+                ]
+            },
+            "type": "Swipe"
+        },
+        "next": [
+            "冬木关卡选择"
+        ],
+        "post_wait_freezes": 500,
+        "repeat": 2,
+        "repeat_delay": 1000
+    },
+    "冬木寻找": {
+        "$__mpe_code": {
+            "position": {
+                "x": 780,
+                "y": 257
+            }
+        },
+        "action": {
+            "param": {
+                "begin": [
+                    1211,
+                    459,
+                    10,
+                    13
+                ],
+                "duration": [
+                    100
+                ],
+                "end": [
+                    [
+                        1209,
+                        220,
+                        17,
+                        16
+                    ]
+                ]
+            },
+            "type": "Swipe"
+        },
+        "post_wait_freezes": 500
+    },
+    "冬木导航": {
+        "$__mpe_code": {
+            "position": {
+                "x": 386,
+                "y": -4
+            }
+        },
+        "next": [
+            "冬木",
+            "冬木寻找",
+            "[JumpBack]冬木寻找"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "主线记录1-1.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "冬木放大": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1133,
+                "y": -15
+            }
+        },
+        "action": {
+            "param": {
+                "swipes": [
+                    {
+                        "begin": [
+                            37,
+                            296,
+                            21,
+                            27
+                        ],
+                        "contact": 0,
+                        "end": [
+                            [
+                                591,
+                                331,
+                                25,
+                                22
+                            ]
+                        ]
+                    },
+                    {
+                        "begin": [
+                            1211,
+                            373,
+                            21,
+                            27
+                        ],
+                        "contact": 1,
+                        "end": [
+                            [
+                                591,
+                                331,
+                                25,
+                                22
+                            ]
+                        ]
+                    }
+                ]
+            },
+            "type": "MultiSwipe"
+        },
+        "next": [
+            "冬木向上"
+        ],
+        "post_wait_freezes": 500,
+        "repeat": 3,
+        "repeat_delay": 1000
+    },
+    "宅邸残迹": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2387,
+                "y": -269
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "recognition": {
+            "param": {
+                "template": [
+                    "q未确认坐标X-A.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    }
+}

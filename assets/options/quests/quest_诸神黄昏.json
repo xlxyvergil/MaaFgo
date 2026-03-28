@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_诸神黄昏": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "登陆点",
+                    "label": "登陆点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q登陆点"
+                        }
+                    }
+                },
+                {
+                    "name": "薄冰之丘",
+                    "label": "薄冰之丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q薄冰之丘"
+                        }
+                    }
+                },
+                {
+                    "name": "巨人的花园",
+                    "label": "巨人的花园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q巨人的花园"
+                        }
+                    }
+                },
+                {
+                    "name": "第23村落",
+                    "label": "第23村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q第23村落"
+                        }
+                    }
+                },
+                {
+                    "name": "英雄的地窖",
+                    "label": "英雄的地窖",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q英雄的地窖"
+                        }
+                    }
+                },
+                {
+                    "name": "雪与冰之城",
+                    "label": "雪与冰之城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雪与冰之城"
+                        }
+                    }
+                },
+                {
+                    "name": "通往尽头之路",
+                    "label": "通往尽头之路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q通往尽头之路"
+                        }
+                    }
+                },
+                {
+                    "name": "炎之馆",
+                    "label": "炎之馆",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q炎之馆"
+                        }
+                    }
+                },
+                {
+                    "name": "第67村落",
+                    "label": "第67村落",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q第67村落"
+                        }
+                    }
+                },
+                {
+                    "name": "北之境界",
+                    "label": "北之境界",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北之境界"
+                        }
+                    }
+                },
+                {
+                    "name": "被遗忘的神殿",
+                    "label": "被遗忘的神殿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q被遗忘的神殿"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

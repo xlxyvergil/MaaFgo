@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_奥林波斯": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "滑翔点",
+                    "label": "滑翔点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q滑翔点"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市西部",
+                    "label": "星间都市西部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市西部"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市南部",
+                    "label": "星间都市南部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市南部"
+                        }
+                    }
+                },
+                {
+                    "name": "星间都市东部",
+                    "label": "星间都市东部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q星间都市东部"
+                        }
+                    }
+                },
+                {
+                    "name": "祭坛街",
+                    "label": "祭坛街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q祭坛街"
+                        }
+                    }
+                },
+                {
+                    "name": "破神同盟基地",
+                    "label": "破神同盟基地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q破神同盟基地"
+                        }
+                    }
+                },
+                {
+                    "name": "大工房",
+                    "label": "大工房",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大工房"
+                        }
+                    }
+                },
+                {
+                    "name": "空中庭园",
+                    "label": "空中庭园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q空中庭园"
+                        }
+                    }
+                },
+                {
+                    "name": "机神回廊",
+                    "label": "机神回廊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q机神回廊"
+                        }
+                    }
+                },
+                {
+                    "name": "大祭坛",
+                    "label": "大祭坛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大祭坛"
+                        }
+                    }
+                },
+                {
+                    "name": "地下机构带·外围",
+                    "label": "地下机构带·外围",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地下机构带·外围"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

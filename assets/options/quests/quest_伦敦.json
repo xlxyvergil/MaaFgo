@@ -1,0 +1,91 @@
+{
+    "option": {
+        "quest_伦敦": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "旧街",
+                    "label": "旧街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q旧街"
+                        }
+                    }
+                },
+                {
+                    "name": "白色教堂",
+                    "label": "白色教堂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q白色教堂"
+                        }
+                    }
+                },
+                {
+                    "name": "伦敦城",
+                    "label": "伦敦城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伦敦城"
+                        }
+                    }
+                },
+                {
+                    "name": "苏活区",
+                    "label": "苏活区",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q苏活区"
+                        }
+                    }
+                },
+                {
+                    "name": "威斯敏斯特",
+                    "label": "威斯敏斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q威斯敏斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "摄政公园",
+                    "label": "摄政公园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q摄政公园"
+                        }
+                    }
+                },
+                {
+                    "name": "克勒肯维尔",
+                    "label": "克勒肯维尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q克勒肯维尔"
+                        }
+                    }
+                },
+                {
+                    "name": "萨瑟克",
+                    "label": "萨瑟克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q萨瑟克"
+                        }
+                    }
+                },
+                {
+                    "name": "海德公园",
+                    "label": "海德公园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海德公园"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

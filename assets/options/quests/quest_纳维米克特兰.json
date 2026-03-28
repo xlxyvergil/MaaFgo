@@ -1,0 +1,154 @@
+{
+    "option": {
+        "quest_纳维米克特兰": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "奇科莫斯托克",
+                    "label": "奇科莫斯托克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奇科莫斯托克"
+                        }
+                    }
+                },
+                {
+                    "name": "贤者的隐居之所",
+                    "label": "贤者的隐居之所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q贤者的隐居之所"
+                        }
+                    }
+                },
+                {
+                    "name": "玉米地",
+                    "label": "玉米地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q玉米地"
+                        }
+                    }
+                },
+                {
+                    "name": "特拉特拉乌基",
+                    "label": "特拉特拉乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q特拉特拉乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "大平原",
+                    "label": "大平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大平原"
+                        }
+                    }
+                },
+                {
+                    "name": "奇琴伊察",
+                    "label": "奇琴伊察",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奇琴伊察"
+                        }
+                    }
+                },
+                {
+                    "name": "坠机点",
+                    "label": "坠机点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q坠机点"
+                        }
+                    }
+                },
+                {
+                    "name": "伊斯塔乌基",
+                    "label": "伊斯塔乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伊斯塔乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "墨西哥城",
+                    "label": "墨西哥城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q墨西哥城"
+                        }
+                    }
+                },
+                {
+                    "name": "烤玉米地",
+                    "label": "烤玉米地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q烤玉米地"
+                        }
+                    }
+                },
+                {
+                    "name": "卡恩的废墟",
+                    "label": "卡恩的废墟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡恩的废墟"
+                        }
+                    }
+                },
+                {
+                    "name": "索索亚乌基",
+                    "label": "索索亚乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q索索亚乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "梅兹蒂特兰",
+                    "label": "梅兹蒂特兰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q梅兹蒂特兰"
+                        }
+                    }
+                },
+                {
+                    "name": "亚亚乌基",
+                    "label": "亚亚乌基",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚亚乌基"
+                        }
+                    }
+                },
+                {
+                    "name": "卡拉克穆尔",
+                    "label": "卡拉克穆尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡拉克穆尔"
+                        }
+                    }
+                },
+                {
+                    "name": "蒂卡尔遗迹",
+                    "label": "蒂卡尔遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒂卡尔遗迹"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

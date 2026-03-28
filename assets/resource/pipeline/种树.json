@@ -1,0 +1,277 @@
+{
+    "$__mpe_config_新建Pipeline5": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\种树.json",
+            "filename": "新建Pipeline5",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774275268968,
+            "prefix": "",
+            "savedViewport": {
+                "x": 544,
+                "y": 419,
+                "zoom": 0.95
+            },
+            "version": "v1.2.3"
+        }
+    },
+    "$__mpe_external_回主界面_新建Pipeline5": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2099,
+                "y": 282
+            }
+        }
+    },
+    "买不了果实": {
+        "$__mpe_code": {
+            "position": {
+                "x": 878,
+                "y": 283
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "回主界面"
+        ],
+        "recognition": {
+            "param": {
+                "expected": [
+                    "行动力不足。"
+                ]
+            },
+            "type": "OCR"
+        }
+    },
+    "交换树苗": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1492,
+                "y": 49
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "关闭树苗"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "交换.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "兑换青铜树苗商店": {
+        "$__mpe_code": {
+            "position": {
+                "x": 263,
+                "y": 65
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "青铜果实"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "兑换青铜树苗.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "关闭树苗": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1789,
+                "y": 51
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "回主界面"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "关闭.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "商店": {
+        "$__mpe_code": {
+            "position": {
+                "x": -49,
+                "y": 142
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "兑换青铜树苗商店",
+            "[JumpBack]寻找兑换青铜树苗"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "商店.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "商店种树": {
+        "$__mpe_code": {
+            "position": {
+                "x": -404,
+                "y": 142
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "商店"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "寻找兑换青铜树苗": {
+        "$__mpe_code": {
+            "position": {
+                "x": 263,
+                "y": 255
+            }
+        },
+        "action": {
+            "param": {
+                "begin": [
+                    1234,
+                    565,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1235,
+                        286,
+                        1,
+                        1
+                    ]
+                ]
+            },
+            "type": "Swipe"
+        }
+    },
+    "种树": {
+        "$__mpe_code": {
+            "position": {
+                "x": -756,
+                "y": 132
+            }
+        },
+        "action": {
+            "param": {
+                "custom_action": "ExecuteSequentialTasks",
+                "custom_action_param": "回主界面,商店种树"
+            },
+            "type": "Custom"
+        }
+    },
+    "购买树苗": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1164,
+                "y": 25
+            }
+        },
+        "action": {
+            "param": {
+                "target": [
+                    842,
+                    315,
+                    1,
+                    1
+                ]
+            },
+            "type": "Click"
+        },
+        "next": [
+            "交换树苗"
+        ],
+        "repeat": 3,
+        "repeat_delay": 300
+    },
+    "青铜果实": {
+        "$__mpe_code": {
+            "position": {
+                "x": 580,
+                "y": 57
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "青铜果实界面",
+            "买不了果实"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "青铜果实.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "青铜果实界面": {
+        "$__mpe_code": {
+            "position": {
+                "x": 877,
+                "y": 45
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "购买树苗"
+        ],
+        "recognition": {
+            "param": {
+                "expected": [
+                    "兑换后追加至所持道具中"
+                ]
+            },
+            "type": "OCR"
+        }
+    }
+}

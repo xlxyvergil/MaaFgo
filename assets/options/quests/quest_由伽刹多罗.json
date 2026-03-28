@@ -1,0 +1,100 @@
+{
+    "option": {
+        "quest_由伽刹多罗": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "起始点",
+                    "label": "起始点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q起始点"
+                        }
+                    }
+                },
+                {
+                    "name": "比丘",
+                    "label": "比丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q比丘"
+                        }
+                    }
+                },
+                {
+                    "name": "隐遁窟",
+                    "label": "隐遁窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐遁窟"
+                        }
+                    }
+                },
+                {
+                    "name": "北之灵峰",
+                    "label": "北之灵峰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北之灵峰"
+                        }
+                    }
+                },
+                {
+                    "name": "西之断层",
+                    "label": "西之断层",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西之断层"
+                        }
+                    }
+                },
+                {
+                    "name": "迪瓦尔",
+                    "label": "迪瓦尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q迪瓦尔"
+                        }
+                    }
+                },
+                {
+                    "name": "神之空岩遗迹",
+                    "label": "神之空岩遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q神之空岩遗迹"
+                        }
+                    }
+                },
+                {
+                    "name": "南之城镇",
+                    "label": "南之城镇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q南之城镇"
+                        }
+                    }
+                },
+                {
+                    "name": "无穷之地",
+                    "label": "无穷之地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q无穷之地"
+                        }
+                    }
+                },
+                {
+                    "name": "东之花园",
+                    "label": "东之花园",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东之花园"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_七丘之城": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "亚壁街道",
+                    "label": "亚壁街道",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚壁街道"
+                        }
+                    }
+                },
+                {
+                    "name": "罗马",
+                    "label": "罗马",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q罗马"
+                        }
+                    }
+                },
+                {
+                    "name": "佛罗伦萨",
+                    "label": "佛罗伦萨",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q佛罗伦萨"
+                        }
+                    }
+                },
+                {
+                    "name": "梅迪奥兰",
+                    "label": "梅迪奥兰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q梅迪奥兰"
+                        }
+                    }
+                },
+                {
+                    "name": "马西利亚",
+                    "label": "马西利亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q马西利亚"
+                        }
+                    }
+                },
+                {
+                    "name": "高卢",
+                    "label": "高卢",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q高卢"
+                        }
+                    }
+                },
+                {
+                    "name": "有形之岛",
+                    "label": "有形之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q有形之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "联军首都",
+                    "label": "联军首都",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q联军首都"
+                        }
+                    }
+                },
+                {
+                    "name": "埃特纳火山",
+                    "label": "埃特纳火山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q埃特纳火山"
+                        }
+                    }
+                },
+                {
+                    "name": "不列颠尼亚",
+                    "label": "不列颠尼亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q不列颠尼亚"
+                        }
+                    }
+                },
+                {
+                    "name": "日耳曼尼亚",
+                    "label": "日耳曼尼亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q日耳曼尼亚"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,154 @@
+{
+    "option": {
+        "quest_阿瓦隆勒菲": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "雾之海岸",
+                    "label": "雾之海岸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雾之海岸"
+                        }
+                    }
+                },
+                {
+                    "name": "康沃尔之村",
+                    "label": "康沃尔之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q康沃尔之村"
+                        }
+                    }
+                },
+                {
+                    "name": "索尔兹伯里",
+                    "label": "索尔兹伯里",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q索尔兹伯里"
+                        }
+                    }
+                },
+                {
+                    "name": "格洛斯特",
+                    "label": "格洛斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q格洛斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "泪之河",
+                    "label": "泪之河",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q泪之河"
+                        }
+                    }
+                },
+                {
+                    "name": "诺里奇",
+                    "label": "诺里奇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q诺里奇"
+                        }
+                    }
+                },
+                {
+                    "name": "卡美洛",
+                    "label": "卡美洛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡美洛"
+                        }
+                    }
+                },
+                {
+                    "name": "伦蒂尼恩",
+                    "label": "伦蒂尼恩",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伦蒂尼恩"
+                        }
+                    }
+                },
+                {
+                    "name": "曼彻斯特",
+                    "label": "曼彻斯特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q曼彻斯特"
+                        }
+                    }
+                },
+                {
+                    "name": "湖区",
+                    "label": "湖区",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q湖区"
+                        }
+                    }
+                },
+                {
+                    "name": "尽头海岸",
+                    "label": "尽头海岸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q尽头海岸"
+                        }
+                    }
+                },
+                {
+                    "name": "奥克尼",
+                    "label": "奥克尼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奥克尼"
+                        }
+                    }
+                },
+                {
+                    "name": "爱丁堡",
+                    "label": "爱丁堡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q爱丁堡"
+                        }
+                    }
+                },
+                {
+                    "name": "新达灵顿",
+                    "label": "新达灵顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新达灵顿"
+                        }
+                    }
+                },
+                {
+                    "name": "牛津",
+                    "label": "牛津",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q牛津"
+                        }
+                    }
+                },
+                {
+                    "name": "多佛宅邸",
+                    "label": "多佛宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q多佛宅邸"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

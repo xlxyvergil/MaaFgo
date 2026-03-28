@@ -1,0 +1,146 @@
+{
+    "option": {
+        "team_index": {
+            "type": "select",
+            "label": "队伍编号",
+            "cases": [
+                {
+                    "name": "队伍1",
+                    "label": "队伍1",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍1"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍2",
+                    "label": "队伍2",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍2"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍3",
+                    "label": "队伍3",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍3"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍4",
+                    "label": "队伍4",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍4"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍5",
+                    "label": "队伍5",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍5"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍6",
+                    "label": "队伍6",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍6"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍7",
+                    "label": "队伍7",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍7"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍8",
+                    "label": "队伍8",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍8"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍9",
+                    "label": "队伍9",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍9"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍10",
+                    "label": "队伍10",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍10"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍11",
+                    "label": "队伍11",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍11"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍12",
+                    "label": "队伍12",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍12"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍13",
+                    "label": "队伍13",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍13"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍14",
+                    "label": "队伍14",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍14"
+                        }
+                    }
+                },
+                {
+                    "name": "队伍15",
+                    "label": "队伍15",
+                    "pipeline_override": {
+                        "队伍编制": {
+                            "next": "队伍15"
+                        }
+                    }
+                }
+            ],
+            "default": "1"
+        }
+    }
+}

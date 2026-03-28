@@ -1,0 +1,66 @@
+{
+    "option": {
+        "apple_type": {
+            "type": "select",
+            "label": "苹果类型",
+            "default": "gold",
+            "cases": [
+                {
+                    "name": "copper",
+                    "label": "铜苹果",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "apple_type": "铜苹果"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "silver",
+                    "label": "银苹果",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "apple_type": "银苹果"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "gold",
+                    "label": "金苹果",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "apple_type": "金苹果"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "blue",
+                    "label": "蓝苹果",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "apple_type": "蓝苹果"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "colorful",
+                    "label": "彩苹果",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "apple_type": "彩苹果"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

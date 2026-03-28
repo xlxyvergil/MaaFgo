@@ -1,0 +1,223 @@
+{
+    "$__mpe_config_新建Pipeline3": {
+        "$__mpe_code": {
+            "prefix": "",
+            "lastSyncTime": 1774254888555,
+            "isModifiedExternally": false,
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\日常战斗.json",
+            "savedViewport": {
+                "x": 270,
+                "y": 162,
+                "zoom": 0.7
+            },
+            "filename": "新建Pipeline3",
+            "version": "v1.2.3"
+        }
+    },
+    "$__mpe_external_回主界面_新建Pipeline3": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2822,
+                "y": 666
+            }
+        }
+    },
+    "BBC成功": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1118,
+                "y": 578
+            }
+        },
+        "next": [
+            "作战成功",
+            "[JumpBack]完成",
+            "好友申请界面",
+            "战斗失败",
+            "失败2",
+            "撤退"
+        ]
+    },
+    "作战成功": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "下一步.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2224,
+                "y": 37
+            }
+        },
+        "next": [
+            "好友申请界面"
+        ]
+    },
+    "失败2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "决定2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2197,
+                "y": 763
+            }
+        },
+        "next": [
+            "撤退"
+        ]
+    },
+    "好友申请界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "关闭.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2196,
+                "y": 260
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "完成": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    575,
+                    576,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2146,
+                "y": 1191
+            }
+        }
+    },
+    "战斗失败": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "撤退.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2204,
+                "y": 457
+            }
+        },
+        "next": [
+            "失败2"
+        ]
+    },
+    "执行BBC任务": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "execute_bbc_task"
+            }
+        },
+        "apple_type": "铜苹果",
+        "run_count": 1,
+        "battle_type": "continuous",
+        "connect": "auto",
+        "mumu_path": "",
+        "mumu_index": 0,
+        "mumu_pkg": "com.bilibili.fatego",
+        "mumu_app_index": 0,
+        "ld_path": "",
+        "ld_index": 0,
+        "manual_port": "",
+        "support_order_mismatch": false,
+        "team_config_error": false,
+        "$__mpe_code": {
+            "position": {
+                "x": 721,
+                "y": 486
+            }
+        },
+        "next": [
+            "BBC成功"
+        ]
+    },
+    "撤退": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "关闭.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2174,
+                "y": 985
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "队伍配置": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "setup_bbc_config",
+                "custom_action_param": ""
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 269,
+                "y": 542
+            }
+        },
+        "next": [
+            "执行BBC任务"
+        ]
+    }
+}

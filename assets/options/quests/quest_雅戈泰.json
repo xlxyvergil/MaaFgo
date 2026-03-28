@@ -1,0 +1,118 @@
+{
+    "option": {
+        "quest_雅戈泰": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "地底平原",
+                    "label": "地底平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地底平原"
+                        }
+                    }
+                },
+                {
+                    "name": "野营地",
+                    "label": "野营地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q野营地"
+                        }
+                    }
+                },
+                {
+                    "name": "河边城市",
+                    "label": "河边城市",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q河边城市"
+                        }
+                    }
+                },
+                {
+                    "name": "桃源乡",
+                    "label": "桃源乡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q桃源乡"
+                        }
+                    }
+                },
+                {
+                    "name": "伊苏",
+                    "label": "伊苏",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q伊苏"
+                        }
+                    }
+                },
+                {
+                    "name": "北部断崖",
+                    "label": "北部断崖",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北部断崖"
+                        }
+                    }
+                },
+                {
+                    "name": "不夜城",
+                    "label": "不夜城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q不夜城"
+                        }
+                    }
+                },
+                {
+                    "name": "山脚密林",
+                    "label": "山脚密林",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q山脚密林"
+                        }
+                    }
+                },
+                {
+                    "name": "地底大河",
+                    "label": "地底大河",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地底大河"
+                        }
+                    }
+                },
+                {
+                    "name": "龙宫城",
+                    "label": "龙宫城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q龙宫城"
+                        }
+                    }
+                },
+                {
+                    "name": "黄金国",
+                    "label": "黄金国",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黄金国"
+                        }
+                    }
+                },
+                {
+                    "name": "大地裂隙",
+                    "label": "大地裂隙",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大地裂隙"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

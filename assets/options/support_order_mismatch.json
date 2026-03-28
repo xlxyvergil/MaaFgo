@@ -1,0 +1,33 @@
+{
+    "option": {
+        "support_order_mismatch": {
+            "type": "select",
+            "label": "助战排序不符合",
+            "default": "ignore",
+            "cases": [
+                {
+                    "name": "ignore",
+                    "label": "停止",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "support_order_mismatch": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "continue",
+                    "label": "继续",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "support_order_mismatch": true
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

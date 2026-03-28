@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_塞勒姆": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "寂静之森",
+                    "label": "寂静之森",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q寂静之森"
+                        }
+                    }
+                },
+                {
+                    "name": "卡特家",
+                    "label": "卡特家",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡特家"
+                        }
+                    }
+                },
+                {
+                    "name": "公众集会堂",
+                    "label": "公众集会堂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q公众集会堂"
+                        }
+                    }
+                },
+                {
+                    "name": "码头",
+                    "label": "码头",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q码头"
+                        }
+                    }
+                },
+                {
+                    "name": "郊外的宅邸",
+                    "label": "郊外的宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q郊外的宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "维特利家",
+                    "label": "维特利家",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维特利家"
+                        }
+                    }
+                },
+                {
+                    "name": "牧草地",
+                    "label": "牧草地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q牧草地"
+                        }
+                    }
+                },
+                {
+                    "name": "加罗丘陵",
+                    "label": "加罗丘陵",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q加罗丘陵"
+                        }
+                    }
+                },
+                {
+                    "name": "隐匿处",
+                    "label": "隐匿处",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐匿处"
+                        }
+                    }
+                },
+                {
+                    "name": "空房",
+                    "label": "空房",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q空房"
+                        }
+                    }
+                },
+                {
+                    "name": "拘留所",
+                    "label": "拘留所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拘留所"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

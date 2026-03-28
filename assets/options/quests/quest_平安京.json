@@ -1,0 +1,127 @@
+{
+    "option": {
+        "quest_平安京": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "七条四坊",
+                    "label": "七条四坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q七条四坊"
+                        }
+                    }
+                },
+                {
+                    "name": "七条二坊",
+                    "label": "七条二坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q七条二坊"
+                        }
+                    }
+                },
+                {
+                    "name": "六条大路",
+                    "label": "六条大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q六条大路"
+                        }
+                    }
+                },
+                {
+                    "name": "贵族宅邸",
+                    "label": "贵族宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q贵族宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "朱雀门",
+                    "label": "朱雀门",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q朱雀门"
+                        }
+                    }
+                },
+                {
+                    "name": "平安宫",
+                    "label": "平安宫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q平安宫"
+                        }
+                    }
+                },
+                {
+                    "name": "朱雀大路",
+                    "label": "朱雀大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q朱雀大路"
+                        }
+                    }
+                },
+                {
+                    "name": "稻荷神社",
+                    "label": "稻荷神社",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q稻荷神社"
+                        }
+                    }
+                },
+                {
+                    "name": "大宫大路",
+                    "label": "大宫大路",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大宫大路"
+                        }
+                    }
+                },
+                {
+                    "name": "赖光的宅邸",
+                    "label": "赖光的宅邸",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q赖光的宅邸"
+                        }
+                    }
+                },
+                {
+                    "name": "五条大桥",
+                    "label": "五条大桥",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q五条大桥"
+                        }
+                    }
+                },
+                {
+                    "name": "大江山",
+                    "label": "大江山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大江山"
+                        }
+                    }
+                },
+                {
+                    "name": "三条三坊",
+                    "label": "三条三坊",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q三条三坊"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

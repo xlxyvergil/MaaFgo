@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_平面之月": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "修理部郊外",
+                    "label": "修理部郊外",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q修理部郊外"
+                        }
+                    }
+                },
+                {
+                    "name": "修理部本部",
+                    "label": "修理部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q修理部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "警防部本部",
+                    "label": "警防部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q警防部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "生产部农地",
+                    "label": "生产部农地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q生产部农地"
+                        }
+                    }
+                },
+                {
+                    "name": "警防部广场",
+                    "label": "警防部广场",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q警防部广场"
+                        }
+                    }
+                },
+                {
+                    "name": "维持部本部",
+                    "label": "维持部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维持部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "外围部",
+                    "label": "外围部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q外围部"
+                        }
+                    }
+                },
+                {
+                    "name": "转运部本部",
+                    "label": "转运部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q转运部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "维持部商业街",
+                    "label": "维持部商业街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q维持部商业街"
+                        }
+                    }
+                },
+                {
+                    "name": "构筑部本部",
+                    "label": "构筑部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q构筑部本部"
+                        }
+                    }
+                },
+                {
+                    "name": "生产部本部",
+                    "label": "生产部本部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q生产部本部"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

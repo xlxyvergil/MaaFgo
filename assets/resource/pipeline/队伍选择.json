@@ -1,0 +1,1012 @@
+{
+    "$__mpe_config_新建Pipeline2": {
+        "$__mpe_code": {
+            "prefix": "",
+            "lastSyncTime": 1774259697512,
+            "isModifiedExternally": false,
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\队伍选择.json",
+            "savedViewport": {
+                "x": 94,
+                "y": 340,
+                "zoom": 0.46
+            },
+            "filename": "新建Pipeline2",
+            "version": "v1.2.3"
+        }
+    },
+    "队伍界面决定": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3172,
+                "y": 308
+            }
+        },
+        "next": [
+            "队伍确定菜单",
+            "[JumpBack]队伍点击决定"
+        ]
+    },
+    "编队": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "编队.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "pre_wait_freezes": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 1504,
+                "y": 391
+            }
+        },
+        "next": [
+            "队伍编制"
+        ]
+    },
+    "菜单": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "pre_wait_freezes": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 1494,
+                "y": 672
+            }
+        }
+    },
+    "队伍1": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2308,
+                "y": 361
+            }
+        },
+        "next": [
+            "队伍编制1",
+            "[JumpBack]队伍1点击"
+        ]
+    },
+    "队伍10": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2356,
+                "y": 3530
+            }
+        },
+        "next": [
+            "队伍编制10",
+            "[JumpBack]队伍点击10"
+        ]
+    },
+    "队伍11": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2346,
+                "y": 2945
+            }
+        },
+        "next": [
+            "队伍编制11",
+            "[JumpBack]队伍点击11"
+        ]
+    },
+    "队伍12": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2341,
+                "y": 2345
+            }
+        },
+        "next": [
+            "队伍编制12",
+            "[JumpBack]队伍点击12"
+        ]
+    },
+    "队伍13": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2366,
+                "y": 1774
+            }
+        },
+        "next": [
+            "队伍编制13",
+            "[JumpBack]队伍点击13"
+        ]
+    },
+    "队伍14": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2364,
+                "y": 1204
+            }
+        },
+        "next": [
+            "队伍编制14",
+            "[JumpBack]队伍点击14"
+        ]
+    },
+    "队伍15": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2486,
+                "y": -968
+            }
+        },
+        "next": [
+            "队伍编制15",
+            "[JumpBack]队伍点击15"
+        ]
+    },
+    "队伍1点击": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    465,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2661,
+                "y": 644
+            }
+        }
+    },
+    "队伍2": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2326,
+                "y": -9
+            }
+        },
+        "next": [
+            "队伍编制2",
+            "[JumpBack]队伍2点击"
+        ]
+    },
+    "队伍2点击": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    490,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2659,
+                "y": 51
+            }
+        }
+    },
+    "队伍3": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2480,
+                "y": -544
+            }
+        },
+        "next": [
+            "队伍编制3",
+            "[JumpBack]队伍点击3"
+        ]
+    },
+    "队伍4": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2491,
+                "y": -1538
+            }
+        },
+        "next": [
+            "队伍编制4",
+            "[JumpBack]队伍点击4"
+        ]
+    },
+    "队伍5": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2491,
+                "y": -2070
+            }
+        },
+        "next": [
+            "队伍编制5",
+            "[JumpBack]队伍点击5"
+        ]
+    },
+    "队伍6": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2501,
+                "y": -2627
+            }
+        },
+        "next": [
+            "队伍编制6",
+            "[JumpBack]队伍点击6"
+        ]
+    },
+    "队伍7": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2502,
+                "y": -3192
+            }
+        },
+        "next": [
+            "队伍编制7",
+            "[JumpBack]队伍点击7"
+        ]
+    },
+    "队伍8": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2490,
+                "y": -3747
+            }
+        },
+        "next": [
+            "队伍编制8",
+            "[JumpBack]队伍点击8"
+        ]
+    },
+    "队伍9": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2495,
+                "y": -4344
+            }
+        },
+        "next": [
+            "队伍编制9",
+            "[JumpBack]队伍点击9"
+        ]
+    },
+    "队伍点击10": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    689,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2693,
+                "y": 3460
+            }
+        }
+    },
+    "队伍点击11": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    715,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2683,
+                "y": 2875
+            }
+        }
+    },
+    "队伍点击12": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    741,
+                    49,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2678,
+                "y": 2275
+            }
+        }
+    },
+    "队伍点击13": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    765,
+                    49,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2703,
+                "y": 1704
+            }
+        }
+    },
+    "队伍点击14": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    790,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2701,
+                "y": 1134
+            }
+        }
+    },
+    "队伍点击15": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    815,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2823,
+                "y": -1038
+            }
+        }
+    },
+    "队伍点击3": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    514,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2761,
+                "y": -445
+            }
+        }
+    },
+    "队伍点击4": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    540,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2828,
+                "y": -1608
+            }
+        }
+    },
+    "队伍点击5": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    564,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2828,
+                "y": -2140
+            }
+        }
+    },
+    "队伍点击6": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    591,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2838,
+                "y": -2697
+            }
+        }
+    },
+    "队伍点击7": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    614,
+                    50,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2839,
+                "y": -3262
+            }
+        }
+    },
+    "队伍点击8": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    640,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2827,
+                "y": -3817
+            }
+        }
+    },
+    "队伍点击9": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    665,
+                    51,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2832,
+                "y": -4414
+            }
+        }
+    },
+    "队伍编制": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "队伍编制.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    892,
+                    140,
+                    201,
+                    62
+                ]
+            }
+        },
+        "pre_wait_freezes": 500,
+        "$__mpe_code": {
+            "position": {
+                "x": 1976,
+                "y": 331
+            }
+        },
+        "next": [
+            "队伍1"
+        ]
+    },
+    "队伍编制1": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "template": [
+                    "D1.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2656,
+                "y": 324
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制10": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D10.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2707,
+                "y": 3180
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制11": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D11.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2697,
+                "y": 2595
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制12": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D12.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2692,
+                "y": 1995
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制13": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D13.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2717,
+                "y": 1424
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制14": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D14.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2715,
+                "y": 854
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制15": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "d15.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2837,
+                "y": -1318
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制2": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D2.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2654,
+                "y": -199
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制3": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D3.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2755,
+                "y": -694
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制4": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D4.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2842,
+                "y": -1888
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制5": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D5.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2842,
+                "y": -2420
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制6": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D6.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2852,
+                "y": -2977
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制7": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D7.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2853,
+                "y": -3542
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制8": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D8.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2841,
+                "y": -4097
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍编制9": {
+        "recognition": {
+            "type": "FeatureMatch",
+            "param": {
+                "roi": [
+                    440,
+                    2,
+                    416,
+                    62
+                ],
+                "template": [
+                    "D9.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2846,
+                "y": -4694
+            }
+        },
+        "next": [
+            "队伍界面决定"
+        ]
+    },
+    "队伍选择": {
+        "$__mpe_code": {
+            "position": {
+                "x": 937,
+                "y": 489
+            }
+        },
+        "next": [
+            "编队",
+            "[JumpBack]菜单"
+        ]
+    },
+    "队伍点击决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "决定.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3488,
+                "y": 388
+            }
+        }
+    },
+    "队伍确定菜单": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3494,
+                "y": 167
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "$__mpe_external_回主界面_新建Pipeline2": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3800,
+                "y": 187
+            }
+        }
+    }
+}

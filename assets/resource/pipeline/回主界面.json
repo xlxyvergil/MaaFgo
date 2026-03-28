@@ -1,0 +1,124 @@
+{
+    "$__mpe_config_回主界面": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\回主界面.json",
+            "filename": "回主界面",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774266306841,
+            "prefix": "",
+            "version": "v1.2.3"
+        }
+    },
+    "主界面判断-二次菜单": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1448,
+                "y": 290
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "recognition": {
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "主界面判断-关闭": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1452,
+                "y": 79
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "recognition": {
+            "param": {
+                "template": [
+                    "菜单关闭.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "主界面判断-活动报酬": {
+        "$__mpe_code": {
+            "position": {
+                "x": 755,
+                "y": 48
+            }
+        },
+        "next": [
+            "主界面判断-菜单",
+            "[JumpBack]主界面判断-返回"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "活动报酬.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "主界面判断-菜单": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1080,
+                "y": 97
+            }
+        },
+        "action": {
+            "param": {},
+            "type": "Click"
+        },
+        "next": [
+            "主界面判断-关闭",
+            "[JumpBack]主界面判断-二次菜单"
+        ],
+        "recognition": {
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            },
+            "type": "TemplateMatch"
+        }
+    },
+    "主界面判断-返回": {
+        "$__mpe_code": {
+            "position": {
+                "x": 1080,
+                "y": 336
+            }
+        },
+        "action": {
+            "param": {
+                "key": [
+                    111
+                ]
+            },
+            "type": "ClickKey"
+        }
+    },
+    "回主界面": {
+        "$__mpe_code": {
+            "position": {
+                "x": 381,
+                "y": 67
+            }
+        },
+        "next": [
+            "主界面判断-活动报酬",
+            "[JumpBack]主界面判断-返回"
+        ]
+    }
+}

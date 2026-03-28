@@ -1,0 +1,56 @@
+{
+    "$__mpe_config_新建Pipeline4": {
+        "$__mpe_code": {
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\章节导航.json",
+            "filename": "新建Pipeline4",
+            "isModifiedExternally": false,
+            "lastSyncTime": 1774270486472,
+            "prefix": "",
+            "savedViewport": {
+                "x": 740,
+                "y": 786,
+                "zoom": 1
+            },
+            "version": "v1.2.3"
+        }
+    },
+    "$__mpe_external_主线记录1导航_新建Pipeline4": {
+        "$__mpe_code": {
+            "position": {
+                "x": 767,
+                "y": -89
+            }
+        }
+    },
+    "$__mpe_external_冬木导航_新建Pipeline4": {
+        "$__mpe_code": {
+            "position": {
+                "x": 802,
+                "y": -285
+            }
+        }
+    },
+    "c冬木": {
+        "$__mpe_code": {
+            "position": {
+                "x": 398,
+                "y": -217
+            }
+        },
+        "next": [
+            "冬木导航",
+            "[JumpBack]主线记录1导航"
+        ]
+    },
+    "章节导航": {
+        "$__mpe_code": {
+            "position": {
+                "x": 63,
+                "y": -212
+            }
+        },
+        "next": [
+            "c冬木"
+        ]
+    }
+}

@@ -1,0 +1,136 @@
+{
+    "option": {
+        "quest_阿纳斯塔西娅": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "锚点",
+                    "label": "锚点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q锚点"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·斯摩棱斯克",
+                    "label": "雅嘎·斯摩棱斯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·斯摩棱斯克"
+                        }
+                    }
+                },
+                {
+                    "name": "风穴冰窟",
+                    "label": "风穴冰窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q风穴冰窟"
+                        }
+                    }
+                },
+                {
+                    "name": "反叛军的堡垒",
+                    "label": "反叛军的堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q反叛军的堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·瑟乔夫卡",
+                    "label": "雅嘎·瑟乔夫卡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·瑟乔夫卡"
+                        }
+                    }
+                },
+                {
+                    "name": "烧光的村庄",
+                    "label": "烧光的村庄",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q烧光的村庄"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·维亚济马",
+                    "label": "雅嘎·维亚济马",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·维亚济马"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·杰缅斯克",
+                    "label": "雅嘎·杰缅斯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·杰缅斯克"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·图拉",
+                    "label": "雅嘎·图拉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·图拉"
+                        }
+                    }
+                },
+                {
+                    "name": "遭毁灭的村庄",
+                    "label": "遭毁灭的村庄",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q遭毁灭的村庄"
+                        }
+                    }
+                },
+                {
+                    "name": "大溪谷之堡垒",
+                    "label": "大溪谷之堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大溪谷之堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·莫斯科",
+                    "label": "雅嘎·莫斯科",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·莫斯科"
+                        }
+                    }
+                },
+                {
+                    "name": "大树根部",
+                    "label": "大树根部",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大树根部"
+                        }
+                    }
+                },
+                {
+                    "name": "雅嘎·梁赞",
+                    "label": "雅嘎·梁赞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q雅嘎·梁赞"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

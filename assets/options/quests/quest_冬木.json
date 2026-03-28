@@ -1,0 +1,83 @@
+{
+    "option": {
+        "quest_冬木": {
+            "type": "select",
+            "label": "关卡",
+            "default": "未确认坐标X-A",
+            "cases": [
+                {
+                    "name": "未确认坐标X-A",
+                    "label": "未确认坐标X-A",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-A"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-B",
+                    "label": "未确认坐标X-B",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-B"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-C",
+                    "label": "未确认坐标X-C",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-C"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-D",
+                    "label": "未确认坐标X-D",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-D"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-E",
+                    "label": "未确认坐标X-E",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-E"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-F",
+                    "label": "未确认坐标X-F",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-F"
+                        }
+                    }
+                },
+                {
+                    "name": "未确认坐标X-G",
+                    "label": "未确认坐标X-G",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q未确认坐标X-G"
+                        }
+                    }
+                },
+                {
+                    "name": "变动坐标点0号",
+                    "label": "变动坐标点0号",
+                    "pipeline_override": {
+                        "冬木关卡选择": {
+                            "next": "q变动坐标点0号"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

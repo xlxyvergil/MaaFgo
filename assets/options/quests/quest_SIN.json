@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_SIN": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "播种地",
+                    "label": "播种地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q播种地"
+                        }
+                    }
+                },
+                {
+                    "name": "邻村",
+                    "label": "邻村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q邻村"
+                        }
+                    }
+                },
+                {
+                    "name": "冰冷窟",
+                    "label": "冰冷窟",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q冰冷窟"
+                        }
+                    }
+                },
+                {
+                    "name": "芥之阵营",
+                    "label": "芥之阵营",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q芥之阵营"
+                        }
+                    }
+                },
+                {
+                    "name": "景阳原",
+                    "label": "景阳原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q景阳原"
+                        }
+                    }
+                },
+                {
+                    "name": "山阳丘",
+                    "label": "山阳丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q山阳丘"
+                        }
+                    }
+                },
+                {
+                    "name": "收容所",
+                    "label": "收容所",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q收容所"
+                        }
+                    }
+                },
+                {
+                    "name": "石泉峡",
+                    "label": "石泉峡",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q石泉峡"
+                        }
+                    }
+                },
+                {
+                    "name": "大坪峪",
+                    "label": "大坪峪",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大坪峪"
+                        }
+                    }
+                },
+                {
+                    "name": "咸阳",
+                    "label": "咸阳",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q咸阳"
+                        }
+                    }
+                },
+                {
+                    "name": "八门洞",
+                    "label": "八门洞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q八门洞"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

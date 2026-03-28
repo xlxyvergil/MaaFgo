@@ -1,0 +1,136 @@
+{
+    "option": {
+        "quest_卡美洛": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "沙尘暴的沙漠",
+                    "label": "沙尘暴的沙漠",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q沙尘暴的沙漠"
+                        }
+                    }
+                },
+                {
+                    "name": "黎明的沙丘",
+                    "label": "黎明的沙丘",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黎明的沙丘"
+                        }
+                    }
+                },
+                {
+                    "name": "死之荒野",
+                    "label": "死之荒野",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q死之荒野"
+                        }
+                    }
+                },
+                {
+                    "name": "东之村",
+                    "label": "东之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东之村"
+                        }
+                    }
+                },
+                {
+                    "name": "圆桌要塞",
+                    "label": "圆桌要塞",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圆桌要塞"
+                        }
+                    }
+                },
+                {
+                    "name": "晚钟庙",
+                    "label": "晚钟庙",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q晚钟庙"
+                        }
+                    }
+                },
+                {
+                    "name": "西之村遗迹",
+                    "label": "西之村遗迹",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西之村遗迹"
+                        }
+                    }
+                },
+                {
+                    "name": "阿特拉斯院",
+                    "label": "阿特拉斯院",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿特拉斯院"
+                        }
+                    }
+                },
+                {
+                    "name": "隐秘之村",
+                    "label": "隐秘之村",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q隐秘之村"
+                        }
+                    }
+                },
+                {
+                    "name": "大神殿",
+                    "label": "大神殿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大神殿"
+                        }
+                    }
+                },
+                {
+                    "name": "圣都正门",
+                    "label": "圣都正门",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圣都正门"
+                        }
+                    }
+                },
+                {
+                    "name": "圣都市街",
+                    "label": "圣都市街",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q圣都市街"
+                        }
+                    }
+                },
+                {
+                    "name": "王城",
+                    "label": "王城",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王城"
+                        }
+                    }
+                },
+                {
+                    "name": "无之大地",
+                    "label": "无之大地",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q无之大地"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

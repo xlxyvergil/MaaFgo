@@ -1,0 +1,23 @@
+{
+    "option": {
+        "mumu_path": {
+            "type": "input",
+            "label": "MuMu模拟器路径",
+            "inputs": [
+                {
+                    "name": "mumu_path",
+                    "label": "模拟器路径",
+                    "default": "",
+                    "pipeline_type": "string"
+                }
+            ],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "mumu_path": "{mumu_path}"
+                    }
+                }
+            }
+        }
+    }
+}

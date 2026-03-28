@@ -1,0 +1,145 @@
+{
+    "option": {
+        "quest_Ordeal Call": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "俄罗斯区域",
+                    "label": "俄罗斯区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q俄罗斯区域"
+                        }
+                    }
+                },
+                {
+                    "name": "东欧区域",
+                    "label": "东欧区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东欧区域"
+                        }
+                    }
+                },
+                {
+                    "name": "夏威夷区域·常夏的休假",
+                    "label": "夏威夷区域·常夏的休假",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q夏威夷区域·常夏的休假"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲西部区域",
+                    "label": "美洲西部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲西部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "大洋洲北部区域",
+                    "label": "大洋洲北部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大洋洲北部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "北欧区域",
+                    "label": "北欧区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北欧区域"
+                        }
+                    }
+                },
+                {
+                    "name": "加勒比海区域",
+                    "label": "加勒比海区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q加勒比海区域"
+                        }
+                    }
+                },
+                {
+                    "name": "东亚区域",
+                    "label": "东亚区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q东亚区域"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲南部区域",
+                    "label": "美洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "非洲南部区域",
+                    "label": "非洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q非洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "南亚区域",
+                    "label": "南亚区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q南亚区域"
+                        }
+                    }
+                },
+                {
+                    "name": "北大西洋区域·光之丝线引导的迷宫",
+                    "label": "北大西洋区域·光之丝线引导的迷宫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q北大西洋区域·光之丝线引导的迷宫"
+                        }
+                    }
+                },
+                {
+                    "name": "美洲东部区域",
+                    "label": "美洲东部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q美洲东部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "大洋洲南部区域",
+                    "label": "大洋洲南部区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q大洋洲南部区域"
+                        }
+                    }
+                },
+                {
+                    "name": "西非区域",
+                    "label": "西非区域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q西非区域"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

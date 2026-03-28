@@ -1,0 +1,22 @@
+{
+    "task": [
+        {
+            "name": "日常战斗",
+            "description": "由于导航功能尚未完善（基本的地图的导航都还没做），暂时不可用。战斗相关BBC使用把bbc放入根目录的BBC文件夹内。拿bbc的 settings 文件夹位置做参考，如下。./BBC/BBchannel/settings",
+            "entry": "日常战斗",
+            "controller": [
+                "安卓设备",
+                "Win32"
+            ],
+            "option": [
+                "chapter",
+                "team_index",
+                "bbc_team_config",
+                "bbc_run_count",
+                "apple_type",
+                "support_order_mismatch",
+                "team_config_error"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,109 @@
+{
+    "option": {
+        "quest_俄刻阿诺斯": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "海盗船",
+                    "label": "海盗船",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海盗船"
+                        }
+                    }
+                },
+                {
+                    "name": "海盗岛",
+                    "label": "海盗岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q海盗岛"
+                        }
+                    }
+                },
+                {
+                    "name": "王者的居岛",
+                    "label": "王者的居岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王者的居岛"
+                        }
+                    }
+                },
+                {
+                    "name": "地图上标记的岛",
+                    "label": "地图上标记的岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q地图上标记的岛"
+                        }
+                    }
+                },
+                {
+                    "name": "潮眼之海",
+                    "label": "潮眼之海",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q潮眼之海"
+                        }
+                    }
+                },
+                {
+                    "name": "翼龙之岛",
+                    "label": "翼龙之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q翼龙之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "暴风雨海域",
+                    "label": "暴风雨海域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q暴风雨海域"
+                        }
+                    }
+                },
+                {
+                    "name": "群岛·寂静的入海口",
+                    "label": "群岛·寂静的入海口",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q群岛·寂静的入海口"
+                        }
+                    }
+                },
+                {
+                    "name": "暗礁海域",
+                    "label": "暗礁海域",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q暗礁海域"
+                        }
+                    }
+                },
+                {
+                    "name": "火山臼之岛",
+                    "label": "火山臼之岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q火山臼之岛"
+                        }
+                    }
+                },
+                {
+                    "name": "丰硕之海",
+                    "label": "丰硕之海",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q丰硕之海"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

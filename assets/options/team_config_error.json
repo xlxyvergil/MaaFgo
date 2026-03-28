@@ -1,0 +1,33 @@
+{
+    "option": {
+        "team_config_error": {
+            "type": "select",
+            "label": "队伍配置错误！",
+            "default": "ignore",
+            "cases": [
+                {
+                    "name": "ignore",
+                    "label": "停止",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "team_config_error": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "continue",
+                    "label": "继续",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "team_config_error": true
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,100 @@
+{
+    "option": {
+        "quest_奥尔良": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "栋雷米",
+                    "label": "栋雷米",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q栋雷米"
+                        }
+                    }
+                },
+                {
+                    "name": "沃库勒尔",
+                    "label": "沃库勒尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q沃库勒尔"
+                        }
+                    }
+                },
+                {
+                    "name": "拉沙里泰",
+                    "label": "拉沙里泰",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拉沙里泰"
+                        }
+                    }
+                },
+                {
+                    "name": "汝拉",
+                    "label": "汝拉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q汝拉"
+                        }
+                    }
+                },
+                {
+                    "name": "里昂",
+                    "label": "里昂",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q里昂"
+                        }
+                    }
+                },
+                {
+                    "name": "蒂耶尔",
+                    "label": "蒂耶尔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒂耶尔"
+                        }
+                    }
+                },
+                {
+                    "name": "奥尔良",
+                    "label": "奥尔良",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q奥尔良"
+                        }
+                    }
+                },
+                {
+                    "name": "巴黎",
+                    "label": "巴黎",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q巴黎"
+                        }
+                    }
+                },
+                {
+                    "name": "马赛",
+                    "label": "马赛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q马赛"
+                        }
+                    }
+                },
+                {
+                    "name": "波尔多",
+                    "label": "波尔多",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q波尔多"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,102 @@
+{
+    "$__mpe_config_新建Pipeline7": {
+        "$__mpe_code": {
+            "prefix": "",
+            "lastSyncTime": 1774270427693,
+            "isModifiedExternally": false,
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\主线记录1导航.json",
+            "isDeleted": true,
+            "savedViewport": {
+                "x": 1238,
+                "y": 565,
+                "zoom": 1
+            },
+            "filename": "新建Pipeline7",
+            "version": "v1.2.3"
+        }
+    },
+    "主线记录1导航": {
+        "$__mpe_code": {
+            "position": {
+                "x": -301,
+                "y": -97
+            }
+        },
+        "next": [
+            "点击主线记录1",
+            "[JumpBack]寻找主线记录1"
+        ]
+    },
+    "寻找主线记录1": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1198,
+                    557,
+                    19,
+                    21
+                ],
+                "duration": [
+                    100
+                ],
+                "end": [
+                    [
+                        1192,
+                        275,
+                        24,
+                        27
+                    ]
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 166,
+                "y": 73
+            }
+        },
+        "next": [
+            "寻找主线记录1-1"
+        ]
+    },
+    "点击主线记录1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "主线记录1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 164,
+                "y": -160
+            }
+        },
+        "next": [
+            "点击主线记录1-1"
+        ]
+    },
+    "点击主线记录1-1": {
+        "$__mpe_code": {
+            "position": {
+                "x": 488,
+                "y": -138
+            }
+        }
+    },
+    "寻找主线记录1-1": {
+        "$__mpe_code": {
+            "position": {
+                "x": 503,
+                "y": 109
+            }
+        }
+    }
+}

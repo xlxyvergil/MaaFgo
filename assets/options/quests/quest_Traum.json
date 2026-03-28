@@ -1,0 +1,154 @@
+{
+    "option": {
+        "quest_Traum": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "边界城镇",
+                    "label": "边界城镇",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q边界城镇"
+                        }
+                    }
+                },
+                {
+                    "name": "破晓平原",
+                    "label": "破晓平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q破晓平原"
+                        }
+                    }
+                },
+                {
+                    "name": "中部森林",
+                    "label": "中部森林",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q中部森林"
+                        }
+                    }
+                },
+                {
+                    "name": "黄昏之森",
+                    "label": "黄昏之森",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q黄昏之森"
+                        }
+                    }
+                },
+                {
+                    "name": "天崄山脉",
+                    "label": "天崄山脉",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q天崄山脉"
+                        }
+                    }
+                },
+                {
+                    "name": "王道界域据点",
+                    "label": "王道界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q王道界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "克桑滕之塔",
+                    "label": "克桑滕之塔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q克桑滕之塔"
+                        }
+                    }
+                },
+                {
+                    "name": "阿查果克堡垒",
+                    "label": "阿查果克堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿查果克堡垒"
+                        }
+                    }
+                },
+                {
+                    "name": "湖畔平原",
+                    "label": "湖畔平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q湖畔平原"
+                        }
+                    }
+                },
+                {
+                    "name": "锡尔米乌姆",
+                    "label": "锡尔米乌姆",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q锡尔米乌姆"
+                        }
+                    }
+                },
+                {
+                    "name": "复权界域据点",
+                    "label": "复权界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q复权界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "门前平原",
+                    "label": "门前平原",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q门前平原"
+                        }
+                    }
+                },
+                {
+                    "name": "复仇界域据点",
+                    "label": "复仇界域据点",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q复仇界域据点"
+                        }
+                    }
+                },
+                {
+                    "name": "莱辛巴赫",
+                    "label": "莱辛巴赫",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q莱辛巴赫"
+                        }
+                    }
+                },
+                {
+                    "name": "止境荒野",
+                    "label": "止境荒野",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q止境荒野"
+                        }
+                    }
+                },
+                {
+                    "name": "约维努斯堡垒",
+                    "label": "约维努斯堡垒",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q约维努斯堡垒"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

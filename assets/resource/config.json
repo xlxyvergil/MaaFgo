@@ -1,0 +1,31 @@
+{
+    "server": {
+        "port": 9066,
+        "host": "localhost"
+    },
+    "file": {
+        "root": "D:\\fgo\\MaaFgo\\assets\\resource",
+        "exclude": [
+            "node_modules",
+            ".git",
+            "dist",
+            "build"
+        ],
+        "extensions": [
+            ".json",
+            ".jsonc"
+        ],
+        "max_depth": 10,
+        "max_files": 10000
+    },
+    "log": {
+        "level": "INFO",
+        "dir": "I:\\MaaPipelineExtremer-windows-amd64-v1.2.3\\logs",
+        "push_to_client": true
+    },
+    "maafw": {
+        "enabled": true,
+        "lib_dir": "D:\\fgo\\MaaFgo\\deps\\bin",
+        "resource_dir": "D:\\fgo\\MaaFgo\\assets\\resource"
+    }
+}

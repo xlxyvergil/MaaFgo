@@ -1,0 +1,299 @@
+{
+    "option": {
+        "chapter": {
+            "type": "select",
+            "label": "章节",
+            "default": "冬木",
+            "cases": [
+                {
+                    "name": "冬木",
+                    "label": "冬木",
+                    "option": [
+                        "quest_冬木"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c冬木"
+                        }
+                    }
+                },
+                {
+                    "name": "奥尔良",
+                    "label": "奥尔良",
+                    "option": [
+                        "quest_奥尔良"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c奥尔良"
+                        }
+                    }
+                },
+                {
+                    "name": "七丘之城",
+                    "label": "七丘之城",
+                    "option": [
+                        "quest_七丘之城"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c七丘之城"
+                        }
+                    }
+                },
+                {
+                    "name": "俄刻阿诺斯",
+                    "label": "俄刻阿诺斯",
+                    "option": [
+                        "quest_俄刻阿诺斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c俄刻阿诺斯"
+                        }
+                    }
+                },
+                {
+                    "name": "伦敦",
+                    "label": "伦敦",
+                    "option": [
+                        "quest_伦敦"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c伦敦"
+                        }
+                    }
+                },
+                {
+                    "name": "合众为一",
+                    "label": "合众为一",
+                    "option": [
+                        "quest_合众为一"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c合众为一"
+                        }
+                    }
+                },
+                {
+                    "name": "卡美洛",
+                    "label": "卡美洛",
+                    "option": [
+                        "quest_卡美洛"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c卡美洛"
+                        }
+                    }
+                },
+                {
+                    "name": "巴比伦尼亚",
+                    "label": "巴比伦尼亚",
+                    "option": [
+                        "quest_巴比伦尼亚"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c巴比伦尼亚"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿",
+                    "label": "新宿",
+                    "option": [
+                        "quest_新宿"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c新宿"
+                        }
+                    }
+                },
+                {
+                    "name": "雅戈泰",
+                    "label": "雅戈泰",
+                    "option": [
+                        "quest_雅戈泰"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c雅戈泰"
+                        }
+                    }
+                },
+                {
+                    "name": "下总国",
+                    "label": "下总国",
+                    "option": [
+                        "quest_下总国"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c下总国"
+                        }
+                    }
+                },
+                {
+                    "name": "塞勒姆",
+                    "label": "塞勒姆",
+                    "option": [
+                        "quest_塞勒姆"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c塞勒姆"
+                        }
+                    }
+                },
+                {
+                    "name": "阿纳斯塔西娅",
+                    "label": "阿纳斯塔西娅",
+                    "option": [
+                        "quest_阿纳斯塔西娅"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c阿纳斯塔西娅"
+                        }
+                    }
+                },
+                {
+                    "name": "诸神黄昏",
+                    "label": "诸神黄昏",
+                    "option": [
+                        "quest_诸神黄昏"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c诸神黄昏"
+                        }
+                    }
+                },
+                {
+                    "name": "SIN",
+                    "label": "SIN",
+                    "option": [
+                        "quest_SIN"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cSIN"
+                        }
+                    }
+                },
+                {
+                    "name": "由伽·刹多罗",
+                    "label": "由伽·刹多罗",
+                    "option": [
+                        "quest_由伽·刹多罗"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c由伽·刹多罗"
+                        }
+                    }
+                },
+                {
+                    "name": "亚特兰蒂斯",
+                    "label": "亚特兰蒂斯",
+                    "option": [
+                        "quest_亚特兰蒂斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c亚特兰蒂斯"
+                        }
+                    }
+                },
+                {
+                    "name": "奥林波斯",
+                    "label": "奥林波斯",
+                    "option": [
+                        "quest_奥林波斯"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c奥林波斯"
+                        }
+                    }
+                },
+                {
+                    "name": "阿瓦隆·勒·菲",
+                    "label": "阿瓦隆·勒·菲",
+                    "option": [
+                        "quest_阿瓦隆·勒·菲"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c阿瓦隆·勒·菲"
+                        }
+                    }
+                },
+                {
+                    "name": "纳维·米克特兰",
+                    "label": "纳维·米克特兰",
+                    "option": [
+                        "quest_纳维·米克特兰"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c纳维·米克特兰"
+                        }
+                    }
+                },
+                {
+                    "name": "平安京",
+                    "label": "平安京",
+                    "option": [
+                        "quest_平安京"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c平安京"
+                        }
+                    }
+                },
+                {
+                    "name": "Traum",
+                    "label": "Traum",
+                    "option": [
+                        "quest_Traum"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cTraum"
+                        }
+                    }
+                },
+                {
+                    "name": "Ordeal Call",
+                    "label": "Ordeal Call",
+                    "option": [
+                        "quest_Ordeal Call"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "cOrdeal Call"
+                        }
+                    }
+                },
+                {
+                    "name": "平面之月",
+                    "label": "平面之月",
+                    "option": [
+                        "quest_平面之月"
+                    ],
+                    "pipeline_override": {
+                        "章节导航": {
+                            "next": "c平面之月"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

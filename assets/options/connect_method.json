@@ -1,0 +1,68 @@
+{
+    "option": {
+        "connect_method": {
+            "type": "select",
+            "label": "连接方式",
+            "default": "auto",
+            "cases": [
+                {
+                    "name": "auto",
+                    "label": "自动连接",
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "connect": "auto"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "mumu",
+                    "label": "MuMu高速连接",
+                    "option": [
+                        "mumu_path",
+                        "mumu_index",
+                        "mumu_pkg",
+                        "mumu_app_index"
+                    ],
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "connect": "mumu"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "ldplayer",
+                    "label": "雷电高速连接",
+                    "option": [
+                        "ld_path",
+                        "ld_index"
+                    ],
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "connect": "ldplayer"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "manual",
+                    "label": "手动输入端口",
+                    "option": [
+                        "manual_port"
+                    ],
+                    "pipeline_override": {
+                        "执行BBC任务": {
+                            "attach": {
+                                "connect": "manual"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

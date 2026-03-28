@@ -1,0 +1,136 @@
+{
+    "option": {
+        "quest_合众为一": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "布拉克山",
+                    "label": "布拉克山",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q布拉克山"
+                        }
+                    }
+                },
+                {
+                    "name": "里弗顿",
+                    "label": "里弗顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q里弗顿"
+                        }
+                    }
+                },
+                {
+                    "name": "丹佛",
+                    "label": "丹佛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q丹佛"
+                        }
+                    }
+                },
+                {
+                    "name": "德明",
+                    "label": "德明",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q德明"
+                        }
+                    }
+                },
+                {
+                    "name": "拉伯克",
+                    "label": "拉伯克",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q拉伯克"
+                        }
+                    }
+                },
+                {
+                    "name": "达拉斯",
+                    "label": "达拉斯",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q达拉斯"
+                        }
+                    }
+                },
+                {
+                    "name": "亚历山德里亚",
+                    "label": "亚历山德里亚",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q亚历山德里亚"
+                        }
+                    }
+                },
+                {
+                    "name": "阿尔卡特拉斯岛",
+                    "label": "阿尔卡特拉斯岛",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q阿尔卡特拉斯岛"
+                        }
+                    }
+                },
+                {
+                    "name": "得梅因",
+                    "label": "得梅因",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q得梅因"
+                        }
+                    }
+                },
+                {
+                    "name": "卡尼",
+                    "label": "卡尼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q卡尼"
+                        }
+                    }
+                },
+                {
+                    "name": "蒙哥马利",
+                    "label": "蒙哥马利",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q蒙哥马利"
+                        }
+                    }
+                },
+                {
+                    "name": "夏洛特",
+                    "label": "夏洛特",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q夏洛特"
+                        }
+                    }
+                },
+                {
+                    "name": "华盛顿",
+                    "label": "华盛顿",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q华盛顿"
+                        }
+                    }
+                },
+                {
+                    "name": "芝加哥",
+                    "label": "芝加哥",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q芝加哥"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -1,0 +1,100 @@
+{
+    "option": {
+        "quest_新宿": {
+            "type": "select",
+            "label": "关卡",
+            "cases": [
+                {
+                    "name": "代代木二丁目",
+                    "label": "代代木二丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q代代木二丁目"
+                        }
+                    }
+                },
+                {
+                    "name": "国道20号",
+                    "label": "国道20号",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q国道20号"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿站",
+                    "label": "新宿站",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿站"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿四丁目",
+                    "label": "新宿四丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿四丁目"
+                        }
+                    }
+                },
+                {
+                    "name": "歌舞伎町",
+                    "label": "歌舞伎町",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q歌舞伎町"
+                        }
+                    }
+                },
+                {
+                    "name": "枪身塔",
+                    "label": "枪身塔",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q枪身塔"
+                        }
+                    }
+                },
+                {
+                    "name": "舞会会场",
+                    "label": "舞会会场",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q舞会会场"
+                        }
+                    }
+                },
+                {
+                    "name": "塔顶楼",
+                    "label": "塔顶楼",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q塔顶楼"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿御苑",
+                    "label": "新宿御苑",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿御苑"
+                        }
+                    }
+                },
+                {
+                    "name": "新宿二丁目",
+                    "label": "新宿二丁目",
+                    "pipeline_override": {
+                        "关卡导航": {
+                            "next": "q新宿二丁目"
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

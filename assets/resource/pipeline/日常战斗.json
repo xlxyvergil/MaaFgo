@@ -1,0 +1,17 @@
+{
+    "日常战斗": {
+        "$__mpe_code": {
+            "position": {
+                "x": -253,
+                "y": 405
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "ExecuteSequentialTasks",
+                "custom_action_param": "回主界面,队伍选择,章节导航,队伍配置"
+            }
+        }
+    }
+}
