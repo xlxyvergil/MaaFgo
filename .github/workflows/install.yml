@@ -80,30 +80,7 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            platform: linux
-            platform_filename: linux
-            arch: x86_64
-            arch_filename: x64
-
-          - os: ubuntu-24.04-arm
-            platform: linux
-            platform_filename: linux
-            arch: aarch64
-            arch_filename: arm64
-
-          - os: macos-15-intel
-            platform: macos
-            platform_filename: osx
-            arch: x86_64
-            arch_filename: x64
-
-          - os: macos-15
-            platform: macos
-            platform_filename: osx
-            arch: aarch64
-            arch_filename: arm64
-
+          # 仅保留 Windows 平台
           - os: windows-2025
             platform: win
             platform_filename: win
