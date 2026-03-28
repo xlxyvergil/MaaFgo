@@ -134,6 +134,7 @@ jobs:
           uv run ./copy_resources.py
           cp -r assets/options build/options
           cp -r assets/i18n build/i18n
+          cp -r assets/BBchannel build/BBchannel
       - name: Download Dependencies
         shell: bash
         run: |
