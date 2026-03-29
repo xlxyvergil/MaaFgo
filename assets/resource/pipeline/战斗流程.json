@@ -156,6 +156,7 @@
                 "custom_action": "execute_bbc_task"
             }
         },
+        "bbc_team_config": "",
         "apple_type": "铜苹果",
         "run_count": 1,
         "battle_type": "continuous",

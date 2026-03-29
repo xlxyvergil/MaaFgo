@@ -171,91 +171,7 @@ def _wait_for_bbc_tcp(timeout: int = 30) -> bool:
     return False
 
 
-def _parse_single_param(argv: CustomAction.RunArg) -> str:
-    """解析单个参数值，去掉可能的引号"""
-    param = argv.custom_action_param if argv.custom_action_param else ""
-    param = param.strip()
-    # 循环去除多层引号
-    while len(param) >= 2:
-        if (param.startswith('"') and param.endswith('"')):
-            param = param[1:-1].strip()
-        elif (param.startswith("'") and param.endswith("'")):
-            param = param[1:-1].strip()
-        else:
-            break
-    return param
-
-
-# ==================== Action 1: 设置 BBC 配置 ====================
-@AgentServer.custom_action("setup_bbc_config")
-class SetupBbcConfig(CustomAction):
-    """设置 BBC 队伍配置 - 启动BBC，加载队伍配置"""
-
-    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
-        print(f"[SetupBbcConfig] 开始执行")
-        
-        bbc_team_config = _parse_single_param(argv)
-        
-        if not bbc_team_config:
-            print("错误：未提供队伍配置文件路径")
-            return CustomAction.RunResult(success=False)
-        
-        print(f"[SetupBbcConfig] team_config={bbc_team_config}")
-        
-        # 检查BBC可执行文件
-        if not os.path.exists(BBC_EXE_PATH):
-            print(f"BBC可执行文件不存在: {BBC_EXE_PATH}")
-            return CustomAction.RunResult(success=False)
-        
-        # 启动BBC进程
-        print("[SetupBbcConfig] 启动 BBC 进程...")
-        subprocess.Popen(BBC_EXE_PATH, shell=True)
-        
-        # 等待TCP服务就绪
-        print("[SetupBbcConfig] 等待 TCP 服务就绪...")
-        if not _wait_for_bbc_tcp(timeout=30):
-            print("[SetupBbcConfig] TCP 服务未就绪")
-            return CustomAction.RunResult(success=False)
-        
-        # 连接TCP服务（创建独立客户端）
-        print("[SetupBbcConfig] 连接 TCP 服务...")
-        tcp_client = BbcTcpClient()
-        if not tcp_client.connect(timeout=10):
-            print("[SetupBbcConfig] TCP 连接失败")
-            return CustomAction.RunResult(success=False)
-        
-        # 等待免责声明关闭（通过弹窗关闭通知）
-        print("[SetupBbcConfig] 等待免责声明关闭...")
-        disclaimer_closed = threading.Event()
-        
-        def wait_disclaimer(popup_data):
-            if popup_data.get('type') == 'popup_closed':
-                title = popup_data.get('title', '')
-                if '免责声明' in title:
-                    print("[SetupBbcConfig] 免责声明已关闭")
-                    disclaimer_closed.set()
-        
-        tcp_client.popup_callbacks.append(wait_disclaimer)
-        tcp_client.start_listening()
-        
-        # 等待免责声明关闭（无限等待）
-        disclaimer_closed.wait()
-        
-        # 发送加载配置命令
-        print(f"[SetupBbcConfig] 加载队伍配置: {bbc_team_config}")
-        result = tcp_client.send_command('load_config', {'filename': bbc_team_config}, timeout=10)
-        
-        if result.get('success'):
-            print("[SetupBbcConfig] 配置加载成功")
-            tcp_client.stop()
-            return CustomAction.RunResult(success=True)
-        else:
-            print(f"[SetupBbcConfig] 配置加载失败: {result}")
-            tcp_client.stop()
-            return CustomAction.RunResult(success=False)
-
-
-# ==================== Action 2: 执行BBC任务（整合版）====================
+# ==================== Action: 执行BBC任务（整合版）====================
 @AgentServer.custom_action("execute_bbc_task")
 class ExecuteBbcTask(CustomAction):
     """执行BBC任务 - 根据连接方式执行相应流程"""
@@ -269,11 +185,12 @@ class ExecuteBbcTask(CustomAction):
             print(f"[ExecuteBbcTask] 错误：无法获取节点数据")
             return CustomAction.RunResult(success=False)
         
-        # 从 attach 字段获取参数
+        # 从 attach 字段获取所有参数
         attach_data = node_data.get('attach', {})
         print(f"[ExecuteBbcTask] attach_data={attach_data}")
         
         # 提取所有参数
+        team_config = attach_data.get('bbc_team_config', '')
         run_count = attach_data.get('run_count')
         apple_type = attach_data.get('apple_type')
         battle_type = attach_data.get('battle_type', '连续出击')
@@ -291,44 +208,95 @@ class ExecuteBbcTask(CustomAction):
         manual_port = attach_data.get('manual_port', '')
         
         # 验证必需参数
+        if not team_config:
+            print(f"[ExecuteBbcTask] 错误：未提供队伍配置文件路径")
+            return CustomAction.RunResult(success=False)
+        
         if run_count is None or apple_type is None:
             print(f"[ExecuteBbcTask] 错误：参数不完整，run_count={run_count}, apple_type={apple_type}")
             return CustomAction.RunResult(success=False)
         
         run_count = int(run_count)
-        print(f"[ExecuteBbcTask] run_count={run_count}, apple_type={apple_type}, battle_type={battle_type}, connect={connect}")
+        print(f"[ExecuteBbcTask] team_config={team_config}, run_count={run_count}, apple_type={apple_type}, battle_type={battle_type}, connect={connect}")
         
-        # 执行BBC战斗流程
-        if not self._execute_bbc_battle(
-            run_count, apple_type, battle_type, connect,
+        # 执行完整BBC流程（启动+配置+战斗）
+        if not self._execute_full_bbc_flow(
+            team_config, run_count, apple_type, battle_type, connect,
             support_order_mismatch, team_config_error,
             mumu_path, mumu_index, mumu_pkg, mumu_app_index,
             ld_path, ld_index, manual_port
         ):
-            print("[ExecuteBbcTask] 错误：BBC战斗执行失败")
+            print("[ExecuteBbcTask] 错误：BBC执行失败")
             return CustomAction.RunResult(success=False)
         
         print("[ExecuteBbcTask] 任务已完成")
         return CustomAction.RunResult(success=True)
     
-    def _execute_bbc_battle(self, run_count, apple_type, battle_type, connect,
-                           support_order_mismatch, team_config_error,
-                           mumu_path, mumu_index, mumu_pkg, mumu_app_index,
-                           ld_path, ld_index, manual_port):
-        """执行BBC战斗流程"""
+    def _execute_full_bbc_flow(self, team_config, run_count, apple_type, battle_type, connect,
+                                support_order_mismatch, team_config_error,
+                                mumu_path, mumu_index, mumu_pkg, mumu_app_index,
+                                ld_path, ld_index, manual_port):
+        """执行完整BBC流程：启动 -> 配置 -> 战斗"""
         try:
-            # 等待 BBC TCP 服务就绪
+            # ========== 步骤1: 启动BBC ==========
+            print("[BBC] 步骤1: 启动BBC...")
+            
+            # 检查BBC可执行文件
+            if not os.path.exists(BBC_EXE_PATH):
+                print(f"[BBC] BBC可执行文件不存在: {BBC_EXE_PATH}")
+                return False
+            
+            # 启动BBC进程
+            print("[BBC] 启动 BBC 进程...")
+            subprocess.Popen(BBC_EXE_PATH, shell=True)
+            
+            # 等待TCP服务就绪
             print("[BBC] 等待 TCP 服务就绪...")
             if not _wait_for_bbc_tcp(timeout=30):
                 print("[BBC] TCP 服务未就绪")
                 return False
             
-            # 连接 TCP 服务（创建独立客户端）
-            print("[BBC] 创建 TCP 客户端...")
+            # 连接TCP服务
+            print("[BBC] 连接 TCP 服务...")
             tcp_client = BbcTcpClient()
             if not tcp_client.connect(timeout=10):
                 print("[BBC] TCP 连接失败")
                 return False
+            
+            # ========== 步骤2: 等待免责声明并加载配置 ==========
+            print("[BBC] 步骤2: 等待免责声明并加载配置...")
+            
+            disclaimer_closed = threading.Event()
+            
+            def wait_disclaimer(popup_data):
+                if popup_data.get('type') == 'popup_closed':
+                    title = popup_data.get('title', '')
+                    if '免责声明' in title:
+                        print("[BBC] 免责声明已关闭")
+                        disclaimer_closed.set()
+            
+            tcp_client.popup_callbacks.append(wait_disclaimer)
+            tcp_client.start_listening()
+            
+            # 等待免责声明关闭
+            disclaimer_closed.wait()
+            
+            # 加载队伍配置
+            print(f"[BBC] 加载队伍配置: {team_config}")
+            result = tcp_client.send_command('load_config', {'filename': team_config}, timeout=10)
+            
+            if not result.get('success'):
+                print(f"[BBC] 配置加载失败: {result}")
+                tcp_client.stop()
+                return False
+            
+            print("[BBC] 配置加载成功")
+            
+            # ========== 步骤3: 执行战斗 ==========
+            print("[BBC] 步骤3: 执行战斗...")
+            
+            # 清除之前的回调，设置新的弹窗处理
+            tcp_client.popup_callbacks.clear()
             
             # 存储弹窗处理配置和状态
             popup_config = {

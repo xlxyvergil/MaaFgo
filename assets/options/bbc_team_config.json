@@ -9,8 +9,10 @@
             "scan_filter": "*.json",
             "cases": [],
             "pipeline_override": {
-                "队伍配置": {
-                    "custom_action_param": "{bbc_team_config}"
+                "执行BBC任务": {
+                    "attach": {
+                        "bbc_team_config": "{bbc_team_config}"
+                    }
                 }
             }
         }
