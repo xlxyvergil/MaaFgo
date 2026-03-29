@@ -335,6 +335,19 @@ def start_tcp_server(bb_window, port=25001):
                 })())
                 return {'success': result}
             
+            elif command == 'connect_ld':
+                result = api_connect_ld(_bb_window_global, type('Args', (), {
+                    'path': args.get('path'),
+                    'index': args.get('index', 0)
+                })())
+                return {'success': result}
+            
+            elif command == 'connect_adb':
+                result = api_connect_adb(_bb_window_global, type('Args', (), {
+                    'ip': args.get('ip')
+                })())
+                return {'success': result}
+            
             elif command == 'set_appletype':
                 page = _bb_window_global.pages[0]
                 apple_type = args.get('type')
@@ -462,6 +475,7 @@ def api_connect_mumu(bb, args):
             with open("MuMuInstallPath.txt", "r", encoding="utf8") as f:
                 path = f.read().strip()
         if not path:
+            print("[API错误] 未指定MuMu安装路径")
             return False
     
     try:
@@ -504,20 +518,25 @@ def api_set_apple_type(page, apple_type):
         try:
             page.appleSet.appleIconPhoto = page.appleSet.getAppleIconPhoto()
             page.appleSet.appleIcon.config(image=page.appleSet.appleIconPhoto)
-        except:
-            pass
+            print(f"[API] 苹果类型已设置: {apple_type}")
+        except Exception as e:
+            print(f"[API警告] 苹果类型已设置但UI更新失败: {e}")
+            print(f"[API] 苹果类型已设置: {apple_type}")
 
 def api_set_run_times(page, times):
     """设置运行次数"""
     if times is not None:
         page.appleSet.runTimes.set(times)
+        print(f"[API] 运行次数: {times}")
 
 def api_set_battle_type(page, battle_type):
     """设置战斗类型"""
     if battle_type == "continuous":
         page.battletype.set(CT.BATTLE_TYPE[0])
+        print("[API] 战斗类型: 连续出击")
     elif battle_type == "single":
         page.battletype.set(CT.BATTLE_TYPE[1])
+        print("[API] 战斗类型: 单次")
 
 def api_load_config(bb, filename):
     """加载队伍配置文件（从第4步开始：直接应用配置）"""
@@ -562,6 +581,96 @@ def api_load_config(bb, filename):
         return True
     except Exception as e:
         log_to_file(f"[LoadConfig] Error: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def api_connect_ld(bb, args):
+    """连接雷电模拟器（高速接口）"""
+    import os
+    import json
+    
+    page = bb.pages[0]
+    
+    path = getattr(args, 'path', None)
+    index = getattr(args, 'index', 0) or 0
+    
+    if not path:
+        if os.path.exists("LDInstallPath.txt"):
+            with open("LDInstallPath.txt", "r", encoding="utf8") as f:
+                path = f.read().strip()
+        if not path:
+            print("[API错误] 未指定雷电安装路径")
+            return False
+    
+    try:
+        path = LDdevice.checkPath(path)
+        with open("LDInstallPath.txt", "w", encoding="utf8") as f:
+            f.write(path)
+        
+        device = LDdevice(path, index)
+        serialno = {'name': str(index)}
+        serialno_str = json.dumps(serialno, ensure_ascii=False)
+        device.set_serialno(serialno_str)
+        device.snapshot()
+        
+        # 创建 Windows 触摸设备
+        from device import Windows
+        touchDevice = Windows(device.player.bndWnd)
+        
+        # 设置设备
+        page.snapshotDevice = page.device.snapshotDevice = device
+        page.operateDevice = page.device.operateDevice = touchDevice
+        
+        bb.pagebar.tags[page.idx].createText(True)
+        bb.updateConnectLst(page.idx)
+        print(f"[API] 雷电连接成功：编号{index}")
+        return True
+    except Exception as e:
+        print(f"[API错误] 雷电连接失败：{e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+def api_connect_adb(bb, args):
+    """连接 ADB 设备（IP:端口方式）"""
+    import os
+    import sys
+    
+    page = bb.pages[0]
+    
+    ip_port = getattr(args, 'ip', None)
+    if not ip_port:
+        print("[API错误] ADB连接需要指定ip参数")
+        return False
+    
+    try:
+        # 使用 airtest 内置的 adb
+        adb_path = os.path.join(os.path.dirname(sys.executable), "airtest", "core", "android", "static", "adb", "windows")
+        if not os.path.exists(os.path.join(adb_path, "adb.exe")):
+            log_to_file(f"[API错误] 找不到 adb.exe: {adb_path}")
+            return False
+        
+        # 执行 adb connect
+        from bbcmd import cmd
+        print(cmd(f'"{adb_path}/adb" connect {ip_port}'))
+        
+        # 创建设备实例
+        from device import Android, USE_AS_BOTH
+        device = Android(ip_port, page.server, USE_AS_BOTH, cap_method="Minicap")
+        
+        if not device.available:
+            device.disconnect()
+            print("[API错误] ADB设备连接失败")
+            return False
+        
+        page.snapshotDevice = page.operateDevice = page.device.snapshotDevice = page.device.operateDevice = device
+        bb.pagebar.tags[page.idx].createText(True)
+        bb.updateConnectLst(page.idx)
+        print(f"[API] ADB连接成功: {ip_port}")
+        return True
+    except Exception as e:
+        print(f"[API错误] ADB连接失败: {e}")
         import traceback
         traceback.print_exc()
         return False

@@ -15,7 +15,7 @@ BBC_TCP_HOST = "127.0.0.1"
 BBC_TCP_PORT = 25001
 
 # 固定BBC路径
-BBC_PATH = "./BBC/BBchannel"
+BBC_PATH = "./BBchannel"
 BBC_EXE_PATH = os.path.join(BBC_PATH, 'dist', 'BBchannel64', 'BBchannel.exe')
 
 # TCP客户端管理（非全局，由Action自行管理）
@@ -263,8 +263,8 @@ class ExecuteBbcTask(CustomAction):
                 print("[BBC] TCP 连接失败")
                 return False
             
-            # ========== 步骤2: 等待免责声明并加载配置 ==========
-            print("[BBC] 步骤2: 等待免责声明并加载配置...")
+            # ========== 步骤2: 等待免责声明并连接模拟器 ==========
+            print("[BBC] 步骤2: 等待免责声明并连接模拟器...")
             
             disclaimer_closed = threading.Event()
             
@@ -281,21 +281,7 @@ class ExecuteBbcTask(CustomAction):
             # 等待免责声明关闭
             disclaimer_closed.wait()
             
-            # 加载队伍配置
-            print(f"[BBC] 加载队伍配置: {team_config}")
-            result = tcp_client.send_command('load_config', {'filename': team_config}, timeout=10)
-            
-            if not result.get('success'):
-                print(f"[BBC] 配置加载失败: {result}")
-                tcp_client.stop()
-                return False
-            
-            print("[BBC] 配置加载成功")
-            
-            # ========== 步骤3: 执行战斗 ==========
-            print("[BBC] 步骤3: 执行战斗...")
-            
-            # 清除之前的回调，设置新的弹窗处理
+            # 清除免责声明回调
             tcp_client.popup_callbacks.clear()
             
             # 存储弹窗处理配置和状态
@@ -338,9 +324,10 @@ class ExecuteBbcTask(CustomAction):
                         tcp_client.send_command('popup_response', {'id': popup_id, 'action': 'ok'})
                         return
                 
-                # 免责声明 - BBC 端自动处理
+                # 免责声明 - 发送 ok 决策
                 if '免责声明' in title:
-                    print("[Popup] 免责声明 - 等待 BBC 自动处理")
+                    print("[Popup] 免责声明 - 发送 ok 决策")
+                    tcp_client.send_command('popup_response', {'id': popup_id, 'action': 'ok'})
                     return
                 
                 # 助战排序不符合
@@ -365,7 +352,6 @@ class ExecuteBbcTask(CustomAction):
                     return
             
             tcp_client.popup_callbacks.append(handle_popup)
-            tcp_client.start_listening()
             
             # 根据连接方式执行相应操作
             if connect == 'auto':
@@ -384,13 +370,43 @@ class ExecuteBbcTask(CustomAction):
                     return False
                 print("[BBC] MuMu 连接成功")
             elif connect == 'ldplayer':
-                print("[BBC] 雷电模拟器连接暂未实现")
-                tcp_client.stop()
-                return False
+                print("[BBC] 执行雷电模拟器连接...")
+                result = tcp_client.send_command('connect_ld', {
+                    'path': ld_path,
+                    'index': int(ld_index)
+                })
+                if not result.get('success'):
+                    print(f"[BBC] 雷电模拟器连接失败: {result}")
+                    tcp_client.stop()
+                    return False
+                print("[BBC] 雷电模拟器连接成功")
             elif connect == 'manual':
-                print("[BBC] 手动端口连接暂未实现")
+                print("[BBC] 执行手动 ADB 连接...")
+                result = tcp_client.send_command('connect_adb', {
+                    'ip': manual_port
+                })
+                if not result.get('success'):
+                    print(f"[BBC] 手动 ADB 连接失败: {result}")
+                    tcp_client.stop()
+                    return False
+                print("[BBC] 手动 ADB 连接成功")
+            
+            # ========== 步骤3: 加载配置 ==========
+            print("[BBC] 步骤3: 加载配置...")
+            
+            # 加载队伍配置
+            print(f"[BBC] 加载队伍配置: {team_config}")
+            result = tcp_client.send_command('load_config', {'filename': team_config}, timeout=10)
+            
+            if not result.get('success'):
+                print(f"[BBC] 配置加载失败: {result}")
                 tcp_client.stop()
                 return False
+            
+            print("[BBC] 配置加载成功")
+            
+            # ========== 步骤4: 设置参数并启动战斗 ==========
+            print("[BBC] 步骤4: 设置参数并启动战斗...")
             
             # 设置运行参数
             print(f"[BBC] 设置运行次数: {run_count}")
