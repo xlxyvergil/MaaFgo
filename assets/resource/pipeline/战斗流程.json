@@ -2,13 +2,13 @@
     "$__mpe_config_新建Pipeline3": {
         "$__mpe_code": {
             "prefix": "",
-            "lastSyncTime": 1774254888555,
+            "lastSyncTime": 1774794119649,
             "isModifiedExternally": false,
-            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\日常战斗.json",
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\战斗流程.json",
             "savedViewport": {
-                "x": 270,
-                "y": 162,
-                "zoom": 0.7
+                "x": 69,
+                "y": -372,
+                "zoom": 1.32
             },
             "filename": "新建Pipeline3",
             "version": "v1.2.3"
@@ -204,13 +204,6 @@
         ]
     },
     "队伍配置": {
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "setup_bbc_config",
-                "custom_action_param": ""
-            }
-        },
         "$__mpe_code": {
             "position": {
                 "x": 269,
