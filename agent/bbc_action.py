@@ -18,27 +18,8 @@ BBC_TCP_PORT = 25001
 BBC_PATH = "./BBC/BBchannel"
 BBC_EXE_PATH = os.path.join(BBC_PATH, 'dist', 'BBchannel64', 'BBchannel.exe')
 
-# 全局TCP客户端（单例）
-_global_tcp_client = None
-_global_tcp_lock = threading.Lock()
-
-
-def get_tcp_client() -> "BbcTcpClient":
-    """获取全局TCP客户端（单例）"""
-    global _global_tcp_client
-    with _global_tcp_lock:
-        if _global_tcp_client is None:
-            _global_tcp_client = BbcTcpClient()
-        return _global_tcp_client
-
-
-def reset_tcp_client():
-    """重置全局TCP客户端"""
-    global _global_tcp_client
-    with _global_tcp_lock:
-        if _global_tcp_client:
-            _global_tcp_client.stop()
-        _global_tcp_client = None
+# TCP客户端管理（非全局，由Action自行管理）
+# 移除全局单例，避免模块导入时创建线程锁
 
 
 class BbcTcpClient:
@@ -236,9 +217,9 @@ class SetupBbcConfig(CustomAction):
             print("[SetupBbcConfig] TCP 服务未就绪")
             return CustomAction.RunResult(success=False)
         
-        # 连接TCP服务（使用全局客户端）
+        # 连接TCP服务（创建独立客户端）
         print("[SetupBbcConfig] 连接 TCP 服务...")
-        tcp_client = get_tcp_client()
+        tcp_client = BbcTcpClient()
         if not tcp_client.connect(timeout=10):
             print("[SetupBbcConfig] TCP 连接失败")
             return CustomAction.RunResult(success=False)
@@ -266,10 +247,11 @@ class SetupBbcConfig(CustomAction):
         
         if result.get('success'):
             print("[SetupBbcConfig] 配置加载成功")
+            tcp_client.stop()
             return CustomAction.RunResult(success=True)
         else:
             print(f"[SetupBbcConfig] 配置加载失败: {result}")
-            reset_tcp_client()
+            tcp_client.stop()
             return CustomAction.RunResult(success=False)
 
 
@@ -341,15 +323,12 @@ class ExecuteBbcTask(CustomAction):
                 print("[BBC] TCP 服务未就绪")
                 return False
             
-            # 连接 TCP 服务（使用全局客户端）
-            print("[BBC] 获取 TCP 连接...")
-            tcp_client = get_tcp_client()
-            # 如果未连接，则重新连接
-            if not tcp_client.sock:
-                print("[BBC] 重新连接 TCP 服务...")
-                if not tcp_client.connect(timeout=10):
-                    print("[BBC] TCP 连接失败")
-                    return False
+            # 连接 TCP 服务（创建独立客户端）
+            print("[BBC] 创建 TCP 客户端...")
+            tcp_client = BbcTcpClient()
+            if not tcp_client.connect(timeout=10):
+                print("[BBC] TCP 连接失败")
+                return False
             
             # 存储弹窗处理配置和状态
             popup_config = {
@@ -478,8 +457,8 @@ class ExecuteBbcTask(CustomAction):
             print("[BBC] 开始监控战斗...")
             battle_ended = self._monitor_battle(tcp_client, popup_config)
             
-            # 战斗结束，重置 TCP 连接
-            reset_tcp_client()
+            # 战斗结束，关闭 TCP 连接
+            tcp_client.stop()
             
             return battle_ended
             
@@ -487,7 +466,6 @@ class ExecuteBbcTask(CustomAction):
             print(f"[BBC] 执行战斗流程出错: {e}")
             import traceback
             traceback.print_exc()
-            reset_tcp_client()
             return False
     
     def _monitor_battle(self, tcp_client: BbcTcpClient, popup_config: dict) -> bool:

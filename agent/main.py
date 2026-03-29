@@ -1,8 +1,5 @@
 import sys
-import os
 
-# 将 agent 目录添加到 Python 路径，确保能导入同级模块
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from maa.agent.agent_server import AgentServer
 from maa.tasker import Tasker
 
