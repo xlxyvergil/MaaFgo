@@ -64,61 +64,8 @@ jobs:
       is_release: ${{ steps.set_tag.outputs.is_release }}
       is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
 
-  download-python-embed:
-    needs: meta
-    strategy:
-      matrix:
-        include:
-          - os: win
-            arch: x86_64
-            runs-on: windows-latest
-          - os: win
-            arch: aarch64
-            runs-on: windows-11-arm
-          - os: macos
-            arch: x86_64
-            runs-on: macos-15-intel
-          - os: macos
-            arch: aarch64
-            runs-on: macos-latest
-          - os: linux
-            arch: x86_64
-            runs-on: ubuntu-latest
-          - os: linux
-            arch: aarch64
-            runs-on: ubuntu-24.04-arm
-      fail-fast: false
-    runs-on: ${{ matrix.runs-on }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          submodules: true
-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.12'
-          architecture: ${{ matrix.arch == 'x86_64' && 'x64' || 'arm64' }}
-
-      - name: Download Python embed
-        shell: bash
-        run: |
-          python ./tools/install_python.py ./python
-
-      - name: Install maafw
-        shell: bash
-        run: |
-          ./python/python.exe -m pip install maafw==5.9.2 || ./python/bin/python -m pip install maafw==5.9.2
-
-      - uses: actions/upload-artifact@v4
-        with:
-          name: python-embed-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./python
-
   install:
-    needs:
-      - meta
-      - download-python-embed
+    needs: meta
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -186,12 +133,6 @@ jobs:
           python ./install.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
           cd ..
 
-      - uses: actions/download-artifact@v4
-        if: matrix.os != 'android'
-        with:
-          name: python-embed-${{ matrix.os }}-${{ matrix.arch }}
-          path: ./install/python
-
       - uses: actions/upload-artifact@v4
         with:
           name: MaaFGO-${{ matrix.os }}-${{ matrix.arch }}
@@ -213,7 +154,7 @@ jobs:
         uses: orhun/git-cliff-action@v4
         id: git-cliff
         with:
-          config: cliff.toml
+          config: .github/cliff.toml
           # 正式版：使用 tag-pattern 只匹配正式版标签，包含所有从上一个正式版以来的提交
           # 预发布版：正常生成，只包含从上一个标签以来的提交
           args: >-
