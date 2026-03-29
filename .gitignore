@@ -448,7 +448,7 @@ build
 install
 
 # BBchannel - 仅保留这三个文件，其余全部忽略
-BBchannel/
+BBchannel/*
 !BBchannel/dist/
 BBchannel/dist/*
 !BBchannel/dist/BBchannel64/
