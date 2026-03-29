@@ -113,20 +113,6 @@ def install_resource():
         install_path,
     )
 
-    # Copy options and i18n directories
-    if (working_dir / "assets" / "options").exists():
-        shutil.copytree(
-            working_dir / "assets" / "options",
-            install_path / "options",
-            dirs_exist_ok=True,
-        )
-    if (working_dir / "assets" / "i18n").exists():
-        shutil.copytree(
-            working_dir / "assets" / "i18n",
-            install_path / "i18n",
-            dirs_exist_ok=True,
-        )
-
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:
         interface = jsonc.load(f)
 
