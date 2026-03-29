@@ -15,18 +15,6 @@
             "name": "安卓设备",
             "type": "Adb",
             "display_short_side": 720
-        },
-        {
-            "name": "Win32",
-            "label": "Win32控制器",
-            "type": "Win32",
-            "description": "标准Win32控制器",
-            "win32": {
-                "class_regex": ".*",
-                "window_regex": "BBchannel",
-                "screenshot": "PrintWindow",
-                "input": "Seize"
-            }
         }
     ],
     "resource": [
@@ -53,6 +41,15 @@
         "./options/apple_type.json",
         "./options/support_order_mismatch.json",
         "./options/team_config_error.json",
+        "./options/bbc_battle_type.json",
+        "./options/connect_method.json",
+        "./options/ld_index.json",
+        "./options/ld_path.json",
+        "./options/manual_port.json",
+        "./options/mumu_app_index.json",
+        "./options/mumu_index.json",
+        "./options/mumu_path.json",
+        "./options/mumu_pkg.json",
         "./options/quests/quest_冬木.json",
         "./options/quests/quest_奥尔良.json",
         "./options/quests/quest_七丘之城.json",
