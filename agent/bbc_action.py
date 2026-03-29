@@ -23,7 +23,7 @@ _global_tcp_client = None
 _global_tcp_lock = threading.Lock()
 
 
-def get_tcp_client() -> BbcTcpClient:
+def get_tcp_client() -> "BbcTcpClient":
     """获取全局TCP客户端（单例）"""
     global _global_tcp_client
     with _global_tcp_lock:
