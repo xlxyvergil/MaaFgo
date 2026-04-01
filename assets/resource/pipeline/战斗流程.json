@@ -2,13 +2,13 @@
     "$__mpe_config_新建Pipeline3": {
         "$__mpe_code": {
             "prefix": "",
-            "lastSyncTime": 1774254888555,
+            "lastSyncTime": 1775063315482,
             "isModifiedExternally": false,
-            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\日常战斗.json",
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\战斗流程.json",
             "savedViewport": {
-                "x": 270,
-                "y": 162,
-                "zoom": 0.7
+                "x": 174,
+                "y": -8,
+                "zoom": 1
             },
             "filename": "新建Pipeline3",
             "version": "v1.2.3"
@@ -156,18 +156,18 @@
                 "custom_action": "execute_bbc_task"
             }
         },
-        "bbc_team_config": "",
         "apple_type": "铜苹果",
-        "run_count": 1,
         "battle_type": "continuous",
+        "bbc_team_config": "",
         "connect": "auto",
-        "mumu_path": "",
-        "mumu_index": 0,
-        "mumu_pkg": "com.bilibili.fatego",
-        "mumu_app_index": 0,
-        "ld_path": "",
         "ld_index": 0,
+        "ld_path": "",
         "manual_port": "",
+        "mumu_app_index": 0,
+        "mumu_index": 0,
+        "mumu_path": "",
+        "mumu_pkg": "com.bilibili.fatego",
+        "run_count": 1,
         "support_order_mismatch": false,
         "team_config_error": false,
         "$__mpe_code": {
@@ -204,13 +204,6 @@
         ]
     },
     "队伍配置": {
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "setup_bbc_config",
-                "custom_action_param": ""
-            }
-        },
         "$__mpe_code": {
             "position": {
                 "x": 269,
