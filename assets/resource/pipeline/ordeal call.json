@@ -1,0 +1,1487 @@
+{
+    "$__mpe_config_ordeal call": {
+        "$__mpe_code": {
+            "prefix": "",
+            "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\ordeal call.json",
+            "lastSyncTime": 1775060288236,
+            "savedViewport": {
+                "x": -1087,
+                "y": 228,
+                "zoom": 1.39
+            },
+            "filename": "ordeal call",
+            "version": "v1.2.3"
+        }
+    },
+    "寻求女神像": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2327,
+                "y": 1832
+            }
+        },
+        "next": [
+            "寻求女神像-1"
+        ]
+    },
+    "高贵的海盗": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2322,
+                "y": 2101
+            }
+        },
+        "next": [
+            "高贵的海盗-1"
+        ]
+    },
+    "复苏的远古浪漫": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2319,
+                "y": 2417
+            }
+        },
+        "next": [
+            "复苏的远古浪漫-1"
+        ]
+    },
+    "荒野的欢乐": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2304,
+                "y": 2710
+            }
+        },
+        "next": [
+            "荒野的欢乐-1"
+        ]
+    },
+    "常夏的休假": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2309,
+                "y": 2991
+            }
+        },
+        "next": [
+            "常夏的休假-1"
+        ]
+    },
+    "常夏展销会场": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2300,
+                "y": 3321
+            }
+        },
+        "next": [
+            "常夏展销会场-1"
+        ]
+    },
+    "寻求女神像-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    740,
+                    269,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2955,
+                "y": 1886
+            }
+        },
+        "next": [
+            "寻求女神像-3"
+        ]
+    },
+    "寻求女神像-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "寻求女神像.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3304,
+                "y": 1843
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "高贵的海盗-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    754,
+                    437,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2963,
+                "y": 2101
+            }
+        },
+        "next": [
+            "高贵的海盗-3"
+        ]
+    },
+    "高贵的海盗-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "高贵的海盗.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3333,
+                "y": 2085
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "复苏的远古浪漫-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    661,
+                    337,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2957,
+                "y": 2343
+            }
+        },
+        "next": [
+            "复苏的远古浪漫-3"
+        ]
+    },
+    "复苏的远古浪漫-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "复苏的远古浪漫.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3330,
+                "y": 2326
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "荒野的欢乐-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    543,
+                    297,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2942,
+                "y": 2700
+            }
+        },
+        "next": [
+            "荒野的欢乐-3"
+        ]
+    },
+    "荒野的欢乐-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "荒野的欢乐.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3372,
+                "y": 2684
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "常夏的休假-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    362,
+                    316,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2930,
+                "y": 3018
+            }
+        },
+        "next": [
+            "常夏的休假-3"
+        ]
+    },
+    "常夏的休假-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "常夏的休假.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3384,
+                "y": 3001
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "常夏展销会场-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    362,
+                    316,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2932,
+                "y": 3327
+            }
+        },
+        "next": [
+            "常夏展销会场-3"
+        ]
+    },
+    "常夏展销会场-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "常夏展销会场.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3378,
+                "y": 3336
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "高贵的海盗-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2612,
+                "y": 2033
+            }
+        },
+        "next": [
+            "高贵的海盗-2"
+        ]
+    },
+    "复苏的远古浪漫-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2589,
+                "y": 2375
+            }
+        },
+        "next": [
+            "复苏的远古浪漫-2"
+        ]
+    },
+    "荒野的欢乐-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2598,
+                "y": 2639
+            }
+        },
+        "next": [
+            "荒野的欢乐-2"
+        ]
+    },
+    "常夏的休假-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2596,
+                "y": 2924
+            }
+        },
+        "next": [
+            "常夏的休假-2"
+        ]
+    },
+    "常夏展销会场-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2597,
+                "y": 3255
+            }
+        },
+        "next": [
+            "常夏展销会场-2"
+        ]
+    },
+    "大堡礁之卵-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 1000
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2601,
+                "y": 3656
+            }
+        },
+        "next": [
+            "大堡礁之卵-2"
+        ]
+    },
+    "大堡礁之卵": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2283,
+                "y": 3720
+            }
+        },
+        "next": [
+            "大堡礁之卵-1"
+        ]
+    },
+    "蛇龙的恶作剧": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2277,
+                "y": 4068
+            }
+        },
+        "next": [
+            "蛇龙的恶作剧-1"
+        ]
+    },
+    "蛇龙的恶作剧-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 1000
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2605,
+                "y": 4010
+            }
+        },
+        "next": [
+            "蛇龙的恶作剧-2"
+        ]
+    },
+    "大堡礁之卵-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    689,
+                    608,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2965,
+                "y": 3722
+            }
+        },
+        "next": [
+            "大堡礁之卵-3"
+        ]
+    },
+    "大堡礁之卵-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "大堡礁之卵.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3361,
+                "y": 3706
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "蛇龙的恶作剧-3": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "蛇龙的恶作剧.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3337,
+                "y": 4042
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "蛇龙的恶作剧-2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    636,
+                    659,
+                    1,
+                    0
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2964,
+                "y": 4041
+            }
+        },
+        "next": [
+            "蛇龙的恶作剧-3"
+        ]
+    },
+    "cOrdeal Call": {
+        "$__mpe_code": {
+            "position": {
+                "x": 743,
+                "y": 196
+            }
+        },
+        "next": [
+            "Ordeal Call-识别",
+            "[JumpBack]Ordeal Call-滑动"
+        ]
+    },
+    "Ordeal Call-识别": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "Ordeal Call-识别.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1031,
+                "y": 112
+            }
+        },
+        "next": [
+            "奏1基准点"
+        ]
+    },
+    "Ordeal Call-滑动": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1220,
+                    524,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1230,
+                        369,
+                        1,
+                        1
+                    ]
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 1026,
+                "y": 293
+            }
+        }
+    },
+    "奏1基准点": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "奏章1基准点.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "post_wait_freezes": 5000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1355,
+                "y": 106
+            }
+        },
+        "next": [
+            "基准返回"
+        ]
+    },
+    "基准返回": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    111
+                ]
+            }
+        },
+        "post_wait_freezes": 5000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1657,
+                "y": 110
+            }
+        },
+        "next": [
+            "OrdealCall关卡导航"
+        ]
+    },
+    "OrdealCall关卡导航": {
+        "post_wait_freezes": 5000,
+        "$__mpe_code": {
+            "position": {
+                "x": 1969,
+                "y": 116
+            }
+        },
+        "next": [
+            "残留的神话"
+        ]
+    },
+    "残留的神话": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2321,
+                "y": -132
+            }
+        },
+        "next": [
+            "残留的神话-1"
+        ]
+    },
+    "噩梦的南瓜": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2319,
+                "y": 44
+            }
+        },
+        "next": [
+            "噩梦的南瓜-1"
+        ]
+    },
+    "冻土的试炼": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2334,
+                "y": 224
+            }
+        },
+        "next": [
+            "冻土的试炼-1"
+        ]
+    },
+    "光之丝线引导的迷宫": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2331,
+                "y": 415
+            }
+        },
+        "next": [
+            "光之丝线引导的迷宫-1"
+        ]
+    },
+    "久远的微笑": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2332,
+                "y": 599
+            }
+        },
+        "next": [
+            "久远的微笑-1"
+        ]
+    },
+    "复活的黄金都市": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2328,
+                "y": 764
+            }
+        },
+        "next": [
+            "复活的黄金都市-1"
+        ]
+    },
+    "赏金猎人数光年": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2325,
+                "y": 928
+            }
+        },
+        "next": [
+            "赏金猎人数光年-1"
+        ]
+    },
+    "月光矿区": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2324,
+                "y": 1099
+            }
+        },
+        "next": [
+            "月光矿区-1"
+        ]
+    },
+    "神秘主义者与魂之故乡": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2329,
+                "y": 1267
+            }
+        },
+        "next": [
+            "神秘主义者与魂之故乡-1"
+        ]
+    },
+    "于荒野萌芽的王之花": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2323,
+                "y": 1448
+            }
+        },
+        "next": [
+            "于荒野萌芽的王之花-1"
+        ]
+    },
+    "残留的神话-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    570,
+                    164,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2645,
+                "y": -142
+            }
+        },
+        "next": [
+            "残留的神话-2"
+        ]
+    },
+    "残留的神话-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "残留的神话.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    908,
+                    178,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2991,
+                "y": -170
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "任务开始": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "任务开始.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3670,
+                "y": 549
+            }
+        }
+    },
+    "噩梦的南瓜-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    597,
+                    220,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2635,
+                "y": 34
+            }
+        },
+        "next": [
+            "噩梦的南瓜-2"
+        ]
+    },
+    "噩梦的南瓜-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "噩梦的南瓜.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    921,
+                    177,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2986,
+                "y": 53
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "冻土的试炼-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    653,
+                    186,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2635,
+                "y": 215
+            }
+        },
+        "next": [
+            "冻土的试炼-2"
+        ]
+    },
+    "冻土的试炼-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "冻土的试炼.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    929,
+                    177,
+                    0,
+                    2
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2979,
+                "y": 225
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "光之丝线引导的迷宫-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    403,
+                    200,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2631,
+                "y": 399
+            }
+        },
+        "next": [
+            "光之丝线引导的迷宫-2"
+        ]
+    },
+    "光之丝线引导的迷宫-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "光之丝线引导的迷宫.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    925,
+                    178,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2977,
+                "y": 415
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "久远的微笑-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    404,
+                    203,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2638,
+                "y": 589
+            }
+        },
+        "next": [
+            "久远的微笑-2"
+        ]
+    },
+    "久远的微笑-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "久远的微笑.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    913,
+                    351,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2974,
+                "y": 579
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "复活的黄金都市-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    432,
+                    402,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2628,
+                "y": 754
+            }
+        },
+        "next": [
+            "复活的黄金都市-2"
+        ]
+    },
+    "复活的黄金都市-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "复活的黄金都市.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    929,
+                    180,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2979,
+                "y": 754
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "赏金猎人数光年-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    767,
+                    370,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2632,
+                "y": 914
+            }
+        },
+        "next": [
+            "赏金猎人数光年-2"
+        ]
+    },
+    "赏金猎人数光年-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "赏金猎人数光年.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    922,
+                    167,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2978,
+                "y": 929
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "月光矿区-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    767,
+                    370,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2618,
+                "y": 1081
+            }
+        },
+        "next": [
+            "月光矿区-2"
+        ]
+    },
+    "月光矿区-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "月光矿区.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    906,
+                    347,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2974,
+                "y": 1104
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "神秘主义者与魂之故乡-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    879,
+                    358,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2617,
+                "y": 1237
+            }
+        },
+        "next": [
+            "神秘主义者与魂之故乡-2"
+        ]
+    },
+    "神秘主义者与魂之故乡-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "神秘主义者与魂之故乡.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    925,
+                    169,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2962,
+                "y": 1276
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "于荒野萌芽的王之花-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    605,
+                    642,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2606,
+                "y": 1436
+            }
+        },
+        "next": [
+            "于荒野萌芽的王之花-2"
+        ]
+    },
+    "于荒野萌芽的王之花-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "于荒野萌芽的王之花.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    924,
+                    166,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2959,
+                "y": 1468
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "举世之飞将军": {
+        "$__mpe_code": {
+            "position": {
+                "x": 2319,
+                "y": 1636
+            }
+        },
+        "next": [
+            "举世之飞将军-1"
+        ]
+    },
+    "举世之飞将军-1": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    907,
+                    239,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2606,
+                "y": 1611
+            }
+        },
+        "next": [
+            "举世之飞将军-2"
+        ]
+    },
+    "举世之飞将军-2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "举世之飞将军.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    902,
+                    167,
+                    1,
+                    1
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2952,
+                "y": 1667
+            }
+        },
+        "next": [
+            "任务开始"
+        ]
+    },
+    "寻求女神像-1": {
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    1232,
+                    511,
+                    1,
+                    1
+                ],
+                "duration": 390
+            }
+        },
+        "post_wait_freezes": 2000,
+        "$__mpe_code": {
+            "position": {
+                "x": 2615,
+                "y": 1772
+            }
+        },
+        "next": [
+            "寻求女神像-2"
+        ]
+    }
+}

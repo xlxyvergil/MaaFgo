@@ -5,137 +5,173 @@
             "label": "关卡",
             "cases": [
                 {
-                    "name": "俄罗斯区域",
-                    "label": "俄罗斯区域",
+                    "name": "残留的神话",
+                    "label": "残留的神话",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q俄罗斯区域"
+                        "OrdealCall关卡导航": {
+                            "next": "残留的神话"
                         }
                     }
                 },
                 {
-                    "name": "东欧区域",
-                    "label": "东欧区域",
+                    "name": "噩梦的南瓜",
+                    "label": "噩梦的南瓜",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q东欧区域"
+                        "OrdealCall关卡导航": {
+                            "next": "噩梦的南瓜"
                         }
                     }
                 },
                 {
-                    "name": "夏威夷区域·常夏的休假",
-                    "label": "夏威夷区域·常夏的休假",
+                    "name": "冻土的试炼",
+                    "label": "冻土的试炼",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q夏威夷区域·常夏的休假"
+                        "OrdealCall关卡导航": {
+                            "next": "冻土的试炼"
                         }
                     }
                 },
                 {
-                    "name": "美洲西部区域",
-                    "label": "美洲西部区域",
+                    "name": "光之丝线引导的迷宫",
+                    "label": "光之丝线引导的迷宫",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q美洲西部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "光之丝线引导的迷宫"
                         }
                     }
                 },
                 {
-                    "name": "大洋洲北部区域",
-                    "label": "大洋洲北部区域",
+                    "name": "久远的微笑",
+                    "label": "久远的微笑",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q大洋洲北部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "久远的微笑"
                         }
                     }
                 },
                 {
-                    "name": "北欧区域",
-                    "label": "北欧区域",
+                    "name": "复活的黄金都市",
+                    "label": "复活的黄金都市",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q北欧区域"
+                        "OrdealCall关卡导航": {
+                            "next": "复活的黄金都市"
                         }
                     }
                 },
                 {
-                    "name": "加勒比海区域",
-                    "label": "加勒比海区域",
+                    "name": "赏金猎人数光年",
+                    "label": "赏金猎人数光年",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q加勒比海区域"
+                        "OrdealCall关卡导航": {
+                            "next": "赏金猎人数光年"
                         }
                     }
                 },
                 {
-                    "name": "东亚区域",
-                    "label": "东亚区域",
+                    "name": "月光矿区",
+                    "label": "月光矿区",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q东亚区域"
+                        "OrdealCall关卡导航": {
+                            "next": "月光矿区"
                         }
                     }
                 },
                 {
-                    "name": "美洲南部区域",
-                    "label": "美洲南部区域",
+                    "name": "神秘主义者与魂之故乡",
+                    "label": "神秘主义者与魂之故乡",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q美洲南部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "神秘主义者与魂之故乡"
                         }
                     }
                 },
                 {
-                    "name": "非洲南部区域",
-                    "label": "非洲南部区域",
+                    "name": "于荒野萌芽的王之花",
+                    "label": "于荒野萌芽的王之花",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q非洲南部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "于荒野萌芽的王之花"
                         }
                     }
                 },
                 {
-                    "name": "南亚区域",
-                    "label": "南亚区域",
+                    "name": "举世之飞将军",
+                    "label": "举世之飞将军",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q南亚区域"
+                        "OrdealCall关卡导航": {
+                            "next": "举世之飞将军"
                         }
                     }
                 },
                 {
-                    "name": "北大西洋区域·光之丝线引导的迷宫",
-                    "label": "北大西洋区域·光之丝线引导的迷宫",
+                    "name": "寻求女神像",
+                    "label": "寻求女神像",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q北大西洋区域·光之丝线引导的迷宫"
+                        "OrdealCall关卡导航": {
+                            "next": "寻求女神像"
                         }
                     }
                 },
                 {
-                    "name": "美洲东部区域",
-                    "label": "美洲东部区域",
+                    "name": "高贵的海盗",
+                    "label": "高贵的海盗",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q美洲东部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "高贵的海盗"
                         }
                     }
                 },
                 {
-                    "name": "大洋洲南部区域",
-                    "label": "大洋洲南部区域",
+                    "name": "复苏的远古浪漫",
+                    "label": "复苏的远古浪漫",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q大洋洲南部区域"
+                        "OrdealCall关卡导航": {
+                            "next": "复苏的远古浪漫"
                         }
                     }
                 },
                 {
-                    "name": "西非区域",
-                    "label": "西非区域",
+                    "name": "荒野的欢乐",
+                    "label": "荒野的欢乐",
                     "pipeline_override": {
-                        "关卡导航": {
-                            "next": "q西非区域"
+                        "OrdealCall关卡导航": {
+                            "next": "荒野的欢乐"
+                        }
+                    }
+                },
+                {
+                    "name": "常夏的休假",
+                    "label": "常夏的休假",
+                    "pipeline_override": {
+                        "OrdealCall关卡导航": {
+                            "next": "常夏的休假"
+                        }
+                    }
+                },
+                {
+                    "name": "常夏展销会场",
+                    "label": "常夏展销会场",
+                    "pipeline_override": {
+                        "OrdealCall关卡导航": {
+                            "next": "常夏展销会场"
+                        }
+                    }
+                },
+                {
+                    "name": "大堡礁之卵",
+                    "label": "大堡礁之卵",
+                    "pipeline_override": {
+                        "OrdealCall关卡导航": {
+                            "next": "大堡礁之卵"
+                        }
+                    }
+                },
+                {
+                    "name": "蛇龙的恶作剧",
+                    "label": "蛇龙的恶作剧",
+                    "pipeline_override": {
+                        "OrdealCall关卡导航": {
+                            "next": "蛇龙的恶作剧"
                         }
                     }
                 }
