@@ -1,20 +1,20 @@
 {
-    "$__mpe_config_新建Pipeline3": {
+    "$__mpe_config_战斗流程": {
         "$__mpe_code": {
             "prefix": "",
-            "lastSyncTime": 1775063315482,
+            "lastSyncTime": 1775064560551,
             "isModifiedExternally": false,
             "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\战斗流程.json",
             "savedViewport": {
-                "x": 174,
-                "y": -8,
+                "x": -724,
+                "y": -363,
                 "zoom": 1
             },
-            "filename": "新建Pipeline3",
+            "filename": "战斗流程",
             "version": "v1.2.3"
         }
     },
-    "$__mpe_external_回主界面_新建Pipeline3": {
+    "$__mpe_external_回主界面_战斗流程": {
         "$__mpe_code": {
             "position": {
                 "x": 2822,
@@ -31,11 +31,12 @@
         },
         "next": [
             "作战成功",
-            "[JumpBack]完成",
             "好友申请界面",
             "战斗失败",
             "失败2",
-            "撤退"
+            "撤退",
+            "战斗结束-主界面",
+            "[JumpBack]完成"
         ]
     },
     "作战成功": {
@@ -121,8 +122,8 @@
         },
         "$__mpe_code": {
             "position": {
-                "x": 2146,
-                "y": 1191
+                "x": 2176,
+                "y": 1370
             }
         }
     },
@@ -147,6 +148,25 @@
         },
         "next": [
             "失败2"
+        ]
+    },
+    "战斗结束-主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 2175,
+                "y": 1201
+            }
+        },
+        "next": [
+            "回主界面"
         ]
     },
     "执行BBC任务": {

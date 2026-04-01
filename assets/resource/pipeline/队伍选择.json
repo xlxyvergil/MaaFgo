@@ -1,30 +1,26 @@
 {
-    "$__mpe_config_新建Pipeline2": {
+    "$__mpe_config_队伍选择": {
         "$__mpe_code": {
             "prefix": "",
-            "lastSyncTime": 1774259697512,
+            "lastSyncTime": 1775063778849,
             "isModifiedExternally": false,
             "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\队伍选择.json",
             "savedViewport": {
-                "x": 94,
-                "y": 340,
-                "zoom": 0.46
+                "x": 950,
+                "y": 478,
+                "zoom": 0.44
             },
-            "filename": "新建Pipeline2",
+            "filename": "队伍选择",
             "version": "v1.2.3"
         }
     },
-    "队伍界面决定": {
+    "$__mpe_external_回主界面_队伍选择": {
         "$__mpe_code": {
             "position": {
-                "x": 3172,
-                "y": 308
+                "x": 3815,
+                "y": 232
             }
-        },
-        "next": [
-            "队伍确定菜单",
-            "[JumpBack]队伍点击决定"
-        ]
+        }
     },
     "编队": {
         "recognition": {
@@ -39,7 +35,7 @@
             "type": "Click",
             "param": {}
         },
-        "pre_wait_freezes": 500,
+        "pre_wait_freezes": 1000,
         "$__mpe_code": {
             "position": {
                 "x": 1504,
@@ -63,10 +59,10 @@
             "type": "Click",
             "param": {}
         },
-        "pre_wait_freezes": 500,
+        "pre_wait_freezes": 1000,
         "$__mpe_code": {
             "position": {
-                "x": 1494,
+                "x": 1501,
                 "y": 672
             }
         }
@@ -550,6 +546,58 @@
             }
         }
     },
+    "队伍点击决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "决定.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {}
+        },
+        "post_wait_freezes": 1000,
+        "$__mpe_code": {
+            "position": {
+                "x": 3488,
+                "y": 388
+            }
+        }
+    },
+    "队伍界面决定": {
+        "$__mpe_code": {
+            "position": {
+                "x": 3172,
+                "y": 308
+            }
+        },
+        "next": [
+            "队伍确定菜单",
+            "[JumpBack]队伍点击决定"
+        ]
+    },
+    "队伍确定菜单": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单.png"
+                ]
+            }
+        },
+        "$__mpe_code": {
+            "position": {
+                "x": 3499,
+                "y": 189
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
     "队伍编制": {
         "recognition": {
             "type": "TemplateMatch",
@@ -570,7 +618,7 @@
                 ]
             }
         },
-        "pre_wait_freezes": 500,
+        "pre_wait_freezes": 1000,
         "$__mpe_code": {
             "position": {
                 "x": 1976,
@@ -961,52 +1009,5 @@
             "编队",
             "[JumpBack]菜单"
         ]
-    },
-    "队伍点击决定": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "决定.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {}
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 3488,
-                "y": 388
-            }
-        }
-    },
-    "队伍确定菜单": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "菜单.png"
-                ]
-            }
-        },
-        "$__mpe_code": {
-            "position": {
-                "x": 3494,
-                "y": 167
-            }
-        },
-        "next": [
-            "回主界面"
-        ]
-    },
-    "$__mpe_external_回主界面_新建Pipeline2": {
-        "$__mpe_code": {
-            "position": {
-                "x": 3800,
-                "y": 187
-            }
-        }
     }
 }

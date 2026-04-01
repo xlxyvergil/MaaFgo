@@ -2,12 +2,12 @@
     "$__mpe_config_回主界面": {
         "$__mpe_code": {
             "prefix": "",
-            "lastSyncTime": 1775053751159,
+            "lastSyncTime": 1775064671051,
             "isModifiedExternally": false,
             "filePath": "D:\\fgo\\MaaFgo\\assets\\resource\\pipeline\\回主界面.json",
             "savedViewport": {
-                "x": 39,
-                "y": 543,
+                "x": 235,
+                "y": 578,
                 "zoom": 1
             },
             "filename": "回主界面",
@@ -34,6 +34,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "$__mpe_code": {
             "position": {
                 "x": 1454,
@@ -54,6 +55,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "$__mpe_code": {
             "position": {
                 "x": 793,
@@ -74,10 +76,11 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "$__mpe_code": {
             "position": {
-                "x": 1111,
-                "y": 332
+                "x": 1046,
+                "y": 243
             }
         }
     },
@@ -90,6 +93,7 @@
                 ]
             }
         },
+        "post_wait_freezes": 500,
         "$__mpe_code": {
             "position": {
                 "x": 1109,
@@ -103,8 +107,8 @@
     "二次确认-关闭": {
         "$__mpe_code": {
             "position": {
-                "x": 1802,
-                "y": -63
+                "x": 1831,
+                "y": -53
             }
         }
     },
