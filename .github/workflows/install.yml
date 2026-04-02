@@ -32,7 +32,7 @@ jobs:
       - id: set_tag
         run: |
           # 检查标签格式
-          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
+          if [[ ${{ github.ref }} =~ ^refs/tags/v[0-9]+\.[0-9]+\.[0-9]+([a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*)?$ ]]; then
             is_release=true
             tag=${GITHUB_REF#refs/tags/}
             echo "Release tag format is valid: $tag"
