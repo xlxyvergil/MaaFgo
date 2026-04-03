@@ -250,23 +250,50 @@ class ExecuteBbcTask(CustomAction):
             logger.info(f"[BBC] TCP响应: {result}")
             
             if result.get('success'):
-                reason = result.get('reason', 'completed')
-                detail = result.get('detail', '')
-                logger.info(f"[BBC] 任务执行成功: {reason}, detail={detail}")
-                print(f"[BBC] 任务执行成功: {reason}")
-                if detail:
-                    print(f"[BBC] 详情: {detail}")
+                popup_title = result.get('popup_title', '')
+                popup_message = result.get('popup_message', '')
+                user_decision = result.get('user_decision', '')
+                logger.info(f"[BBC] 任务执行成功: {popup_title}, message={popup_message}")
+                print(f"[BBC] 任务执行成功: {popup_title}")
+                if popup_message:
+                    print(f"[BBC] 详情: {popup_message}")
                 return True
             else:
                 reason = result.get('reason', 'unknown')
-                detail = result.get('detail', '')
                 error = result.get('error', '')
-                logger.error(f"[BBC] 任务执行失败: {reason}, detail={detail}, error={error}")
-                print(f"[BBC] 任务执行失败: {reason}")
-                if detail:
-                    print(f"[BBC] 失败详情: {detail}")
-                if error:
-                    print(f"[BBC] 错误信息: {error}")
+                popup_title = result.get('popup_title', '')
+                popup_message = result.get('popup_message', '')
+                user_decision = result.get('user_decision', '')
+                result_info = result.get('result', {})
+                
+                if popup_title or popup_message:
+                    # 有弹窗信息，显示具体原因
+                    display_title = popup_title if popup_title else '任务已取消'
+                    # 用户选择映射为中文
+                    decision_map = {
+                        'ok': '确定',
+                        'cancel': '取消',
+                        'yes': '是',
+                        'no': '否',
+                        'retry': '重试'
+                    }
+                    friendly_decision = decision_map.get(user_decision, user_decision)
+                    logger.error(f"[BBC] 任务失败: {display_title}, {popup_message}, 用户选择: {friendly_decision}")
+                    print(f"[BBC] 任务失败: {display_title}")
+                    if popup_message:
+                        print(f"[BBC] 详情: {popup_message}")
+                elif error:
+                    logger.error(f"[BBC] 任务执行失败: {error}")
+                    print(f"[BBC] 任务执行失败: {error}")
+                elif result_info:
+                    description = result_info.get('description', '')
+                    logger.error(f"[BBC] 任务执行失败: {reason}, {description}")
+                    print(f"[BBC] 任务执行失败: {reason}")
+                    if description:
+                        print(f"[BBC] 错误信息: {description}")
+                else:
+                    logger.error(f"[BBC] 任务执行失败: {reason}")
+                    print(f"[BBC] 任务执行失败: {reason}")
                 return False
             
         except Exception as e:
