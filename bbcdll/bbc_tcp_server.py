@@ -28,6 +28,9 @@ _current_task_args = {}
 _task_should_end = False
 _task_end_reason = ''
 
+# 最后解决的弹窗信息（后覆盖前，用于返回给客户端）
+_last_resolved_popup = None
+
 def update_bb_window(bb_window):
     """更新全局 bb_window 引用"""
     global _bb_window_global
@@ -734,23 +737,38 @@ def api_run_bbc_task(args):
         if not api_connect_mumu(_bb_window_global, type('Args', (), {
             'path': mumu_path, 'index': mumu_index
         })()):
-            return {'success': False, 'reason': 'mumu_connect_failed'}
+            return {
+                'success': False,
+                'reason': 'mumu_connect_failed',
+                'result': {'type': 'connect_failed', 'category': 'error', 'description': 'MuMu模拟器连接失败'}
+            }
     elif connect == 'ldplayer' and ld_path:
         if not api_connect_ld(_bb_window_global, type('Args', (), {
             'path': ld_path, 'index': ld_index
         })()):
-            return {'success': False, 'reason': 'ldplayer_connect_failed'}
+            return {
+                'success': False,
+                'reason': 'ldplayer_connect_failed',
+                'result': {'type': 'connect_failed', 'category': 'error', 'description': '雷电模拟器连接失败'}
+            }
     elif connect == 'manual' and manual_port:
         if not api_connect_adb(_bb_window_global, type('Args', (), {
             'ip': manual_port
         })()):
-            return {'success': False, 'reason': 'adb_connect_failed'}
+            return {
+                'success': False,
+                'reason': 'adb_connect_failed',
+                'result': {'type': 'connect_failed', 'category': 'error', 'description': 'ADB设备连接失败'}
+            }
     # 等待连接完成
     time.sleep(1)
     
     # 加载配置
     if not api_load_config(_bb_window_global, team_config):
-        return {'success': False, 'reason': 'config_load_failed'}
+        return {
+            'success': False,
+            'error': f'配置文件加载失败: {team_config}'
+        }
     
     # 设置参数
     page = _bb_window_global.pages[0]
@@ -760,7 +778,10 @@ def api_run_bbc_task(args):
     
     # 启动战斗
     if not api_start_battle(page):
-        return {'success': False, 'reason': 'start_battle_failed'}
+        return {
+            'success': False,
+            'error': '战斗启动失败，请检查队伍配置'
+        }
     
     # 轮询等待战斗结束
     # 无限等待战斗结束
@@ -785,28 +806,65 @@ def api_run_bbc_task(args):
         for p in temp_list:
             popup_event_queue.put(p)
         
-        # 检查是否用户选择取消
+        # 检查是否用户选择取消（从_last_resolved_popup获取弹窗信息）
         if _task_should_end:
-            return {'success': False, 'reason': _task_end_reason}
+            global _last_resolved_popup
+            if _last_resolved_popup:
+                return {
+                    'success': False,
+                    'popup_title': _last_resolved_popup['title'],
+                    'popup_message': _last_resolved_popup['message'],
+                    'user_decision': _last_resolved_popup['result']
+                }
+            else:
+                return {
+                    'success': False,
+                    'popup_title': '',
+                    'popup_message': _task_end_reason,
+                    'user_decision': ''
+                }
         
         if battle_ended:
-            # 关闭结束弹窗
+            # 关闭结束弹窗并获取弹窗信息
+            end_popup_info = None
             end_popups = ['脚本停止！']
             for p in temp_list:
                 title = p.get('title', '')
                 if any(popup in title for popup in end_popups):
+                    end_popup_info = p
                     popup_id = p.get('id')
                     if popup_id:
                         _resolve_popup(popup_id, 'ok')
-            return {'success': True, 'reason': 'completed', 'detail': end_reason}
+            
+            if end_popup_info:
+                return {
+                    'success': True,
+                    'popup_title': end_popup_info.get('title', ''),
+                    'popup_message': end_popup_info.get('message', ''),
+                    'user_decision': 'ok'
+                }
+            else:
+                return {
+                    'success': True,
+                    'popup_title': '脚本停止！',
+                    'popup_message': end_reason,
+                    'user_decision': 'ok'
+                }
         
         time.sleep(1)
 
 def _resolve_popup(popup_id, action):
     """处理弹窗响应"""
+    global _last_resolved_popup
     with _popup_wait_lock:
         popup_info = _popup_wait_dict.get(popup_id)
         if popup_info and popup_info.get('status') == 'waiting':
             popup_info['result'] = action
             popup_info['status'] = 'resolved'
+            # 保存弹窗信息（后覆盖前，最后的就是结束的）
+            _last_resolved_popup = {
+                'title': popup_info.get('title', ''),
+                'message': popup_info.get('message', ''),
+                'result': action
+            }
 
