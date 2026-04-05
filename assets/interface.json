@@ -5,8 +5,8 @@
     "contact": "QQ群: 无",
     "license": "MIT",
     "welcome": "首次使用！欢迎使用 MaaFgo!",
-    "github": "https://github.com/xlxyvergil/MaaFgo",
-    "version": "1.0.0",
+    "github": "https://github.com/xlxyvergil/MaaFgo-MWU",
+    "version": "1.0.27",
     "languages": {
         "zh_cn": "./i18n/zh_cn.json"
     },
