@@ -156,6 +156,60 @@ jobs:
         run: |
           7z x ${{ fromJson(steps.download_artifact.outputs.downloaded_files)[0] }} -obuild -y
 
+      - name: Setup embedded Python
+        if: matrix.platform == 'win'
+        shell: pwsh
+        run: |
+          $pythonVersion = "3.12.10"
+          $destDir = "build/python"
+          
+          if (Test-Path $destDir) {
+            Remove-Item -Recurse -Force $destDir
+          }
+          New-Item -ItemType Directory -Path $destDir -Force
+          
+          $arch = "${{ matrix.arch }}"
+          if ($arch -eq "x86_64") {
+            $winArch = "amd64"
+          } else {
+            $winArch = "arm64"
+          }
+          
+          $url = "https://www.python.org/ftp/python/$pythonVersion/python-$pythonVersion-embed-$winArch.zip"
+          $zipFile = "$destDir/python-embed.zip"
+          
+          Write-Host "Downloading Python from $url"
+          Invoke-WebRequest -Uri $url -OutFile $zipFile
+          
+          Write-Host "Extracting Python..."
+          Expand-Archive -Path $zipFile -DestinationPath $destDir -Force
+          Remove-Item $zipFile
+          
+          # Modify ._pth file
+          $pthFile = Get-ChildItem -Path $destDir -Filter "python*._pth" | Select-Object -First 1
+          if ($pthFile) {
+            $content = Get-Content $pthFile.FullName
+            $content = $content -replace "#import site", "import site"
+            $content += "`n.`nLib`nLib\site-packages`nDLLs"
+            Set-Content -Path $pthFile.FullName -Value $content
+            Write-Host "Modified $($pthFile.Name)"
+          }
+          
+          # Install pip
+          $getPipUrl = "https://bootstrap.pypa.io/get-pip.py"
+          $getPipFile = "$destDir/get-pip.py"
+          Invoke-WebRequest -Uri $getPipUrl -OutFile $getPipFile
+          & "$destDir/python.exe" $getPipFile
+          Remove-Item $getPipFile
+          
+          Write-Host "Embedded Python setup complete"
+      
+      - name: Install Python dependencies
+        if: matrix.platform == 'win'
+        shell: bash
+        run: |
+          ./build/python/python.exe -m pip install -r requirements.txt
+
       - name: Compress Final Artifact
         run: |
           7z a -t7z -mx=9 -mmt -ms -r ${{ env.repo_name }}-${{ matrix.platform }}-${{ matrix.arch }}-${{ env.tag }}.7z "./build/*"

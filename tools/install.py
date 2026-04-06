@@ -118,6 +118,14 @@ def install_resource():
 
     interface["version"] = version
 
+    # 设置 agent 使用内置 Python
+    if os_name == "win":
+        interface["agent"]["child_exec"] = r"./python/python.exe"
+    elif os_name == "macos":
+        interface["agent"]["child_exec"] = r"./python/bin/python3"
+    else:
+        interface["agent"]["child_exec"] = r"python3"
+
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
         jsonc.dump(interface, f, ensure_ascii=False, indent=4)
 
