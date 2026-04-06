@@ -3,7 +3,7 @@ name: install-avalonia
 on:
   push:
     tags:
-      - "v*"
+      - "v*Avalonia*"
     branches:
       - "**"
     paths:

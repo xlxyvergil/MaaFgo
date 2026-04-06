@@ -3,7 +3,7 @@ name: install-mwu
 on:
   push:
     tags:
-      - "v*"
+      - "v*MWU*"
     branches:
       - "**"
     paths:
