@@ -81,22 +81,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            platform: linux
-            arch: x86_64
-
-          - os: ubuntu-24.04-arm
-            platform: linux
-            arch: aarch64
-
-          - os: macos-15-intel
-            platform: macos
-            arch: x86_64
-
-          - os: macos-15
-            platform: macos
-            arch: aarch64
-
           - os: windows-2025
             platform: win
             arch: x86_64
@@ -157,7 +141,6 @@ jobs:
           7z x ${{ fromJson(steps.download_artifact.outputs.downloaded_files)[0] }} -obuild -y
 
       - name: Setup embedded Python
-        if: matrix.platform == 'win'
         shell: pwsh
         run: |
           $pythonVersion = "3.12.10"
@@ -205,7 +188,6 @@ jobs:
           Write-Host "Embedded Python setup complete"
       
       - name: Install Python dependencies
-        if: matrix.platform == 'win'
         shell: bash
         run: |
           ./build/python/python.exe -m pip install -r requirements.txt
