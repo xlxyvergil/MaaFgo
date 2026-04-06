@@ -1,20 +1,20 @@
-name: install-mwu
+name: install
 
 on:
   push:
     tags:
-      - "v*MWU*"
+      - "v*"
     branches:
       - "**"
     paths:
-      - ".github/workflows/install-mwu.yml"
+      - ".github/workflows/install.yml"
       - "assets/**"
       - "**.py"
   pull_request:
     branches:
       - "**"
     paths:
-      - ".github/workflows/install-mwu.yml"
+      - ".github/workflows/install.yml"
       - "assets/**"
       - "**.py"
   workflow_dispatch:
@@ -66,7 +66,7 @@ jobs:
       is_prerelease: ${{ steps.set_tag.outputs.is_prerelease }}
       repo_name: ${{ steps.set_tag.outputs.repo_name }}
 
-  build:
+  build-mwu:
     env:
       UV_INDEX: https://pypi.org/simple
       repo_name: ${{ needs.meta.outputs.repo_name }}
@@ -202,7 +202,6 @@ jobs:
         shell: bash
         run: |
           tag="${{ env.tag }}"
-          # Remove v prefix and any suffix like Avalonia or MWU
           version=$(echo "$tag" | sed 's/^v//; s/Avalonia$//; s/MWU$//')
           echo "clean_version=$version" >> $GITHUB_OUTPUT
 
@@ -215,6 +214,138 @@ jobs:
         with:
           name: ${{ env.repo_name }}-MWU-${{ matrix.platform }}-${{ matrix.arch }}-v${{ steps.get_version.outputs.clean_version }}
           path: ${{ env.repo_name }}-MWU-${{ matrix.platform }}-${{ matrix.arch }}-v${{ steps.get_version.outputs.clean_version }}.7z
+
+  build-avalonia:
+    needs: meta
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: win
+            arch: x86_64
+            runner: windows-latest
+          - os: win
+            arch: aarch64
+            runner: windows-11-arm
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - name: Download MaaFramework
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: MaaXYZ/MaaFramework
+          fileName: "MAA-${{ matrix.os }}-${{ matrix.arch }}*"
+          latest: true
+          out-file-path: "deps"
+          extract: true
+
+      - name: Download FGO-MFAAvalonia
+        id: download_mfa
+        uses: robinraju/release-downloader@v1
+        with:
+          repository: xlxyvergil/MFAAvalonia
+          fileName: "MFAAvalonia-*-win-${{ (matrix.arch == 'x86_64' && 'x64') || (matrix.arch == 'aarch64' && 'arm64') }}*"
+          latest: true
+          out-file-path: "MFA"
+          extract: true
+
+      - name: Clean up MFAAvalonia archive
+        shell: bash
+        run: |
+          ARCHIVE_FILE_PATH="${{ fromJson(steps.download_mfa.outputs.downloaded_files)[0] }}"
+          rm -f "${ARCHIVE_FILE_PATH}"
+          echo "Archive cleanup command executed for MFAAvalonia."
+
+      - name: Remove built-in runtime in MFA
+        shell: bash
+        run: |
+          rm -rf MFA/runtimes
+      
+      - name: Setup embedded Python
+        shell: pwsh
+        run: |
+          $pythonVersion = "3.12.10"
+          $destDir = "install/python"
+          
+          if (Test-Path $destDir) {
+            Remove-Item -Recurse -Force $destDir
+          }
+          New-Item -ItemType Directory -Path $destDir -Force
+          
+          $arch = "${{ matrix.arch }}"
+          if ($arch -eq "x86_64") {
+            $winArch = "amd64"
+          } else {
+            $winArch = "arm64"
+          }
+          
+          $url = "https://www.python.org/ftp/python/$pythonVersion/python-$pythonVersion-embed-$winArch.zip"
+          $zipFile = "$destDir/python-embed.zip"
+          
+          Write-Host "Downloading Python from $url"
+          Invoke-WebRequest -Uri $url -OutFile $zipFile
+          
+          Write-Host "Extracting Python..."
+          Expand-Archive -Path $zipFile -DestinationPath $destDir -Force
+          Remove-Item $zipFile
+          
+          # Modify ._pth file
+          $pthFile = Get-ChildItem -Path $destDir -Filter "python*._pth" | Select-Object -First 1
+          if ($pthFile) {
+            $content = Get-Content $pthFile.FullName
+            $content = $content -replace "#import site", "import site"
+            $content += "`n.`nLib`nLib\site-packages`nDLLs"
+            Set-Content -Path $pthFile.FullName -Value $content
+            Write-Host "Modified $($pthFile.Name)"
+          }
+          
+          # Install pip
+          $getPipUrl = "https://bootstrap.pypa.io/get-pip.py"
+          $getPipFile = "$destDir/get-pip.py"
+          Invoke-WebRequest -Uri $getPipUrl -OutFile $getPipFile
+          & "$destDir/python.exe" $getPipFile
+          Remove-Item $getPipFile
+          
+          Write-Host "Embedded Python setup complete"
+      
+      - name: Install Python dependencies
+        shell: bash
+        run: |
+          ./install/python/python.exe -m pip install -r requirements.txt
+
+      - name: Install
+        shell: pwsh
+        run: |
+          if (Test-Path "MFA") {
+            Write-Host "Copying MFA files to install directory..."
+            New-Item -ItemType Directory -Path "install" -Force
+            Copy-Item -Path "MFA\*" -Destination "install" -Recurse -Force
+            Write-Host "MFA files copied successfully."
+          } else {
+            Write-Host "MFA directory not found, skipping copy."
+          }
+
+          cd tools
+          python -m pip install json-with-comments
+          python ./install.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
+          cd ..
+
+      - name: Get version without suffix
+        id: get_version
+        shell: bash
+        run: |
+          tag="${{ needs.meta.outputs.tag }}"
+          version=$(echo "$tag" | sed 's/^v//; s/Avalonia$//; s/MWU$//')
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: MaaFGO-Avalonia-${{ matrix.os }}-${{ matrix.arch }}-v${{ steps.get_version.outputs.version }}
+          path: "install"
 
   changelog:
     name: Generate changelog
@@ -242,16 +373,29 @@ jobs:
 
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, build, changelog]
+    needs: [meta, build-mwu, build-avalonia, changelog]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v8.0.1
         with:
           path: release
 
+      - name: Package Avalonia artifacts
+        run: |
+          mkdir -p release-packed
+          cd release
+          for f in MaaFGO-Avalonia-*; do
+            if [ -d "$f" ]; then
+              clean_version=$(echo "$f" | grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' | head -1 || echo "")
+              (cd "$f" && zip -r "../release-packed/MaaFGO-Avalonia-win-${f#*-win-}.zip" .)
+            fi
+          done
+
       - uses: softprops/action-gh-release@v2.2.2
         with:
-          files: release/**/*.7z
+          files: |
+            release/**/*.7z
+            release-packed/*.zip
           tag_name: ${{ needs.meta.outputs.tag }}
           body: ${{ needs.changelog.outputs.release_body }}
           draft: false
