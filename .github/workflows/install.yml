@@ -128,7 +128,7 @@ jobs:
         uses: robinraju/release-downloader@v1
         with:
           repository: ravizhan/MWU
-          latest: true
+          tag: v0.12.2
           fileName: MWU-${{ matrix.platform }}-${{ matrix.arch }}-*.7z
           out-file-path: ./
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -188,14 +188,6 @@ jobs:
         shell: bash
         run: |
           ./build/python/python.exe -m pip install -r requirements.txt
-
-      - name: Fix bbc_team_config scan_dir for MWU
-        shell: pwsh
-        run: |
-          $configFile = "./build/options/bbc_team_config.json"
-          $content = Get-Content $configFile -Raw
-          $content = $content -replace './BBchannel/settings', 'resource/BBchannel/settings'
-          Set-Content $configFile $content -NoNewline
 
       - name: Get clean version
         id: get_version
