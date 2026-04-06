@@ -117,6 +117,42 @@ jobs:
           cp -r assets/i18n build/i18n
           cp -r bbcdll build/bbcdll
 
+      - name: Generate MWU Agent Main
+        shell: bash
+        run: |
+          cat > build/agent/main.py << 'EOF'
+          import os
+          import sys
+
+          from maa.agent.agent_server import AgentServer
+          from maa.tasker import Tasker
+
+          import bbc_action
+          import sequential_tasks_action
+
+
+          def main():
+              # 使用相对于 agent 文件的绝对路径
+              agent_dir = os.path.dirname(os.path.abspath(__file__))
+              log_dir = os.path.join(os.path.dirname(agent_dir), 'logs')
+              Tasker.set_log_dir(log_dir)
+
+              if len(sys.argv) < 2:
+                  print("Usage: python main.py <socket_id>")
+                  print("socket_id is provided by AgentIdentifier.")
+                  sys.exit(1)
+
+              socket_id = sys.argv[-1]
+
+              AgentServer.start_up(socket_id)
+              AgentServer.join()
+              AgentServer.shut_down()
+
+
+          if __name__ == "__main__":
+              main()
+          EOF
+
       - name: Download Dependencies
         shell: bash
         run: |
@@ -136,58 +172,6 @@ jobs:
       - name: Decompress Artifact to build
         run: |
           7z x ${{ fromJson(steps.download_artifact.outputs.downloaded_files)[0] }} -obuild -y
-
-      - name: Setup embedded Python
-        shell: pwsh
-        run: |
-          $pythonVersion = "3.12.10"
-          $destDir = "build/python"
-          
-          if (Test-Path $destDir) {
-            Remove-Item -Recurse -Force $destDir
-          }
-          New-Item -ItemType Directory -Path $destDir -Force
-          
-          $arch = "${{ matrix.arch }}"
-          if ($arch -eq "x86_64") {
-            $winArch = "amd64"
-          } else {
-            $winArch = "arm64"
-          }
-          
-          $url = "https://www.python.org/ftp/python/$pythonVersion/python-$pythonVersion-embed-$winArch.zip"
-          $zipFile = "$destDir/python-embed.zip"
-          
-          Write-Host "Downloading Python from $url"
-          Invoke-WebRequest -Uri $url -OutFile $zipFile
-          
-          Write-Host "Extracting Python..."
-          Expand-Archive -Path $zipFile -DestinationPath $destDir -Force
-          Remove-Item $zipFile
-          
-          # Modify ._pth file
-          $pthFile = Get-ChildItem -Path $destDir -Filter "python*._pth" | Select-Object -First 1
-          if ($pthFile) {
-            $content = Get-Content $pthFile.FullName
-            $content = $content -replace "#import site", "import site"
-            $content += "`n.`nLib`nLib\site-packages`nDLLs"
-            Set-Content -Path $pthFile.FullName -Value $content
-            Write-Host "Modified $($pthFile.Name)"
-          }
-          
-          # Install pip
-          $getPipUrl = "https://bootstrap.pypa.io/get-pip.py"
-          $getPipFile = "$destDir/get-pip.py"
-          Invoke-WebRequest -Uri $getPipUrl -OutFile $getPipFile
-          & "$destDir/python.exe" $getPipFile
-          Remove-Item $getPipFile
-          
-          Write-Host "Embedded Python setup complete"
-      
-      - name: Install Python dependencies
-        shell: bash
-        run: |
-          ./build/python/python.exe -m pip install -r requirements.txt
 
       - name: Get clean version
         id: get_version
