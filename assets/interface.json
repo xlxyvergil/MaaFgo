@@ -6,7 +6,7 @@
     "license": "MIT",
     "welcome": "首次使用！欢迎使用 MaaFgo!",
     "github": "https://github.com/xlxyvergil/MaaFgo",
-    "version": "v1.1.13",
+    "version": "v1.1.18",
     "languages": {
         "zh_cn": "./i18n/zh_cn.json"
     },
