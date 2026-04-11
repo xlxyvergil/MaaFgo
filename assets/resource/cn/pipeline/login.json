@@ -18,7 +18,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "gonggao.png",
+                "template": "公告.png",
                 "threshold": 0.7,
                 "method": 5
             }
