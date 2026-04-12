@@ -5,6 +5,15 @@
             "label": "队伍编号",
             "cases": [
                 {
+                    "name": "默认队伍",
+                    "label": "默认队伍",
+                    "pipeline_override": {
+                      "队伍编制": {
+                        "next": "回主界面"
+                        }
+                    }
+                },
+                {
                     "name": "队伍1",
                     "label": "队伍1",
                     "pipeline_override": {
