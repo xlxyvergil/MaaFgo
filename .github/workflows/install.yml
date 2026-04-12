@@ -113,6 +113,7 @@ jobs:
           cp -r assets/options build/options
           cp -r assets/i18n build/i18n
           cp -r bbcdll build/bbcdll
+          cp -r assets/tasks build/tasks
       - name: Download Dependencies
         shell: bash
         run: |

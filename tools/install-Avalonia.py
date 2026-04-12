@@ -193,11 +193,22 @@ def install_bbcdll():
     )
 
 
+def install_tasks():
+    """复制 tasks 目录"""
+    if (working_dir / "assets" / "tasks").exists():
+        shutil.copytree(
+            working_dir / "assets" / "tasks",
+            install_path / "tasks",
+            dirs_exist_ok=True,
+        )
+
+
 if __name__ == "__main__":
     install_deps()
     install_resource()
     install_chores()
     install_agent()
     install_bbcdll()
+    install_tasks()
 
     print(f"Install to {install_path} successfully.")
