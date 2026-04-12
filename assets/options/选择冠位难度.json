@@ -7,12 +7,12 @@
         {
           "name": "100⭐⭐",
           "pipeline_override": {
-            "冠位戴冠战-等级副本": {
+            "戴冠战-匹配检测": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
                   "template": [
-                    "grand_6.png"
+                    "grand/grand_6.png"
                   ],
                   "threshold": [
                     0.8
@@ -25,12 +25,12 @@
         {
           "name": "100⭐⭐⭐",
           "pipeline_override": {
-            "冠位戴冠战-等级副本": {
+            "戴冠战-匹配检测": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
                   "template": [
-                    "grand_7.png"
+                    "grand/grand_7.png"
                   ],
                   "threshold": [
                     0.8
