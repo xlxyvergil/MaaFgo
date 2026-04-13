@@ -77,10 +77,6 @@ jobs:
           - os: windows-2025
             platform: win
             arch: x86_64
-
-          - os: windows-11-arm
-            platform: win
-            arch: aarch64
     runs-on: ${{ matrix.os }}
     name: Build MWU (${{ matrix.platform }}-${{ matrix.arch }})
     needs: meta
@@ -198,9 +194,6 @@ jobs:
           - os: win
             arch: x86_64
             runner: windows-latest
-          - os: win
-            arch: aarch64
-            runner: windows-11-arm
       fail-fast: false
 
     steps:
