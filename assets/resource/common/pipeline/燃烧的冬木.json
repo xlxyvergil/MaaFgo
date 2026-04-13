@@ -1,102 +1,39 @@
 {
-    "q未确认坐标X-A": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    359,
-                    82,
-                    203,
-                    173
-                ],
-                "template": [
-                    "未确认坐标X-A.png"
-                ]
-            }
-        },
+    "冬木": {
         "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    449,
-                    191,
-                    2,
-                    4
-                ]
-            }
+            "type": "Click"
         },
         "next": [
-            "宅邸残迹"
-        ]
-    },
-    "冬木": {
+            "地图坐标导航"
+        ],
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    200,
-                    100,
-                    880,
-                    600
+                    646,
+                    112,
+                    572,
+                    485
                 ],
                 "template": [
-                    "燃烧的冬木.png"
+                    "主线记录1导航/冬木.png"
                 ],
                 "threshold": 0.7
             }
-        },
-        "action": {
-            "type": "Click",
-            "param": {}
-        },
-        "next": [
-            "冬木放大"
-        ]
-    },
-    "冬木关卡选择": {
-        "next": [
-            "q未确认坐标X-A"
-        ]
-    },
-    "冬木向上": {
-        "action": {
-            "type": "Swipe",
-            "param": {
-                "begin": [
-                    39,
-                    478,
-                    1,
-                    1
-                ],
-                "end": [
-                    [
-                        73,
-                        139,
-                        1,
-                        1
-                    ]
-                ]
-            }
-        },
-        "post_wait_freezes": 500,
-        "repeat": 2,
-        "repeat_delay": 1000,
-        "next": [
-            "冬木关卡选择"
-        ]
+        }
     },
     "冬木寻找": {
         "action": {
             "type": "Swipe",
             "param": {
+                "duration": [
+                    100
+                ],
                 "begin": [
                     1211,
                     459,
                     10,
                     13
-                ],
-                "duration": [
-                    100
                 ],
                 "end": [
                     [
@@ -108,83 +45,27 @@
                 ]
             }
         },
-        "post_wait_freezes": 500
+        "post_wait_freezes": 500,
+        "recognition": {
+            "type": "DirectHit"
+        }
     },
     "冬木导航": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "主线记录1-1.png"
-                ]
-            }
-        },
         "next": [
             "冬木",
             "[JumpBack]冬木寻找"
-        ]
-    },
-    "冬木放大": {
-        "action": {
-            "type": "MultiSwipe",
-            "param": {
-                "swipes": [
-                    {
-                        "begin": [
-                            37,
-                            296,
-                            21,
-                            27
-                        ],
-                        "contact": 0,
-                        "end": [
-                            [
-                                591,
-                                331,
-                                25,
-                                22
-                            ]
-                        ]
-                    },
-                    {
-                        "begin": [
-                            1211,
-                            373,
-                            21,
-                            27
-                        ],
-                        "contact": 1,
-                        "end": [
-                            [
-                                591,
-                                331,
-                                25,
-                                22
-                            ]
-                        ]
-                    }
-                ]
-            }
-        },
-        "post_wait_freezes": 1000,
-        "repeat": 3,
-        "repeat_delay": 500,
-        "next": [
-            "冬木向上"
-        ]
-    },
-    "宅邸残迹": {
+        ],
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": [
-                    "q未确认坐标X-A.png"
-                ]
+                "roi": [
+                    854,
+                    0,
+                    424,
+                    80
+                ],
+                "template": "主线记录1导航/主线记录1-1.png"
             }
-        },
-        "action": {
-            "type": "Click",
-            "param": {}
         }
     }
 }

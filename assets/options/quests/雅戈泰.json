@@ -3,13 +3,197 @@
         "雅戈泰": {
             "type": "select",
             "label": "关卡",
+            "default": "q地底平原",
             "cases": [
                 {
-                    "name": "残留的神话",
-                    "label": "残留的神话",
+                    "name": "q地底平原",
+                    "label": "q地底平原",
                     "pipeline_override": {
-                        "OrdealCall关卡导航": {
-                            "next": "残留的神话"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q野营地",
+                    "label": "q野营地",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q河边城市",
+                    "label": "q河边城市",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q桃源乡",
+                    "label": "q桃源乡",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q伊苏",
+                    "label": "q伊苏",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q北部断崖",
+                    "label": "q北部断崖",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q不夜城",
+                    "label": "q不夜城",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q山脚密林",
+                    "label": "q山脚密林",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q地底大河",
+                    "label": "q地底大河",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q龙宫城",
+                    "label": "q龙宫城",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q黄金国",
+                    "label": "q黄金国",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q大地裂隙",
+                    "label": "q大地裂隙",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

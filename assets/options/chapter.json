@@ -14,6 +14,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c冬木"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c冬木"
+                            }
                         }
                     }
                 },
@@ -26,6 +31,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c奥尔良"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c奥尔良"
+                            }
                         }
                     }
                 },
@@ -38,6 +48,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c七丘之城"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c七丘之城"
+                            }
                         }
                     }
                 },
@@ -50,6 +65,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c俄刻阿诺斯"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c俄刻阿诺斯"
+                            }
                         }
                     }
                 },
@@ -62,6 +82,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c伦敦"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c伦敦"
+                            }
                         }
                     }
                 },
@@ -74,6 +99,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c合众为一"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c合众为一"
+                            }
                         }
                     }
                 },
@@ -86,6 +116,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c卡美洛"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c卡美洛"
+                            }
                         }
                     }
                 },
@@ -98,6 +133,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c巴比伦尼亚"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c巴比伦尼亚"
+                            }
                         }
                     }
                 },
@@ -110,6 +150,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c新宿"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c新宿"
+                            }
                         }
                     }
                 },
@@ -122,6 +167,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c雅戈泰"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c雅戈泰"
+                            }
                         }
                     }
                 },
@@ -134,6 +184,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c下总国"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c下总国"
+                            }
                         }
                     }
                 },
@@ -146,6 +201,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c塞勒姆"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c塞勒姆"
+                            }
                         }
                     }
                 },
@@ -158,6 +218,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c阿纳斯塔西娅"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c阿纳斯塔西娅"
+                            }
                         }
                     }
                 },
@@ -170,6 +235,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c诸神黄昏"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c诸神黄昏"
+                            }
                         }
                     }
                 },
@@ -182,6 +252,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "cSIN"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "cSIN"
+                            }
                         }
                     }
                 },
@@ -194,6 +269,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c由伽刹多罗"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c由伽刹多罗"
+                            }
                         }
                     }
                 },
@@ -206,6 +286,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c亚特兰蒂斯"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c亚特兰蒂斯"
+                            }
                         }
                     }
                 },
@@ -218,6 +303,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c奥林波斯"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c奥林波斯"
+                            }
                         }
                     }
                 },
@@ -230,6 +320,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c阿瓦隆勒菲"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c阿瓦隆勒菲"
+                            }
                         }
                     }
                 },
@@ -254,6 +349,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c平安京"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c平安京"
+                            }
                         }
                     }
                 },
@@ -266,6 +366,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "cTraum"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "cTraum"
+                            }
                         }
                     }
                 },
@@ -290,6 +395,11 @@
                     "pipeline_override": {
                         "章节导航": {
                             "next": "c平面之月"
+                        },
+                        "地图坐标导航": {
+                            "attach": {
+                                "chapter": "c平面之月"
+                            }
                         }
                     }
                 }

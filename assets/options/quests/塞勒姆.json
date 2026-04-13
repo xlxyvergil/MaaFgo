@@ -3,13 +3,181 @@
         "塞勒姆": {
             "type": "select",
             "label": "关卡",
+            "default": "q寂静之森",
             "cases": [
                 {
-                    "name": "残留的神话",
-                    "label": "残留的神话",
+                    "name": "q寂静之森",
+                    "label": "q寂静之森",
                     "pipeline_override": {
-                        "OrdealCall关卡导航": {
-                            "next": "残留的神话"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q卡特家",
+                    "label": "q卡特家",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q公众集会堂",
+                    "label": "q公众集会堂",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q码头",
+                    "label": "q码头",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q郊外的宅邸",
+                    "label": "q郊外的宅邸",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q维特利家",
+                    "label": "q维特利家",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q牧草地",
+                    "label": "q牧草地",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q加罗丘陵",
+                    "label": "q加罗丘陵",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q隐匿处",
+                    "label": "q隐匿处",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q空房",
+                    "label": "q空房",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q拘留所",
+                    "label": "q拘留所",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

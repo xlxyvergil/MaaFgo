@@ -3,13 +3,213 @@
         "平安京": {
             "type": "select",
             "label": "关卡",
+            "default": "q七条四坊",
             "cases": [
                 {
-                    "name": "残留的神话",
-                    "label": "残留的神话",
+                    "name": "q七条四坊",
+                    "label": "q七条四坊",
                     "pipeline_override": {
-                        "OrdealCall关卡导航": {
-                            "next": "残留的神话"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q七条二坊",
+                    "label": "q七条二坊",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q六条大路",
+                    "label": "q六条大路",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q贵族宅邸",
+                    "label": "q贵族宅邸",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q朱雀门",
+                    "label": "q朱雀门",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q平安宫",
+                    "label": "q平安宫",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q朱雀大路",
+                    "label": "q朱雀大路",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q稻荷神社",
+                    "label": "q稻荷神社",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q大宫大路",
+                    "label": "q大宫大路",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q赖光的宅邸",
+                    "label": "q赖光的宅邸",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q五条大桥",
+                    "label": "q五条大桥",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q大江山",
+                    "label": "q大江山",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q三条三坊",
+                    "label": "q三条三坊",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

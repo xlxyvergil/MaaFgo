@@ -45,7 +45,7 @@
         "recognition": {
             "param": {
                 "template": [
-                    "决定2.png"
+                    "撤退决定.png"
                 ]
             },
             "type": "TemplateMatch"
@@ -62,7 +62,7 @@
         "recognition": {
             "param": {
                 "template": [
-                    "关闭.png"
+                    "关闭好友申请.png"
                 ]
             },
             "type": "TemplateMatch"
@@ -137,7 +137,7 @@
                     86
                 ],
                 "template": [
-                    "关闭2.png"
+                    "关闭.png"
                 ]
             },
             "type": "TemplateMatch"

@@ -3,13 +3,229 @@
         "巴比伦尼亚": {
             "type": "select",
             "label": "关卡",
+            "default": "q废都巴比伦",
             "cases": [
                 {
-                    "name": "残留的神话",
-                    "label": "残留的神话",
+                    "name": "q废都巴比伦",
+                    "label": "废都巴比伦",
                     "pipeline_override": {
-                        "OrdealCall关卡导航": {
-                            "next": "残留的神话"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q北之高台",
+                    "label": "北之高台",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q黑色杉木林",
+                    "label": "黑色杉木林",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q高原",
+                    "label": "高原",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q湿地",
+                    "label": "湿地",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q乌尔",
+                    "label": "乌尔",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q埃里都",
+                    "label": "埃里都",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q观测所",
+                    "label": "观测所",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q芦苇原",
+                    "label": "芦苇原",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q库撒",
+                    "label": "库撒",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q北壁",
+                    "label": "北壁",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q尼普尔",
+                    "label": "尼普尔",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q艾比夫山",
+                    "label": "艾比夫山",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q鲜血神殿",
+                    "label": "鲜血神殿",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

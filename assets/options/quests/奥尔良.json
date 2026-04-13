@@ -3,13 +3,165 @@
         "奥尔良": {
             "type": "select",
             "label": "关卡",
+            "default": "q栋雷米",
             "cases": [
                 {
-                    "name": "残留的神话",
-                    "label": "残留的神话",
+                    "name": "q栋雷米",
+                    "label": "q栋雷米",
                     "pipeline_override": {
-                        "OrdealCall关卡导航": {
-                            "next": "残留的神话"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q沃库勒尔",
+                    "label": "q沃库勒尔",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q拉沙里泰",
+                    "label": "q拉沙里泰",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q汝拉",
+                    "label": "q汝拉",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q里昂",
+                    "label": "q里昂",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q蒂耶尔",
+                    "label": "q蒂耶尔",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q奥尔良",
+                    "label": "q奥尔良",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q巴黎",
+                    "label": "q巴黎",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q马赛",
+                    "label": "q马赛",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "q波尔多",
+                    "label": "q波尔多",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

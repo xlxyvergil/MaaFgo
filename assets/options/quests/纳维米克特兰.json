@@ -3,6 +3,7 @@
         "纳维米克特兰": {
             "type": "select",
             "label": "关卡",
+            "default": "q奇科莫斯托克",
             "cases": [
                 {
                     "name": "残留的神话",

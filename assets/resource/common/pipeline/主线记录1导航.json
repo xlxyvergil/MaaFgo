@@ -3,20 +3,23 @@
         "next": [
             "点击主线记录1",
             "[JumpBack]寻找主线记录1"
-        ]
+        ],
+        "recognition": {
+            "type": "DirectHit"
+        }
     },
     "寻找主线记录1": {
         "action": {
             "type": "Swipe",
             "param": {
+                "duration": [
+                    100
+                ],
                 "begin": [
                     1198,
                     557,
                     19,
                     21
-                ],
-                "duration": [
-                    100
                 ],
                 "end": [
                     [
@@ -30,25 +33,41 @@
         },
         "next": [
             "寻找主线记录1-1"
-        ]
+        ],
+        "recognition": {
+            "type": "DirectHit"
+        }
+    },
+    "寻找主线记录1-1": {
+        "recognition": {
+            "type": "DirectHit"
+        }
     },
     "点击主线记录1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "主线记录1.png"
-                ]
-            }
-        },
         "action": {
-            "type": "Click",
-            "param": {}
+            "type": "Click"
         },
         "next": [
             "点击主线记录1-1"
-        ]
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    647,
+                    101,
+                    586,
+                    482
+                ],
+                "template": [
+                    "主线记录1导航/主线记录1.png"
+                ]
+            }
+        }
     },
-    "点击主线记录1-1": {},
-    "寻找主线记录1-1": {}
+    "点击主线记录1-1": {
+        "recognition": {
+            "type": "DirectHit"
+        }
+    }
 }

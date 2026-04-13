@@ -3,14 +3,133 @@
         "冬木": {
             "type": "select",
             "label": "关卡",
-            "default": "未确认坐标X-A",
+            "default": "宅邸残迹",
             "cases": [
                 {
-                    "name": "未确认坐标X-A",
-                    "label": "未确认坐标X-A",
+                    "name": "宅邸残迹",
+                    "label": "宅邸残迹",
                     "pipeline_override": {
-                        "冬木关卡选择": {
-                            "next": "q未确认坐标X-A"
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XA"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/宅邸残迹.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "爆炸中心地",
+                    "label": "爆炸中心地",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XB"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/爆炸中心地.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "大桥",
+                    "label": "大桥",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XC"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/大桥.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "鲜红港口",
+                    "label": "鲜红港口",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XD"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/鲜红港口.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "骸骨彷徨的教会",
+                    "label": "骸骨彷徨的教会",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XE"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/骸骨彷徨的教会.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "烧尽崩塌的校舍",
+                    "label": "烧尽崩塌的校舍",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XF"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/烧尽崩塌的校舍.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "大空洞",
+                    "label": "大空洞",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q未确认坐标XG"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/大空洞.png"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "熊熊燃烧的森林",
+                    "label": "熊熊燃烧的森林",
+                    "pipeline_override": {
+                        "地图坐标导航": {
+                            "attach": {
+                                "quests": "q变动坐标点0号"
+                            }
+                        },
+                        "关卡选择": {
+                            "template": [
+                                "冬木/熊熊燃烧的森林.png"
+                            ]
                         }
                     }
                 }

@@ -113,7 +113,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "举世之飞将军.png"
+                    "ordealcall/举世之飞将军.png"
                 ]
             }
         }
@@ -166,7 +166,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "久远的微笑.png"
+                    "ordealcall/久远的微笑.png"
                 ]
             }
         }
@@ -219,7 +219,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "于荒野萌芽的王之花.png"
+                    "ordealcall/于荒野萌芽的王之花.png"
                 ]
             }
         }
@@ -232,7 +232,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "任务开始.png"
+                    "ordealcall/任务开始.png"
                 ]
             }
         }
@@ -285,7 +285,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "光之丝线引导的迷宫.png"
+                    "ordealcall/光之丝线引导的迷宫.png"
                 ]
             }
         }
@@ -338,7 +338,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "冻土的试炼.png"
+                    "ordealcall/冻土的试炼.png"
                 ]
             }
         }
@@ -391,7 +391,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "噩梦的南瓜.png"
+                    "ordealcall/噩梦的南瓜.png"
                 ]
             }
         }
@@ -461,7 +461,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "复活的黄金都市.png"
+                    "ordealcall/复活的黄金都市.png"
                 ]
             }
         }
@@ -527,7 +527,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "复苏的远古浪漫.png"
+                    "ordealcall/复苏的远古浪漫.png"
                 ]
             }
         }
@@ -593,7 +593,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "大堡礁之卵.png"
+                    "ordealcall/大堡礁之卵.png"
                 ]
             }
         }
@@ -610,7 +610,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "奏章1基准点.png"
+                    "ordealcall/奏章1基准点.png"
                 ]
             }
         }
@@ -676,7 +676,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "寻求女神像.png"
+                    "ordealcall/寻求女神像.png"
                 ]
             }
         }
@@ -742,7 +742,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "常夏展销会场.png"
+                    "ordealcall/常夏展销会场.png"
                 ]
             }
         }
@@ -808,7 +808,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "常夏的休假.png"
+                    "ordealcall/常夏的休假.png"
                 ]
             }
         }
@@ -832,8 +832,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -857,8 +863,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -882,8 +894,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -907,8 +925,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -932,8 +956,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -957,8 +987,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    799,
+                    1,
+                    481,
+                    84
+                ],
                 "template": [
-                    "oc.png"
+                    "ordealcall/oc.png"
                 ]
             }
         }
@@ -1011,7 +1047,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "月光矿区.png"
+                    "ordealcall/月光矿区.png"
                 ]
             }
         }
@@ -1064,7 +1100,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "残留的神话.png"
+                    "ordealcall/残留的神话.png"
                 ]
             }
         }
@@ -1117,7 +1153,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "神秘主义者与魂之故乡.png"
+                    "ordealcall/神秘主义者与魂之故乡.png"
                 ]
             }
         }
@@ -1183,7 +1219,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "荒野的欢乐.png"
+                    "ordealcall/荒野的欢乐.png"
                 ]
             }
         }
@@ -1249,7 +1285,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "蛇龙的恶作剧.png"
+                    "ordealcall/蛇龙的恶作剧.png"
                 ]
             }
         }
@@ -1302,7 +1338,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "赏金猎人数光年.png"
+                    "ordealcall/赏金猎人数光年.png"
                 ]
             }
         }
@@ -1368,7 +1404,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "高贵的海盗.png"
+                    "ordealcall/高贵的海盗.png"
                 ]
             }
         }
