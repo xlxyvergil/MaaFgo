@@ -1,295 +1,279 @@
 {
-    "主界面菜单": {
-        "next": [
-            "商店"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "主菜单.png"
-                ],
-                "green_mask": true
-            }
-        }
-    },
-    "买不了取消": {
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "回主界面"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "取消.png"
-                ]
-            }
-        }
-    },
-    "买不了果实": {
-        "next": [
-            "买不了取消"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    534,
-                    435,
-                    192,
-                    54
-                ],
-                "expected": "行动力不足。"
-            }
-        }
-    },
-    "交换树苗": {
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "关闭树苗"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "交换.png"
-                ]
-            }
-        }
-    },
-    "兑换青铜树苗商店": {
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "青铜果实"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    680,
-                    102,
-                    553,
-                    441
-                ],
-                "template": [
-                    "兑换青铜树苗.png"
-                ]
-            }
-        }
-    },
-    "关闭树苗": {
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "回主界面"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "关闭.png"
-                ]
-            }
-        }
-    },
-    "商店": {
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "兑换青铜树苗商店",
-            "[JumpBack]寻找兑换青铜树苗"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "FeatureMatch",
-            "param": {
-                "roi": [
-                    725,
-                    533,
-                    167,
-                    152
-                ],
-                "template": [
-                    "商店.png"
-                ]
-            }
-        }
-    },
-    "商店-菜单": {
-        "action": {
-            "type": "Click"
-        },
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    1057,
-                    569,
-                    222,
-                    138
-                ],
-                "template": [
-                    "菜单.png"
-                ]
-            }
-        }
-    },
-    "商店种树": {
-        "next": [
-            "菜单关闭判断",
-            "[JumpBack]商店-菜单"
-        ],
-        "recognition": {
-            "type": "DirectHit"
-        }
-    },
-    "寻找兑换青铜树苗": {
-        "action": {
-            "type": "Swipe",
-            "param": {
-                "begin": [
-                    1232,
-                    567,
-                    1,
-                    1
-                ],
-                "end": [
-                    [
-                        1236,
-                        340,
-                        1,
-                        1
-                    ]
-                ]
-            }
-        },
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "DirectHit"
-        }
-    },
-    "种树": {
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "ExecuteSequentialTasks",
-                "custom_action_param": "回主界面,商店种树"
-            }
-        },
-        "recognition": {
-            "type": "DirectHit"
-        }
-    },
-    "菜单关闭判断": {
-        "next": [
-            "主界面菜单"
-        ],
-        "post_wait_freezes": 1000,
-        "recognition": {
-            "type": "FeatureMatch",
-            "param": {
-                "roi": [
-                    1043,
-                    389,
-                    233,
-                    325
-                ],
-                "template": [
-                    "菜单关闭.png"
-                ],
-                "green_mask": true
-            }
-        }
-    },
-    "购买树苗": {
+    "0个苹果": {
         "action": {
             "type": "Click",
             "param": {
                 "target": [
-                    842,
-                    315,
-                    1,
-                    1
+                    604,
+                    598,
+                    71,
+                    43
                 ]
             }
         },
         "next": [
-            "交换树苗"
+            "回主界面"
         ],
-        "post_wait_freezes": 1000,
         "recognition": {
-            "type": "DirectHit"
-        },
-        "repeat": 3,
-        "repeat_delay": 300
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    891,
+                    618,
+                    31,
+                    29
+                ],
+                "expected": "0"
+            }
+        }
     },
-    "青铜果实": {
+    "1个直接交换": {
         "action": {
             "type": "Click"
         },
         "next": [
-            "青铜果实界面-单个识别",
-            "青铜果实界面-多个识别",
-            "[JumpBack]买不了果实"
+            "交换完成关闭"
         ],
-        "post_wait_freezes": 1000,
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "roi": [
+                    724,
+                    571,
+                    180,
+                    50
+                ],
                 "template": [
-                    "青铜果实.png"
+                    "种树/1个直接交换.png"
+                ],
+                "threshold": 0.6,
+                "green_mask": true
+            }
+        }
+    },
+    "1个苹果": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    857,
+                    605,
+                    63,
+                    30
+                ]
+            }
+        },
+        "next": [
+            "1个直接交换"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    895,
+                    622,
+                    27,
+                    27
+                ],
+                "expected": "1"
+            }
+        }
+    },
+    "主界面体力": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    157,
+                    683,
+                    15,
+                    23
+                ]
+            }
+        },
+        "next": [
+            "打开体力界面"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    138,
+                    667,
+                    54,
+                    50
+                ],
+                "template": [
+                    "体力+.png"
                 ]
             }
         }
     },
-    "青铜果实界面-单个识别": {
+    "交换完成关闭": {
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "回主界面"
+        ],
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    471,
-                    435,
-                    334,
+                    500,
+                    524,
+                    282,
+                    72
+                ],
+                "template": "种树/交换完成关闭.png",
+                "threshold": 0.6,
+                "green_mask": true
+            }
+        }
+    },
+    "多个苹果": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    856,
+                    599,
+                    67,
+                    41
+                ]
+            }
+        },
+        "inverse": true,
+        "next": [
+            "种树加号查找"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    898,
+                    619,
+                    19,
+                    28
+                ],
+                "template": [
+                    "种树/0个苹果.png",
+                    "种树/1个苹果.png"
+                ],
+                "threshold": 0.6
+            }
+        }
+    },
+    "打开体力界面": {
+        "next": [
+            "0个苹果",
+            "1个苹果",
+            "多个苹果"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    850,
+                    619,
+                    35,
+                    27
+                ],
+                "template": [
+                    "种树/青铜树苗.png"
+                ],
+                "threshold": 0.6
+            }
+        }
+    },
+    "确认完成种树点击": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    769,
+                    576,
+                    79,
+                    40
+                ]
+            }
+        },
+        "next": [
+            "交换完成关闭"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    832,
+                    269,
+                    49,
+                    57
+                ],
+                "template": [
+                    "种树/确认完成种树点击.png"
+                ]
+            }
+        }
+    },
+    "种树": {
+        "next": [
+            "种树主界面识别",
+            "[JumpBack]回主界面"
+        ],
+        "recognition": {
+            "type": "DirectHit"
+        }
+    },
+    "种树主界面识别": {
+        "next": [
+            "主界面体力"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    209,
+                    557,
+                    50,
                     50
                 ],
-                "expected": "兌換后追加至所持道具中"
+                "template": [
+                    "主界面圣晶石.png"
+                ],
+                "threshold": 0.6,
+                "green_mask": true
+            }
+        }
+    },
+    "种树加号查找": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -39,
+                    42,
+                    -58,
+                    -86
+                ]
             }
         },
         "next": [
-            "购买树苗"
-        ]
-    },
-    "青铜果实界面-多个识别": {
+            "确认完成种树点击"
+        ],
         "recognition": {
-            "type": "OCR",
+            "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    479,
-                    529,
-                    321,
-                    44
+                    878,
+                    248,
+                    72,
+                    104
                 ],
-                "expected": "兌換后追加至所持道具中"
+                "template": [
+                    "种树/加号.png"
+                ]
             }
-        },
-        "next": [
-            "购买树苗"
-        ]
+        }
     }
 }

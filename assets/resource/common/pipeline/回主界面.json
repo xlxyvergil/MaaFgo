@@ -1,9 +1,13 @@
 {
     "主界面判断-活动报酬": {
+        "next": [
+            "无弹窗",
+            "[JumpBack]有弹窗返回"
+        ],
+        "post_wait_freezes": 500,
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "green_mask": true,
                 "roi": [
                     1099,
                     3,
@@ -12,14 +16,10 @@
                 ],
                 "template": [
                     "活动报酬.png"
-                ]
+                ],
+                "green_mask": true
             }
-        },
-        "post_wait_freezes": 500,
-        "next": [
-            "无弹窗",
-            "[JumpBack]有弹窗返回"
-        ]
+        }
     },
     "主界面判断-返回": {
         "action": {
@@ -30,13 +30,38 @@
                 ]
             }
         },
-        "post_wait_freezes": 500
+        "post_wait_freezes": 500,
+        "recognition": {
+            "type": "DirectHit"
+        }
     },
     "回主界面": {
         "next": [
             "主界面判断-活动报酬",
             "[JumpBack]主界面判断-返回"
-        ]
+        ],
+        "recognition": {
+            "type": "DirectHit"
+        }
+    },
+    "无弹窗": {
+        "post_wait_freezes": 500,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    209,
+                    557,
+                    50,
+                    50
+                ],
+                "template": [
+                    "主界面圣晶石.png"
+                ],
+                "threshold": 0.6,
+                "green_mask": true
+            }
+        }
     },
     "有弹窗返回": {
         "action": {
@@ -47,24 +72,9 @@
                 ]
             }
         },
-        "post_wait_freezes": 500
-    },
-    "无弹窗": {
+        "post_wait_freezes": 500,
         "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "green_mask": true,
-                "roi": [
-                    186,
-                    539,
-                    94,
-                    83
-                ],
-                "template": [
-                    "主界面圣晶石.png"
-                ]
-            }
-        },
-        "post_wait_freezes": 500
+            "type": "DirectHit"
+        }
     }
 }
