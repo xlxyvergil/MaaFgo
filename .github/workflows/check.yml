@@ -32,16 +32,8 @@ jobs:
 
       - name: Run maa-checker
         run: |
-          npx @nekosu/maa-checker@latest ./assets/interface.json --github=.
-
-      - name: Install maafw
-        run: |
-          python -m pip install --upgrade pip
-          python -m pip install --upgrade maafw --pre
-
-      - name: Check Resource
-        run: |
-          python ./check_resource.py ./assets/resource/
+          npm ci
+          npx @nekosu/maa-tools check
 
       - name: Validate JSON Schema
         run: |
