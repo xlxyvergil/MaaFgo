@@ -130,6 +130,11 @@ jobs:
           out-file-path: ./
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Download Python Dependencies
+        shell: bash
+        run: |
+          python tools/download_deps.py ${{ matrix.platform }} ${{ matrix.arch }}
+
       - name: Setup Python Environment for Agent
         shell: bash
         run: |
@@ -152,10 +157,14 @@ jobs:
       - name: Install Agent Dependencies
         shell: bash
         run: |
-          # 使用刚才下载的 Python 安装 requirements.txt 中的依赖到 build/deps
+          # 使用刚才下载的 Python 安装依赖到 build/deps
           if [[ "${{ matrix.platform }}" == "win" ]]; then
-            ./build/python/python.exe -m ensurepip
-            ./build/python/python.exe -m pip install -r requirements.txt --target build/deps
+            # 1. 下载 get-pip.py
+            curl -L https://bootstrap.pypa.io/get-pip.py -o build/python/get-pip.py
+            # 2. 安装 pip
+            ./build/python/python.exe build/python/get-pip.py
+            # 3. 离线安装所有预下载的 Wheel 包
+            ./build/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary opencv-python numpy --target build/deps
           fi
 
       - name: Decompress Artifact to build
@@ -207,6 +216,11 @@ jobs:
           latest: true
           out-file-path: "deps"
           extract: true
+
+      - name: Download Python Dependencies
+        shell: bash
+        run: |
+          python tools/download_deps.py ${{ matrix.os }} ${{ matrix.arch }}
 
       - name: Download FGO-MFAAvalonia
         id: download_mfa
@@ -280,7 +294,7 @@ jobs:
       - name: Install Python dependencies
         shell: bash
         run: |
-          ./install/python/python.exe -m pip install -r requirements.txt
+          ./install/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary opencv-python numpy
 
       - name: Prepare Avalonia main.py
         shell: bash
