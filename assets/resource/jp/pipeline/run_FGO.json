@@ -11,7 +11,8 @@
             "自动登录",
             "[JumpBack]是否要更新",
             "[JumpBack]异常启动弹窗",
-            "[JumpBack]等待更新完成"
+            "[JumpBack]等待更新完成",
+            "登录-已经在主界面"
         ]
     },
     "直到达到主界面": {
@@ -237,5 +238,22 @@
     "登录流程持续识别": {
         "max_hit": 4,
         "post_delay": 5000
+    },
+    "登录-已经在主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "task.png"
+                ],
+                "green_mask": true
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "发现已经在主界面"
+        },
+        "next": [
+            "最终确认抵达主界面"
+        ]
     }
 }
