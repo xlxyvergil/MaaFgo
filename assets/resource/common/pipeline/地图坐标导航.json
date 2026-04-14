@@ -1,45 +1,61 @@
 {
-    "地图坐标导航": {
+    "UI隐藏": {
         "action": {
-            "type": "Custom",
+            "type": "Click",
             "param": {
-                "custom_action": "general_navigation"
+                "target": [
+                    1037,
+                    645,
+                    26,
+                    18
+                ]
             }
         },
-        "attach": {
-            "chapter": "c冬木",
-            "quests": "宅邸残迹"
-        },
-        "recognition": {
-            "type": "DirectHit"
-        },
-        "next": [
-            "关卡归位"
-        ]
-    },
-    "关卡选择": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    621,
-                    92,
+                    1019,
                     619,
-                    520
+                    60,
+                    62
                 ],
-                "template": [
-                    "地图坐标导航/关卡选择占位图.png"
+                "template": "地图坐标导航/UI隐藏.png"
+            }
+        }
+    },
+    "关卡归位": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1252,
+                    114,
+                    11,
+                    8
                 ]
             }
         },
-        "action": {
-            "type": "Click"
+        "next": [
+            "关卡选择",
+            "[JumpBack]关卡滑动"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    611,
+                    78,
+                    663,
+                    543
+                ],
+                "template": [
+                    "地图坐标导航/关卡归位.png"
+                ]
+            }
         }
     },
     "关卡滑动": {
-        "recognition": {
-            "type": "DirectHit"
-        },
         "action": {
             "type": "Swipe",
             "param": {
@@ -56,37 +72,46 @@
                     16
                 ]
             }
+        },
+        "recognition": {
+            "type": "DirectHit"
         }
     },
-    "关卡归位": {
+    "关卡选择": {
+        "action": {
+            "type": "Click"
+        },
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    611,
-                    78,
-                    663,
-                    543
+                    621,
+                    92,
+                    619,
+                    520
                 ],
                 "template": [
-                    "地图坐标导航/关卡归位.png"
+                    "地图坐标导航/关卡选择占位图.png"
                 ]
+            }
+        }
+    },
+    "地图坐标导航": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "general_navigation"
             }
         },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target_offset": [
-                    645,
-                    34,
-                    -654,
-                    -527
-                ]
-            }
+        "attach": {
+            "chapter": "c冬木",
+            "quests": "宅邸残迹"
         },
         "next": [
-            "关卡选择",
-            "[JumpBack]关卡滑动"
-        ]
+            "关卡归位"
+        ],
+        "recognition": {
+            "type": "DirectHit"
+        }
     }
 }

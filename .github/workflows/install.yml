@@ -105,6 +105,13 @@ jobs:
           cp -r assets/i18n build/i18n
           cp -r bbcdll build/bbcdll
           cp -r assets/tasks build/tasks
+          # 仅复制 MWU 必需的 Agent 文件，排除 Avalonia 版本
+          mkdir -p build/agent
+          cp agent/main.py build/agent/
+          cp agent/bbc_action.py build/agent/
+          cp agent/sequential_tasks_action.py build/agent/
+          cp agent/general_navigation_action.py build/agent/ 2>/dev/null || true
+          cp agent/map_coordinates.json build/agent/ 2>/dev/null || true
       - name: Download Dependencies
         shell: bash
         run: |

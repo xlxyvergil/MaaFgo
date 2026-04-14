@@ -17,6 +17,7 @@ from maa.toolkit import Toolkit
 
 import bbc_action
 import sequential_tasks_action
+import general_navigation_action
 
 
 def main():

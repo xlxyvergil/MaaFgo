@@ -58,7 +58,7 @@
                 "template": [
                     "主界面圣晶石.png"
                 ],
-                "threshold": 0.6,
+                "threshold": 0.5,
                 "green_mask": true
             }
         }
