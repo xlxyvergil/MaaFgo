@@ -2,6 +2,9 @@ from pathlib import Path
 
 import shutil
 import sys
+import subprocess
+import os
+import urllib.request
 
 try:
     import jsonc
@@ -162,11 +165,56 @@ def install_chores():
     )
 
 
+def setup_embedded_python():
+    """配置嵌入式 Python 环境并安装依赖"""
+    py_dir = install_path / "python"
+    if not py_dir.exists():
+        print("Python directory not found in install, skipping embedded python setup.")
+        return
+
+    # 1. 配置 python312._pth (Windows)
+    pth_file = py_dir / "python312._pth"
+    if pth_file.exists():
+        content = pth_file.read_text(encoding="utf-8")
+        content = content.replace("#import site", "import site")
+        if ".\n" not in content:
+            content += ".\n"
+        if "Lib/site-packages\n" not in content:
+            content += "Lib/site-packages\n"
+        pth_file.write_text(content, encoding="utf-8")
+        print(f"Configured {pth_file}")
+
+    # 2. 安装 pip
+    py_exe = py_dir / "python.exe"
+    get_pip = py_dir / "get-pip.py"
+    if not get_pip.exists():
+        print("Downloading get-pip.py...")
+        urllib.request.urlretrieve("https://bootstrap.pypa.io/get-pip.py", str(get_pip))
+    
+    print("Installing pip...")
+    subprocess.run([str(py_exe), str(get_pip)], check=True)
+
+    # 3. 离线安装依赖
+    deps_dir = working_dir / "deps" / "python_packages"
+    if deps_dir.exists():
+        packages = ["maafw", "maaagentbinary", "numpy", "Pillow", "opencv-python"]
+        cmd = [str(py_exe), "-m", "pip", "install", "--no-index", 
+               f"--find-links={deps_dir}"] + packages
+        print(f"Installing dependencies: {', '.join(packages)}")
+        subprocess.run(cmd, check=True)
+    else:
+        print("Warning: deps/python_packages not found, skipping offline install.")
+
+
 def install_agent_deps():
     """将 site-packages 中的 cv2 等库移动到 agent/libs/"""
     libs_dir = install_path / "agent" / "libs"
     libs_dir.mkdir(parents=True, exist_ok=True)
     site_packages = install_path / "python" / "Lib" / "site-packages"
+
+    if not site_packages.exists():
+        print("Warning: site-packages not found, skipping agent deps move.")
+        return
 
     print(f"Moving dependencies from site-packages to {libs_dir}...")
     for item in site_packages.iterdir():
@@ -208,10 +256,11 @@ def install_tasks():
 
 
 if __name__ == "__main__":
+    setup_embedded_python()  # 新增：配置 Python 和安装依赖
     install_deps()
     install_resource()
     install_chores()
-    install_agent_deps()  # 新增：安装 Agent 依赖到 libs/
+    install_agent_deps()  # 移动依赖到 agent/libs
     install_agent()
     install_bbcdll()
     install_tasks()

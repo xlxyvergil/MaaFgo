@@ -124,7 +124,7 @@ jobs:
         run: |
           python tools/download_deps.py ${{ matrix.platform }} ${{ matrix.arch }}
 
-      - name: Download MWU Artifact from Release
+      - name: Download MWU Artifact
         id: download_mwu
         uses: robinraju/release-downloader@v1
         with:
@@ -132,52 +132,14 @@ jobs:
           latest: true
           fileName: MWU-${{ matrix.platform }}-${{ matrix.arch }}-*.7z
           out-file-path: ./
-          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Decompress MWU to build
+      - name: Setup & Install MWU
+        shell: bash
         run: |
+          # 解压 MWU 到 build 目录
           7z x ${{ fromJson(steps.download_mwu.outputs.downloaded_files)[0] }} -obuild -y
-
-      - name: Setup Python Environment for Agent
-        shell: bash
-        run: |
-          # 创建 python 目录
-          mkdir -p build/python
-          # 下载嵌入式 Python (以 3.12 为例)
-          if [[ "${{ matrix.platform }}" == "win" ]]; then
-            if [[ "${{ matrix.arch }}" == "x86_64" ]]; then
-              curl -L https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-amd64.zip -o python_embed.zip
-            else
-              curl -L https://www.python.org/ftp/python/3.12.10/python-3.12.10-embed-arm64.zip -o python_embed.zip
-            fi
-            7z x python_embed.zip -obuild/python -y
-            # 启用 pip (取消注释 import site)
-            sed -i 's/#import site/import site/' build/python/python312._pth
-            echo . >> build/python/python312._pth
-            echo Lib/site-packages >> build/python/python312._pth
-          fi
-
-      - name: Install Agent Dependencies
-        shell: bash
-        run: |
-          # 使用嵌入式 Python 直接安装依赖到 site-packages
-          if [[ "${{ matrix.platform }}" == "win" ]]; then
-            # 1. 下载 get-pip.py
-            curl -L https://bootstrap.pypa.io/get-pip.py -o build/python/get-pip.py
-            # 2. 安装 pip
-            ./build/python/python.exe build/python/get-pip.py
-            # 3. 离线安装所有预下载的 Wheel 包到 site-packages (包含 cv2)
-            ./build/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow opencv-python
-          fi
-
-
-      - name: Install MWU
-        shell: bash
-        run: |
-          cd tools
-          python -m pip install json-with-comments
-          python ./install-MWU.py ${{ env.tag }} ${{ matrix.platform }} ${{ matrix.arch }}
-          cd ..
+          # 调用脚本完成剩余所有工作（Python配置、依赖安装、资源组装）
+          python tools/install-MWU.py ${{ env.tag }} ${{ matrix.platform }} ${{ matrix.arch }}
 
       - name: Get clean version
         id: get_version
@@ -258,84 +220,14 @@ jobs:
           rm -f "${ARCHIVE_FILE_PATH}"
           echo "Archive cleanup command executed for MFAAvalonia."
 
-      - name: Remove built-in runtime in MFA
-        shell: bash
-        run: |
-          rm -rf MFA/runtimes
-      
-      - name: Clean install directory
+      - name: Setup & Install Avalonia
         shell: bash
         run: |
           rm -rf install
-      
-      - name: Setup embedded Python
-        shell: pwsh
-        run: |
-          $pythonVersion = "3.12.10"
-          $destDir = "install/python"
-          
-          if (Test-Path $destDir) {
-            Remove-Item -Recurse -Force $destDir
-          }
-          New-Item -ItemType Directory -Path $destDir -Force
-          
-          $arch = "${{ matrix.arch }}"
-          if ($arch -eq "x86_64") {
-            $winArch = "amd64"
-          } else {
-            $winArch = "arm64"
-          }
-          
-          $url = "https://www.python.org/ftp/python/$pythonVersion/python-$pythonVersion-embed-$winArch.zip"
-          $zipFile = "$destDir/python-embed.zip"
-          
-          Write-Host "Downloading Python from $url"
-          Invoke-WebRequest -Uri $url -OutFile $zipFile
-          
-          Write-Host "Extracting Python..."
-          Expand-Archive -Path $zipFile -DestinationPath $destDir -Force
-          Remove-Item $zipFile
-          
-          # Modify ._pth file
-          $pthFile = Get-ChildItem -Path $destDir -Filter "python*._pth" | Select-Object -First 1
-          if ($pthFile) {
-            $content = Get-Content $pthFile.FullName
-            $content = $content -replace "#import site", "import site"
-            $content += "`n.`nLib`nLib\site-packages`nDLLs"
-            Set-Content -Path $pthFile.FullName -Value $content
-            Write-Host "Modified $($pthFile.Name)"
-          }
-          
-          # Install pip
-          $getPipUrl = "https://bootstrap.pypa.io/get-pip.py"
-          $getPipFile = "$destDir/get-pip.py"
-          Invoke-WebRequest -Uri $getPipUrl -OutFile $getPipFile
-          & "$destDir/python.exe" $getPipFile
-          Remove-Item $getPipFile
-          
-          Write-Host "Embedded Python setup complete"
-      
-      - name: Install Python dependencies
-        shell: bash
-        run: |
-          ./install/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow opencv-python
-
-      - name: Install
-        shell: pwsh
-        run: |
-          if (Test-Path "MFA") {
-            Write-Host "Copying MFA files to install directory..."
-            New-Item -ItemType Directory -Path "install" -Force
-            Copy-Item -Path "MFA\*" -Destination "install" -Recurse -Force
-            Write-Host "MFA files copied successfully."
-          } else {
-            Write-Host "MFA directory not found, skipping copy."
-          }
-
-          cd tools
-          python -m pip install json-with-comments
-          python ./install-Avalonia.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
-          cd ..
+          mkdir -p install
+          cp -rpvn MFA/. install/
+          rm -rf install/runtimes
+          python tools/install-Avalonia.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
 
       - name: Get version without suffix
         id: get_version
