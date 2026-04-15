@@ -57,7 +57,6 @@ def get_dotnet_platform_tag():
 def install_deps():
     if not (working_dir / "deps" / "bin").exists():
         print('Please download the MaaFramework to "deps" first.')
-        print('请先下载 MaaFramework 到 "deps"。')
         sys.exit(1)
 
     if os_name == "android":
