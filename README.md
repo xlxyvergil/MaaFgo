@@ -127,7 +127,8 @@ MaaFgo/
 
 感谢以下开发者对本项目作出的贡献:
 
-[![Contributors](https://contrib.rocks/image?repo=xlxyvergil/MaaFgo&max=1000)](https://github.com/xlxyvergil/MaaFgo/graphs/contributors)
+<a href="https://github.com/xlxyvergil"><img src="https://avatars.githubusercontent.com/u/103964792?v=4" width="50" height="50" alt="xlxyvergil"/></a>
+<a href="https://github.com/dingi8528"><img src="https://avatars.githubusercontent.com/u/dingi8528?v=4" width="50" height="50" alt="dingi8528"/></a>
 
 ## 免责声明
 
