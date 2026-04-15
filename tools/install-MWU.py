@@ -166,30 +166,20 @@ def install_chores():
 
 
 def install_agent_deps():
-    """将依赖安装到 agent/libs/ 目录"""
-    import subprocess
-    
-    # 确定嵌入式 Python 的路径 (MWU 打包后通常在 build/python)
-    python_exe = install_path / "python" / "python.exe"
-    if not python_exe.exists():
-        print(f"Warning: Embedded Python not found at {python_exe}, skipping agent deps installation.")
-        return
-
+    """将 site-packages 中的 cv2 等库移动到 agent/libs/"""
     libs_dir = install_path / "agent" / "libs"
     libs_dir.mkdir(parents=True, exist_ok=True)
+    site_packages = install_path / "python" / "Lib" / "site-packages"
 
-    print(f"Installing dependencies to {libs_dir}...")
-    try:
-        subprocess.check_call([
-            str(python_exe), "-m", "pip", "install",
-            "--no-index",
-            "--find-links", str(working_dir / "deps" / "python_packages"),
-            "-t", str(libs_dir),
-            "opencv-python"
-        ])
-        print("Agent dependencies installed successfully.")
-    except Exception as e:
-        print(f"Error installing agent dependencies: {e}")
+    print(f"Moving dependencies from site-packages to {libs_dir}...")
+    for item in site_packages.iterdir():
+        # 移动 cv2, numpy, PIL 等导航所需的库
+        if item.name.startswith(("cv2", "numpy", "PIL", "pillow")):
+            dest = libs_dir / item.name
+            if dest.exists():
+                shutil.rmtree(dest) if dest.is_dir() else dest.unlink()
+            shutil.move(str(item), str(dest))
+            print(f"  Moved: {item.name}")
 
 def install_agent():
     # 复制 agent 目录，但排除 Avalonia 版本文件

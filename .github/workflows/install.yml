@@ -170,8 +170,8 @@ jobs:
             curl -L https://bootstrap.pypa.io/get-pip.py -o build/python/get-pip.py
             # 2. 安装 pip
             ./build/python/python.exe build/python/get-pip.py
-            # 3. 离线安装所有预下载的 Wheel 包到 site-packages
-            ./build/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow
+            # 3. 离线安装所有预下载的 Wheel 包到 site-packages (包含 cv2)
+            ./build/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow opencv-python
           fi
 
 
@@ -326,7 +326,7 @@ jobs:
       - name: Install Python dependencies
         shell: bash
         run: |
-          ./install/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow
+          ./install/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow opencv-python
 
       - name: Install
         shell: pwsh
