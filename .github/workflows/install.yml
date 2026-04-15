@@ -231,8 +231,7 @@ jobs:
           # 1. 配置嵌入式 Python
           python tools/setup_embed_python.py install/python ${{ matrix.arch == 'x86_64' && 'amd64' || 'arm64' }}
           
-          # 2. 准备 MFA 文件
-          rm -rf install
+          # 2. 准备 MFA 文件（-n 不覆盖已存在的 python 目录）
           mkdir -p install
           cp -rpvn MFA/. install/
           rm -rf install/runtimes
