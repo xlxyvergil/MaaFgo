@@ -71,11 +71,22 @@ class GeneralNavigationAction(CustomAction):
             _nav_logger.info(f"[Nav] Mapped chapter '{chapter_cn}' to file '{map_name}'")
 
             # 3. 加载地图坐标映射 JSON
-            AGENT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            map_file = os.path.join(AGENT_ROOT, "utils", "map_coordinates.json")
+            # 脚本在 agent/custom/，往上两级是 agent/
+            AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            # JSON 在 agent/utils/ 下
+            map_file = os.path.join(AGENT_DIR, "utils", "map_coordinates.json")
             
-            with open(map_file, 'r', encoding='utf-8') as f:
-                coordinates_data = json.load(f)
+            _nav_logger.info(f"[Nav] Looking for map file at: {map_file}")
+            if not os.path.exists(map_file):
+                _nav_logger.error(f"[Nav] Map file NOT found at: {map_file}")
+                return CustomAction.RunResult(success=False)
+
+            try:
+                with open(map_file, 'r', encoding='utf-8') as f:
+                    coordinates_data = json.load(f)
+            except Exception as e:
+                _nav_logger.error(f"[Nav] Failed to load JSON: {e}")
+                return CustomAction.RunResult(success=False)
             
             quest_list = coordinates_data.get("maps", {}).get(map_name, [])
             quest_coordinates = None
@@ -92,10 +103,12 @@ class GeneralNavigationAction(CustomAction):
             
             target_x, target_y = quest_coordinates
 
-            # 4. 加载大地图模板 (采用 FGO-py 的 cv2.imread 方式)
+            # 4. 加载大地图模板
             _nav_logger.info("[Nav] Step 4: Loading map template...")
-            # AGENT_ROOT 指向 agent/，resource 在其父目录（根目录）下
-            map_template_path = os.path.join(AGENT_ROOT, "..", "resource", "common", "image", "地图坐标导航", f"{map_name}.png")
+            # resource 在根目录，即 agent 的上一级 (os.path.dirname(AGENT_DIR))
+            ROOT_DIR = os.path.dirname(AGENT_DIR)
+            map_template_path = os.path.join(ROOT_DIR, "resource", "common", "image", "地图坐标导航", f"{map_name}.png")
+            _nav_logger.info(f"[Nav] Template path: {map_template_path}")
             
             map_template = cv2.imread(map_template_path)
             
