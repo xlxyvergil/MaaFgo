@@ -161,22 +161,10 @@ def setup_embedded_python():
     """配置嵌入式 Python 环境并安装依赖"""
     py_dir = install_path / "python"
     if not py_dir.exists():
-        print("Python directory not found in install, skipping embedded python setup.")
+        print("Error: Python directory not found in install. Ensure CI prepares it first.")
         return
 
-    # 1. 配置 python312._pth (Windows)
-    pth_file = py_dir / "python312._pth"
-    if pth_file.exists():
-        content = pth_file.read_text(encoding="utf-8")
-        content = content.replace("#import site", "import site")
-        if ".\n" not in content:
-            content += ".\n"
-        if "Lib/site-packages\n" not in content:
-            content += "Lib/site-packages\n"
-        pth_file.write_text(content, encoding="utf-8")
-        print(f"Configured {pth_file}")
-
-    # 2. 安装 pip
+    # 1. 安装 pip
     py_exe = py_dir / "python.exe"
     get_pip = py_dir / "get-pip.py"
     if not get_pip.exists():
@@ -186,10 +174,10 @@ def setup_embedded_python():
     print("Installing pip...")
     subprocess.run([str(py_exe), str(get_pip)], check=True)
 
-    # 3. 离线安装依赖
+    # 2. 离线安装依赖
     deps_dir = working_dir / "deps" / "python_packages"
     if deps_dir.exists():
-        packages = ["maafw", "maaagentbinary", "numpy", "Pillow", "opencv-python"]
+        packages = ["maafw", "maaagentbinary", "opencv-python"]
         cmd = [str(py_exe), "-m", "pip", "install", "--no-index", 
                f"--find-links={deps_dir}"] + packages
         print(f"Installing dependencies: {', '.join(packages)}")

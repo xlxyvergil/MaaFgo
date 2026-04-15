@@ -136,11 +136,14 @@ jobs:
       - name: Setup & Install MWU
         shell: bash
         run: |
-          # 解压 MWU 到 build 目录
+          # 1. 配置嵌入式 Python
+          python tools/setup_embed_python.py build/python ${{ matrix.arch == 'x86_64' && 'amd64' || 'arm64' }}
+          
+          # 2. 解压 MWU
           MWU_FILE=$(ls MWU-*.7z | head -n 1)
-          echo "Found MWU file: $MWU_FILE"
           7z x "$MWU_FILE" -obuild -y
-          # 调用脚本完成剩余所有工作
+          
+          # 3. 调用脚本完成依赖安装和资源组装
           python tools/install-MWU.py ${{ env.tag }} ${{ matrix.platform }} ${{ matrix.arch }}
 
       - name: Get clean version
@@ -225,12 +228,16 @@ jobs:
       - name: Setup & Install Avalonia
         shell: bash
         run: |
+          # 1. 配置嵌入式 Python
+          python tools/setup_embed_python.py install/python ${{ matrix.arch == 'x86_64' && 'amd64' || 'arm64' }}
+          
+          # 2. 准备 MFA 文件
           rm -rf install
           mkdir -p install
-          # 复制 MFA 文件并清理运行时
           cp -rpvn MFA/. install/
           rm -rf install/runtimes
-          # 调用脚本完成剩余所有工作
+          
+          # 3. 调用脚本完成依赖安装和资源组装
           python tools/install-Avalonia.py ${{ needs.meta.outputs.tag }} ${{ matrix.os }} ${{ matrix.arch }}
 
       - name: Get version without suffix
