@@ -455,6 +455,7 @@ tools/ImageCropper/**/*.png
 
 config
 assets/resource/config.json
+assets/resource/mpe/
 debug
 
 venv/

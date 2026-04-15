@@ -165,6 +165,22 @@ def install_chores():
     )
 
 
+def install_agent_deps():
+    """将 site-packages 中的 cv2 等库移动到 agent/libs/"""
+    libs_dir = install_path / "agent" / "libs"
+    libs_dir.mkdir(parents=True, exist_ok=True)
+    site_packages = install_path / "python" / "Lib" / "site-packages"
+
+    print(f"Moving dependencies from site-packages to {libs_dir}...")
+    for item in site_packages.iterdir():
+        # 移动 cv2, numpy, PIL 等导航所需的库
+        if item.name.startswith(("cv2", "numpy", "PIL", "pillow")):
+            dest = libs_dir / item.name
+            if dest.exists():
+                shutil.rmtree(dest) if dest.is_dir() else dest.unlink()
+            shutil.move(str(item), str(dest))
+            print(f"  Moved: {item.name}")
+
 def install_agent():
     # 复制 agent 目录，但排除 Avalonia 版本文件
     shutil.copytree(
@@ -173,12 +189,13 @@ def install_agent():
         ignore=shutil.ignore_patterns("main-Avalonia.py", "bbc_action-Avalonia.py"),
         dirs_exist_ok=True,
     )
-    # 将 main.py 保留（MWU 使用标准 main.py）
-    # 将 bbc_action-mwu.py 重命名为 bbc_action.py
-    mwu_bbc = install_path / "agent" / "bbc_action-mwu.py"
-    target_bbc = install_path / "agent" / "bbc_action.py"
+    
+    # MWU 特殊处理：将 bbc_action-mwu.py 覆盖为 bbc_action.py
+    mwu_bbc = install_path / "agent" / "custom" / "bbc_action-mwu.py"
+    target_bbc = install_path / "agent" / "custom" / "bbc_action.py"
     if mwu_bbc.exists():
         shutil.move(str(mwu_bbc), str(target_bbc))
+        print(f"MWU: Moved bbc_action-mwu.py to bbc_action.py")
 
 
 def install_bbcdll():
@@ -204,6 +221,7 @@ if __name__ == "__main__":
     install_deps()
     install_resource()
     install_chores()
+    install_agent_deps()  # 新增：安装 Agent 依赖到 libs/
     install_agent()
     install_bbcdll()
     install_tasks()

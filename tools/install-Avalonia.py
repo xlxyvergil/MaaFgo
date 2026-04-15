@@ -162,25 +162,30 @@ def install_chores():
     )
 
 
+def install_agent_deps():
+    """将 site-packages 中的 cv2 等库移动到 agent/libs/"""
+    libs_dir = install_path / "agent" / "libs"
+    libs_dir.mkdir(parents=True, exist_ok=True)
+    site_packages = install_path / "python" / "Lib" / "site-packages"
+
+    print(f"Moving dependencies from site-packages to {libs_dir}...")
+    for item in site_packages.iterdir():
+        # 移动 cv2, numpy, PIL 等导航所需的库
+        if item.name.startswith(("cv2", "numpy", "PIL", "pillow")):
+            dest = libs_dir / item.name
+            if dest.exists():
+                shutil.rmtree(dest) if dest.is_dir() else dest.unlink()
+            shutil.move(str(item), str(dest))
+            print(f"  Moved: {item.name}")
+
 def install_agent():
     # 复制 agent 目录，但排除 MWU 版本文件
     shutil.copytree(
         working_dir / "agent",
         install_path / "agent",
-        ignore=shutil.ignore_patterns("main.py", "bbc_action.py"),
+        ignore=shutil.ignore_patterns("bbc_action-mwu.py"),
         dirs_exist_ok=True,
     )
-    # 将 main-Avalonia.py 重命名为 main.py
-    avalonia_main = install_path / "agent" / "main-Avalonia.py"
-    target_main = install_path / "agent" / "main.py"
-    if avalonia_main.exists():
-        shutil.move(str(avalonia_main), str(target_main))
-    
-    # 将 bbc_action-Avalonia.py 重命名为 bbc_action.py
-    avalonia_bbc = install_path / "agent" / "bbc_action-Avalonia.py"
-    target_bbc = install_path / "agent" / "bbc_action.py"
-    if avalonia_bbc.exists():
-        shutil.move(str(avalonia_bbc), str(target_bbc))
 
 
 def install_bbcdll():
@@ -206,6 +211,7 @@ if __name__ == "__main__":
     install_deps()
     install_resource()
     install_chores()
+    install_agent_deps()  # 新增：安装 Agent 依赖到 libs/
     install_agent()
     install_bbcdll()
     install_tasks()
