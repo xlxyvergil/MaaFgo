@@ -125,6 +125,11 @@ def install_resource():
         target_config = install_path / "options" / "bbc_team_config.json"
         if mwu_config.exists():
             shutil.move(str(mwu_config), str(target_config))
+        # 删除 MWU artifact 中可能存在的 Avalonia 配置文件
+        avalonia_config = install_path / "options" / "bbc_team_config-Avalonia.json"
+        if avalonia_config.exists():
+            avalonia_config.unlink()
+            print(f"Removed Avalonia config: {avalonia_config}")
     if (working_dir / "assets" / "i18n").exists():
         shutil.copytree(
             working_dir / "assets" / "i18n",
