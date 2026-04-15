@@ -137,14 +137,6 @@ jobs:
             ./build/python/python.exe -m pip install --no-index --find-links deps/python_packages maafw maaagentbinary numpy Pillow --target build/deps
           fi
 
-      - name: Decompress Artifact to build
-        run: |
-          7z x ${{ fromJson(steps.download_artifact.outputs.downloaded_files)[0] }} -obuild -y
-
-      - name: Clean build directory
-        shell: bash
-        run: |
-          rm -rf build
 
       - name: Install MWU
         shell: bash
