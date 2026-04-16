@@ -25,7 +25,7 @@
                     132
                 ],
                 "template": [
-                    "队伍选择/点击队伍编制.png"
+                    "team/点击队伍编制.png"
                 ]
             }
         }
@@ -48,7 +48,7 @@
                     80
                 ],
                 "template": [
-                    "队伍选择/编队.png"
+                    "team/编队.png"
                 ]
             }
         }
@@ -503,7 +503,7 @@
                     93
                 ],
                 "template": [
-                    "队伍选择/队伍点击决定.png"
+                    "team/队伍点击决定.png"
                 ],
                 "threshold": 0.6,
                 "green_mask": true
@@ -565,7 +565,7 @@
                     37
                 ],
                 "template": [
-                    "队伍选择/D1.png"
+                    "team/D1.png"
                 ]
             }
         }
@@ -585,7 +585,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D10.png"
+                    "team/D10.png"
                 ]
             }
         }
@@ -605,7 +605,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D11.png"
+                    "team/D11.png"
                 ]
             }
         }
@@ -625,7 +625,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D12.png"
+                    "team/D12.png"
                 ]
             }
         }
@@ -645,7 +645,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D13.png"
+                    "team/D13.png"
                 ]
             }
         }
@@ -665,7 +665,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D14.png"
+                    "team/D14.png"
                 ]
             }
         }
@@ -685,7 +685,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D15.png"
+                    "team/D15.png"
                 ]
             }
         }
@@ -705,7 +705,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D2.png"
+                    "team/D2.png"
                 ]
             }
         }
@@ -725,7 +725,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D3.png"
+                    "team/D3.png"
                 ],
                 "detector": "SIFT"
             }
@@ -746,7 +746,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D4.png"
+                    "team/D4.png"
                 ]
             }
         }
@@ -766,7 +766,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D5.png"
+                    "team/D5.png"
                 ]
             }
         }
@@ -786,7 +786,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D6.png"
+                    "team/D6.png"
                 ]
             }
         }
@@ -806,7 +806,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D7.png"
+                    "team/D7.png"
                 ]
             }
         }
@@ -826,7 +826,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D8.png"
+                    "team/D8.png"
                 ]
             }
         }
@@ -846,7 +846,7 @@
                     62
                 ],
                 "template": [
-                    "队伍选择/D9.png"
+                    "team/D9.png"
                 ]
             }
         }
