@@ -1,14 +1,14 @@
 {
-    "Ordeal Call": {
+    "寻找OrdealCall": {
         "next": [
-            "Ordeal Call-识别",
-            "[JumpBack]Ordeal Call-滑动"
+            "OrdealCall-识别",
+            "[JumpBack]OrdealCall-滑动"
         ],
         "recognition": {
             "type": "DirectHit"
         }
     },
-    "Ordeal Call-滑动": {
+    "OrdealCall-滑动": {
         "action": {
             "type": "Swipe",
             "param": {
@@ -33,7 +33,7 @@
             "type": "DirectHit"
         }
     },
-    "Ordeal Call-识别": {
+    "OrdealCall-识别": {
         "action": {
             "type": "Click"
         },
@@ -51,7 +51,7 @@
                     498
                 ],
                 "template": [
-                    "Ordeal Call-识别.png"
+                    "ordealcall/OrdealCall-识别.png"
                 ]
             }
         }
