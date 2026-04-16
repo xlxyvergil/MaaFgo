@@ -5,7 +5,7 @@
             "label": "BBC 队伍配置",
             "description": "选择 BBC 队伍配置文件",
             "default": "",
-            "scan_dir": "./BBchannel/settings",
+            "scan_dir": "BBchannel/settings",
             "scan_filter": "*.json",
             "cases": [],
             "pipeline_override": {
