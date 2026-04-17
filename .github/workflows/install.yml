@@ -252,13 +252,9 @@ jobs:
         shell: bash
         run: |
           python tools/install-MXU.py ${{ env.tag }}
-          # 复制内嵌Python环境
+          # 复制内嵌Python环境（已包含所有依赖）
           if [ -d "install/python" ]; then
             cp -rpvn install/python/. install-mxu/python/
-          fi
-          # 复制Python依赖
-          if [ -d "install/deps" ]; then
-            cp -rpvn install/deps/. install-mxu/deps/
           fi
 
       - name: Copy MXU executable
