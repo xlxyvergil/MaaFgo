@@ -110,13 +110,13 @@ def install_agent():
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:
         interface = json.load(f)
 
-    # 根据平台设置 Python 路径
+    # MXU 使用内嵌 Python，路径相对于 install-mxu 目录
     if sys.platform.startswith("win"):
         interface["agent"]["child_exec"] = r"./python/python.exe"
     elif sys.platform.startswith("darwin"):
         interface["agent"]["child_exec"] = r"./python/bin/python3"
     elif sys.platform.startswith("linux"):
-        interface["agent"]["child_exec"] = r"python3"
+        interface["agent"]["child_exec"] = r"./python/bin/python3"
 
     interface["agent"]["child_args"] = ["-u", r"./agent/main.py"]
 

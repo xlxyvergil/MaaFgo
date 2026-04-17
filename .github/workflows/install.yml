@@ -231,6 +231,18 @@ jobs:
         run: |
           python tools/download_deps.py ${{ matrix.platform }} ${{ matrix.arch }}
 
+      - name: Setup Embed Python
+        shell: bash
+        run: |
+          python tools/setup_embed_python.py install/python ${{ matrix.arch == 'x86_64' && 'amd64' || 'arm64' }}
+          
+      - name: Install Python Dependencies to Embed Python
+        shell: bash
+        run: |
+          ./install/python/python.exe install/python/get-pip.py
+          ./install/python/python.exe -m pip install --upgrade pip
+          ./install/python/python.exe -m pip install -r requirements.txt
+
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
@@ -252,9 +264,11 @@ jobs:
         shell: bash
         run: |
           python tools/install-MXU.py ${{ env.tag }}
+          # 复制内嵌Python环境
           if [ -d "install/python" ]; then
             cp -rpvn install/python/. install-mxu/python/
           fi
+          # 复制Python依赖
           if [ -d "install/deps" ]; then
             cp -rpvn install/deps/. install-mxu/deps/
           fi
