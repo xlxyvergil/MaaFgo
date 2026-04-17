@@ -22,22 +22,9 @@ def install_deps():
     参考: https://github.com/MistEO/MXU#依赖文件
     """
 
-    # 判断deps结构：flatten后直接用deps，否则用deps/bin
-    deps_bin = working_dir / "deps" / "bin"
-    deps_root = working_dir / "deps"
-    
-    if deps_bin.exists():
-        # M9A 模式：有 bin 子目录
-        src_dir = deps_bin
-    elif deps_root.exists():
-        # MWU 模式：flatten 后的根目录
-        src_dir = deps_root
-    else:
-        raise FileNotFoundError(f"Neither {deps_bin} nor {deps_root} exists")
-
     # MaaFramework 运行库 → maafw/
     shutil.copytree(
-        src_dir,
+        working_dir / "deps" / "bin",
         install_path / "maafw",
         ignore=shutil.ignore_patterns(
             "*MaaDbgControlUnit*",
@@ -47,6 +34,11 @@ def install_deps():
             "*.node",
             "*MaaPiCli*",
         ),
+        dirs_exist_ok=True,
+    )
+    shutil.copytree(
+        working_dir / "deps" / "share" / "MaaAgentBinary",
+        install_path / "maafw" / "MaaAgentBinary",
         dirs_exist_ok=True,
     )
 
@@ -99,7 +91,7 @@ def install_resource():
     interface["mirrorchyan_multiplatform"] = True
 
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
-        json.dump(interface, f, ensure_ascii=False, indent=2)
+        json.dump(interface, f, ensure_ascii=False, indent=4)
 
 
 def install_chores():
@@ -128,12 +120,12 @@ def install_agent():
     elif sys.platform.startswith("darwin"):
         interface["agent"]["child_exec"] = r"./python/bin/python3"
     elif sys.platform.startswith("linux"):
-        interface["agent"]["child_exec"] = r"./python/bin/python3"
+        interface["agent"]["child_exec"] = r"python3"
 
     interface["agent"]["child_args"] = ["-u", r"./agent/main.py"]
 
     with open(install_path / "interface.json", "w", encoding="utf-8") as f:
-        json.dump(interface, f, ensure_ascii=False, indent=2)
+        json.dump(interface, f, ensure_ascii=False, indent=4)
 
 
 def install_bbcdll():

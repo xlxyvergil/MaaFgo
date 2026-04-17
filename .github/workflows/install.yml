@@ -194,13 +194,7 @@ jobs:
         with:
           submodules: true
 
-      - name: Install uv
-        uses: astral-sh/setup-uv@v7.5.0
-        with:
-          enable-cache: true
-
       - name: Download MaaFramework
-        id: download_mfw
         uses: robinraju/release-downloader@v1
         with:
           repository: MaaXYZ/MaaFramework
@@ -208,46 +202,6 @@ jobs:
           latest: true
           out-file-path: "deps"
           extract: true
-
-      - name: Verify deps directory
-        shell: bash
-        run: |
-          echo "=== Checking deps directory ==="
-          if [ ! -d "deps" ]; then
-            echo "ERROR: deps directory does not exist!"
-            exit 1
-          fi
-          ls -la deps/
-          if [ -d "deps/bin" ]; then
-            echo "Found deps/bin (M9A style)"
-          elif [ -d "deps/share" ]; then
-            echo "Found deps/share (M9A style)"
-          else
-            echo "No bin or share subdirectory found, checking for flatten structure..."
-            ls -la deps/ | head -20
-          fi
-
-      - name: Setup Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.12.10"
-
-      - name: Download Python Dependencies
-        shell: bash
-        run: |
-          python tools/download_deps.py ${{ matrix.platform }} ${{ matrix.arch }}
-
-      - name: Setup Embed Python
-        shell: bash
-        run: |
-          python tools/setup_embed_python.py install/python ${{ matrix.arch == 'x86_64' && 'amd64' || 'arm64' }}
-          
-      - name: Install Python Dependencies to Embed Python
-        shell: bash
-        run: |
-          ./install/python/python.exe install/python/get-pip.py
-          ./install/python/python.exe -m pip install --upgrade pip
-          ./install/python/python.exe -m pip install -r requirements.txt
 
       - name: Download MXU
         id: download_mxu
@@ -266,14 +220,23 @@ jobs:
           rm -f "${ARCHIVE_FILE_PATH}"
           echo "Archive cleanup command executed for MXU."
 
+      - name: Setup Embed Python
+        shell: bash
+        run: |
+          python tools/setup_embed_python.py
+          
+      - name: Install Python Dependencies to Embed Python
+        shell: bash
+        run: |
+          ./install/python/python.exe install/python/get-pip.py
+          ./install/python/python.exe -m pip install --upgrade pip
+          ./install/python/python.exe -m pip install -r requirements.txt
+
       - name: Create MXU version
         shell: bash
         run: |
-          python tools/install-MXU.py ${{ env.tag }}
-          # 复制内嵌Python环境（已包含所有依赖）
-          if [ -d "install/python" ]; then
-            cp -rpvn install/python/. install-mxu/python/
-          fi
+          ./install/python/python.exe tools/install-MXU.py ${{ env.tag }}
+          cp -rpvn install/python/. install-mxu/python/
 
       - name: Copy MXU executable
         shell: bash
