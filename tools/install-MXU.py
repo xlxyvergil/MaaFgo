@@ -23,8 +23,9 @@ def install_deps():
     """
 
     # MaaFramework 运行库 → maafw/
+    # 注意：CI中已将MAA压缩包内容直接解压到deps/根目录
     shutil.copytree(
-        working_dir / "deps" / "bin",
+        working_dir / "deps",
         install_path / "maafw",
         ignore=shutil.ignore_patterns(
             "*MaaDbgControlUnit*",
@@ -34,11 +35,6 @@ def install_deps():
             "*.node",
             "*MaaPiCli*",
         ),
-        dirs_exist_ok=True,
-    )
-    shutil.copytree(
-        working_dir / "deps" / "share" / "MaaAgentBinary",
-        install_path / "maafw" / "MaaAgentBinary",
         dirs_exist_ok=True,
     )
 
