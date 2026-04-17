@@ -204,17 +204,6 @@ jobs:
           out-file-path: "deps"
           extract: true
 
-      - name: Flatten MaaFramework directory
-        shell: bash
-        run: |
-          rm -f deps/*.zip
-          MFW_DIR=$(find deps -maxdepth 1 -type d -name "MAA-*" | head -n 1)
-          if [ -n "$MFW_DIR" ] && [ "$MFW_DIR" != "deps" ]; then
-            mv "$MFW_DIR"/* deps/
-            mv "$MFW_DIR"/.* deps/ 2>/dev/null || true
-            rmdir "$MFW_DIR"
-          fi
-
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
