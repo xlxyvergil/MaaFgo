@@ -209,6 +209,18 @@ jobs:
           out-file-path: "deps"
           extract: true
 
+      - name: Flatten MaaFramework directory
+        shell: bash
+        run: |
+          MFW_DIR=$(find deps -maxdepth 1 -type d -name "MAA-*" | head -n 1)
+          if [ -n "$MFW_DIR" ] && [ "$MFW_DIR" != "deps" ]; then
+            echo "Moving contents from $MFW_DIR to deps/"
+            mv "$MFW_DIR"/* deps/
+            mv "$MFW_DIR"/.* deps/ 2>/dev/null || true
+            rmdir "$MFW_DIR"
+          fi
+          ls -la deps/
+
       - name: Setup Python
         uses: actions/setup-python@v6.2.0
         with:
