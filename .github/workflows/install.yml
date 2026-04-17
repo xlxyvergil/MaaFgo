@@ -203,6 +203,18 @@ jobs:
           out-file-path: "deps"
           extract: true
 
+      - name: Verify MaaFramework download
+        shell: bash
+        run: |
+          if [ ! -d "deps/bin" ]; then
+            echo "ERROR: MaaFramework download failed or structure incorrect!"
+            echo "Contents of deps/:"
+            ls -la deps/ 2>/dev/null || echo "deps/ directory does not exist"
+            exit 1
+          fi
+          echo "MaaFramework downloaded successfully"
+          ls -la deps/bin/ | head -10
+
       - name: Download MXU
         id: download_mxu
         uses: robinraju/release-downloader@v1
