@@ -17,6 +17,7 @@
                 "template": [
                     "活动报酬.png"
                 ],
+                "method": 3,
                 "green_mask": true
             }
         }
