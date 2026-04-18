@@ -1,9 +1,43 @@
 {
     "Global_Null": {
-        "recognition": "DirectHit",
-        "action": "DoNothing",
-        "post_delay": 0,
+        "doc": "【全局默认空on_error覆盖】Jumpback链路崩毁默认节点",
         "pre_delay": 0,
-        "doc": "【全局默认空on_error覆盖】Jumpback链路崩毁默认节点"
+        "post_delay": 0,
+        "next": [
+            "风暴罐不足",
+            "其他异常"
+        ]
+    },
+    "风暴罐不足": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "errorcode/风暴罐不足.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    578,
+                    550,
+                    114,
+                    25
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">风暴罐不足，任务无法继续进行！！</span>"
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "其他异常": {
+        "focus": {
+            "Node.Recognition.Starting": "出现未知异常报错"
+        }
     }
 }
