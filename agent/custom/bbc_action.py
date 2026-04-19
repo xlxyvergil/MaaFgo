@@ -152,7 +152,7 @@ class ExecuteBbcTask(CustomAction):
         # 无论成功与否，都将弹窗信息通过 pipeline_override 输出到 JSON 节点
         if popup_title or popup_message:
             display_text = f"{popup_title}: {popup_message}" if popup_title else popup_message
-            context.pipeline_override({
+            context.override_pipeline({
                 "bbc弹窗信息输出": {
                     "focus": {
                         "Node.Recognition.Starting": f"<span style=\"color: #FF0000;\">{display_text}</span>"
@@ -204,7 +204,9 @@ class ExecuteBbcTask(CustomAction):
             'team_config': team_config,
             'run_count': run_count,
             'apple_type': apple_type,
-            'battle_type': battle_type
+            'battle_type': battle_type,
+            'support_order_mismatch': support_order_mismatch,
+            'team_config_error': team_config_error
         }, timeout=None)  # 无超时，等待战斗结束
         
         tcp_client.stop()

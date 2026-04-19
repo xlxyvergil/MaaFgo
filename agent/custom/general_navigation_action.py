@@ -109,7 +109,7 @@ class GeneralNavigationAction(CustomAction):
             # 4. 加载大地图模板
             _nav_logger.info("[Nav] Step 4: Loading map template...")
             ROOT_DIR = os.path.dirname(AGENT_DIR)
-            map_template_path = os.path.join(ROOT_DIR, "resource", "common", "image", "map", f"{map_image_name}.png")
+            map_template_path = os.path.join(ROOT_DIR, "resource", "base", "image", "map", f"{map_image_name}.png")
             _nav_logger.info(f"[Nav] Template path: {map_template_path}")
             
             map_template = cv2.imread(map_template_path)
