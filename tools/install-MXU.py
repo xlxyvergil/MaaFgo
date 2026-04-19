@@ -47,6 +47,9 @@ def install_resource():
     # 配置 OCR 模型
     configure_ocr_model()
 
+    # 确保 install_path 目录存在
+    install_path.mkdir(parents=True, exist_ok=True)
+
     # 复制 resource 目录
     shutil.copytree(
         working_dir / "assets" / "resource",

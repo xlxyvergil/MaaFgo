@@ -98,6 +98,9 @@ def install_resource():
 
     configure_ocr_model()
 
+    # 确保 install_path 目录存在
+    install_path.mkdir(parents=True, exist_ok=True)
+
     shutil.copytree(
         working_dir / "assets" / "resource",
         install_path / "resource",
@@ -110,9 +113,6 @@ def install_resource():
 
     # Copy options and i18n directories
     if (working_dir / "assets" / "options").exists():
-        # 确保 options 目录存在
-        (install_path / "options").mkdir(parents=True, exist_ok=True)
-        
         # 复制 options 目录，但排除 bbc_team_config.json
         for item in (working_dir / "assets" / "options").iterdir():
             if item.name == "bbc_team_config.json":
