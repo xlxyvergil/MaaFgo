@@ -24,6 +24,12 @@
             "关闭公告后异常处理添加"
         ]
     },
+    "关闭公告后异常处理添加": {
+        "next": [
+            "特殊情况1",
+            "回主界面"
+        ]
+    },
     "关闭观看": {
         "recognition": {
             "type": "TemplateMatch",
@@ -58,6 +64,12 @@
                 "threshold": 0.8
             }
         },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "处理完成，等待动画": {
+        "timeout": 20000,
         "next": [
             "回主界面"
         ]
@@ -131,6 +143,22 @@
             "开始更新"
         ]
     },
+    "特殊情况1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "errorcode/cnerror1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "处理完成，等待动画"
+        ]
+    },
     "登录": {
         "recognition": {
             "type": "TemplateMatch",
@@ -198,51 +226,6 @@
         ],
         "on_error": [
             "登录-关闭游戏"
-        ]
-    },
-    "关闭公告后异常处理添加": {
-        "next": [
-            "公告后主界面判断",
-            "[JumpBack]特殊情况1"
-        ]
-    },
-    "特殊情况1": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "errorcode/cnerror1.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "处理完成，等待动画"
-        ]
-    },
-    "处理完成，等待动画": {
-        "timeout": 20000
-    },
-    "公告后主界面判断": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    200,
-                    550,
-                    65,
-                    60
-                ],
-                "template": [
-                    "主界面圣晶石.png"
-                ],
-                "green_mask": true
-            }
-        },
-        "next": [
-            "回主界面"
         ]
     }
 }
