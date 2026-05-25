@@ -82,6 +82,13 @@ def install_resource():
         install_path,
     )
     
+    # 复制 bbc_team_config.json 到根目录（与 interface.json 同级）
+    if (working_dir / "assets" / "bbc_team_config.json").exists():
+        shutil.copy2(
+            working_dir / "assets" / "bbc_team_config.json",
+            install_path / "bbc_team_config.json",
+        )
+    
     # 复制 restart_mfa.exe 到根目录
     if (working_dir / "assets" / "restart_mfa.exe").exists():
         shutil.copy2(
