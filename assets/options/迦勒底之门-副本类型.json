@@ -208,7 +208,7 @@
           "name": "剑80",
           "label": "剑80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -228,7 +228,7 @@
           "name": "弓80",
           "label": "弓80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -248,7 +248,7 @@
           "name": "枪80",
           "label": "枪80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -268,7 +268,7 @@
           "name": "骑80",
           "label": "骑80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -288,7 +288,7 @@
           "name": "术80",
           "label": "术80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -308,7 +308,7 @@
           "name": "杀80",
           "label": "杀80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -328,7 +328,7 @@
           "name": "狂80",
           "label": "狂80",
           "pipeline_override": {
-            "迦门-修炼场选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
@@ -355,7 +355,7 @@
           "name": "LV60",
           "label": "LV60",
           "pipeline_override": {
-            "迦门-QP本选择": {
+            "迦门-种火-选择职介和等级": {
               "recognition": {
                 "type": "TemplateMatch",
                 "param": {
