@@ -9,7 +9,6 @@ script_dir = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(script_dir)
 
 from configure import configure_ocr_model
-from bbc_config_helper import copy_options_with_bbc_config
 
 working_dir = Path(__file__).parent.parent
 install_path = working_dir / Path("install-mxu")
@@ -58,8 +57,13 @@ def install_resource():
         dirs_exist_ok=True,
     )
     
-    # 复制 options 和 i18n 目录（MaaFgo 特有）
-    copy_options_with_bbc_config(working_dir, install_path)
+    # 复制 options 目录（MaaFgo 特有）- 直接复制，不走 bbc_config_helper
+    if (working_dir / "assets" / "options").exists():
+        shutil.copytree(
+            working_dir / "assets" / "options",
+            install_path / "options",
+            dirs_exist_ok=True,
+        )
     
     if (working_dir / "assets" / "i18n").exists():
         shutil.copytree(
