@@ -82,10 +82,10 @@ def install_resource():
         install_path,
     )
     
-    # MXU: 将 bbc_team_config_nomwu.json 复制并重命名为 bbc_team_config.json
-    nomwu_config = working_dir / "assets" / "bbc_team_config_nomwu.json"
+    # MXU: 复制 bbc_team_config.json（使用 scan_select 类型）
+    mxu_config = working_dir / "assets" / "bbc_team_config.json"
     shutil.copy2(
-        nomwu_config,
+        mxu_config,
         install_path / "bbc_team_config.json",
     )
     

@@ -217,7 +217,7 @@ jobs:
         id: download_mxu
         uses: robinraju/release-downloader@v1
         with:
-          repository: MistEO/MXU
+          repository: xlxyvergil/MXU-scan_select-
           fileName: "MXU-${{ matrix.platform }}-${{ matrix.arch }}*"
           latest: true
           out-file-path: "MXU"
