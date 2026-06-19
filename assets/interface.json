@@ -40,9 +40,7 @@
   "option": {},
   "import": [
     "tasks/preset/default.json",
-    "tasks/preset/setting.json",
     "tasks/登录.json",
-    "tasks/更新settings.json",
     "tasks/启动bbc.json",
     "tasks/种树.json",
     "tasks/日常战斗.json",
