@@ -169,25 +169,6 @@ def install_tasks():
         )
 
 
-def install_restart_files():
-    """复制 restart_mfa.exe 和 restart_config.json"""
-    # 复制 restart_mfa.exe
-    if (working_dir / "assets" / "restart_mfa.exe").exists():
-        shutil.copy2(
-            working_dir / "assets" / "restart_mfa.exe",
-            install_path,
-        )
-    
-    # 复制并修改 restart_config.json
-    if (working_dir / "assets" / "restart_config.json").exists():
-        with open(working_dir / "assets" / "restart_config.json", 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        config['target_exe'] = 'MWU.exe'
-        config['description'] = 'MWU重启配置'
-        with open(install_path / "restart_config.json", 'w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=2)
-
-
 def fix_cv2_path():
     """修复 cv2 模块路径：从 deps/cv2 移动到根目录"""
     cv2_src = install_path / "deps" / "cv2"
@@ -204,7 +185,6 @@ if __name__ == "__main__":
     install_chores()
     install_bbcdll()  # 复制 bbcdll 目录
     install_tasks()  # 复制 tasks 目录
-    # install_restart_files()  # MWU 版本不需要 restart_mfa.exe
     fix_cv2_path()  # 修复 cv2 模块路径
 
     print(f"Install to {install_path} successfully.")

@@ -92,22 +92,6 @@ def install_resource():
         mxu_config,
         install_path / "bbc_team_config.json",
     )
-    
-    # 复制 restart_mfa.exe 到根目录
-    if (working_dir / "assets" / "restart_mfa.exe").exists():
-        shutil.copy2(
-            working_dir / "assets" / "restart_mfa.exe",
-            install_path,
-        )
-    
-    # 复制 restart_config.json 并修改 target_exe 为 MaaFgo.exe
-    if (working_dir / "assets" / "restart_config.json").exists():
-        with open(working_dir / "assets" / "restart_config.json", 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        config['target_exe'] = 'MaaFgo.exe'
-        config['description'] = 'MaaFgo重启配置'
-        with open(install_path / "restart_config.json", 'w', encoding='utf-8') as f:
-            json.dump(config, f, ensure_ascii=False, indent=2)
 
     # 更新 interface.json 中的版本号和 mirrorchyan 配置
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:

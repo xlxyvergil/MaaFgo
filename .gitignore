@@ -36,7 +36,7 @@ build-*
 *.exe
 *.out
 *.app
-!assets/restart_mfa.exe
+!tools/restart_mfa.exe
 
 Debug
 Release
