@@ -1,0 +1,268 @@
+{
+    "关闭公告": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "公告.png",
+                "method": 5,
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1214,
+                    13,
+                    62,
+                    49
+                ]
+            }
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "关闭公告后异常处理添加"
+        ]
+    },
+    "关闭公告后异常处理添加": {
+        "next": [
+            "特殊情况1",
+            "回主界面"
+        ]
+    },
+    "关闭观看": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    382,
+                    545,
+                    117,
+                    40
+                ],
+                "template": "不收看.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "可能已经完成登录": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    3,
+                    3,
+                    181,
+                    83
+                ],
+                "template": "main_ui.png",
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "处理完成，等待动画": {
+        "timeout": 20000,
+        "next": [
+            "回主界面"
+        ]
+    },
+    "开始更新": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "开始更新资料.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "开始游戏": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    291,
+                    568,
+                    684,
+                    152
+                ],
+                "template": "login2.png",
+                "method": 5,
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "享游开始游戏",
+            "登录",
+            "关闭公告",
+            "关闭观看",
+            "[JumpBack]等待登录"
+        ]
+    },
+    "享游开始游戏": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    470,
+                    330,
+                    340,
+                    125
+                ],
+                "template": "xiangyou_start.png",
+                "method": 5,
+                "threshold": 0.75
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    490,
+                    348,
+                    300,
+                    90
+                ]
+            }
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "登录",
+            "关闭公告",
+            "关闭观看",
+            "[JumpBack]等待登录"
+        ]
+    },
+    "打开游戏": {
+        "action": {
+            "type": "StartApp",
+            "param": {
+                "package": "com.bilibili.fatego"
+            }
+        },
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "更新": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "更新.png"
+                ],
+                "green_mask": true
+            }
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "开始更新"
+        ]
+    },
+    "特殊情况1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "errorcode/cnerror1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "处理完成，等待动画"
+        ]
+    },
+    "登录": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    382,
+                    569,
+                    523,
+                    98
+                ],
+                "template": "login3.png",
+                "method": 5,
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_wait_freezes": 2000,
+        "next": [
+            "享游开始游戏",
+            "关闭公告",
+            "[JumpBack]等待登录"
+        ]
+    },
+    "登录-关闭游戏": {
+        "action": {
+            "type": "StopApp",
+            "param": {
+                "package": "com.bilibili.fatego.sharejoy"
+            }
+        },
+        "next": [
+            "登录识别"
+        ]
+    },
+    "登录识别": {
+        "next": [
+            "打开游戏"
+        ]
+    },
+    "等待登录": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    79,
+                    322,
+                    20,
+                    21
+                ]
+            }
+        },
+        "post_wait_freezes": 5000
+    },
+    "阶段判断循环": {
+        "post_wait_freezes": 2000,
+        "next": [
+            "开始游戏",
+            "享游开始游戏",
+            "登录",
+            "关闭公告",
+            "更新",
+            "可能已经完成登录",
+            "关闭观看",
+            "[JumpBack]等待登录"
+        ],
+        "on_error": [
+            "登录-关闭游戏"
+        ]
+    }
+}

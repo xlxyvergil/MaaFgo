@@ -29,6 +29,14 @@
       ]
     },
     {
+      "name": "享游服",
+      "path": [
+        "resource/base",
+        "resource/cn",
+        "resource/channel/xiangyou"
+      ]
+    },
+    {
       "name": "日服",
       "path": [
         "resource/base",

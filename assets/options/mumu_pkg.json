@@ -17,6 +17,17 @@
           }
         },
         {
+          "name": "享游服",
+          "label": "享游服",
+          "pipeline_override": {
+            "启动bbc": {
+              "attach": {
+                "mumu_pkg": "com.bilibili.fatego.sharejoy"
+              }
+            }
+          }
+        },
+        {
           "name": "日服",
           "label": "日服",
           "pipeline_override": {
