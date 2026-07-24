@@ -1,83 +1,125 @@
 {
     "主界面判断-main-ui": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    5,
+                    2,
+                    183,
+                    84
+                ],
+                "template": "main_ui.png",
+                "threshold": 0.8
+            }
+        },
+        "post_wait_freezes": 500,
         "next": [
             "无弹窗",
+            "回主界面的指引",
             "[JumpBack]有弹窗返回"
-        ],
-        "post_wait_freezes": 500,
-        "recognition": "TemplateMatch",
-        "roi": [
-            5,
-            2,
-            183,
-            84
-        ],
-        "template": "main_ui.png",
-        "threshold": 0.8
+        ]
     },
     "主界面判断-返回": {
-        "action": "ClickKey",
-        "post_wait_freezes": 500,
-        "recognition": "DirectHit",
-        "key": [
-            111
-        ]
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    111
+                ]
+            }
+        },
+        "post_wait_freezes": 500
     },
-    "初始化完成": {
-        "recognition": "DirectHit"
-    },
+    "初始化完成": {},
     "初始化界面": {
-        "action": "Click",
         "max_hit": 2,
-        "recognition": "DirectHit",
-        "target": [
-            1254,
-            103,
-            8,
-            9
-        ]
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1254,
+                    103,
+                    8,
+                    9
+                ]
+            }
+        }
     },
     "判断是否要初始化": {
         "max_hit": 2,
-        "recognition": "TemplateMatch",
-        "roi": [
-            1227,
-            75,
-            53,
-            62
-        ],
-        "template": "回主界面/判断是否要初始化_1.png"
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1227,
+                    75,
+                    53,
+                    62
+                ],
+                "template": "回主界面/判断是否要初始化_1.png"
+            }
+        }
     },
     "回主界面": {
         "next": [
             "主界面判断-main-ui",
+            "回主界面的指引",
             "[JumpBack]主界面判断-返回"
-        ],
-        "recognition": "DirectHit"
+        ]
     },
     "无弹窗": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    192,
+                    539,
+                    86,
+                    85
+                ],
+                "template": "主界面圣晶石.png",
+                "green_mask": true
+            }
+        },
+        "post_wait_freezes": 500,
         "next": [
             "判断是否要初始化",
             "[JumpBack]初始化界面",
             "初始化完成"
-        ],
-        "post_wait_freezes": 500,
-        "recognition": "TemplateMatch",
-        "green_mask": true,
-        "roi": [
-            192,
-            539,
-            86,
-            85
-        ],
-        "template": "主界面圣晶石.png"
+        ]
     },
     "有弹窗返回": {
-        "action": "ClickKey",
-        "post_wait_freezes": 500,
-        "recognition": "DirectHit",
-        "key": [
-            111
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    111
+                ]
+            }
+        },
+        "post_wait_freezes": 500
+    },
+    "回主界面的指引": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1197,
+                    0,
+                    84,
+                    88
+                ],
+                "template": [
+                    "errorcode/cnerror1.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "回主界面"
         ]
     }
 }
