@@ -43,8 +43,8 @@ from maa.context import Context
 import mfaalog
 
 # 检测参数
-MATCH_TH = 0.80           # 对比识别模板匹配阈值
-MATCH_SCALES = [0.8, 0.9, 1.0, 1.1, 1.2]  # 对比识别多尺度
+MATCH_TH = 0.85           # 对比识别模板匹配阈值(0.85: 滤掉相似关卡名误识别, 正确匹配普遍>=0.90)
+MATCH_H = 20              # 统一匹配高度: 候选框与模板都缩放到此高度再匹配(消除尺度差异)
 
 # 滑动与循环参数
 SWIPE_DIST = 200          # 单次滑动距离(px), 手指上滑=看下方
@@ -101,33 +101,35 @@ def load_special_config(path):
     return {}
 
 
-def match_score(crop_gray, template_bgr):
-    """多尺度模板匹配, 返回最高分(0~1)"""
+def match_score(crop_bgr, template_bgr):
+    """统一高度模板匹配: 候选框与模板都缩放到 MATCH_H 高度, 消除尺度差异
+    模板比框宽时, 将框等比放大到模板宽度再匹配(避免宽度差几像素就整体放弃)"""
     th, tw = template_bgr.shape[:2]
     if th < 4 or tw < 4:
         return 0.0
-    best = 0.0
-    for scale in MATCH_SCALES:
-        w, h = max(4, int(tw * scale)), max(4, int(th * scale))
-        if h > crop_gray.shape[0] or w > crop_gray.shape[1]:
-            continue
-        tpl = cv2.resize(template_bgr, (w, h))
-        tpl_gray = cv2.cvtColor(tpl, cv2.COLOR_BGR2GRAY)
-        res = cv2.matchTemplate(crop_gray, tpl_gray, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, _ = cv2.minMaxLoc(res)
-        if max_val > best:
-            best = float(max_val)
-    return best
+    ch, cw = crop_bgr.shape[:2]
+    if ch < 4 or cw < 4:
+        return 0.0
+    crop_r = cv2.resize(crop_bgr, (max(4, int(cw * MATCH_H / ch)), MATCH_H))
+    tpl_r = cv2.resize(template_bgr, (max(4, int(tw * MATCH_H / th)), MATCH_H))
+    if tpl_r.shape[1] > crop_r.shape[1]:
+        # 模板比框宽: 框等比放大到模板宽度(不拉伸模板, 保持内容比例)
+        ratio = tpl_r.shape[1] / crop_r.shape[1]
+        crop_r = cv2.resize(crop_r, (tpl_r.shape[1], max(4, int(round(crop_r.shape[0] * ratio)))))
+    cg = cv2.cvtColor(crop_r, cv2.COLOR_BGR2GRAY)
+    tg = cv2.cvtColor(tpl_r, cv2.COLOR_BGR2GRAY)
+    res = cv2.matchTemplate(cg, tg, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, _ = cv2.minMaxLoc(res)
+    return float(max_val)
 
 
 def identify_quest(crop_bgr, templates):
     """对比识别: 检测框内容 vs 素材库 -> (关卡名, 分数) 或 (None, 0)"""
     if crop_bgr is None or crop_bgr.size == 0 or not templates:
         return None, 0.0
-    crop_gray = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
     best_name, best_score = None, 0.0
     for name, tpl in templates.items():
-        s = match_score(crop_gray, tpl)
+        s = match_score(crop_bgr, tpl)
         if s > best_score:
             best_score, best_name = s, name
     if best_name is not None and best_score >= MATCH_TH:
@@ -212,6 +214,7 @@ class QuestDetector:
     """
     IMGSZ = 640
     CONF = 0.5        # 主检测阈值
+    LOW_CONF = 0.2    # 低置信兜底阈值: 全图推理捞回被主检测滤掉的真实框(如被UI/遮罩遮挡), 宁多勿漏
     RC_CONF = 0.1     # 窗口重检阈值
     WIN = 640         # 重检窗口边长
 
@@ -263,8 +266,17 @@ class QuestDetector:
         return res
 
     def detect(self, img):
-        """主检测 + 混合重检, 返回 (nametags, tags), 每项 [(x,y,w,h,conf)]"""
-        boxes = self._infer(img, self.CONF)
+        """主检测 + 低置信兜底 + 混合重检, 返回 (nametags, tags), 每项 [(x,y,w,h,conf)]
+        主检测(CONF)捞高置信框; 再全图低阈值(LOW_CONF)兜底捞被滤掉的真实框(遮罩/小目标,
+        置信度虽低但满足配对条件即可识别), 合并去重后走配对/重检逻辑"""
+        hi = self._infer(img, self.CONF)
+        lo = self._infer(img, self.LOW_CONF)
+        boxes = list(hi)
+        for (x1, y1, x2, y2, c, cl) in lo:
+            if any(self._iou((x1, y1, x2, y2), (hx1, hy1, hx2, hy2)) > 0.5
+                   for (hx1, hy1, hx2, hy2, hc, hcl) in hi):
+                continue
+            boxes.append((x1, y1, x2, y2, c, cl))
         nametags = [(x1, y1, x2 - x1, y2 - y1, c) for x1, y1, x2, y2, c, cl in boxes if cl == 0]
         tags = [(x1, y1, x2 - x1, y2 - y1, c) for x1, y1, x2, y2, c, cl in boxes if cl == 1]
 
