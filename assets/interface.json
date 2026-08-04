@@ -26,7 +26,8 @@
       "path": [
         "resource/base",
         "resource/cn"
-      ]
+      ],
+      "option": ["资源包类型-cn"]
     },
     {
       "name": "享游服",
@@ -34,19 +35,22 @@
         "resource/base",
         "resource/cn",
         "resource/channel/xiangyou"
-      ]
+      ],
+      "option": ["资源包类型-cn"]
     },
     {
       "name": "日服",
       "path": [
         "resource/base",
         "resource/jp"
-      ]
+      ],
+      "option": ["资源包类型-jp"]
     }
   ],
   "task": [],
   "option": {},
   "import": [
+    "options/资源包类型.json",
     "tasks/preset/default.json",
     "tasks/登录.json",
     "tasks/启动bbc.json",

@@ -1,0 +1,10 @@
+{
+    "资源包配置": {
+        "action": {
+            "type": "DoNothing"
+        },
+        "attach": {
+            "resource_package": "base"
+        }
+    }
+}

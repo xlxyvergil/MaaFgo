@@ -1,0 +1,16 @@
+{
+    "关卡检测": {
+        "recognition": {
+            "type": "NeuralNetworkDetect",
+            "param": {
+                "model": "quest_detect.onnx",
+                "labels": [
+                    "nametag",
+                    "tag"
+                ],
+                "threshold": 0.5,
+                "order_by": "Horizontal"
+            }
+        }
+    }
+}

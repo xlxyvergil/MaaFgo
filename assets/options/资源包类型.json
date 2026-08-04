@@ -1,0 +1,36 @@
+{
+    "option": {
+        "资源包类型-cn": {
+            "type": "select",
+            "default_case": "cn",
+            "cases": [
+                {
+                    "name": "cn",
+                    "pipeline_override": {
+                        "资源包配置": {
+                            "attach": {
+                                "resource_package": "cn"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "资源包类型-jp": {
+            "type": "select",
+            "default_case": "jp",
+            "cases": [
+                {
+                    "name": "jp",
+                    "pipeline_override": {
+                        "资源包配置": {
+                            "attach": {
+                                "resource_package": "jp"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

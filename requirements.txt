@@ -3,3 +3,4 @@ opencv-python
 numpy
 psutil
 highspy
+ultralytics
