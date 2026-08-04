@@ -34,7 +34,7 @@ from maa.context import Context
 import mfaalog
 
 # 检测参数
-MATCH_TH = 0.60           # 对比识别模板匹配阈值
+MATCH_TH = 0.80           # 对比识别模板匹配阈值
 MATCH_SCALES = [0.8, 0.9, 1.0, 1.1, 1.2]  # 对比识别多尺度
 
 # 滑动与循环参数
