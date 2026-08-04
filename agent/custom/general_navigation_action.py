@@ -54,7 +54,9 @@ def resolve_quest_dir(root_dir, resource_package, template_path):
     素材直接放章节文件夹: resource/{pkg}/image/map/{英文}/ (与关卡选择模板同目录)"""
     pkg = resource_package if resource_package in ("cn", "jp") else "base"
     folder = os.path.dirname(template_path).replace("\\", "/").strip("/")
-    return os.path.join(root_dir, "resource", pkg, "image", "map", folder)
+    # template 形如 "map/PaperMoon/隔离设施.png", 目录部分即 "map/PaperMoon",
+    # 素材与模板同目录: resource/{pkg}/image/{folder}
+    return os.path.join(root_dir, "resource", pkg, "image", folder)
 
 
 def load_quest_templates(quest_dir):
@@ -123,23 +125,19 @@ def pinch_zoom_out(controller):
     f1_start, f1_end = (200, 150), (560, 330)
     f2_start, f2_end = (1080, 570), (720, 390)
     steps = 6
-    try:
-        controller.post_touch_down(*f1_start, 0, 1.0).wait()
-        controller.post_touch_down(*f2_start, 1, 1.0).wait()
-        for i in range(1, steps + 1):
-            t = i / steps
-            p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
-                  int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
-            p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
-                  int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
-            controller.post_touch_move(*p1, 0, 1.0).wait()
-            controller.post_touch_move(*p2, 1, 1.0).wait()
-            time.sleep(0.05)
-        controller.post_touch_up(0).wait()
-        controller.post_touch_up(1).wait()
-    except Exception as e:
-        mfaalog.warning(f"[导航] 双指缩放失败: {e}，使用当前缩放")
-        return
+    controller.post_touch_down(*f1_start, 0, 1).wait()
+    controller.post_touch_down(*f2_start, 1, 1).wait()
+    for i in range(1, steps + 1):
+        t = i / steps
+        p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
+              int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
+        p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
+              int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
+        controller.post_touch_move(*p1, 0, 1).wait()
+        controller.post_touch_move(*p2, 1, 1).wait()
+        time.sleep(0.05)
+    controller.post_touch_up(0).wait()
+    controller.post_touch_up(1).wait()
     time.sleep(0.5)
 
 
@@ -304,12 +302,8 @@ class GeneralNavigationAction(CustomAction):
             # 注意: 不做 UI隐藏, 隐藏 UI 会导致 YOLO 需要识别的名称条/tag 不可见
             controller = context.tasker.controller
             for i in range(ZOOM_ROUNDS):
-                try:
-                    pinch_zoom_out(controller)
-                    mfaalog.info(f"[导航] 缩放第{i + 1}轮完成")
-                except Exception as e:
-                    mfaalog.warning(f"[导航] 缩放失败: {e}，使用当前缩放")
-                    break
+                pinch_zoom_out(controller)
+                mfaalog.info(f"[导航] 缩放第{i + 1}轮完成")
             time.sleep(0.5)
             # 反向滑动归位: 从左上角向右下角滑动几轮(每轮约200px), 让地图回到左上角起点
             for i in range(HOME_SWIPE_ROUNDS):
@@ -339,7 +333,7 @@ class GeneralNavigationAction(CustomAction):
                     last_set = cur_set
                     controller.post_swipe(640, 600, 640, 600 - SWIPE_DIST, SWIPE_DURATION).wait()
                     swipe_count += 1
-                    time.sleep(0.5)
+                    time.sleep(1.0)   # 移动后停顿1S, 等地图稳定后再截图检测
                 # 到底后: 固定 ROI 特殊判定
                 cfg = special[target_quest]
                 roi = cfg.get("roi")
@@ -396,10 +390,10 @@ class GeneralNavigationAction(CustomAction):
                     break
                 last_set = cur_set
 
-                # 5d. 向下滑动(手指上滑, 看下方地图) 200px
+                # 5d. 向下滑动(手指上滑, 看下方地图) 200px, 移动后停顿1S再检测
                 controller.post_swipe(640, 600, 640, 600 - SWIPE_DIST, SWIPE_DURATION).wait()
                 swipe_count += 1
-                time.sleep(0.5)
+                time.sleep(1.0)
 
             mfaalog.error(f"[导航] 滑到底未找到目标关卡: {target_quest} (共滑动 {swipe_count} 次)")
             return CustomAction.RunResult(success=False)
