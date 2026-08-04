@@ -6,7 +6,6 @@
 
 【鸽子衔枝之年】
 
-
 流程:
 1. 读取章节/关卡参数 + 资源包类型
 2. 双指缩放到最大 + 左上角归位(顶部起点)
@@ -18,15 +17,20 @@
    d. 对比识别: 有效框/兜底区域内容 vs 名称条素材库(多尺度模板匹配) -> 关卡名
    e. 目标关卡在屏 -> 点击框中心
    f. 无 -> 向下滑动 SWIPE_DIST(手指上滑=看下一屏)
-4. 特殊关卡(被UI完全遮挡, YOLO识别不到): 滑动计数进入窗口时,
-   在固定ROI内做模板匹配, 命中即点击
+4. 特殊关卡(被UI完全遮挡, YOLO识别不到): 直接滑到底, 在指定位置放大
+   后再走 YOLO+匹配识别, 命中即点击
 5. 到底判定: 连续两屏识别到的关卡集合相同 -> 到底, 导航失败
 
 素材约定(每章):
   resource/{pkg}/image/map/{英文章节目录}/   目录由运行时"关卡选择"节点 template(map/{英文}/{关卡}.png) 推导
     {关卡名}.png      名称条截图(最大缩放视图下裁剪), 文件名=关卡名, 与关卡选择模板同目录
-    special.json     可选, 特殊关卡配置:
-                      {"关卡A": {"roi":[x,y,w,h], "template":"A.png", "swipe_count":5}, ...}
+
+特殊关卡映射(全局, 不按地图拆分):
+  agent/utils/special.json   记录哪些关卡走特殊处理, 格式:
+                      {"关卡A": {"zoom_center":[x,y], "zoom_rounds":1}, ...}
+                      zoom_center: 滑到底后放大操作的中心点坐标(默认 [640,360])
+                      zoom_rounds: 放大轮数(默认 1), 每轮放大后做一次 YOLO+匹配识别
+                                    注意: 放大过多会导致画面过大识别失效, 不建议 > 1
 """
 import os
 import time
@@ -52,6 +56,11 @@ ZOOM_ROUNDS = 3           # 双指捏合缩小轮数(建议3-4轮到最大可视
 HOME_SWIPE_START = (300, 250)   # 归位滑动: 从左上角...
 HOME_SWIPE_END = (441, 391)     # ...向右下角(对角线约200px)
 HOME_SWIPE_ROUNDS = 3           # 归位滑动轮数
+ZOOM_PULL_UP = 50         # 特殊关卡放大后向上微调距离(px), 让被遮挡的关卡进入可视区
+ZOOM_PULL_RIGHT = 300     # 特殊关卡放大后向右微调总距离(px), 部分地图需再右移才能看到目标
+ZOOM_PULL_DURATION = 800  # 微调滑动持续时间(ms), 慢速拖拽避免被识别为 fling 导致位移不足
+ZOOM_PULL_STEP = 100      # 右滑分段单次距离(px), 单次长滑动实际位移不足, 分段累计
+ZOOM_PULL_STEPS = 3       # 右滑分段次数(总距离 = STEP * STEPS = 300px)
 
 
 def resolve_quest_dir(root_dir, resource_package, template_path):
@@ -79,9 +88,10 @@ def load_quest_templates(quest_dir):
     return templates
 
 
-def load_special_config(quest_dir):
-    """加载特殊关卡配置(special.json), 不存在返回空 dict"""
-    path = os.path.join(quest_dir, "special.json")
+def load_special_config(path):
+    """加载全局特殊关卡映射(special.json), 不存在返回空 dict
+    special.json 记录哪些关卡走特殊处理(被UI遮挡, 需滑到底后放大识别),
+    统一放 agent/utils/ 下, 不再按地图目录拆分"""
     if os.path.exists(path):
         try:
             with open(path, encoding="utf-8") as fp:
@@ -129,6 +139,31 @@ def pinch_zoom_out(controller):
     """双指捏合缩小地图(Maa 官方多点触控 API), 缩放到最大可视范围"""
     f1_start, f1_end = (200, 150), (560, 330)
     f2_start, f2_end = (1080, 570), (720, 390)
+    steps = 6
+    controller.post_touch_down(*f1_start, 0, 1).wait()
+    controller.post_touch_down(*f2_start, 1, 1).wait()
+    for i in range(1, steps + 1):
+        t = i / steps
+        p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
+              int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
+        p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
+              int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
+        controller.post_touch_move(*p1, 0, 1).wait()
+        controller.post_touch_move(*p2, 1, 1).wait()
+        time.sleep(0.05)
+    controller.post_touch_up(0).wait()
+    controller.post_touch_up(1).wait()
+    time.sleep(0.5)
+
+
+def pinch_zoom_in(controller, center, spread=360):
+    """以 center 为中心双指外扩放大地图(Maa 官方多点触控 API)
+    center: (cx, cy) 放大中心点
+    spread: 手指外扩总距离(px), 两指从 center 两侧同时展开"""
+    cx, cy = int(center[0]), int(center[1])
+    half = spread // 2
+    f1_start, f1_end = (cx - half, cy), (cx - spread, cy)
+    f2_start, f2_end = (cx + half, cy), (cx + spread, cy)
     steps = 6
     controller.post_touch_down(*f1_start, 0, 1).wait()
     controller.post_touch_down(*f2_start, 1, 1).wait()
@@ -296,7 +331,7 @@ class GeneralNavigationAction(CustomAction):
             ROOT_DIR = os.path.dirname(AGENT_DIR)
             quest_dir = resolve_quest_dir(ROOT_DIR, resource_package, template)
             templates = load_quest_templates(quest_dir)
-            special = load_special_config(quest_dir)
+            special = load_special_config(os.path.join(AGENT_DIR, "utils", "special.json"))
 
             if target_quest not in templates:
                 mfaalog.error(f"[导航] 素材库缺少目标关卡名称条截图: {quest_dir}/{target_quest}.png")
@@ -316,9 +351,10 @@ class GeneralNavigationAction(CustomAction):
                 time.sleep(0.3)
             time.sleep(0.5)
 
-            # 步骤4: 特殊关卡: 目标在 special 配置中 -> 直接滑到底, 走特殊判定进入
+            # 步骤4: 特殊关卡: 目标在 special 配置中 -> 直接滑到底, 在指定位置放大后再走 YOLO+匹配识别
+            # 特殊关卡识别不到: 地图最大缩放下该关卡被 UI 遮挡, 到底后在指定位置放大使其可见
             if target_quest in special:
-                mfaalog.info(f"[导航] 目标[{target_quest}]为特殊关卡, 直接滑到底后特殊判定")
+                mfaalog.info(f"[导航] 目标[{target_quest}]为特殊关卡, 直接滑到底后放大识别")
                 last_set, swipe_count = None, 0
                 img = None
                 for round_idx in range(MAX_ROUNDS):
@@ -339,24 +375,37 @@ class GeneralNavigationAction(CustomAction):
                     controller.post_swipe(640, 600, 640, 600 - SWIPE_DIST, SWIPE_DURATION).wait()
                     swipe_count += 1
                     time.sleep(1.0)   # 移动后停顿1S, 等地图稳定后再截图检测
-                # 到底后: 固定 ROI 特殊判定
+                # 到底后: 在指定位置放大, 每轮放大后 YOLO+匹配识别, 命中即点击
                 cfg = special[target_quest]
-                roi = cfg.get("roi")
-                tpl_path = os.path.join(quest_dir, cfg.get("template", ""))
-                if roi and img is not None and os.path.exists(tpl_path):
-                    tpl = cv2.imdecode(np.fromfile(tpl_path, dtype=np.uint8), cv2.IMREAD_COLOR)
-                    if tpl is not None:
-                        x, y, w, h = map(int, roi)
-                        region = img[y:y + h, x:x + w]
-                        if region.size:
-                            s = match_score(cv2.cvtColor(region, cv2.COLOR_BGR2GRAY), tpl)
-                            mfaalog.info(f"[导航] 特殊关卡[{target_quest}] 到底后 ROI匹配分 {s:.3f}")
-                            if s >= MATCH_TH:
-                                cx, cy = x + w // 2, y + h // 2
-                                mfaalog.info(f"[导航] 特殊关卡[{target_quest}] 命中, 点击 ({cx},{cy})")
-                                controller.post_click(cx, cy).wait()
-                                return CustomAction.RunResult(success=True)
-                mfaalog.error(f"[导航] 特殊关卡[{target_quest}] 特殊判定未命中 (滑动 {swipe_count} 次)")
+                center = tuple(int(v) for v in cfg.get("zoom_center", [640, 360]))
+                zoom_rounds = int(cfg.get("zoom_rounds", 1))
+                mfaalog.info(f"[导航] 特殊关卡[{target_quest}] 到底, 以 {center} 为中心放大 {zoom_rounds} 轮后识别")
+                for zi in range(zoom_rounds):
+                    pinch_zoom_in(controller, center)
+                    # 放大后微调视野: 先上移, 等地图稳定后再右移(慢速拖拽), 让被遮挡的关卡进入可视区
+                    controller.post_swipe(640, 600, 640, 600 - ZOOM_PULL_UP, ZOOM_PULL_DURATION).wait()
+                    time.sleep(0.5)   # 上移后等待地图稳定, 避免连续滑动被合并
+                    # 右滑分 3 段各 100px 累计, 单次长滑动实际位移不足
+                    for _ in range(ZOOM_PULL_STEPS):
+                        controller.post_swipe(600, 600, 600 + ZOOM_PULL_STEP, 600, ZOOM_PULL_DURATION).wait()
+                        time.sleep(0.3)
+                    time.sleep(1.0)   # 移动后停顿, 等画面稳定再截图检测
+                    mfaalog.info(f"[导航] 特殊关卡放大第{zi + 1}轮完成")
+                    img = controller.post_screencap().wait().get()
+                    if img is None:
+                        break
+                    nametags, _tags = self._detector().detect(img)
+                    for (nx, ny, nw, nh, _c) in nametags:
+                        nx, ny, nw, nh = int(nx), int(ny), int(nw), int(nh)
+                        crop = img[ny:ny + nh, nx:nx + nw]
+                        name, score = identify_quest(crop, templates)
+                        if name != target_quest:
+                            continue
+                        cx, cy = nx + nw // 2, ny + nh // 2
+                        mfaalog.info(f"[导航] 特殊关卡[{target_quest}] 放大后识别到, 点击 ({cx},{cy}) 匹配分 {score:.2f}")
+                        controller.post_click(cx, cy).wait()
+                        return CustomAction.RunResult(success=True)
+                mfaalog.error(f"[导航] 特殊关卡[{target_quest}] 放大 {zoom_rounds} 轮后仍未识别到 (滑动 {swipe_count} 次)")
                 return CustomAction.RunResult(success=False)
 
             # 步骤5: 普通关卡滑动循环
