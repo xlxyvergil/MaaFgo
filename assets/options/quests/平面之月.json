@@ -25,7 +25,7 @@
                     "pipeline_override": {
                         "地图坐标导航": {
                             "attach": {
-                                "quests": "修理部总部"
+                                "quests": "修理部本部"
                             }
                         },
                         "关卡选择": {
@@ -39,7 +39,7 @@
                     "pipeline_override": {
                         "地图坐标导航": {
                             "attach": {
-                                "quests": "警防部总部"
+                                "quests": "警防部本部"
                             }
                         },
                         "关卡选择": {

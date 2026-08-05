@@ -137,10 +137,10 @@
                 "type": "TemplateMatch",
                 "param": {
                   "roi": [
-                    97,
-                    357,
-                    27,
-                    34
+                    94,
+                    353,
+                    26,
+                    39
                   ],
                   "template": [
                     "grand/grand_ex2.png"
