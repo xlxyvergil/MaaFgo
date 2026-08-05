@@ -202,6 +202,53 @@ def install_agent_deps():
     print("Agent dependencies installed.")
 
 
+def install_stdlib_compat():
+    """从本机完整 Python 3.12 标准库复制纯 Python 模块到 build/deps
+
+    MWU 打包版内置的是便捷版 python(Nuitka 嵌入运行时), 只有 C 扩展
+    (.pyd) 而缺失大量纯 Python 标准库模块(asyncio/email/http/json/logging/
+    urllib 等)。agent 在进程内加载时通过 deps/ 解析标准库, 需补齐。
+    只复制 .py/.pyi 纯 Python 实现, 跳过测试目录与 __pycache__。
+    """
+    import sysconfig
+
+    if sys.version_info[:2] != (3, 12):
+        print(f"警告: 当前 Python 为 {sys.version_info.major}.{sys.version_info.minor}, "
+              f"打包版内置便捷 python 为 3.12, 建议使用 Python 3.12 运行本脚本")
+
+    stdlib = Path(sysconfig.get_paths()["stdlib"])
+    if not stdlib.exists():
+        print(f"找不到本机 Python 标准库: {stdlib}")
+        return
+
+    deps_dir = install_path / "deps"
+    deps_dir.mkdir(parents=True, exist_ok=True)
+
+    skip_names = {"__pycache__", "test", "tests", "site-packages"}
+    copied = 0
+
+    for entry in sorted(stdlib.iterdir()):
+        if entry.name in skip_names:
+            continue
+        if entry.is_file():
+            if entry.suffix in (".py", ".pyi"):
+                shutil.copy2(entry, deps_dir / entry.name)
+                copied += 1
+        elif entry.is_dir():
+            py_files = [p for p in entry.rglob("*") if p.is_file() and p.suffix in (".py", ".pyi")]
+            py_files = [
+                p for p in py_files
+                if not any(part in skip_names for part in p.relative_to(entry).parts)
+            ]
+            for p in py_files:
+                dst = deps_dir / p.relative_to(stdlib)
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                shutil.copy2(p, dst)
+                copied += 1
+
+    print(f"Standard library modules copied to {deps_dir}: {copied}")
+
+
 def fix_cv2_path():
     """修复 cv2 模块路径：从 deps/cv2 移动到根目录"""
     cv2_src = install_path / "deps" / "cv2"
@@ -214,7 +261,8 @@ def fix_cv2_path():
 
 if __name__ == "__main__":
     install_deps()
-    install_agent_deps()  # 安装 agent 进程依赖库到 build/deps
+    install_agent_deps()  # 安装 agent 进程第三方依赖库到 build/deps
+    install_stdlib_compat()  # 补齐便捷版 python 缺失的标准库模块到 build/deps
     install_resource()
     install_chores()
     install_bbcdll()  # 复制 bbcdll 目录
