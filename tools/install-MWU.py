@@ -186,6 +186,7 @@ def install_agent_deps():
         "numpy",
         "pillow",           # PIL
         "psutil",           # bbc_stop / bbc_connection_manager
+        "highspy",
         "ultralytics",      # YOLO 关卡检测 (依赖 torch, 体积较大)
     ]
 
