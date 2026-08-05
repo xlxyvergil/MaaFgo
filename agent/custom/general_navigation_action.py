@@ -11,7 +11,7 @@
 2. 双指缩放到最大 + 左上角归位(顶部起点)
 3. 循环(最多 MAX_ROUNDS 屏):
    a. 截图
-   b. 截图 + QuestDetector(纯 Python ultralytics) 主检测 + 孤框窗口重检, 返回全部 nametag/tag 框
+   b. 截图 + QuestDetector(纯 Python ultralytics) 主检测 + 孤框窗口重检, 仅返回配对有效的 nametag/tag 框
    c. 配对: tag 左边缘在 nametag 右侧 40% 区域内且 y 重叠才算有效关卡
       未配对 tag(孤点, nametag 置信度不足被滤掉)从 tag 向左扩展区域做兜底识别
    d. 对比识别: 有效框/兜底区域内容 vs 名称条素材库(多尺度模板匹配) -> 关卡名
@@ -50,6 +50,7 @@ MATCH_H = 20              # 统一匹配高度: 候选框与模板都缩放到�
 SWIPE_DIST = 200          # 单次滑动距离(px), 手指上滑=看下方
 SWIPE_DURATION = 300
 MAX_ROUNDS = 30           # 最大滑动屏数
+EMPTY_SCREEN_LIMIT = 3    # 连续空屏(未识别到关卡)判定到底的阈值
 
 # 缩放与归位参数(无归位按钮, 靠捏合缩小+反向滑动归位到左上角起点)
 ZOOM_ROUNDS = 3           # 双指捏合缩小轮数(建议3-4轮到最大可视范围)
@@ -162,25 +163,37 @@ def pinch_zoom_in(controller, center, spread=360):
     """以 center 为中心双指外扩放大地图(Maa 官方多点触控 API)
     center: (cx, cy) 放大中心点
     spread: 手指外扩总距离(px), 两指从 center 两侧同时展开"""
+    W, H = 1280, 720      # 屏幕宽高(统一 1280 宽坐标系, 720p)
     cx, cy = int(center[0]), int(center[1])
     half = spread // 2
     f1_start, f1_end = (cx - half, cy), (cx - spread, cy)
     f2_start, f2_end = (cx + half, cy), (cx + spread, cy)
     steps = 6
-    controller.post_touch_down(*f1_start, 0, 1).wait()
-    controller.post_touch_down(*f2_start, 1, 1).wait()
+
+    def clamp(x, y):
+        # 触点钳制到有效屏幕范围内, center 接近边缘时也不会越界
+        return max(0, min(W - 1, int(x))), max(0, min(H - 1, int(y)))
+
+    controller.post_touch_down(*clamp(*f1_start), 0, 1).wait()
+    controller.post_touch_down(*clamp(*f2_start), 1, 1).wait()
     for i in range(1, steps + 1):
         t = i / steps
-        p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
-              int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
-        p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
-              int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
-        controller.post_touch_move(*p1, 0, 1).wait()
-        controller.post_touch_move(*p2, 1, 1).wait()
+        p1 = (f1_start[0] + (f1_end[0] - f1_start[0]) * t,
+              f1_start[1] + (f1_end[1] - f1_start[1]) * t)
+        p2 = (f2_start[0] + (f2_end[0] - f2_start[0]) * t,
+              f2_start[1] + (f2_end[1] - f2_start[1]) * t)
+        controller.post_touch_move(*clamp(*p1), 0, 1).wait()
+        controller.post_touch_move(*clamp(*p2), 1, 1).wait()
         time.sleep(0.05)
     controller.post_touch_up(0).wait()
     controller.post_touch_up(1).wait()
     time.sleep(0.5)
+
+
+def is_paired(nx, ny, nw, nh, tx, ty, tw, th):
+    """nametag 与 tag 配对判定
+    tag 左边缘落在 nametag 右侧 40% 区域内(且不超出右侧 5px), y 方向有重叠"""
+    return nx + nw * 0.4 <= tx <= nx + nw + 5 and ty < ny + nh and ty + th > ny
 
 
 def pair_nametag_tag(boxes):
@@ -195,11 +208,7 @@ def pair_nametag_tag(boxes):
     tag_paired = [False] * len(tags)
     for nx, ny, nw, nh in nametags:
         for ti, (tx, ty, tw, th) in enumerate(tags):
-            # tag 左边缘在 nametag 右侧 40% 区域内
-            if not (nx + nw * 0.4 <= tx <= nx + nw + 5):
-                continue
-            # y 方向重叠
-            if not (ty < ny + nh and ty + th > ny):
+            if not is_paired(nx, ny, nw, nh, tx, ty, tw, th):
                 continue
             valid.append((nx, ny, nw, nh))
             tag_paired[ti] = True
@@ -210,7 +219,7 @@ def pair_nametag_tag(boxes):
 
 class QuestDetector:
     """纯 Python 关卡检测: ultralytics(YOLOv8) 主检测 + 混合重检
-    主检测整图 + 孤 nametag/tag 局部 640x640 窗口放大重检, 合并去重后返回
+    主检测整图 + 孤 nametag/tag 局部 640x640 窗口放大重检, 合并去重后仅返回配对有效框
     """
     IMGSZ = 640
     CONF = 0.5        # 主检测阈值
@@ -268,7 +277,8 @@ class QuestDetector:
     def detect(self, img):
         """主检测 + 低置信兜底 + 混合重检, 返回 (nametags, tags), 每项 [(x,y,w,h,conf)]
         主检测(CONF)捞高置信框; 再全图低阈值(LOW_CONF)兜底捞被滤掉的真实框(遮罩/小目标,
-        置信度虽低但满足配对条件即可识别), 合并去重后走配对/重检逻辑"""
+        置信度虽低但满足配对条件即可识别), 合并去重后配对, 孤框经局部窗口重检找补;
+        返回前仅保留配对有效的框(孤 nametag/tag 不计)"""
         hi = self._infer(img, self.CONF)
         lo = self._infer(img, self.LOW_CONF)
         boxes = list(hi)
@@ -281,11 +291,11 @@ class QuestDetector:
         tags = [(x1, y1, x2 - x1, y2 - y1, c) for x1, y1, x2, y2, c, cl in boxes if cl == 1]
 
         def paired_n(nx, ny, nw, nh):
-            return any(tx >= nx + nw * 0.4 and tx <= nx + nw + 5 and ty < ny + nh and ty + th > ny
+            return any(is_paired(nx, ny, nw, nh, tx, ty, tw, th)
                        for tx, ty, tw, th, tc in tags)
 
         def paired_t(tx, ty, tw, th):
-            return any(tx >= nx + nw * 0.4 and tx <= nx + nw + 5 and ty < ny + nh and ty + th > ny
+            return any(is_paired(nx, ny, nw, nh, tx, ty, tw, th)
                        for nx, ny, nw, nh, nc in nametags)
 
         un_n = [(x, y, w, h) for x, y, w, h, c in nametags if not paired_n(x, y, w, h)]
@@ -304,7 +314,13 @@ class QuestDetector:
                        for nx, ny, nw, nh, nc in nametags):
                     continue
                 nametags.append((x1, y1, x2 - x1, y2 - y1, c))
-        return nametags, tags
+        # 返回仅保留配对有效的框: 孤 nametag(无右侧 tag)/孤 tag(无左侧 nametag)不计,
+        # 供 identify_quest 消费的都是按配对规则有效的关卡名称条
+        paired_tags = [(tx, ty, tw, th, c) for tx, ty, tw, th, c in tags
+                       if any(is_paired(nx, ny, nw, nh, tx, ty, tw, th) for nx, ny, nw, nh, _ in nametags)]
+        paired_nametags = [(nx, ny, nw, nh, c) for nx, ny, nw, nh, c in nametags
+                           if any(is_paired(nx, ny, nw, nh, tx, ty, tw, th) for tx, ty, tw, th, _ in paired_tags)]
+        return paired_nametags, paired_tags
 
 
 @AgentServer.custom_action("general_navigation")
@@ -367,23 +383,35 @@ class GeneralNavigationAction(CustomAction):
             # 特殊关卡识别不到: 地图最大缩放下该关卡被 UI 遮挡, 到底后在指定位置放大使其可见
             if target_quest in special:
                 mfaalog.info(f"[导航] 目标[{target_quest}]为特殊关卡, 直接滑到底后放大识别")
-                last_set, swipe_count = None, 0
+                last_quests, empty_count, swipe_count = None, 0, 0
                 img = None
                 for round_idx in range(MAX_ROUNDS):
                     img = controller.post_screencap().wait().get()
                     if img is None:
-                        break
+                        mfaalog.error("[导航] 截图失败")
+                        return CustomAction.RunResult(success=False)
                     nametags, _tags = self._detector().detect(img)
                     cur_set = set()
+                    cur_quests = []
                     for (nx, ny, nw, nh, _c) in nametags:
                         name, _s = identify_quest(img[int(ny):int(ny + nh), int(nx):int(nx + nw)], templates)
                         if name:
                             cur_set.add(name)
-                    # 到底判定: 连续两屏关卡集合相同且非空
-                    if last_set is not None and cur_set == last_set and cur_set:
-                        mfaalog.info(f"[导航] 滑到底, 关卡集合 {cur_set} 与上屏相同")
-                        break
-                    last_set = cur_set
+                            cur_quests.append((name, int(nx), int(ny)))
+                    cur_quests = sorted(cur_quests)
+                    # 到底判定: 比较连续两屏检测框像素坐标, 完全一致才算到底
+                    # (仅关卡名集合相同但坐标不同 = 地图实际在移动, 不算到底)
+                    if cur_quests:
+                        empty_count = 0   # 检测到关卡 -> 重置连续空屏计数
+                        if last_quests is not None and cur_quests == last_quests:
+                            mfaalog.info(f"[导航] 滑到底, 关卡集合 {cur_set} 与上屏坐标完全一致")
+                            break
+                    else:
+                        empty_count += 1  # 空屏: 连续空屏达到阈值判定到底
+                        if empty_count >= EMPTY_SCREEN_LIMIT:
+                            mfaalog.info(f"[导航] 连续 {empty_count} 屏未识别到关卡, 判定到底")
+                            break
+                    last_quests = cur_quests
                     controller.post_swipe(640, 600, 640, 600 - SWIPE_DIST, SWIPE_DURATION).wait()
                     swipe_count += 1
                     time.sleep(1.0)   # 移动后停顿1S, 等地图稳定后再截图检测
@@ -421,8 +449,9 @@ class GeneralNavigationAction(CustomAction):
                 return CustomAction.RunResult(success=False)
 
             # 步骤5: 普通关卡滑动循环
-            last_set = None      # 上一屏识别的关卡集合
-            swipe_count = 0      # 已滑动次数
+            last_quests = None       # 上一屏识别的关卡(名称+像素坐标)
+            empty_count = 0          # 连续空屏计数
+            swipe_count = 0          # 已滑动次数
             for round_idx in range(MAX_ROUNDS):
                 mfaalog.info(f"[导航] === 第{round_idx + 1}屏 ===")
                 img = controller.post_screencap().wait().get()
@@ -434,8 +463,9 @@ class GeneralNavigationAction(CustomAction):
                 nametags, tags = self._detector().detect(img)
                 mfaalog.info(f"[导航] 检测框 {len(nametags)} nametag, {len(tags)} tag")
 
-                # 5b. 对比识别 -> 当前屏关卡集合, 目标在屏直接点击进入
+                # 5b. 对比识别 -> 当前屏关卡集合(含像素坐标), 目标在屏直接点击进入
                 cur_set = set()
+                cur_quests = []
                 for (nx, ny, nw, nh, _c) in nametags:
                     nx, ny, nw, nh = int(nx), int(ny), int(nw), int(nh)
                     crop = img[ny:ny + nh, nx:nx + nw]
@@ -443,18 +473,28 @@ class GeneralNavigationAction(CustomAction):
                     if name is None:
                         continue
                     cur_set.add(name)
+                    cur_quests.append((name, nx, ny))
                     mfaalog.info(f"[导航] 识别到关卡: {name} ({score:.2f}) 框=({nx},{ny},{nw},{nh})")
                     if name == target_quest:
                         cx, cy = nx + nw // 2, ny + nh // 2
                         mfaalog.info(f"[导航] 目标[{target_quest}]在屏, 点击 ({cx},{cy})")
                         controller.post_click(cx, cy).wait()
                         return CustomAction.RunResult(success=True)
+                cur_quests = sorted(cur_quests)
 
-                # 5c. 到底判定: 连续两屏关卡集合相同且非空
-                if last_set is not None and cur_set == last_set and cur_set:
-                    mfaalog.info(f"[导航] 滑到底, 关卡集合 {cur_set} 与上屏相同")
-                    break
-                last_set = cur_set
+                # 5c. 到底判定: 比较连续两屏检测框像素坐标, 完全一致才判定到底
+                # (关卡名集合相同但坐标不同 = 地图实际在移动, 不算到底)
+                if cur_quests:
+                    empty_count = 0   # 检测到关卡 -> 重置连续空屏计数
+                    if last_quests is not None and cur_quests == last_quests:
+                        mfaalog.info(f"[导航] 滑到底, 关卡集合 {cur_set} 与上屏坐标完全一致")
+                        break
+                else:
+                    empty_count += 1  # 空屏: 连续空屏达到阈值判定到底
+                    if empty_count >= EMPTY_SCREEN_LIMIT:
+                        mfaalog.info(f"[导航] 连续 {empty_count} 屏未识别到关卡, 判定到底")
+                        break
+                last_quests = cur_quests
 
                 # 5d. 向下滑动(手指上滑, 看下方地图) 200px, 移动后停顿1S再检测
                 controller.post_swipe(640, 600, 640, 600 - SWIPE_DIST, SWIPE_DURATION).wait()
