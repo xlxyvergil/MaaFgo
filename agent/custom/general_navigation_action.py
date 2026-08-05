@@ -145,17 +145,20 @@ def pinch_zoom_out(controller):
     steps = 6
     controller.post_touch_down(*f1_start, 0, 1).wait()
     controller.post_touch_down(*f2_start, 1, 1).wait()
-    for i in range(1, steps + 1):
-        t = i / steps
-        p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
-              int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
-        p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
-              int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
-        controller.post_touch_move(*p1, 0, 1).wait()
-        controller.post_touch_move(*p2, 1, 1).wait()
-        time.sleep(0.05)
-    controller.post_touch_up(0).wait()
-    controller.post_touch_up(1).wait()
+    try:
+        for i in range(1, steps + 1):
+            t = i / steps
+            p1 = (int(f1_start[0] + (f1_end[0] - f1_start[0]) * t),
+                  int(f1_start[1] + (f1_end[1] - f1_start[1]) * t))
+            p2 = (int(f2_start[0] + (f2_end[0] - f2_start[0]) * t),
+                  int(f2_start[1] + (f2_end[1] - f2_start[1]) * t))
+            controller.post_touch_move(*p1, 0, 1).wait()
+            controller.post_touch_move(*p2, 1, 1).wait()
+            time.sleep(0.05)
+    finally:
+        # 异常时也确保释放两个触点, 避免屏幕卡在多指触控状态
+        controller.post_touch_up(0).wait()
+        controller.post_touch_up(1).wait()
     time.sleep(0.5)
 
 
@@ -176,17 +179,20 @@ def pinch_zoom_in(controller, center, spread=360):
 
     controller.post_touch_down(*clamp(*f1_start), 0, 1).wait()
     controller.post_touch_down(*clamp(*f2_start), 1, 1).wait()
-    for i in range(1, steps + 1):
-        t = i / steps
-        p1 = (f1_start[0] + (f1_end[0] - f1_start[0]) * t,
-              f1_start[1] + (f1_end[1] - f1_start[1]) * t)
-        p2 = (f2_start[0] + (f2_end[0] - f2_start[0]) * t,
-              f2_start[1] + (f2_end[1] - f2_start[1]) * t)
-        controller.post_touch_move(*clamp(*p1), 0, 1).wait()
-        controller.post_touch_move(*clamp(*p2), 1, 1).wait()
-        time.sleep(0.05)
-    controller.post_touch_up(0).wait()
-    controller.post_touch_up(1).wait()
+    try:
+        for i in range(1, steps + 1):
+            t = i / steps
+            p1 = (f1_start[0] + (f1_end[0] - f1_start[0]) * t,
+                  f1_start[1] + (f1_end[1] - f1_start[1]) * t)
+            p2 = (f2_start[0] + (f2_end[0] - f2_start[0]) * t,
+                  f2_start[1] + (f2_end[1] - f2_start[1]) * t)
+            controller.post_touch_move(*clamp(*p1), 0, 1).wait()
+            controller.post_touch_move(*clamp(*p2), 1, 1).wait()
+            time.sleep(0.05)
+    finally:
+        # 异常时也确保释放两个触点, 避免屏幕卡在多指触控状态
+        controller.post_touch_up(0).wait()
+        controller.post_touch_up(1).wait()
     time.sleep(0.5)
 
 
