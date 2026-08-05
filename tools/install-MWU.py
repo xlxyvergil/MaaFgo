@@ -169,6 +169,39 @@ def install_tasks():
         )
 
 
+def install_agent_deps():
+    """安装 agent 进程运行所需的 Python 依赖库到 build/deps
+
+    MWU 通过黑魔法在进程内动态加载 agent 代码, 第三方库从运行根目录
+    deps/ 解析(见 maa_worker/agent_loader.py::run_black_magic)。
+    仿官方 deploy/download_deps.py 使用 `uv pip install --target` 一次性装齐,
+    避免打包版运行时依赖手工后补库。
+    """
+    deps_dir = install_path / "deps"
+    deps_dir.mkdir(parents=True, exist_ok=True)
+
+    packages = [
+        "maafw",            # MaaFramework Python 绑定 (maa/ 包 + bin dll)
+        "opencv-python",    # cv2
+        "numpy",
+        "pillow",           # PIL
+        "psutil",           # bbc_stop / bbc_connection_manager
+        "ultralytics",      # YOLO 关卡检测 (依赖 torch, 体积较大)
+    ]
+
+    print(f"Installing agent dependencies to {deps_dir} ...")
+    try:
+        subprocess.check_call(
+            ["uv", "pip", "install", "--target", str(deps_dir), "--python-version", "3.12", *packages]
+        )
+    except FileNotFoundError:
+        print("uv 不可用, 回退到 pip install --target ...")
+        subprocess.check_call(
+            [sys.executable, "-m", "pip", "install", "--target", str(deps_dir), *packages]
+        )
+    print("Agent dependencies installed.")
+
+
 def fix_cv2_path():
     """修复 cv2 模块路径：从 deps/cv2 移动到根目录"""
     cv2_src = install_path / "deps" / "cv2"
@@ -181,6 +214,7 @@ def fix_cv2_path():
 
 if __name__ == "__main__":
     install_deps()
+    install_agent_deps()  # 安装 agent 进程依赖库到 build/deps
     install_resource()
     install_chores()
     install_bbcdll()  # 复制 bbcdll 目录

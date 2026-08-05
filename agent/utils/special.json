@@ -6,5 +6,9 @@
     "丰硕之海": {
         "zoom_center": [651, 637],
         "zoom_rounds": 1
+    },
+    "南之城镇": {
+        "zoom_center": [651, 637],
+        "zoom_rounds": 1
     }
 }

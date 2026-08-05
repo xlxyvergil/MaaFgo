@@ -1,0 +1,49 @@
+{
+    "防止导航误触": {
+        "next": [
+            "防止导航误触启动",
+            "关闭误触"
+        ]
+    },
+    "防止导航误触启动": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1021,
+                    619,
+                    59,
+                    63
+                ],
+                "template": [
+                    "UI隐藏.png"
+                ],
+                "threshold": [
+                    0.6
+                ]
+            }
+        },
+        "focus": "<span style=\"color: #FF0000;\">没误触</span>",
+        "next": [
+            "防止误触结束"
+        ]
+    },
+    "防止误触结束": {},
+    "关闭误触": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    83,
+                    32,
+                    51,
+                    25
+                ]
+            }
+        },
+        "focus": "<span style=\"color: #FF0000;\">有误触</span>",
+        "next": [
+            "防止误触结束"
+        ]
+    }
+}
