@@ -109,7 +109,8 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "免费常驻池.png"
+                    "免费常驻池.png",
+                    "免费常驻池2.png"
                 ],
                 "threshold": [
                     0.9
