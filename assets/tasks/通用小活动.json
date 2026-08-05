@@ -1,31 +1,34 @@
 {
-  "task": [
-    {
-      "name": "通用小活动",
-      "label": "通用小活动",
-      "description": "适配没有地图的活动，从主界面开始，进入上次挑战的副本\n需要确认以下信息：\n1.活动在主界面排序第一个\n2.点击活动后，能直接展示副本列表",
-      "entry": "通用小活动",
-      "controller": [
-        "安卓设备"
-      ],
-      "option": [
-        "通用小活动-副本类型",
-        "team_index",
-        "team_config",
-        "bbc_run_count",
-        "apple_type",
-        "战前吃苹果",
-        "bbc_battle_type",
-        "support_order_mismatch",
-        "team_config_error"
-      ],
-      "pipeline_override": {
-        "执行章节导航": {
-          "next": [
-            "通用小活动-开始"
-          ]
+    "task": [
+        {
+            "name": "通用小活动",
+            "label": "通用小活动",
+            "description": "适配没有地图的活动，从主界面开始，进入上次挑战的副本\n需要确认以下信息：\n1.活动在主界面排序第一个\n2.点击活动后，能直接展示副本列表",
+            "entry": "通用小活动",
+            "controller": [
+                "安卓设备"
+            ],
+            "option": [
+                "通用小活动-副本类型",
+                "team_index",
+                "team_config",
+                "bbc_run_count",
+                "apple_type",
+                "战前吃苹果",
+                "bbc_battle_type",
+                "support_order_mismatch",
+                "team_config_error"
+            ],
+            "pipeline_override": {
+                "执行章节导航": {
+                    "next": [
+                        "通用小活动-开始"
+                    ]
+                }
+            },
+            "group": [
+                "战斗相关"
+            ]
         }
-      }
-    }
-  ]
+    ]
 }

@@ -13,7 +13,12 @@
                 "type": {
                     "title": "控制器类型",
                     "type": "string",
-                    "enum": ["Adb", "Win32", "PlayCover"]
+                    "enum": [
+                        "Adb",
+                        "Win32",
+                        "PlayCover",
+                        "Linux"
+                    ]
                 }
             }
         },
@@ -50,6 +55,24 @@
                 "uuid": {
                     "title": "Bundle Identifier",
                     "type": "string"
+                }
+            }
+        },
+        "linux": {
+            "title": "Linux配置",
+            "type": "object",
+            "properties": {
+                "wlr_socket_path": {
+                    "title": "Wayland Socket 路径",
+                    "type": "string"
+                },
+                "pw_screen_width": {
+                    "title": "PipeWire 屏幕宽度（像素）",
+                    "type": "integer"
+                },
+                "pw_screen_height": {
+                    "title": "PipeWire 屏幕高度（像素）",
+                    "type": "integer"
                 }
             }
         },

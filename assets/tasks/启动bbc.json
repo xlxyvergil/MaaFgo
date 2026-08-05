@@ -7,6 +7,9 @@
             "entry": "启动bbc",
             "option": [
                 "connect_method"
+            ],
+            "group": [
+                "基础流程"
             ]
         }
     ]

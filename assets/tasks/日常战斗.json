@@ -15,6 +15,9 @@
                 "bbc_battle_type",
                 "support_order_mismatch",
                 "team_config_error"
+            ],
+            "group": [
+                "战斗相关"
             ]
         }
     ]

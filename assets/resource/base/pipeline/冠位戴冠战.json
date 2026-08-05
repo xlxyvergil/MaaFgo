@@ -1,56 +1,4 @@
 {
-    "戴冠战-按次数上划": {
-        "action": {
-            "type": "Swipe",
-            "param": {
-                "begin": [
-                    1014,
-                    212,
-                    1,
-                    1
-                ],
-                "end": [
-                    [
-                        1010,
-                        402,
-                        1,
-                        1
-                    ]
-                ],
-                "duration": 1000
-            }
-        },
-        "repeat": 0,
-        "repeat_delay": 1500,
-        "next": [
-            "戴冠战-点击进副本"
-        ]
-    },
-    "戴冠战-按次数找副本": {
-        "next": [
-            "戴冠战-按次数上划"
-        ]
-    },
-    "戴冠战-点击进副本": {
-        "max_hit": 5,
-        "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    909,
-                    157,
-                    71,
-                    46
-                ]
-            }
-        },
-        "post_delay": 3000,
-        "next": [
-            "冠位戴冠战-进入1",
-            "[JumpBack]戴冠战-体力不足",
-            "戴冠战-点击进副本"
-        ]
-    },
     "冠位戴冠战-开始": {
         "focus": {
             "Node.Action.Starting": "<span style=\"color: #FF0000;\">开始戴冠战</span>"
@@ -87,7 +35,10 @@
                     0
                 ],
                 "template": [
-                    "grand/grand_ex2.png"
+                    "grand/grand_ex1.png"
+                ],
+                "threshold": [
+                    0.7
                 ]
             }
         },
@@ -175,7 +126,8 @@
                     ]
                 ]
             }
-        }
+        },
+        "post_delay": 2000
     },
     "如果需要关闭弹窗": {
         "recognition": {
@@ -270,6 +222,7 @@
             }
         },
         "repeat": 5,
+        "repeat_delay": 400,
         "post_delay": 5000,
         "next": [
             "戴冠战-尝试进入副本"
@@ -417,5 +370,57 @@
             "type": "Click"
         },
         "post_delay": 3000
+    },
+    "戴冠战-按次数上划": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1014,
+                    212,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1010,
+                        402,
+                        1,
+                        1
+                    ]
+                ],
+                "duration": 1000
+            }
+        },
+        "repeat": 0,
+        "repeat_delay": 1500,
+        "next": [
+            "戴冠战-点击进副本"
+        ]
+    },
+    "戴冠战-按次数找副本": {
+        "next": [
+            "戴冠战-按次数上划"
+        ]
+    },
+    "戴冠战-点击进副本": {
+        "max_hit": 5,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    909,
+                    157,
+                    71,
+                    46
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "冠位戴冠战-进入1",
+            "[JumpBack]戴冠战-体力不足",
+            "戴冠战-点击进副本"
+        ]
     }
 }

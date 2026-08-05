@@ -1,23 +1,26 @@
 {
-  "task": [
-    {
-      "name": "迦勒底之门",
-      "label": "迦勒底之门",
-      "description": "bbchannel的安装方法请查看 <https://www.bilibili.com/video/BV1c3DgBWEjN> 。全版本使用bbc的方式一致。",
-      "entry": "迦勒底之门",
-      "controller": [
-        "安卓设备"
-      ],
-      "option": [
-        "chaldea_gate_quest_type"
-      ],
-      "pipeline_override": {
-        "执行章节导航": {
-          "next": [
-            "迦勒底之门-开始"
-          ]
+    "task": [
+        {
+            "name": "迦勒底之门",
+            "label": "迦勒底之门",
+            "description": "bbchannel的安装方法请查看 <https://www.bilibili.com/video/BV1c3DgBWEjN> 。全版本使用bbc的方式一致。",
+            "entry": "迦勒底之门",
+            "controller": [
+                "安卓设备"
+            ],
+            "option": [
+                "chaldea_gate_quest_type"
+            ],
+            "pipeline_override": {
+                "执行章节导航": {
+                    "next": [
+                        "迦勒底之门-开始"
+                    ]
+                }
+            },
+            "group": [
+                "战斗相关"
+            ]
         }
-      }
-    }
-  ]
+    ]
 }

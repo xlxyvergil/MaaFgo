@@ -1,38 +1,41 @@
 {
-  "task": [
-    {
-      "name": "直接bbc战斗",
-      "label": "直接bbc战斗",
-      "description": "直接打开bbc运行战斗，请确保当前已经处于助战或者编队界面（建议搭配启动bbc）",
-      "entry": "直接bbc战斗",
-      "controller": [
-        "安卓设备"
-      ],
-      "option": [
-        "team_config",
-        "bbc_run_count",
-        "apple_type",
-        "bbc_battle_type",
-        "support_order_mismatch",
-        "team_config_error"
-      ],
-      "pipeline_override": {
-        "执行章节导航": {
-          "next": [
-            "全局空节点"
-          ]
-        },
-        "执行队伍选择": {
-          "next": [
-            "全局空节点"
-          ]
-        },
-        "执行回主界面": {
-          "next": [
-            "全局空节点"
-          ]
+    "task": [
+        {
+            "name": "直接bbc战斗",
+            "label": "直接bbc战斗",
+            "description": "直接打开bbc运行战斗，请确保当前已经处于助战或者编队界面（建议搭配启动bbc）",
+            "entry": "直接bbc战斗",
+            "controller": [
+                "安卓设备"
+            ],
+            "option": [
+                "team_config",
+                "bbc_run_count",
+                "apple_type",
+                "bbc_battle_type",
+                "support_order_mismatch",
+                "team_config_error"
+            ],
+            "pipeline_override": {
+                "执行章节导航": {
+                    "next": [
+                        "全局空节点"
+                    ]
+                },
+                "执行队伍选择": {
+                    "next": [
+                        "全局空节点"
+                    ]
+                },
+                "执行回主界面": {
+                    "next": [
+                        "全局空节点"
+                    ]
+                }
+            },
+            "group": [
+                "战斗相关"
+            ]
         }
-      }
-    }
-  ]
+    ]
 }

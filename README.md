@@ -5,10 +5,10 @@
 
 # MaaFgo
 
-基于全新架构的 FGO 自动战斗助手。图像技术 + 模拟控制，解放双手！  
+基于图像识别的 FGO 自动战斗助手，解放双手！  
 由 [MaaFramework](https://github.com/MaaXYZ/MaaFramework) 强力驱动！  
-<a href="https://github.com/xlxyvergil/MaaFgo" target="_blank" style="font-weight: bold;">🔗 本项目 GitHub 仓库</a><br>
-🌟喜欢本项目就在仓库右上角点个星星吧🌟
+<a href="https://github.com/xlxyvergil/MaaFgo" target="_blank" style="font-weight: bold;">🔗 项目仓库</a><br>
+🌟 觉得好用就在仓库右上角点个 Star 吧 🌟
 
 </div>
 
@@ -21,80 +21,94 @@
   <img alt="stars" src="https://img.shields.io/github/stars/xlxyvergil/MaaFgo?style=social">
 </p>
 
-<div align="center">
-
-[简体中文](./README.md)
-
-</div>
-
-## 简介
-
-MaaFgo 是一款基于图像识别技术的 FGO（Fate/Grand Order）自动战斗工具。通过 MWU 前端提供 Web 访问支持，让您可以在浏览器中轻松配置和监控战斗任务。
+---
 
 ## 功能列表
 
-- 🎮 **自动登录** - 自动启动游戏，处理更新弹窗和登录流程
-- ⚔️ **主线自由本** - 支持大部分主线章节和 Ordeal Call 白纸化关卡的自动刷取
-- 🔥 **限时活动** - 支持有地图和无地图两类限时活动的自动战斗
-- 🗡️ **冠位戴冠战** - 日服冠位戴冠战自动刷取，支持职阶和难度选择
-- 🚪 **迦勒底之门** - 种火、修炼场、QP 本等日替副本自动刷取
-- ⚡ **快速战斗** - 跳过导航，在当前助战 / 编队界面直接启动战斗
-- 💎 **每日1石** - 自动抽取每日付费召唤卡池
-- 🌳 **自动收树** - 自动收取蓝苹果（青铜树苗）兑换体力
-- 🔗 **Chaldea 联动** - 粘贴 Chaldea 分享链接直接配置队伍并启动战斗
-- 🎯 **自定义队伍** - 支持预设多套队伍配置，自由切换
-- 🍎 **智能吃苹果** - 体力不足时自动补充，支持金 / 银 / 铜 / 蓝苹果
-- 📱 **多模拟器支持** - 支持雷电、MuMu 等主流安卓模拟器，也可手动指定 ADB 连接
+### ⚔️ 战斗相关
 
-## 使用说明
+| 任务 | 说明 |
+| ------ | ------ |
+| 日常战斗 | 主线自由本刷取，覆盖冬木至梅塔特洛尼俄斯共 27 个章节 |
+| 迦勒底之门 | 种火、修炼场、QP 本等日替副本 |
+| 冠位戴冠战 | 支持职阶和难度选择，含国服最新枪冠位 |
+| 通用大活动 | 适配有独立地图的大型活动，自动找上次挑战副本 |
+| 通用小活动 | 适配无地图的小型活动，支持倒数选择副本 |
+| 直接 BBC 战斗 | 跳过导航，在助战/编队界面直接启动 |
+| Chaldea 联动 | 粘贴 Chaldea 分享链接，一键配置队伍并战斗 |
+
+### 🛠 基础流程
+
+| 任务 | 说明 |
+| ------ | ------ |
+| 登录 | 自动启动游戏，处理更新弹窗和选择服务器 |
+| 启动 BBC | 连接 BBchannel 战斗核心，支持雷电/MuMu/ADB |
+| 关闭游戏 | 任务结束后自动关闭游戏 |
+
+### 🗓 日常行为
+
+| 任务 | 说明 |
+| ------ | ------ |
+| 每日 1 石 | 自动抽每日付费召唤卡池，石头不足自动跳过 |
+| 免费友情 10 连 | 自动抽每日免费友情池 |
+| 常驻每日 1 抽 | 常驻卡池每日免费一抽 |
+| 种树 | 自动收集蓝苹果兑换体力 |
+
+### 🍎 辅助功能
+
+- **智能吃苹果**：体力不足时自动补充，支持金/银/铜/蓝苹果
+- **自定义队伍**：支持预设多套队伍配置，自由切换
+- **多模拟器**：支持雷电、MuMu、新版 MuMu 及手动 ADB 连接
+
+---
+
+## 支持的平台
+
+| 服务器 | 主线 | Ordeal Call | 迦勒底之门 | 冠位戴冠战 |
+| :--- | :---: | :---: | :---: | :---: |
+| B 服（小米 / 应用宝） | ✅ | ✅ | ✅ | ✅ |
+| 享游服 | ✅ | ✅ | ✅ | ✅ |
+| 日服 | ✅ | ✅ | ✅ | ✅ |
+
+---
+
+## 快速开始
 
 ### 前置要求
 
 - Windows 操作系统
-- 安卓模拟器（雷电模拟器 / MuMu 模拟器）
+- 安卓模拟器（雷电 / MuMu）
 
-### 快速开始
+### 1. 下载安装
 
-1. **下载 release 版本**
+前往 [Releases](https://github.com/xlxyvergil/MaaFgo/releases) 下载最新版本。提供两种版本：
 
-   前往 [Releases](https://github.com/xlxyvergil/MaaFgo/releases) 页面下载最新版本
+| 版本 | 文件名标识 | 说明 |
+|------|-----------|------|
+| **MXU**（推荐） | `MXU.zip` | 桌面客户端，原生窗口体验，启动更快，无需浏览器 |
+| MWU | `MWU.zip` | Web 界面版，通过浏览器访问，兼容性好 |
 
-2. **正确放置bbc**
-    视频教程：
-   - bbchannel的安装方法请查看 <https://www.bilibili.com/video/BV1c3DgBWEjN> 。全版本使用bbc的方式一致。
-   
-   
-    文字版说明：
-    -  a.将BBC放入maaFGO的根目录
-    -  b.将bbcdll文件夹内的文件放入BBchannel\\dist\\BBchannel64目录下【替换】（非64位的放BBchannel文件夹下）
+> 推荐使用 MXU 桌面版，体验更流畅。
 
-2. **连接模拟器**
+### 2. 安装 BBchannel
 
-   支持多种连接方式：
-   - 雷电模拟器自动检测
-   - MuMu 模拟器自动检测
-   - 手动输入 ADB 端口
+视频教程：
 
-3. **配置任务**
+- [完整使用教程](https://www.bilibili.com/video/BV1GsjW6wEej/)
+- [BBchannel 安装方法](https://www.bilibili.com/video/BV1c3DgBWEjN)
 
-   通过 Web 界面配置需要执行的任务：
-   - 选择章节和关卡
-   - 设置队伍配置
-   - 配置战斗次数和苹果使用策略
+1. 将 BBC 文件夹放入 MaaFgo 根目录
+2. 将 `bbcdll` 文件夹内的文件放入 `BBchannel\dist\BBchannel64` 目录下（替换同名文件）
 
-4. **启动任务**
+### 3. 连接模拟器
 
-   点击开始按钮，让 MaaFgo 自动完成战斗
+支持雷电、MuMu 自动检测，也支持手动输入 ADB 端口。
 
-## 支持的平台与内容
+### 4. 配置并启动
 
-| 服务器 | 主线 | Ordeal Call 白纸化 | 迦勒底之门日替 | 冠位戴冠战 |
-|:---|:---:|:---:|:---:|:---:|
-| 国服 B 服 | ✅ | ✅ | ✅ | ✅ |
-| 国服享游服 | ✅ | ✅ | ✅ | ✅ |
-| 日服 | ✅ | ✅ | ✅ | ✅ |
+通过界面选择任务，设置章节/关卡、队伍、战斗次数和苹果策略，点击开始即可。
 
-> 主线覆盖冬木至梅塔特洛尼俄斯共 27 个章节
+---
 
 ## 开发相关
 
@@ -103,39 +117,23 @@ MaaFgo 是一款基于图像识别技术的 FGO（Fate/Grand Order）自动战�
 ```
 MaaFgo/
 ├── agent/          # Python 代理程序
-├── assets/         # 资源文件（图片、配置、Pipeline）
+├── assets/         # 资源文件（图片、Pipeline、任务配置）
 ├── BBchannel/      # BBchannel 战斗核心
+├── bbcdll/         # BBC 接口补丁
 ├── deps/           # MaaFramework 依赖
 └── tools/          # 开发工具
 ```
 
 ### 技术栈
 
-- **核心框架**: [MaaFramework](https://github.com/MaaXYZ/MaaFramework)
-- **前端**: MWU / MXU
-- **战斗核心**: BBchannel
-- **图像识别**: MaaFramework Pipeline + OCR
+- **核心框架**: [MaaFramework](https://github.com/MaaXYZ/MaaFramework) — 图像识别自动化
+- **前端**: MWU / MXU — Web 界面与桌面客户端
+- **战斗核心**: [BBchannel](https://github.com/Meowcolm024/FGO-Automata)
+- **地图导航**: [FGO-py](https://github.com/hgjazhgj/FGO-py) — 图像匹配与坐标导航
+
+---
 
 ## 鸣谢
-
-### 核心框架
-
-- [MaaFramework](https://github.com/MaaXYZ/MaaFramework)  
-  基于图像识别的自动化黑盒测试框架
-
-### 前端支持
-
-- [MWU](https://github.com/ravizhan/MWU)  
-  基于 Vue + FastAPI 的轻量级跨平台通用 WebUI。由 MaaFramework 强力驱动！
-- [MXU](https://github.com/MistEO/MXU)  
-  基于 Tauri 2 + React 的轻量级跨平台通用 GUI。由 MaaFramework 强力驱动！
-
-### 战斗核心
-
-- [BBchannel](https://github.com/Meowcolm024/FGO-Automata)  
-  FGO 自动化战斗核心
-
-## 🙏 致谢
 
 ### 开源项目
 
@@ -148,9 +146,9 @@ MaaFgo/
 
 ### 开发者
 
-感谢以下开发者对本项目作出的贡献:
-
 [![Contributors](https://contrib.rocks/image?repo=xlxyvergil/MaaFgo&max=1000)](https://github.com/xlxyvergil/MaaFgo/graphs/contributors)
+
+---
 
 ## 免责声明
 

@@ -81,6 +81,7 @@
                     161
                 ],
                 "template": [
+                    "召唤2次.png",
                     "召唤1次.png"
                 ]
             }
@@ -101,14 +102,15 @@
                 ]
             }
         },
-        "post_delay": 1000
+        "post_delay": 2000
     },
     "常驻每日1抽-寻找免费图标": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "免费常驻池.png"
+                    "免费常驻池.png",
+                    "免费常驻池2.png"
                 ],
                 "threshold": [
                     0.9

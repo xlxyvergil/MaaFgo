@@ -47,6 +47,23 @@
       "option": ["资源包类型-jp"]
     }
   ],
+  "group": [
+    {
+      "name": "战斗相关",
+      "label": "战斗相关",
+      "default_expand": true
+    },
+    {
+      "name": "基础流程",
+      "label": "基础流程",
+      "default_expand": true
+    },
+    {
+      "name": "日常行为",
+      "label": "日常行为",
+      "default_expand": true
+    }
+  ],
   "task": [],
   "option": {},
   "import": [

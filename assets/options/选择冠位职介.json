@@ -123,6 +123,9 @@
                   ],
                   "template": [
                     "grand/grand_ex1.png"
+                  ],
+                  "threshold": [
+                    0.85
                   ]
                 }
               }
@@ -144,6 +147,9 @@
                   ],
                   "template": [
                     "grand/grand_ex2.png"
+                  ],
+                  "threshold": [
+                    0.85
                   ]
                 }
               }
