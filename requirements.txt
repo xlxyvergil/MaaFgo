@@ -3,4 +3,4 @@ opencv-python
 numpy
 psutil
 highspy
-ultralytics
+ultralytics==8.4.115

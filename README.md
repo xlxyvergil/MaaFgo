@@ -160,4 +160,4 @@ FGO 版权归 TYPE-MOON / FGO PROJECT 所有，本项目与官方无关。
 
 ## 许可证
 
-本项目基于 [MIT License](./LICENSE) 开源。
+本项目基于 [AGPL-3.0 License](./LICENSE) 开源。

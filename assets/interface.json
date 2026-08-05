@@ -3,7 +3,7 @@
   "name": "MaaFgo",
   "description": "FGO自动战斗工具,模拟器需要强制为1280*720模式",
   "contact": "QQ群: 1102496882",
-  "license": "MIT",
+  "license": "AGPL-3.0",
   "welcome": "Announcement.md",
   "github": "https://github.com/xlxyvergil/MaaFgo",
   "icon": "resource/icon.png",
