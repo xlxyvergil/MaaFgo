@@ -171,6 +171,7 @@ VISIBLE_POLY = np.array([
 
 # 局部模板定位(YOLO漏检兜底)参数
 MT_MIN_SCORE = 0.9       # 局部 matchTemplate 命中阈值
+CLICK_X_OFFSET = 5       # 点击点相对识别中心左偏px, 防名称条中心点击误触相邻关卡(如格洛斯特)
 LOCAL_RADIUS = 250       # 局部匹配窗口半径(px, 以预测位置为中心)
 NEAR_RADIUS = 300        # 预测位置附近 YOLO 框(tag/nametag)判定半径(px)
 
@@ -609,8 +610,9 @@ class GeneralNavigationAction(CustomAction):
                 for (bi, bj, score) in assigned:
                     nx, ny, nw, nh = box_infos[bi]
                     name = tpl_names[bj]
-                    recognized.append((name, nx + nw // 2, ny + nh // 2, score))
-                    mfaalog.info(f"[导航] 识别到: {name} ({score:.2f}) 中心=({nx + nw // 2},{ny + nh // 2})")
+                    # 点击点左偏 CLICK_X_OFFSET, 名称条中心可能被相邻关卡点击区覆盖
+                    recognized.append((name, nx + nw // 2 - CLICK_X_OFFSET, ny + nh // 2, score))
+                    mfaalog.info(f"[导航] 识别到: {name} ({score:.2f}) 点击=({nx + nw // 2 - CLICK_X_OFFSET},{ny + nh // 2})")
 
                 # 目标在屏 -> 点击进入
                 for (name, sx, sy, _score) in recognized:
@@ -683,7 +685,7 @@ class GeneralNavigationAction(CustomAction):
                             break
                     if win_found is not None:
                         (bx, by, bw, bh, lscore), _wx, _wy, _ww0, _wh0 = win_found
-                        cx, cy = bx + bw // 2, by + bh // 2
+                        cx, cy = bx + bw // 2 - CLICK_X_OFFSET, by + bh // 2
                         complete = (0 <= bx and bx + bw <= SCREEN_W
                                     and 0 <= by and by + bh <= SCREEN_H)
                         clickable = _in_visible_area(cx, cy) and _icon_in_visible(cx, cy, bw, bh)
@@ -707,7 +709,7 @@ class GeneralNavigationAction(CustomAction):
                                                 float(p_target[0]), float(p_target[1]))
                         if loc is not None:
                             bx, by, bw, bh, lscore = loc
-                            cx, cy = bx + bw // 2, by + bh // 2
+                            cx, cy = bx + bw // 2 - CLICK_X_OFFSET, by + bh // 2
                             complete = (0 <= bx and bx + bw <= SCREEN_W
                                         and 0 <= by and by + bh <= SCREEN_H)
                             clickable = _in_visible_area(cx, cy) and _icon_in_visible(cx, cy, bw, bh)
