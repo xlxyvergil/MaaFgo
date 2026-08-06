@@ -258,23 +258,24 @@ def greedy_match_boxes(box_crops, templates):
     return assigned, unassigned
 
 
-def load_quest_coords(quest_dir, root_dir, folder):
-    """读取 coords.json(全景坐标表, 由 tools/distribute_coords.py 分发)
-    固定从 resource 目录读取: 先当前pkg素材目录(quest_dir 即 resource/{pkg}/image/{folder}),
-    再 resource/base。coords 的 key = 素材文件名(关卡名), 与 load_quest_templates 一致。
+def load_quest_coords(root_dir, folder):
+    """读取 coords.json(全景坐标表, 由 distribute_coords.py 分发)
+    固定只读 agent 附属数据目录 root_dir/agent/utils/{folder}/coords.json
+    (folder 形如 map/Gotterdammerung, 与素材目录命名一致; agent 目录不参与
+    MaaFramework 资源校验; resource/image 下不放置 coords.json, 无需兜底)。
+    coords 的 key = 素材文件名(关卡名), 与 load_quest_templates 一致。
     无坐标表时返回空 dict, 调用方退化为全模板匹配(原行为)。"""
-    for base_dir in (quest_dir, os.path.join(root_dir, "resource", "base", "image", folder)):
-        path = os.path.join(base_dir, "coords.json")
-        if not os.path.isfile(path):
-            continue
-        try:
-            with open(path, encoding="utf-8") as fp:
-                data = json.load(fp)
-            coords = {q: (int(v["x"]), int(v["y"]))
-                      for q, v in data.get("quests", {}).items() if "x" in v and "y" in v}
-            return coords, int(data.get("map_height", 0))
-        except Exception as e:
-            mfaalog.warning(f"[导航] coords.json 读取失败: {e}")
+    path = os.path.join(root_dir, "agent", "utils", folder, "coords.json")
+    if not os.path.isfile(path):
+        return {}, 0
+    try:
+        with open(path, encoding="utf-8") as fp:
+            data = json.load(fp)
+        coords = {q: (int(v["x"]), int(v["y"]))
+                  for q, v in data.get("quests", {}).items() if "x" in v and "y" in v}
+        return coords, int(data.get("map_height", 0))
+    except Exception as e:
+        mfaalog.warning(f"[导航] coords.json 读取失败: {e}")
     return {}, 0
 
 
@@ -759,7 +760,7 @@ class GeneralNavigationAction(CustomAction):
                 return CustomAction.RunResult(success=False)
 
             # 步骤5: 普通关卡滑动循环(坐标表辅助: 候选过滤 + offset_y 反推闭环)
-            coords, _map_h = load_quest_coords(quest_dir, ROOT_DIR,
+            coords, _map_h = load_quest_coords(ROOT_DIR,
                                                os.path.dirname(template.replace("\\", "/")).strip("/"))
             offset_y = None          # 当前视角顶部在全景图中的y, 由识别结果反推(首屏只按x过滤)
             last_bottom = None       # 上一屏底部关卡 (名称, 屏幕y), 用于到底判定
