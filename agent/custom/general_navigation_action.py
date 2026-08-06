@@ -187,6 +187,18 @@ def _in_visible_area(px, py, margin=40):
     return cv2.pointPolygonTest(VISIBLE_POLY, (float(px), float(py)), True) >= margin
 
 
+def _icon_in_visible(px, py, tw, th, margin=20):
+    """名称条图标(模板尺寸 tw x th, 中心 px,py)是否整体进入可视区域且距边界至少 margin px
+    中心点进入可视区不代表整条不被UI遮挡: 名称条较宽, 右下角/左下斜线/顶部角落的 UI 会盖住部分。
+    四角都必须远离 UI 边界才能点击, 否则继续滑动把图标拉进安全区
+    (右下偏低->上拉, 左下斜线附近->右拉, 左低->上拉, 顶部角落->下拉, 由滑动朝向中心自然完成)"""
+    import cv2
+    hw, hh = tw / 2, th / 2
+    pts = [(px - hw, py - hh), (px + hw, py - hh), (px - hw, py + hh), (px + hw, py + hh)]
+    return all(cv2.pointPolygonTest(VISIBLE_POLY, (float(pxx), float(pyy)), True) >= margin
+               for pxx, pyy in pts)
+
+
 def locate_quest_near(img, tpl_bgr, px, py, radius=LOCAL_RADIUS, min_score=MT_MIN_SCORE):
     """在 (px,py) 附近局部窗口内用目标素材多尺度 matchTemplate 定位名称条
     (处理 YOLO 漏检: 预测到位但识别列表无目标)
@@ -612,13 +624,14 @@ class GeneralNavigationAction(CustomAction):
                 dist_center = float(np.hypot(*(p_target - SCREEN_CENTER)))
                 mfaalog.info(f"[导航] 目标预测屏幕位置 ({p_target[0]:.0f},{p_target[1]:.0f}), 距中心 {dist_center:.0f}px")
 
-                # 到位判定: 名称条(模板尺寸)完整在屏幕内 + 中心在可视区(可点击)
+                # 到位判定: 名称条(模板尺寸)完整在屏幕内 + 中心在可视区 + 整体图标四角进入可视区(不被UI遮挡)
                 th, tw = templates[target_quest].shape[:2]
-                arrive = (_in_visible_area(p_target[0], p_target[1])
-                          and 0 <= p_target[0] - tw / 2 and p_target[0] + tw / 2 <= SCREEN_W
-                          and 0 <= p_target[1] - th / 2 and p_target[1] + th / 2 <= SCREEN_H)
+                icon_ok = (_icon_in_visible(p_target[0], p_target[1], tw, th)
+                           and 0 <= p_target[0] - tw / 2 and p_target[0] + tw / 2 <= SCREEN_W
+                           and 0 <= p_target[1] - th / 2 and p_target[1] + th / 2 <= SCREEN_H)
+                arrive = (_in_visible_area(p_target[0], p_target[1]) and icon_ok)
                 mfaalog.info(f"[导航] 目标预测屏幕位置 ({p_target[0]:.0f},{p_target[1]:.0f}), "
-                             f"距中心 {dist_center:.0f}px, 名称条({tw}x{th})完整在屏可点={arrive}")
+                             f"距中心 {dist_center:.0f}px, 名称条({tw}x{th})整体可视={icon_ok} 可点={arrive}")
 
                 # 目标预测到位(名称条完整可见): 停止滑动, 精确定位识别
                 # 成功必须由"识别到目标"确认: 小窗口YOLO补检 / 附近YOLO框局部模板定位, 预测本身不算
