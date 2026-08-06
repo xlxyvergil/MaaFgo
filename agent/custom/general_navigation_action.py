@@ -46,6 +46,11 @@ import mfaalog
 PAD = 3                   # YOLO 框四周外扩像素(px): 吸收框位置抖动(±1-2px), 纯名称条内容匹配旧素材
 SIFT_TH = 0.30            # SIFT 匹配判定阈值: 原0.32 奥克尼等短名称条匹配波动差线, 0.20 过松误匹配风险, 折中 0.30
 
+# 坐标表辅助(方案A过渡): coords.json 按 x/y 过滤 SIFT 候选, 反推视角偏移, 缩小小尺寸匹配集
+SCREEN_H = 720            # 屏幕高度(统一 1280 宽坐标系, 720p)
+COORDS_X_TOL = 60         # 候选x容差(px): 缩放后名称条x固定且与全景x一致, 框中心误差<20px, 60 留余量
+COORDS_Y_MARGIN = 80      # 候选y容差(px): offset_y 反推误差余量(含框高/滑动漂移)
+
 # 滑动与循环参数
 SWIPE_DIST = 100          # 单次滑动距离(px), 手指上滑=看下方; 200px 一次滑过会漏检处于画面带中的关卡(如原型肇始商务区), 改 100px 保证覆盖
 SWIPE_DURATION = 300
@@ -93,6 +98,7 @@ def load_quest_templates(quest_dir):
                                cv2.IMREAD_COLOR)
             if img is not None:
                 templates[name] = img
+    clear_sift_cache()   # 素材重载后清空模板描述符缓存
     return templates
 
 
@@ -127,28 +133,93 @@ def identify_quest(crop_bgr, templates):
     return None, best_score
 
 
+# ---- SIFT 性能优化(行为不变): 复用单例 SIFT/BFMatcher + 模板描述符缓存 ----
+# 原实现每次 match_sift 都新建 cv2.SIFT_create()/cv2.BFMatcher, 且对每个模板重新
+# detectAndCompute; greedy_match_boxes 在 O(框×模板) 循环里调用, 模板特征被重复计算
+# m 次/框, 每帧 CPU 开销随模板数线性放大。优化:
+#   1. 模块级单例 SIFT/BFMatcher(惰性创建; SIFT/BF 均确定性 -> 结果不变)
+#   2. 模板 灰度图+关键点+描述符 按 id(模板图) 缓存(素材在导航会话期间常驻, id 稳定;
+#      缓存条目持有图像引用防 id 复用, 命中时校验对象同一性)
+#   3. greedy/坐标匹配循环内每框只提取一次裁剪框特征(_crop_desc), 不再随模板数重复
+_SIFT = None
+_BF = None
+_TEMPLATE_CACHE = {}
+
+
+def _get_sift():
+    global _SIFT
+    if _SIFT is None:
+        try:
+            _SIFT = cv2.SIFT_create()
+        except Exception:
+            _SIFT = False      # 环境不支持 SIFT: 标记不可用, 避免每次重试
+    return _SIFT
+
+
+def _get_bf():
+    global _BF
+    if _BF is None:
+        _BF = cv2.BFMatcher(cv2.NORM_L2)
+    return _BF
+
+
+def _template_features(template_bgr):
+    """模板 (灰度图, 关键点, 描述符), 带缓存:
+    以 id(模板图) 为 key, 缓存条目持有图像引用 -> 图未被 GC 前 id 不复用,
+    命中时校验对象同一性防止 id 碰撞; 结果与逐次新建 SIFT 计算完全一致。"""
+    key = id(template_bgr)
+    hit = _TEMPLATE_CACHE.get(key)
+    if hit is not None and hit[0] is template_bgr:
+        return hit[1]
+    tb = template_bgr
+    if tb.ndim == 3 and tb.shape[2] == 4:
+        tb = tb[:, :, :3]      # 丢弃 alpha 通道, 兼容 Maa screencap
+    tg = cv2.cvtColor(tb, cv2.COLOR_BGR2GRAY)
+    tk, td = _get_sift().detectAndCompute(tg, None)
+    entry = (tg, tk, td if td is not None else None)
+    _TEMPLATE_CACHE[key] = (template_bgr, entry)
+    return entry
+
+
+def clear_sift_cache():
+    """清空模板描述符缓存(素材重载后调用, 防旧条目残留与内存增长)"""
+    _TEMPLATE_CACHE.clear()
+
+
+def _crop_desc(crop_bgr):
+    """裁剪框 (灰度图, 描述符): 每帧截图内容都变, 不缓存, 每框只算一次"""
+    if crop_bgr is None or crop_bgr.size == 0:
+        return None, None
+    cb = crop_bgr
+    if cb.ndim == 3 and cb.shape[2] == 4:
+        cb = cb[:, :, :3]      # 丢弃 alpha 通道, 兼容 Maa screencap
+    sift = _get_sift()
+    if not sift:
+        return None, None
+    cg = cv2.cvtColor(cb, cv2.COLOR_BGR2GRAY)
+    _, cd = sift.detectAndCompute(cg, None)
+    return cg, cd
+
+
+def _sift_pair_score(cd, template_bgr):
+    """模板特征(缓存) vs 已提取裁剪框描述符 -> 匹配分, 行为与 match_sift 一致"""
+    _, tk, td = _template_features(template_bgr)
+    if cd is None or td is None or len(tk) < 3:
+        return 0.0
+    matches = _get_bf().knnMatch(td, cd, k=2)
+    good = [m for m, n in matches if m.distance < 0.75 * n.distance]
+    return float(len(good)) / max(1.0, len(tk))
+
+
 def match_sift(crop_bgr, template_bgr):
     """SIFT 特征匹配分数: good匹配数(ratio test 0.75) / 模板关键点数
     对缩放/位移/亮度鲁棒, 无需缩放即可匹配尺寸不一致的素材;
-    生产识别当前走 match_sift(外扩PAD+20高旧素材), 达标阈值 SIFT_TH(0.30)。"""
-    try:
-        sift = cv2.SIFT_create()
-    except Exception:
+    生产识别当前走 match_sift(外扩PAD+20高旧素材), 达标阈值 SIFT_TH(0.30)。
+    性能: 复用单例 SIFT/BFMatcher + 模板描述符缓存, 结果与原实现一致。"""
+    _, cd = _crop_desc(crop_bgr)
+    if cd is None:
         return 0.0
-    if crop_bgr.ndim == 3 and crop_bgr.shape[2] == 4:
-        crop_bgr = crop_bgr[:, :, :3]      # 丢弃 alpha 通道, 兼容 Maa screencap
-    if template_bgr.ndim == 3 and template_bgr.shape[2] == 4:
-        template_bgr = template_bgr[:, :, :3]
-    cg = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
-    tg = cv2.cvtColor(template_bgr, cv2.COLOR_BGR2GRAY)
-    _, cd = sift.detectAndCompute(cg, None)
-    tk, td = sift.detectAndCompute(tg, None)
-    if cd is None or td is None or len(tk) < 3:
-        return 0.0
-    bf = cv2.BFMatcher(cv2.NORM_L2)
-    matches = bf.knnMatch(td, cd, k=2)
-    good = [m for m, n in matches if m.distance < 0.75 * n.distance]
-    return float(len(good)) / max(1.0, len(tk))
+    return _sift_pair_score(cd, template_bgr)
 
 
 def greedy_match_boxes(box_crops, templates):
@@ -163,31 +234,104 @@ def greedy_match_boxes(box_crops, templates):
     tpl_names = list(templates.keys())
     n, m = len(box_crops), len(tpl_names)
     scores = np.zeros((n, m))
+    cds = [_crop_desc(b)[1] for b in box_crops]   # 每框只提取一次特征(模板特征走缓存)
     for i in range(n):
         if box_crops[i] is None or box_crops[i].size == 0:
             continue
         for j in range(m):
-            scores[i, j] = match_sift(box_crops[i], templates[tpl_names[j]])
+            scores[i, j] = _sift_pair_score(cds[i], templates[tpl_names[j]])
+    # 独占分配: 按分数降序排序后一次遍历(同分按 i,j 升序, 与原"每轮全表扫描取最高分"
+    # 严格一致), 复杂度由 O(n·m·min(n,m)) 降为 O(n·m·log(n·m))
     used_box = [False] * n
     used_tpl = [False] * m
     assigned = []
-    while True:
-        best, bi, bj = -1.0, -1, -1
-        for i in range(n):
-            if used_box[i]:
-                continue
-            for j in range(m):
-                if used_tpl[j]:
-                    continue
-                if scores[i, j] > best:
-                    best, bi, bj = scores[i, j], i, j
-        if bi < 0 or best < SIFT_TH:
-            break
-        assigned.append((bi, bj, best))
-        used_box[bi] = True
-        used_tpl[bj] = True
+    pairs = [(scores[i, j], i, j) for i in range(n) for j in range(m)
+             if scores[i, j] >= SIFT_TH]
+    pairs.sort(key=lambda x: (-x[0], x[1], x[2]))
+    for s, i, j in pairs:
+        if used_box[i] or used_tpl[j]:
+            continue
+        assigned.append((i, j, s))
+        used_box[i] = True
+        used_tpl[j] = True
     unassigned = [i for i in range(n) if not used_box[i]]
     return assigned, unassigned
+
+
+def load_quest_coords(quest_dir, root_dir, folder):
+    """读取 coords.json(全景坐标表, 由 tools/distribute_coords.py 分发)
+    固定从 resource 目录读取: 先当前pkg素材目录(quest_dir 即 resource/{pkg}/image/{folder}),
+    再 resource/base。coords 的 key = 素材文件名(关卡名), 与 load_quest_templates 一致。
+    无坐标表时返回空 dict, 调用方退化为全模板匹配(原行为)。"""
+    for base_dir in (quest_dir, os.path.join(root_dir, "resource", "base", "image", folder)):
+        path = os.path.join(base_dir, "coords.json")
+        if not os.path.isfile(path):
+            continue
+        try:
+            with open(path, encoding="utf-8") as fp:
+                data = json.load(fp)
+            coords = {q: (int(v["x"]), int(v["y"]))
+                      for q, v in data.get("quests", {}).items() if "x" in v and "y" in v}
+            return coords, int(data.get("map_height", 0))
+        except Exception as e:
+            mfaalog.warning(f"[导航] coords.json 读取失败: {e}")
+    return {}, 0
+
+
+def match_with_coords(box_infos, box_crops, templates, coords, offset_y):
+    """坐标表辅助独占匹配: 每框候选 = x容差 + (offset_y 建立后)全景y在视口±margin 内的模板,
+    候选内做全局最高分独占分配(行为与原 greedy 一致, 只是候选集缩小, 更快更准).
+    返回 (assigned, offset_y):
+      assigned:  [(box_idx, 关卡名, score), ...] 按分数从高到低
+      offset_y:  由本次识别结果反推的视角顶部全景y(多关取中位数, 抗误匹配), 未识别则不变
+    无 coords 时退化为全模板 greedy(原行为), offset_y 不更新。"""
+    tpl_names = list(templates.keys())
+    if not coords:
+        assigned, _ = greedy_match_boxes(box_crops, templates)
+        return [(bi, tpl_names[bj], s) for bi, bj, s in assigned], offset_y
+
+    n = len(box_crops)
+    cand = [[] for _ in range(n)]   # 每框候选模板索引
+    for i in range(n):
+        if box_crops[i] is None or box_crops[i].size == 0:
+            continue
+        cx = box_infos[i][0] + box_infos[i][2] // 2
+        cy = box_infos[i][1] + box_infos[i][3] // 2
+        for j, name in enumerate(tpl_names):
+            t = coords.get(name)
+            if t is None:
+                continue
+            tx, ty = t
+            if abs(tx - cx) > COORDS_X_TOL:
+                continue
+            if offset_y is not None and not (offset_y - COORDS_Y_MARGIN <= ty <= offset_y + SCREEN_H + COORDS_Y_MARGIN):
+                continue
+            cand[i].append(j)
+
+    scores = np.full((n, len(tpl_names)), -1.0)
+    cds = [_crop_desc(b)[1] for b in box_crops]   # 每框只提取一次特征(模板特征走缓存)
+    for i in range(n):
+        for j in cand[i]:
+            scores[i, j] = _sift_pair_score(cds[i], templates[tpl_names[j]])
+    # 独占分配: 分数降序排序一次遍历(同分按 i,j 升序, 与"每轮全表扫描取最高"一致)
+    used_box, used_tpl = [False] * n, [False] * len(tpl_names)
+    assigned = []
+    pairs = [(scores[i, j], i, j) for i in range(n) for j in range(len(tpl_names))
+             if scores[i, j] >= SIFT_TH]
+    pairs.sort(key=lambda x: (-x[0], x[1], x[2]))
+    for s, i, j in pairs:
+        if used_box[i] or used_tpl[j]:
+            continue
+        assigned.append((i, tpl_names[j], s))
+        used_box[i] = True
+        used_tpl[j] = True
+
+    # 反推 offset_y: 识别对 (box_cy + offset_y = 全景y), 多关取中位数
+    if assigned:
+        offs = sorted(coords[name][1] - (box_infos[bi][1] + box_infos[bi][3] // 2)
+                      for bi, name, _ in assigned)
+        offset_y = offs[len(offs) // 2]
+    return assigned, offset_y
 
 
 def prevent_touch(context):
@@ -342,15 +486,25 @@ class QuestDetector:
     @staticmethod
     def _norm_img(img):
         """规范化输入图像为 BGR uint8 numpy (H,W,3)
-        兼容 Maa screencap: 可能是 4通道(RGBA/ARGB) numpy, 或带 data/width/height 的 Image 对象"""
+        兼容 Maa screencap: 可能是 4通道(RGBA/ARGB) numpy, 或带 data/width/height 的 Image 对象
+        无法识别的类型: 记录日志并返回 None(快速失败), 由调用方处理错误路径,
+        不再原样透传导致错误在 ultralytics 内部抛出且无上下文"""
         if not isinstance(img, np.ndarray):
             if hasattr(img, "to_numpy"):
                 img = img.to_numpy()
             elif hasattr(img, "data") and hasattr(img, "width") and hasattr(img, "height"):
-                img = np.frombuffer(img.data, dtype=np.uint8).reshape(
-                    img.height, img.width, -1)
+                w, h = int(img.width), int(img.height)
+                total = len(img.data)
+                ch = total // (w * h) if w > 0 and h > 0 else -1
+                # 显式算通道数(不依赖 -1 整除); frombuffer 只读 -> copy 可写
+                # (ultralytics/OpenCV 就地预处理需可写数组, 否则 ValueError: read-only)
+                if ch not in (1, 3, 4) or total != w * h * ch:
+                    mfaalog.error(f"[检测] 截图 data 长度 {total} 与 {w}x{h} 不匹配, 返回 None")
+                    return None
+                img = np.frombuffer(img.data, dtype=np.uint8).reshape(h, w, ch).copy()
             else:
-                return img
+                mfaalog.error(f"[检测] 截图类型 {type(img).__name__} 无法规范化, 返回 None")
+                return None
         if img.ndim == 3 and img.shape[2] == 4:
             img = img[:, :, :3]      # 丢弃 alpha 通道
         if img.dtype != np.uint8:
@@ -361,6 +515,8 @@ class QuestDetector:
         """整图推理, 返回 [(x1,y1,x2,y2,score,cls)] 原图坐标(ultralytics 原生后处理)
         输入先规范化: Maa screencap 可能返回 RGBA(4通道) numpy, ultralytics 要求 3通道 uint8"""
         img = self._norm_img(img)
+        if img is None:
+            return []      # 规范化失败(已记录日志), 按无检测结果处理, 不传给 ultralytics
         r = self.model(img, conf=conf, imgsz=self.IMGSZ, verbose=False)[0]
         res = []
         for b in r.boxes:
@@ -602,8 +758,11 @@ class GeneralNavigationAction(CustomAction):
                 mfaalog.error(f"[导航] 特殊关卡[{target_quest}] 放大 {zoom_rounds} 轮后仍未识别到 (滑动 {swipe_count} 次)")
                 return CustomAction.RunResult(success=False)
 
-            # 步骤5: 普通关卡滑动循环
-            last_quests = None       # 上一屏识别的关卡(名称+像素坐标)
+            # 步骤5: 普通关卡滑动循环(坐标表辅助: 候选过滤 + offset_y 反推闭环)
+            coords, _map_h = load_quest_coords(quest_dir, ROOT_DIR,
+                                               os.path.dirname(template.replace("\\", "/")).strip("/"))
+            offset_y = None          # 当前视角顶部在全景图中的y, 由识别结果反推(首屏只按x过滤)
+            last_bottom = None       # 上一屏底部关卡 (名称, 屏幕y), 用于到底判定
             empty_count = 0          # 连续空屏计数
             swipe_count = 0          # 已滑动次数
             for round_idx in range(MAX_ROUNDS):
@@ -626,14 +785,10 @@ class GeneralNavigationAction(CustomAction):
                     crop = img[max(0, ny - PAD):ny + nh + PAD, max(0, nx - PAD):nx + nw + PAD]
                     box_infos.append((nx, ny, nw, nh))
                     box_crops.append(crop if crop.size else None)
-                assigned, _un = greedy_match_boxes(box_crops, templates)
-                tpl_names = list(templates.keys())
-                cur_set = set()
+                assigned, offset_y = match_with_coords(box_infos, box_crops, templates, coords, offset_y)
                 cur_quests = []
-                for (bi, bj, score) in assigned:
+                for (bi, name, score) in assigned:
                     nx, ny, nw, nh = box_infos[bi]
-                    name = tpl_names[bj]
-                    cur_set.add(name)
                     cur_quests.append((name, nx, ny))
                     mfaalog.info(f"[导航] 识别到关卡: {name} ({score:.2f}) 框=({nx},{ny},{nw},{nh})")
                     if name == target_quest:
@@ -643,19 +798,27 @@ class GeneralNavigationAction(CustomAction):
                         return CustomAction.RunResult(success=True)
                 cur_quests = sorted(cur_quests)
 
-                # 5c. 到底判定: 比较连续两屏检测框像素坐标, 完全一致才判定到底
-                # (关卡名集合相同但坐标不同 = 地图实际在移动, 不算到底)
+                # 5c. 到底判定: 看坐标表 Y 最大(底部)的关卡, 连续两屏屏幕y变化不大 => 地图已到底
                 if cur_quests:
                     empty_count = 0   # 检测到关卡 -> 重置连续空屏计数
-                    if last_quests is not None and cur_quests == last_quests:
-                        mfaalog.info(f"[导航] 滑到底, 关卡集合 {cur_set} 与上屏坐标完全一致")
-                        break
+                    if coords:
+                        bot_name, bot_sy, bot_ty = None, -1, -1
+                        for name, nx, ny in cur_quests:
+                            ty = coords.get(name, (0, 0))[1]
+                            if ty > bot_ty:
+                                bot_name, bot_sy, bot_ty = name, ny, ty
+                        if bot_name is not None and last_bottom is not None \
+                                and last_bottom[0] == bot_name and abs(bot_sy - last_bottom[1]) <= 2:
+                            mfaalog.info(f"[导航] 滑到底, 底部关卡[{bot_name}]两屏屏幕y "
+                                         f"{last_bottom[1]}->{bot_sy} 不再移动")
+                            break
+                        if bot_name is not None:
+                            last_bottom = (bot_name, bot_sy)
                 else:
                     empty_count += 1  # 空屏: 连续空屏达到阈值判定到底
                     if empty_count >= EMPTY_SCREEN_LIMIT:
                         mfaalog.info(f"[导航] 连续 {empty_count} 屏未识别到关卡, 判定到底")
                         break
-                last_quests = cur_quests
 
                 # 5d. 向下滑动(手指上滑, 看下方地图) 200px, 移动后停顿1S再检测
                 controller.post_swipe(*SWIPE_START, SWIPE_START[0], SWIPE_START[1] - SWIPE_DIST, SWIPE_DURATION).wait()
