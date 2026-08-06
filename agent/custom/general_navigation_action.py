@@ -108,7 +108,7 @@
 
 失败终止(无兜底): 连续空屏 / 滑动无进展 / 超轮 / 目标无坐标 -> 返回失败
 
-识别方法说明(2026-08-07 实测定稿, fallback_navigation 已删除):
+识别方法说明:
 - YOLO imgsz 用 256(640 下舞会会场类受周围元素干扰的名称条漏检, 256 整图直接检出;
   7 张截图全量覆盖率 640=89% -> 256=100%)
 - 主识别: 中心锚点 ROI + 多尺度 matchTemplate(TM_CCOEFF_NORMED, 阈值 0.9), 替代 SIFT/greedy
@@ -205,8 +205,10 @@ def locate_quest_near(img, tpl_bgr, px, py, radius=LOCAL_RADIUS, min_score=MT_MI
     返回 (bx, by, bw, bh, score) 名称条左上角+尺寸+分数; 未命中返回 None"""
     import cv2
     H, W = img.shape[:2]
-    x0 = max(0, int(px - radius)); x1 = min(W, int(px + radius))
-    y0 = max(0, int(py - radius)); y1 = min(H, int(py + radius))
+    x0 = max(0, int(px - radius))
+    x1 = min(W, int(px + radius))
+    y0 = max(0, int(py - radius))
+    y1 = min(H, int(py + radius))
     win = img[y0:y1, x0:x1]
     if win.size == 0:
         return None
@@ -257,19 +259,24 @@ def load_quest_templates(quest_dir):
 
 
 def load_quest_coords(root_dir, folder):
-    """读取 coords.json(全景坐标表, 固定只读 agent/utils/{folder}/coords.json)"""
+    """读取 coords.json(全景坐标表, 固定只读 agent/utils/{folder}/coords.json)
+
+    返回 {关卡名: (x, y)}: quests 坐标已归一化到 2.0 缩放基准, 导航用恒定 SCALE=2.0
+    换算屏幕坐标, 不依赖地图尺寸。
+    coords.json 顶层 map_width/map_height 为生成坐标表时的全景图原始尺寸, 纯元数据:
+    仅离线工具(normalize_coords/sync_coords/simulate_blank_view)读写, 不参与运行时
+    缩放或边界计算(边界保护由"滑动无进展/连续空屏"判定覆盖)"""
     path = os.path.join(root_dir, "agent", "utils", folder, "coords.json")
     if not os.path.isfile(path):
-        return {}, 0
+        return {}
     try:
         with open(path, encoding="utf-8") as fp:
             data = json.load(fp)
-        coords = {q: (int(v["x"]), int(v["y"]))
-                  for q, v in data.get("quests", {}).items() if "x" in v and "y" in v}
-        return coords, int(data.get("map_height", 0))
+        return {q: (int(v["x"]), int(v["y"]))
+                for q, v in data.get("quests", {}).items() if "x" in v and "y" in v}
     except Exception as e:
         mfaalog.warning(f"[导航] coords.json 读取失败: {e}")
-    return {}, 0
+    return {}
 
 
 def prevent_touch(context):
@@ -293,7 +300,7 @@ def prevent_touch(context):
 
 
 class QuestDetector:
-    """YOLO 关卡检测(内联自 fallback_navigation, 模块已删除)
+    """YOLO 关卡检测
     imgsz=256: 实测整图 640 下舞会会场类受周围元素干扰的名称条漏检(conf 0.12),
     256 下整图直接检出(conf 0.80); 7 张截图全量覆盖率 640=89% -> 256=100%
     管线: 高低阈合并 -> IoU 去重 -> nametag/tag 配对 -> 孤框小窗口(220x60)重检 -> 配对过滤
@@ -447,39 +454,71 @@ def _center_roi(img, cx, cy, max_w, max_h, pad=ROI_PAD):
     return img[y0:y0 + h, x0:x0 + w]
 
 
-def _mt_best(crop_bgr, tpl_bgr):
-    """多尺度 TM_CCOEFF_NORMED: A.模板多尺度在ROI内搜索 + B.ROI放大后原模板匹配, 取最大"""
+def build_tpl_cache(templates):
+    """预计算模板灰度图 + MT_SCALES 缩放金字塔(模板不变时可跨轮复用, 避免重复 cvtColor/resize)
+    返回 {关卡名: (模板灰度, {scale: 缩放模板灰度})}"""
     import cv2
-    g = cv2.cvtColor(crop_bgr, cv2.COLOR_BGR2GRAY)
-    tg = cv2.cvtColor(tpl_bgr, cv2.COLOR_BGR2GRAY)
+    cache = {}
+    for name, tpl_bgr in templates.items():
+        tg = cv2.cvtColor(tpl_bgr, cv2.COLOR_BGR2GRAY)
+        pyr = {}
+        for s in MT_SCALES:
+            tw = max(12, int(tg.shape[1] * s))
+            th = max(6, int(tg.shape[0] * s))
+            pyr[s] = cv2.resize(tg, (tw, th))
+        cache[name] = (tg, pyr)
+    return cache
+
+
+def _mt_best(gray, enlarged, tg, tpl_pyr):
+    """多尺度 TM_CCOEFF_NORMED: A.模板缩放金字塔在ROI灰度上搜索 + B.ROI放大后原模板匹配, 取最大
+    gray/enlarged/tg/tpl_pyr 均为预计算缓存, 复用避免重复 cvtColor/resize"""
+    import cv2
     best = 0.0
-    for s in MT_SCALES:
-        tw, th = max(12, int(tg.shape[1] * s)), max(6, int(tg.shape[0] * s))
-        if tw > g.shape[1] or th > g.shape[0]:
+    for rtpl in tpl_pyr.values():
+        if rtpl.shape[1] > gray.shape[1] or rtpl.shape[0] > gray.shape[0]:
             continue
-        r = cv2.matchTemplate(g, cv2.resize(tg, (tw, th)), cv2.TM_CCOEFF_NORMED)
+        r = cv2.matchTemplate(gray, rtpl, cv2.TM_CCOEFF_NORMED)
         best = max(best, float(r.max()))
-    for k in (1.2, 1.5, 2.0):
-        w, h = int(g.shape[1] * k), int(g.shape[0] * k)
-        if w < tg.shape[1] or h < tg.shape[0]:
+    for big in enlarged.values():
+        if big.shape[1] < tg.shape[1] or big.shape[0] < tg.shape[0]:
             continue
-        r = cv2.matchTemplate(cv2.resize(g, (w, h)), tg, cv2.TM_CCOEFF_NORMED)
+        r = cv2.matchTemplate(big, tg, cv2.TM_CCOEFF_NORMED)
         best = max(best, float(r.max()))
     return best
 
 
-def mt_exclusive_match(roi_crops, templates, th=MT_RECOG_TH):
+def mt_exclusive_match(roi_crops, templates, tpl_cache=None, th=MT_RECOG_TH):
     """中心ROI matchTemplate 独占匹配(替代 greedy_match_boxes/SIFT):
     每(框,模板)打分, 全局最高分优先双向 used, 分数>=th 才进入分配
-    返回 [(box_idx, tpl_idx, score)] 按分数从高到低"""
+    返回 [(box_idx, tpl_idx, score)] 按分数从高到低
+    tpl_cache 由 build_tpl_cache 预计算, 跨轮复用(为空时内部构建)"""
+    import cv2
     tpl_names = list(templates.keys())
     n, m = len(roi_crops), len(tpl_names)
-    scores = np.zeros((n, m))
+    if tpl_cache is None:
+        tpl_cache = build_tpl_cache(templates)
+    # ROI 预计算: 灰度 + (1.2/1.5/2.0) 放大版本, 双重循环外只算一次
+    roi_cache = []
     for i in range(n):
         if roi_crops[i] is None or roi_crops[i].size == 0:
+            roi_cache.append(None)
             continue
+        g = cv2.cvtColor(roi_crops[i], cv2.COLOR_BGR2GRAY)
+        enlarged = {}
+        for k in (1.2, 1.5, 2.0):
+            w, h = int(g.shape[1] * k), int(g.shape[0] * k)
+            enlarged[k] = cv2.resize(g, (w, h))
+        roi_cache.append((g, enlarged))
+    scores = np.zeros((n, m))
+    for i in range(n):
+        rc = roi_cache[i]
+        if rc is None:
+            continue
+        g, enlarged = rc
         for j in range(m):
-            scores[i, j] = _mt_best(roi_crops[i], templates[tpl_names[j]])
+            tg, pyr = tpl_cache[tpl_names[j]]
+            scores[i, j] = _mt_best(g, enlarged, tg, pyr)
     used_box, used_tpl = [False] * n, [False] * m
     assigned = []
     pairs = [(scores[i, j], i, j) for i in range(n) for j in range(m) if scores[i, j] >= th]
@@ -503,24 +542,16 @@ class GeneralNavigationAction(CustomAction):
             AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             ROOT_DIR = os.path.dirname(AGENT_DIR)
 
-            # 步骤1: 参数(固定读取 nav_test.json, 测试用)
-            test_cfg_path = os.path.join(AGENT_DIR, "utils", "nav_test.json")
-            if not os.path.isfile(test_cfg_path):
-                mfaalog.error(f"[导航] 缺少测试参数文件: {test_cfg_path}")
-                return CustomAction.RunResult(success=False)
-            with open(test_cfg_path, encoding="utf-8") as fp:
-                test_cfg = json.load(fp)
-            target_quest = test_cfg.get("target_quest", "")
-            template = test_cfg.get("template", "")
-            resource_package = test_cfg.get("resource_package", "base") or "base"
-
-            if not template:
-                mfaalog.error("[导航] nav_test.json 缺少 template")
-                return CustomAction.RunResult(success=False)
-            if not target_quest:
-                mfaalog.error("[导航] nav_test.json 缺少 target_quest")
-                return CustomAction.RunResult(success=False)
-            mfaalog.info(f"[导航] 测试参数(nav_test.json): quest={target_quest} template={template} pkg={resource_package}")
+            # 步骤1: 参数(全部实时读 pipeline 节点——玩家选择经 options 覆盖
+            # attach.quests / 关卡选择.template / 资源包配置.attach.resource_package, 读到的即运行时最终值)
+            node = context.get_node_data(_argv.node_name) or {}
+            target_quest = str((node.get("attach") or {}).get("quests") or "").strip()
+            sel = context.get_node_data("关卡选择") or {}
+            tpl_val = ((sel.get("recognition") or {}).get("param") or {}).get("template")
+            template = tpl_val if isinstance(tpl_val, str) else ""
+            cfg = context.get_node_data("资源包配置") or {}
+            resource_package = str((cfg.get("attach") or {}).get("resource_package") or "").strip()
+            mfaalog.info(f"[导航] 导航参数: quest={target_quest} template={template} pkg={resource_package}")
 
             # 步骤2: 素材目录 + 归一化坐标表
             quest_dir = resolve_quest_dir(ROOT_DIR, resource_package, template)
@@ -532,7 +563,7 @@ class GeneralNavigationAction(CustomAction):
             mfaalog.info(f"[导航] 素材库 {len(templates)} 关")
 
             folder = os.path.dirname(template.replace("\\", "/")).strip("/")
-            coords, _map_h = load_quest_coords(ROOT_DIR, folder)
+            coords = load_quest_coords(ROOT_DIR, folder)
 
             # 目标在坐标表中缺失(素材名与 coords 键不一致) -> 直接失败, 无兜底
             if not coords or target_quest not in coords:
@@ -542,6 +573,8 @@ class GeneralNavigationAction(CustomAction):
             # 中心锚点 ROI 基准: 地图内最大模板尺寸 + 四周冗余(每次加载后动态计算)
             max_w = max(t.shape[1] for t in templates.values())
             max_h = max(t.shape[0] for t in templates.values())
+            # 模板灰度/缩放金字塔缓存: 主循环内 templates 不变, 跨轮复用(避免每轮重复 cvtColor/resize)
+            tpl_cache = build_tpl_cache(templates)
 
             controller = context.tasker.controller
             t_xy = None          # 当前视角平移 (tx, ty)
@@ -553,6 +586,7 @@ class GeneralNavigationAction(CustomAction):
 
             # 步骤3: 主循环 - 识别 -> 反推 t -> 定向滑动
             for round_idx in range(MAX_ROUNDS):
+                t_fresh = False   # 本轮是否成功从有效坐标锚点反推 t(防陈旧 t_xy 驱动预测)
                 mfaalog.info(f"[导航] === 第{round_idx + 1}轮 ===")
                 img = QuestDetector._norm_img(controller.post_screencap().wait().get())
                 if img is None:
@@ -569,7 +603,7 @@ class GeneralNavigationAction(CustomAction):
                     nx, ny, nw, nh = int(nx), int(ny), int(nw), int(nh)
                     box_infos.append((nx, ny, nw, nh))
                     roi_crops.append(_center_roi(img, nx + nw // 2, ny + nh // 2, max_w, max_h))
-                assigned = mt_exclusive_match(roi_crops, templates)
+                assigned = mt_exclusive_match(roi_crops, templates, tpl_cache)
                 tpl_names = list(templates.keys())
                 recognized = []   # [(name, 屏幕中心x, 屏幕中心y, score)]
                 for (bi, bj, score) in assigned:
@@ -586,7 +620,6 @@ class GeneralNavigationAction(CustomAction):
                         return CustomAction.RunResult(success=True)
 
                 if recognized:
-                    empty_count = 0
                     # 反推 t: 识别关卡(在 coords 中) 的 屏幕中心 - SCALE*coords 取中位数
                     xs, ys = [], []
                     for (name, sx, sy, _sc) in recognized:
@@ -597,12 +630,14 @@ class GeneralNavigationAction(CustomAction):
                         ys.append(sy - SCALE * p[1])
                     if xs and ys:
                         t_xy = (float(np.median(xs)), float(np.median(ys)))
+                        t_fresh = True
+                        empty_count = 0
                         mfaalog.info(f"[导航] 反推视角平移 t=({t_xy[0]:.1f},{t_xy[1]:.1f}) 锚点{len(xs)}个")
                     else:
                         mfaalog.info("[导航] 识别关卡均不在坐标表, 无法反推 t")
 
-                # 无 t(识别不到任何带坐标关卡) -> 空屏计数, 超限失败; 否则盲滑
-                if t_xy is None:
+                # 本轮未反推出新鲜 t(空屏/识别关卡无坐标锚点) -> 空屏计数, 超限失败; 否则盲滑
+                if t_xy is None or not t_fresh:
                     empty_count += 1
                     mfaalog.info(f"[导航] 空屏(无坐标锚点) {empty_count}/{EMPTY_SCREEN_LIMIT}")
                     if empty_count >= EMPTY_SCREEN_LIMIT:
@@ -692,6 +727,7 @@ class GeneralNavigationAction(CustomAction):
                             if wait_count >= RECOG_WAIT_LIMIT:
                                 mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
                                 return CustomAction.RunResult(success=False)
+                            time.sleep(1.5)   # 重试前等待, 给画面变化机会, 避免连续重复推理
                             continue
                     else:
                         wait_count += 1
@@ -699,6 +735,7 @@ class GeneralNavigationAction(CustomAction):
                         if wait_count >= RECOG_WAIT_LIMIT:
                             mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
                             return CustomAction.RunResult(success=False)
+                        time.sleep(1.5)   # 重试前等待, 给画面变化机会, 避免连续重复推理
                         continue
 
                 # 滑动进展检测: 目标距中心不缩小 -> 判定无进展(边界/方向错) -> 失败
@@ -736,17 +773,6 @@ class GeneralNavigationAction(CustomAction):
             mfaalog.error(f"[导航] 严重错误: {str(e)}")
             return CustomAction.RunResult(success=False)
 
-    @staticmethod
-    def _iou2(a, b):
-        """两框 (x1,y1,x2,y2) 的 IoU"""
-        ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
-        ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
-        iw, ih = max(0, ix2 - ix1), max(0, iy2 - iy1)
-        inter = iw * ih
-        if inter == 0:
-            return 0.0
-        return inter / ((a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - inter)
-
     def _detect_window_nametags(self, img, center, ww=WIN_W, wh=WIN_H):
         """整图漏检兜底: 在预测位置附近开小窗口(约名称条大小)推理找名称条
         整图推理时名称条受周围元素干扰被模型漏检; 小窗口裁剪去除干扰后模型可正常识别。
@@ -767,7 +793,7 @@ class GeneralNavigationAction(CustomAction):
         names = [(x, y, w, h, c) for x, y, w, h, c, cl in raw if cl == 0]
         dedup = []
         for (x, y, w, h, c) in sorted(names, key=lambda t: -t[4]):
-            if any(self._iou2((x, y, x + w, y + h), (dx, dy, dx + dw, dy + dh)) > 0.5
+            if any(QuestDetector._iou((x, y, x + w, y + h), (dx, dy, dx + dw, dy + dh)) > 0.5
                    for (dx, dy, dw, dh, _c) in dedup):
                 continue
             dedup.append((x, y, w, h, c))
