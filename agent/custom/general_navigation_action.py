@@ -101,7 +101,9 @@
     t = median(屏幕中心 - SCALE * coords[name]),  SCALE = 2.0
 目标屏幕预测位置 P = SCALE * coords[target] + t:
     识别到目标 -> 点击进入
-    P 在屏内(距中心 < CLICK_RADIUS) -> 直接点击 P(名称条较宽, t 误差被中位数吸收)
+    名称条完整在屏 + 中心在可视区(距边界>=40px) -> 判定到位, 停止滑动:
+        小窗口YOLO补检(220x60) + 局部模板定位确认(阈值0.9) -> 点击进入
+        确认失败(附近有YOLO框但模板未命中 / 无框) -> 原地重试, 超 RECOG_WAIT_LIMIT -> 失败
     P 在屏外 -> 按 (屏幕中心 - P) 方向定向滑动(地图跟手), 滑动后重新识别循环
 
 失败终止(无兜底): 连续空屏 / 滑动无进展 / 超轮 / 目标无坐标 -> 返回失败
@@ -124,7 +126,8 @@
    b. 中心ROI matchTemplate 独占匹配(阈值0.9) -> 识别关卡列表(名称+屏幕中心+分数)
    c. 目标在屏 -> 点击进入 -> 成功
    d. 识别列表非空 -> 反推 t(中位数, 只统计 coords 中存在的关卡)
-   e. 计算目标预测 P, 决定点击/滑动
+   e. 计算目标预测 P: 名称条完整在屏且在可视区 -> 到位(小窗口补检+局部模板确认点击/原地重试);
+      否则定向滑动逼近
    f. 空屏 -> 沿上轮方向盲滑; 连续空屏 -> 失败
    g. 滑动无进展(目标距中心不再缩小) -> 失败
 3. 超轮数/异常 -> 失败
@@ -145,7 +148,6 @@ SCREEN_CENTER = np.array([SCREEN_W / 2.0, SCREEN_H / 2.0])
 SWIPE_SIGN = 1.0         # 滑动方向符号: 地图跟手=+1; 若实测方向相反改为 -1
 SWIPE_DIST = 100         # 固定滑动距离(px): 起点=中心朝目标方向100px处, 向中心滑动
 SWIPE_DURATION = 300     # 滑动持续时间(ms)
-CLICK_RADIUS = 60        # 目标预测位置距屏幕中心小于此值(px)直接点击预测位置
 NO_PROGRESS_LIMIT = 3    # 目标距中心连续不缩小次数 -> 判定滑动无进展 -> 失败
 EMPTY_SCREEN_LIMIT = 3   # 连续空屏(未识别到任何关卡) -> 失败
 MAX_ROUNDS = 40          # 最大识别-滑动轮数
@@ -157,6 +159,65 @@ ROI_PAD = 10             # 中心锚点ROI 四周冗余px(基准=地图内最大
 # 孤框小窗口重检参数(YOLO 检测管线内, 全部推理统一 imgsz=256)
 WIN_W = 220              # 小窗口宽度(px)
 WIN_H = 60               # 小窗口高度(px)
+RECOG_WAIT_LIMIT = 5     # 预测到位后停止滑动, 原地重试识别上限轮数
+
+# 可视区域多边形(屏幕 1280x720 坐标系, 取自 rebuild_pano.py POLY): 内部基本无 UI 遮挡,
+# 目标预测屏幕位置落入此区域且距边界足够远才认为"可点击/稳定识别"
+VISIBLE_POLY = np.array([
+    [0, 171], [0, 493], [112, 493], [193, 565], [599, 565], [600, 719],
+    [1030, 719], [1031, 608], [1279, 608], [1279, 85], [736, 85],
+    [735, 0], [179, 0], [178, 84], [88, 84], [87, 171],
+], dtype=np.int32)
+
+# 局部模板定位(YOLO漏检兜底)参数
+MT_MIN_SCORE = 0.9       # 局部 matchTemplate 命中阈值
+LOCAL_RADIUS = 250       # 局部匹配窗口半径(px, 以预测位置为中心)
+NEAR_RADIUS = 300        # 预测位置附近 YOLO 框(tag/nametag)判定半径(px)
+
+# 小窗口 YOLO 补检(整图漏检兜底)参数
+# 整图推理时名称条受周围元素干扰漏检; 在预测位置开约名称条大小的窗口裁剪推理, 干扰被去除后模型可正常识别
+WIN_CONF = 0.2           # 小窗口推理置信阈值
+WIN_MIN_MT = 0.9         # 小窗口检出框的目标模板确认阈值(与主识别一致)
+
+
+def _in_visible_area(px, py, margin=40):
+    """目标屏幕位置是否在可视区域内且距边界至少 margin px
+    (中心需远离可视区边界 >=40px 才能点击/稳定识别, 靠边时继续滑动让目标居中)"""
+    import cv2
+    return cv2.pointPolygonTest(VISIBLE_POLY, (float(px), float(py)), True) >= margin
+
+
+def locate_quest_near(img, tpl_bgr, px, py, radius=LOCAL_RADIUS, min_score=MT_MIN_SCORE):
+    """在 (px,py) 附近局部窗口内用目标素材多尺度 matchTemplate 定位名称条
+    (处理 YOLO 漏检: 预测到位但识别列表无目标)
+    返回 (bx, by, bw, bh, score) 名称条左上角+尺寸+分数; 未命中返回 None"""
+    import cv2
+    H, W = img.shape[:2]
+    x0 = max(0, int(px - radius)); x1 = min(W, int(px + radius))
+    y0 = max(0, int(py - radius)); y1 = min(H, int(py + radius))
+    win = img[y0:y1, x0:x1]
+    if win.size == 0:
+        return None
+    gray = cv2.cvtColor(win, cv2.COLOR_BGR2GRAY)
+    gtpl = cv2.cvtColor(tpl_bgr, cv2.COLOR_BGR2GRAY)
+    tw0, th0 = gtpl.shape[1], gtpl.shape[0]
+    best = (0.0, None, 1.0)
+    for s in MT_SCALES:
+        tw, th = max(12, int(tw0 * s)), max(6, int(th0 * s))
+        if tw > win.shape[1] or th > win.shape[0]:
+            continue
+        rtpl = cv2.resize(gtpl, (tw, th))
+        r = cv2.matchTemplate(gray, rtpl, cv2.TM_CCOEFF_NORMED)
+        _mv, mvv, _ml, mvl = cv2.minMaxLoc(r)
+        if mvv > best[0]:
+            best = (float(mvv), (mvl[0], mvl[1]), s)
+    sc, bpos, bs = best
+    if bpos is None or sc < min_score:
+        return None
+    bxw, byw = bpos
+    bx, by = x0 + bxw, y0 + byw
+    tw, th = max(12, int(tw0 * bs)), max(6, int(th0 * bs))
+    return bx, by, tw, th, sc
 
 
 # ---- 内联自 fallback_navigation(该模块已删除): 素材/坐标加载 + YOLO 检测 + 防误触 ----
@@ -476,6 +537,7 @@ class GeneralNavigationAction(CustomAction):
             empty_count = 0      # 连续空屏计数
             no_progress = 0      # 目标距中心连续不缩小计数
             last_dist = None     # 上一轮目标距屏幕中心距离
+            wait_count = 0       # 预测到位后原地重试识别轮数
 
             # 步骤3: 主循环 - 识别 -> 反推 t -> 定向滑动
             for round_idx in range(MAX_ROUNDS):
@@ -550,14 +612,81 @@ class GeneralNavigationAction(CustomAction):
                 dist_center = float(np.hypot(*(p_target - SCREEN_CENTER)))
                 mfaalog.info(f"[导航] 目标预测屏幕位置 ({p_target[0]:.0f},{p_target[1]:.0f}), 距中心 {dist_center:.0f}px")
 
-                # 目标预测在屏幕中心附近(名称条宽, 直接点击预测位置, 处理识别漏检)
-                if dist_center <= CLICK_RADIUS:
-                    cx, cy = int(round(p_target[0])), int(round(p_target[1]))
-                    cx = max(0, min(SCREEN_W - 1, cx))
-                    cy = max(0, min(SCREEN_H - 1, cy))
-                    mfaalog.info(f"[导航] 目标预测位置在屏内, 点击 ({cx},{cy})")
-                    controller.post_click(cx, cy).wait()
-                    return CustomAction.RunResult(success=True)
+                # 到位判定: 名称条(模板尺寸)完整在屏幕内 + 中心在可视区(可点击)
+                th, tw = templates[target_quest].shape[:2]
+                arrive = (_in_visible_area(p_target[0], p_target[1])
+                          and 0 <= p_target[0] - tw / 2 and p_target[0] + tw / 2 <= SCREEN_W
+                          and 0 <= p_target[1] - th / 2 and p_target[1] + th / 2 <= SCREEN_H)
+                mfaalog.info(f"[导航] 目标预测屏幕位置 ({p_target[0]:.0f},{p_target[1]:.0f}), "
+                             f"距中心 {dist_center:.0f}px, 名称条({tw}x{th})完整在屏可点={arrive}")
+
+                # 目标预测到位(名称条完整可见): 停止滑动, 精确定位识别
+                # 成功必须由"识别到目标"确认: 小窗口YOLO补检 / 附近YOLO框局部模板定位, 预测本身不算
+                if arrive:
+                    # 1) 小窗口 YOLO 补检: 整图推理漏检(周围元素干扰)时, 在预测位置开小窗口裁剪
+                    #    推理找名称条, 检出框再用目标模板确认(半径加大到 LOCAL_RADIUS, 防宽模板放不下)
+                    win_found = None
+                    for (wx, wy, ww0, wh0) in self._detect_window_nametags(img, p_target):
+                        loc = locate_quest_near(img, templates[target_quest],
+                                                wx + ww0 / 2, wy + wh0 / 2,
+                                                radius=LOCAL_RADIUS, min_score=WIN_MIN_MT)
+                        if loc is not None:
+                            win_found = (loc, wx, wy, ww0, wh0)
+                            break
+                    if win_found is not None:
+                        (bx, by, bw, bh, lscore), _wx, _wy, _ww0, _wh0 = win_found
+                        cx, cy = bx + bw // 2, by + bh // 2
+                        complete = (0 <= bx and bx + bw <= SCREEN_W
+                                    and 0 <= by and by + bh <= SCREEN_H)
+                        clickable = _in_visible_area(cx, cy)
+                        if complete and clickable:
+                            mfaalog.info(f"[导航] 小窗口YOLO补检定位到位: ({cx},{cy}) score={lscore:.2f}")
+                            controller.post_click(cx, cy).wait()
+                            return CustomAction.RunResult(success=True)
+                        # 小窗口定位命中但靠边不可点 -> 用真实位置继续滑动居中
+                        p_target = np.array([float(cx), float(cy)])
+                        dist_center = float(np.hypot(*(p_target - SCREEN_CENTER)))
+                        mfaalog.info(f"[导航] 小窗口定位({cx},{cy}) score={lscore:.2f} "
+                                     f"靠边不可点, 用真实位置继续滑动居中")
+                    # 2) 预测位置附近有 YOLO 框(tag/nametag) -> 目标确实在该区域, 局部模板定位
+                    nearby = []
+                    for (bx0, by0, bw0, bh0, _c) in list(nametags) + list(tags):
+                        if np.hypot(bx0 + bw0 / 2 - p_target[0],
+                                    by0 + bh0 / 2 - p_target[1]) < NEAR_RADIUS:
+                            nearby.append((int(bx0), int(by0), int(bw0), int(bh0)))
+                    if nearby:
+                        loc = locate_quest_near(img, templates[target_quest],
+                                                float(p_target[0]), float(p_target[1]))
+                        if loc is not None:
+                            bx, by, bw, bh, lscore = loc
+                            cx, cy = bx + bw // 2, by + bh // 2
+                            complete = (0 <= bx and bx + bw <= SCREEN_W
+                                        and 0 <= by and by + bh <= SCREEN_H)
+                            clickable = _in_visible_area(cx, cy)
+                            if complete and clickable:
+                                mfaalog.info(f"[导航] 局部模板匹配定位到位: ({cx},{cy}) score={lscore:.2f}")
+                                controller.post_click(cx, cy).wait()
+                                return CustomAction.RunResult(success=True)
+                            # 模板命中但靠边不可点(距可视区边<40px) -> 用真实位置继续滑动居中
+                            p_target = np.array([float(cx), float(cy)])
+                            dist_center = float(np.hypot(*(p_target - SCREEN_CENTER)))
+                            mfaalog.info(f"[导航] 模板定位({cx},{cy}) score={lscore:.2f} "
+                                         f"靠边不可点, 用真实位置继续滑动居中")
+                        else:
+                            wait_count += 1
+                            mfaalog.info(f"[导航] 预测到位, 附近{NEAR_RADIUS}px有{len(nearby)}个YOLO框 "
+                                         f"但局部模板未命中(<{MT_MIN_SCORE}), 原地重试 {wait_count}/{RECOG_WAIT_LIMIT}")
+                            if wait_count >= RECOG_WAIT_LIMIT:
+                                mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
+                                return CustomAction.RunResult(success=False)
+                            continue
+                    else:
+                        wait_count += 1
+                        mfaalog.info(f"[导航] 预测到位但附近{NEAR_RADIUS}px内无YOLO框, 原地重试 {wait_count}/{RECOG_WAIT_LIMIT}")
+                        if wait_count >= RECOG_WAIT_LIMIT:
+                            mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
+                            return CustomAction.RunResult(success=False)
+                        continue
 
                 # 滑动进展检测: 目标距中心不缩小 -> 判定无进展(边界/方向错) -> 失败
                 if last_dist is not None and dist_center >= last_dist - 3.0:
@@ -593,6 +722,43 @@ class GeneralNavigationAction(CustomAction):
         except Exception as e:
             mfaalog.error(f"[导航] 严重错误: {str(e)}")
             return CustomAction.RunResult(success=False)
+
+    @staticmethod
+    def _iou2(a, b):
+        """两框 (x1,y1,x2,y2) 的 IoU"""
+        ix1, iy1 = max(a[0], b[0]), max(a[1], b[1])
+        ix2, iy2 = min(a[2], b[2]), min(a[3], b[3])
+        iw, ih = max(0, ix2 - ix1), max(0, iy2 - iy1)
+        inter = iw * ih
+        if inter == 0:
+            return 0.0
+        return inter / ((a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - inter)
+
+    def _detect_window_nametags(self, img, center, ww=WIN_W, wh=WIN_H):
+        """整图漏检兜底: 在预测位置附近开小窗口(约名称条大小)推理找名称条
+        整图推理时名称条受周围元素干扰被模型漏检; 小窗口裁剪去除干扰后模型可正常识别。
+        返回 [(x, y, w, h)] 整图坐标的 nametag 框列表(高/低阈合并去重)"""
+        H, W = img.shape[:2]
+        if ww > W or wh > H:
+            return []
+        x0 = max(0, min(int(center[0] - ww / 2), W - ww))
+        y0 = max(0, min(int(center[1] - wh / 2), H - wh))
+        win = img[y0:y0 + wh, x0:x0 + ww]
+        det = self._detector()
+        raw = []
+        for conf in (det.CONF, WIN_CONF):
+            r = det.model(win, conf=conf, imgsz=det.IMGSZ, verbose=False)[0]
+            for b in r.boxes:
+                x1, y1, x2, y2 = map(int, b.xyxy[0].tolist())
+                raw.append((x1, y1, x2 - x1, y2 - y1, float(b.conf[0]), int(b.cls[0])))
+        names = [(x, y, w, h, c) for x, y, w, h, c, cl in raw if cl == 0]
+        dedup = []
+        for (x, y, w, h, c) in sorted(names, key=lambda t: -t[4]):
+            if any(self._iou2((x, y, x + w, y + h), (dx, dy, dx + dw, dy + dh)) > 0.5
+                   for (dx, dy, dw, dh, _c) in dedup):
+                continue
+            dedup.append((x, y, w, h, c))
+        return [(x0 + x, y0 + y, w, h) for (x, y, w, h, _c) in dedup]
 
     def _detector(self):
         """延迟加载全局检测器(ultralytics), 复用避免重复初始化"""
