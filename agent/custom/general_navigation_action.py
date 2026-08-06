@@ -651,7 +651,7 @@ class GeneralNavigationAction(CustomAction):
                         cx, cy = bx + bw // 2, by + bh // 2
                         complete = (0 <= bx and bx + bw <= SCREEN_W
                                     and 0 <= by and by + bh <= SCREEN_H)
-                        clickable = _in_visible_area(cx, cy)
+                        clickable = _in_visible_area(cx, cy) and _icon_in_visible(cx, cy, bw, bh)
                         if complete and clickable:
                             mfaalog.info(f"[导航] 小窗口YOLO补检定位到位: ({cx},{cy}) score={lscore:.2f}")
                             controller.post_click(cx, cy).wait()
@@ -675,7 +675,7 @@ class GeneralNavigationAction(CustomAction):
                             cx, cy = bx + bw // 2, by + bh // 2
                             complete = (0 <= bx and bx + bw <= SCREEN_W
                                         and 0 <= by and by + bh <= SCREEN_H)
-                            clickable = _in_visible_area(cx, cy)
+                            clickable = _in_visible_area(cx, cy) and _icon_in_visible(cx, cy, bw, bh)
                             if complete and clickable:
                                 mfaalog.info(f"[导航] 局部模板匹配定位到位: ({cx},{cy}) score={lscore:.2f}")
                                 controller.post_click(cx, cy).wait()
