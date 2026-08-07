@@ -59,6 +59,8 @@
         ]
     },
     "关卡滑动": {
+        "pre_wait_freezes": 600,
+        "pre_delay": 600,
         "action": {
             "type": "Swipe",
             "param": {
@@ -77,7 +79,9 @@
                     ]
                 ]
             }
-        }
+        },
+        "post_wait_freezes": 600,
+        "post_delay": 600
     },
     "关卡选择": {
         "recognition": {
@@ -89,7 +93,9 @@
                     460,
                     484
                 ],
-                "template": "map/关卡选择占位图.png",
+                "template": [
+                    "map/Fuyuki/宅邸残迹.png"
+                ],
                 "count": 12
             }
         },
