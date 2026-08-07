@@ -25,7 +25,7 @@
                     "pipeline_override": {
                         "资源包配置": {
                             "attach": {
-                                "resource_package": "jp"
+                                "resource_package": "base"
                             }
                         }
                     }
