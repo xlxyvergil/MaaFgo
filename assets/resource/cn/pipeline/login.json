@@ -54,13 +54,14 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "roi": [
-                    3,
-                    3,
-                    181,
-                    83
+                "template": [
+                    "main_ui.png",
+                    "通用-关闭-管理室-通知.png",
+                    "菜单.png",
+                    "close_botton.png",
+                    "体力+.png",
+                    "主界面圣晶石.png"
                 ],
-                "template": "main_ui.png",
                 "threshold": 0.8
             }
         },

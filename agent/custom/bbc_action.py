@@ -101,6 +101,10 @@ class ExecuteBbcTask(CustomAction):
         8. 输出结果并返回
         """
         try:
+            # 恢复"执行战斗结束"的 next 为默认值
+            # （上一轮助战错误可能已将其覆盖为"阶段判断循环"，每轮需重置）
+            context.override_next("执行战斗结束", ["结束战斗"])
+
             # 从 Context 获取节点数据（包含 attach 参数）
             node_data = context.get_node_data("执行BBC任务")
             if not node_data:
@@ -206,7 +210,7 @@ class ExecuteBbcTask(CustomAction):
                 return {'success': False, 'error': '战斗启动失败'}
             
             # 步骤4: 等待战斗结束（心跳检查+弹窗处理分离）
-            popup_title, popup_message = self._wait_for_battle_end(state)
+            popup_title, popup_message = self._wait_for_battle_end(context, state)
             
             manager.disconnect_tcp()
             
@@ -608,24 +612,28 @@ class ExecuteBbcTask(CustomAction):
         
         return False
     
-    def _wait_for_battle_end(self, state: dict):
+    def _wait_for_battle_end(self, context: Context, state: dict):
         """等待战斗结束 - 心跳检查和弹窗处理分离
-        
+
         工作原理：
         1. 主线程每30秒发送一次 get_status 心跳检查
         2. 如果 BBC 服务无响应，标记为错误并需要重启
-        3. 弹窗处理由回调函数在后台线程完成，通过 state['finished'] 通知主线程
-        4. 当 state['finished'] 为 True 时，返回弹窗信息
+        3. 心跳成功后截图并运行"助战错误识别"pipeline，识别到助战错误则停止BBC脚本并正常结束任务
+        4. 弹窗处理由回调函数在后台线程完成，通过 state['finished'] 通知主线程
+        5. 当 state['finished'] 为 True 时，返回弹窗信息
         """
-        
+
         # 获取 manager 实例
         manager = get_manager()
-        
-        # 主线程：只做心跳检查
+
+        # 主线程：心跳检查 + 截图识别
         heartbeat_interval = 30  # 30秒一次心跳
+        miss_count = 0           # 连续识别到助战错误的次数
+        miss_threshold = 1       # 阈值，达到则停止BBC脚本并正常结束任务
+
         while not state['finished']:
             time.sleep(heartbeat_interval)
-            
+
             # 心跳检查：发送 get_status 命令验证 BBC 服务是否正常
             status = manager.send_command('get_status', {}, timeout=5)
             if not status.get('success'):
@@ -635,8 +643,61 @@ class ExecuteBbcTask(CustomAction):
                 state['popup_message'] = 'BBC服务异常'
                 state['need_restart'] = True  # 标记需要重启BBC
                 break
-            
-            mfaalog.debug("[ExecuteBbcTask] 心跳检查正常")
-        
+
+            # 截图并通过"助战错误识别"pipeline 判断是否处于助战错误状态
+            try:
+                mfaalog.info("[ExecuteBbcTask] 开始截图检测战斗状态...")
+                image = context.tasker.controller.post_screencap().wait().get()
+                if image is None:
+                    mfaalog.warning("[ExecuteBbcTask] 截图返回空数据，跳过本次战斗状态检测")
+                    continue
+
+                mfaalog.info(f"[ExecuteBbcTask] 截图成功，图像尺寸: {image.shape}")
+
+                # 运行"助战错误识别"pipeline（模板匹配，兼容各服），
+                # 专门识别两个准确结果节点：有助战错误 / 无助战错误
+                mfaalog.info("[ExecuteBbcTask] 开始识别助战错误...")
+                task_detail = context.run_task("助战错误识别")
+                has_error = False
+                if task_detail is not None:
+                    for node in task_detail.nodes:
+                        if not node.completed:
+                            continue
+                        if node.name == "有助战错误":
+                            has_error = True
+                            break
+                        if node.name == "无助战错误":
+                            has_error = False
+                            break
+
+                if has_error:
+                    miss_count += 1
+                    mfaalog.warning(
+                        f"[ExecuteBbcTask] 识别到助战错误 ({miss_count}/{miss_threshold})"
+                    )
+                    if miss_count >= miss_threshold:
+                        mfaalog.info(f"[ExecuteBbcTask] 识别到助战错误，停止BBC脚本并正常结束任务")
+                        # 先覆盖"执行战斗结束"的 next 为"阶段判断循环"（确保覆盖必然生效），
+                        # 再停止BBC脚本：stop_battle 会触发"脚本停止"弹窗，避免其干扰后续流程
+                        # （助战错误的点击会使游戏重新进入登录状态，"结束战斗"流程无法走通）
+                        mfaalog.info("[ExecuteBbcTask] 覆盖'执行战斗结束'为阶段判断循环，处理游戏状态...")
+                        context.override_next("执行战斗结束", ["阶段判断循环"])
+                        # 停止BBC脚本，避免继续干扰模拟器操作
+                        stop_result = manager.send_command('stop_battle', {}, timeout=5)
+                        if stop_result.get('success'):
+                            mfaalog.info("[ExecuteBbcTask] BBC脚本已停止")
+                        else:
+                            mfaalog.warning(f"[ExecuteBbcTask] 停止BBC脚本失败: {stop_result.get('error', '')}")
+                        # 等待BBC脚本完全停止，避免干扰后续任务
+                        time.sleep(3)
+                        # 正常结束不设置弹窗信息，避免被误判为异常
+                        state['finished'] = True
+                        break
+                else:
+                    miss_count = 0
+                    mfaalog.info(f"[ExecuteBbcTask] 未识别到错误提示，战斗进行中，识别文本: {all_texts}")
+            except Exception as e:
+                mfaalog.warning(f"[ExecuteBbcTask] 截图识别异常: {e}")
+
         return state['popup_title'], state['popup_message']
     

@@ -1,0 +1,42 @@
+{
+    "助战错误识别": {
+        "next": [
+            "识别有助战错误",
+            "无助战错误"
+        ]
+    },
+    "识别有助战错误": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "支援不存在.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "点击退出"
+        ]
+    },
+    "有助战错误": {},
+    "无助战错误": {},
+    "点击退出": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "退出.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "有助战错误"
+        ]
+    }
+}
