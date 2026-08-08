@@ -101,10 +101,6 @@ class ExecuteBbcTask(CustomAction):
         8. 输出结果并返回
         """
         try:
-            # 恢复"执行战斗结束"的 next 为默认值
-            # （上一轮助战错误可能已将其覆盖为"阶段判断循环"，每轮需重置）
-            context.override_next("执行战斗结束", ["结束战斗"])
-
             # 从 Context 获取节点数据（包含 attach 参数）
             node_data = context.get_node_data("执行BBC任务")
             if not node_data:
