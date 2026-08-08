@@ -288,6 +288,7 @@ class BbcConnectionManager:
         data = {'cmd': cmd, 'args': args or {}}
         # 命令锁：串行化整个发送-接收事务，防止心跳/弹窗回调等线程同时操作同一 socket 导致请求响应交叉
         with self._cmd_lock:
+            original_timeout = None
             try:
                 msg = json.dumps(data, ensure_ascii=False).encode('utf-8')
                 msg_with_len = len(msg).to_bytes(4, 'big') + msg
@@ -306,13 +307,19 @@ class BbcConnectionManager:
                 if not response_data:
                     return {'success': False, 'error': 'No response data'}
                 
-                sock.settimeout(original_timeout)
                 return json.loads(response_data.decode('utf-8'))
             except socket.timeout:
                 return {'success': False, 'error': f'Timeout (cmd={cmd})'}
             except Exception as e:
                 mfaalog.error(f"[BbcConnectionManager] 发送命令失败: {e}")
                 return {'success': False, 'error': str(e)}
+            finally:
+                # 无论成功或异常，都恢复原始超时时间，避免影响后续调用
+                if original_timeout is not None:
+                    try:
+                        sock.settimeout(original_timeout)
+                    except OSError:
+                        pass  # socket 可能已断开/关闭，忽略恢复失败
     
     def _recv_all(self, sock: socket.socket, n: int) -> bytes:
         """接收指定字节数"""
