@@ -56,6 +56,7 @@ class BbcConnectionManager:
             'bbc_process': None,  # BBC 进程对象
         }
         self._state_lock = threading.Lock()  # 状态锁
+        self._cmd_lock = threading.Lock()  # 命令锁：串行化TCP命令发送-接收事务，防止多线程交叉
         
         mfaalog.info(f"[BbcConnectionManager] 创建新实例, ID: {id(self)}, Event ID: {id(self._bbc_ready_event)}")
         
@@ -232,13 +233,20 @@ class BbcConnectionManager:
         """建立 TCP 连接"""
         with self._state_lock:
             if self._state['connected'] and self._tcp_sock:
-                # 测试连接是否仍然有效
+                sock = self._tcp_sock
+            else:
+                sock = None
+
+        if sock is not None:
+            # 测试连接是否仍然有效（与命令事务串行化，避免与 send_command 交叉）
+            with self._cmd_lock:
                 try:
-                    self._tcp_sock.settimeout(1)
-                    self._tcp_sock.send(b'\x00\x00\x00\x00')  # 空消息测试
+                    sock.settimeout(1)
+                    sock.send(b'\x00\x00\x00\x00')  # 空消息测试
                     return True
                 except:
-                    self._disconnect_tcp()
+                    with self._state_lock:
+                        self._disconnect_tcp()
         
         try:
             sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -278,31 +286,33 @@ class BbcConnectionManager:
             sock = self._tcp_sock
         
         data = {'cmd': cmd, 'args': args or {}}
-        try:
-            msg = json.dumps(data, ensure_ascii=False).encode('utf-8')
-            msg_with_len = len(msg).to_bytes(4, 'big') + msg
-            sock.sendall(msg_with_len)
-            
-            # 接收响应
-            original_timeout = sock.gettimeout()
-            sock.settimeout(timeout)
-            
-            length_bytes = self._recv_all(sock, 4)
-            if not length_bytes:
-                return {'success': False, 'error': 'Connection closed'}
-            
-            length = struct.unpack('>I', length_bytes)[0]
-            response_data = self._recv_all(sock, length)
-            if not response_data:
-                return {'success': False, 'error': 'No response data'}
-            
-            sock.settimeout(original_timeout)
-            return json.loads(response_data.decode('utf-8'))
-        except socket.timeout:
-            return {'success': False, 'error': f'Timeout (cmd={cmd})'}
-        except Exception as e:
-            mfaalog.error(f"[BbcConnectionManager] 发送命令失败: {e}")
-            return {'success': False, 'error': str(e)}
+        # 命令锁：串行化整个发送-接收事务，防止心跳/弹窗回调等线程同时操作同一 socket 导致请求响应交叉
+        with self._cmd_lock:
+            try:
+                msg = json.dumps(data, ensure_ascii=False).encode('utf-8')
+                msg_with_len = len(msg).to_bytes(4, 'big') + msg
+                sock.sendall(msg_with_len)
+                
+                # 接收响应
+                original_timeout = sock.gettimeout()
+                sock.settimeout(timeout)
+                
+                length_bytes = self._recv_all(sock, 4)
+                if not length_bytes:
+                    return {'success': False, 'error': 'Connection closed'}
+                
+                length = struct.unpack('>I', length_bytes)[0]
+                response_data = self._recv_all(sock, length)
+                if not response_data:
+                    return {'success': False, 'error': 'No response data'}
+                
+                sock.settimeout(original_timeout)
+                return json.loads(response_data.decode('utf-8'))
+            except socket.timeout:
+                return {'success': False, 'error': f'Timeout (cmd={cmd})'}
+            except Exception as e:
+                mfaalog.error(f"[BbcConnectionManager] 发送命令失败: {e}")
+                return {'success': False, 'error': str(e)}
     
     def _recv_all(self, sock: socket.socket, n: int) -> bytes:
         """接收指定字节数"""
@@ -322,28 +332,32 @@ class BbcConnectionManager:
         with self._state_lock:
             if not self._tcp_sock or not self._state['connected']:
                 return False
-            
+            sock = self._tcp_sock
+
+        # 命令锁：与 send_command 串行化，避免连接测试与命令发送交叉
+        with self._cmd_lock:
             # 测试连接是否仍然可用
             try:
-                original_timeout = self._tcp_sock.gettimeout()
-                self._tcp_sock.settimeout(1)
+                original_timeout = sock.gettimeout()
+                sock.settimeout(1)
                 test_msg = json.dumps({'cmd': 'get_status', 'args': {}}).encode('utf-8')
                 msg_with_len = len(test_msg).to_bytes(4, 'big') + test_msg
-                self._tcp_sock.sendall(msg_with_len)
-                
-                length_bytes = self._recv_all(self._tcp_sock, 4)
+                sock.sendall(msg_with_len)
+
+                length_bytes = self._recv_all(sock, 4)
                 if not length_bytes:
                     return False
-                
+
                 length = struct.unpack('>I', length_bytes)[0]
-                response_data = self._recv_all(self._tcp_sock, length)
+                response_data = self._recv_all(sock, length)
                 if not response_data:
                     return False
-                
-                self._tcp_sock.settimeout(original_timeout)
+
+                sock.settimeout(original_timeout)
                 return True
             except:
-                self._disconnect_tcp()
+                with self._state_lock:
+                    self._disconnect_tcp()
                 return False
     
     def ensure_connected(self, timeout: int = 5) -> bool:
