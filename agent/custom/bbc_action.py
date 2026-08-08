@@ -695,7 +695,7 @@ class ExecuteBbcTask(CustomAction):
                         break
                 else:
                     miss_count = 0
-                    mfaalog.info(f"[ExecuteBbcTask] 未识别到错误提示，战斗进行中，识别文本: {all_texts}")
+                    mfaalog.info("[ExecuteBbcTask] 未识别到助战错误，战斗进行中")
             except Exception as e:
                 mfaalog.warning(f"[ExecuteBbcTask] 截图识别异常: {e}")
 
