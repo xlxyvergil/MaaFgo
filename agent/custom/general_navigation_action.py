@@ -149,12 +149,13 @@ SWIPE_SIGN = 1.0         # 滑动方向符号: 地图跟手=+1; 若实测方向�
 SWIPE_DIST = 100         # 固定滑动距离(px): 起点=中心朝目标方向100px处, 向中心滑动
 SWIPE_DURATION = 300     # 滑动持续时间(ms)
 NO_PROGRESS_LIMIT = 3    # 目标距中心连续不缩小次数 -> 判定滑动无进展 -> 失败
-EMPTY_SCREEN_LIMIT = 3   # 连续空屏(未识别到任何关卡) -> 失败
+EMPTY_SCREEN_LIMIT = 8   # 连续空屏(未识别到任何关卡) -> 失败(雾区画面逐帧变化, 提高轮数等轻雾帧)
+ROUND_INTERVAL = 1.5     # 轮间间隔秒(识别失败等场景每轮之间等待, 雾气飘动后下一帧画面不同)
 MAX_ROUNDS = 40          # 最大识别-滑动轮数
 
 # matchTemplate 识别参数(中心锚点 ROI, 替代原 SIFT/greedy)
 MT_SCALES = (0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.5, 1.8, 2.0)
-MT_RECOG_TH = 0.9        # 主识别阈值(中心ROI matchTemplate top1 达标才算识别)
+MT_RECOG_TH = 0.8        # 主识别阈值(中心ROI matchTemplate top1 达标才算识别; 雾区画面干扰, 0.9 会误判空屏)
 ROI_PAD = 10             # 中心锚点ROI 四周冗余px(基准=地图内最大模板尺寸)
 # 孤框小窗口重检参数(YOLO 检测管线内, 全部推理统一 imgsz=256)
 WIN_W = 220              # 小窗口宽度(px)
@@ -170,7 +171,7 @@ VISIBLE_POLY = np.array([
 ], dtype=np.int32)
 
 # 局部模板定位(YOLO漏检兜底)参数
-MT_MIN_SCORE = 0.9       # 局部 matchTemplate 命中阈值
+MT_MIN_SCORE = 0.8       # 局部 matchTemplate 命中阈值
 CLICK_X_OFFSET = 5       # 点击点相对识别中心左偏px, 防名称条中心点击误触相邻关卡(如格洛斯特)
 LOCAL_RADIUS = 250       # 局部匹配窗口半径(px, 以预测位置为中心)
 NEAR_RADIUS = 300        # 预测位置附近 YOLO 框(tag/nametag)判定半径(px)
@@ -178,7 +179,7 @@ NEAR_RADIUS = 300        # 预测位置附近 YOLO 框(tag/nametag)判定半径(
 # 小窗口 YOLO 补检(整图漏检兜底)参数
 # 整图推理时名称条受周围元素干扰漏检; 在预测位置开约名称条大小的窗口裁剪推理, 干扰被去除后模型可正常识别
 WIN_CONF = 0.2           # 小窗口推理置信阈值
-WIN_MIN_MT = 0.9         # 小窗口检出框的目标模板确认阈值(与主识别一致)
+WIN_MIN_MT = 0.8         # 小窗口检出框的目标模板确认阈值(与主识别一致)
 
 
 def _in_visible_area(px, py, margin=40):
@@ -590,6 +591,8 @@ class GeneralNavigationAction(CustomAction):
             for round_idx in range(MAX_ROUNDS):
                 t_fresh = False   # 本轮是否成功从有效坐标锚点反推 t(防陈旧 t_xy 驱动预测)
                 mfaalog.info(f"[导航] === 第{round_idx + 1}轮 ===")
+                if round_idx > 0:
+                    time.sleep(ROUND_INTERVAL)   # 轮间间隔: 雾气飘动后下一帧画面不同, 提高识别命中
                 img = QuestDetector._norm_img(controller.post_screencap().wait().get())
                 if img is None:
                     mfaalog.error("[导航] 截图失败")
