@@ -519,9 +519,14 @@ class ExecuteBbcTask(CustomAction):
             popup_id = msg.get('popup_id', '')
             
             mfaalog.info(f"[Callback] 收到弹窗: {popup_title}")
-            
+
+            # 免责声明弹窗: 最高优先级, 无论何时出现都不视为战斗结束/bbc结束。
+            # BBC Server自动关闭, 只记录日志忽略, 不进入下方任何结束性分支。
+            if '免责声明' in popup_title or '免责声明' in popup_message:
+                mfaalog.info(f"[Callback] 免责声明弹窗(非战斗结束, BBC自动关闭), 忽略继续: {popup_title}:{popup_message}")
+                # 不设置 state['finished'], 战斗继续
             # 处理助战排序不符合 (askyesno 类型，使用布尔值 True/False)
-            if '助战排序不符合' in popup_title:
+            elif '助战排序不符合' in popup_title:
                 action = support_order_mismatch  # True=继续, False=停止
                 mfaalog.info(f"[Callback] 助战弹窗(askyesno)，响应: {action}")
                 
