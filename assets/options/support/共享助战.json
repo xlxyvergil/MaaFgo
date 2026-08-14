@@ -1,0 +1,78 @@
+{
+    "option": {
+        "主动技能": {
+            "type": "input",
+            "label": "主动技能",
+            "inputs": [
+                {
+                    "name": "skill_active",
+                    "label": "主动技能",
+                    "default": ""
+                }
+            ],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "skill_active": "0-0-0"
+                    }
+                }
+            }
+        },
+        "被动技能": {
+            "type": "input",
+            "label": "被动技能",
+            "inputs": [
+                {
+                    "name": "skill_passive",
+                    "label": "被动技能",
+                    "default": ""
+                }
+            ],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "skill_passive": "0-0-0-0-0"
+                    }
+                }
+            }
+        },
+        "宝具等级": {
+            "type": "input",
+            "label": "宝具等级",
+            "inputs": [
+                {
+                    "name": "np_level",
+                    "label": "宝具等级",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "np_level": "1"
+                    }
+                }
+            }
+        },
+        "英灵等级": {
+            "type": "input",
+            "label": "英灵等级",
+            "inputs": [
+                {
+                    "name": "level",
+                    "label": "英灵等级",
+                    "default": "1",
+                    "pipeline_type": "int"
+                }
+            ],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "level": "90"
+                    }
+                }
+            }
+        }
+    }
+}

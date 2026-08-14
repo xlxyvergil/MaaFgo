@@ -1,0 +1,51 @@
+{
+    "option": {
+        "助战类型": {
+            "type": "select",
+            "label": "助战类型",
+            "default": "normal",
+            "cases": [
+                {
+                    "name": "normal",
+                    "label": "普通助战",
+                    "option": [
+                        "英灵选择",
+                        "普通助战-礼装",
+                        "主动技能",
+                        "被动技能",
+                        "宝具等级",
+                        "英灵等级"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "custom_action_param": {
+                                "support_type": "normal"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "grand",
+                    "label": "冠位助战",
+                    "option": [
+                        "英灵选择",
+                        "冠位助战-1号礼装",
+                        "冠位助战-2号礼装",
+                        "冠位助战-羁绊礼装",
+                        "主动技能",
+                        "被动技能",
+                        "宝具等级",
+                        "英灵等级"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "custom_action_param": {
+                                "support_type": "grand"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

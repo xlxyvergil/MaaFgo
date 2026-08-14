@@ -25,7 +25,7 @@ import bbc_stop_listener
 import chaldea_import_action
 import general_navigation_action
 import ocr_logger
-
+import support_action
 
 
 def main():
