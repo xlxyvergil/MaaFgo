@@ -144,12 +144,15 @@
     "options/通用小活动-副本类型.json",
     "options/从者技能强化.json",
     "options/从者追加技能强化.json",
-    "options/抽卡截图.json"
+    "options/抽卡截图.json",
+    "tasks/原生自动战斗.json",
+    "options/原生自动战斗次数.json",
+    "options/原生自动战斗跳过剧情.json"
   ],
   "agent": {
     "child_exec": "python",
     "child_args": [
-      "./agent/main.py"
+      "../agent/main.py"
     ]
   }
 }
