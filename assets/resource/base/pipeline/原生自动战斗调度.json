@@ -158,12 +158,14 @@
         },
         "action": {
             "type": "Click",
-            "target": [
-                591,
-                236,
-                63,
-                39
-            ]
+            "param": {
+                "target": [
+                    591,
+                    236,
+                    63,
+                    39
+                ]
+            }
         },
         "post_delay": 1500,
         "next": [
@@ -173,18 +175,24 @@
     "进本-队伍确认": {
         "recognition": {
             "type": "Or",
-            "any_of": [
-                {
-                    "recognition": "TemplateMatch",
-                    "template": "战斗开始.png",
-                    "threshold": 0.8
-                },
-                {
-                    "recognition": "TemplateMatch",
-                    "template": "开始任务.png",
-                    "threshold": 0.8
-                }
-            ]
+            "param": {
+                "any_of": [
+                    {
+                        "type": "TemplateMatch",
+                        "param": {
+                            "template": "战斗开始.png",
+                            "threshold": 0.8
+                        }
+                    },
+                    {
+                        "type": "TemplateMatch",
+                        "param": {
+                            "template": "开始任务.png",
+                            "threshold": 0.8
+                        }
+                    }
+                ]
+            }
         },
         "action": {
             "type": "Click"
@@ -194,14 +202,16 @@
         "max_hit": 1,
         "recognition": {
             "type": "OCR",
-            "expected": "跳过",
-            "roi": [
-                1143,
-                24,
-                80,
-                35
-            ],
-            "threshold": 0.5
+            "param": {
+                "expected": "跳过",
+                "roi": [
+                    1143,
+                    24,
+                    80,
+                    35
+                ],
+                "threshold": 0.5
+            }
         },
         "action": {
             "type": "Click"
@@ -214,14 +224,16 @@
     "跳过剧情-确认跳过": {
         "recognition": {
             "type": "TemplateMatch",
-            "template": "是.png",
-            "threshold": 0.8,
-            "roi": [
-                756,
-                535,
-                144,
-                49
-            ]
+            "param": {
+                "template": "是.png",
+                "threshold": 0.8,
+                "roi": [
+                    756,
+                    535,
+                    144,
+                    49
+                ]
+            }
         },
         "action": {
             "type": "Click"
