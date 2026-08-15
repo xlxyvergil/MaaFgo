@@ -468,13 +468,3 @@ debug
 
 venv/
 assets/config.json
-bbcdll/*
-.claude/*
-.codex/*
-.agents/*
-
-# 本地环境配置与工具目录
-.env
-.env.example
-.dev/
-

@@ -19,17 +19,16 @@ from .config_checker import validate_bbc_config
 logger = logging.getLogger(__name__)
 
 
-def fetch_share_data(source: str):
-    """下载 + 解码 Chaldea BattleShareData（BBC 与 auto-battle 共用入口）。
+def fetch_and_convert(source: str, output_dir: Optional[str] = None) -> Optional[str]:
+    """
+    主入口编排: 通过 source 获取数据并生成 BBC 配置文件
 
-    解析 source（team_id / quest_id / URL / data= 压缩串），按需从 Chaldea
-    API 下载（team_id / quest_id）或离线解码（data= 内联数据），返回解码后的
-    BattleShareData dict。
+    参数:
+        source: 用户输入 (quest_id / team_id / URL / 压缩数据)
+        output_dir: 输出目录
 
-    Returns:
-        (share_data, quest_id, team_id)：
-        - share_data: 解码后的 dict，失败为 None
-        - quest_id / team_id: 解析出的展示用标识（str），供命名等使用
+    返回:
+        保存的文件名，失败返回 None
     """
     quest_id, team_id, direct_data = parse_import_source(source)
     share_data = None
@@ -46,6 +45,7 @@ def fetch_share_data(source: str):
             quest_id = team_resp.get("questId", "0")
         else:
             logger.error("[Chaldea] 队伍接口无匹配数据。")
+            return None
     elif quest_id:
         teams = fetch_teams_by_quest(quest_id, 3, 10)
         best = select_best_team(teams)
@@ -54,24 +54,11 @@ def fetch_share_data(source: str):
             team_id = best.get("id", "top")
         else:
             logger.error("[Chaldea] 该关卡无可用队伍数据。")
+            return None
     else:
         logger.error("[Chaldea] 无法解析输入来源。")
+        return None
 
-    return share_data, quest_id, team_id
-
-
-def fetch_and_convert(source: str, output_dir: Optional[str] = None) -> Optional[str]:
-    """
-    主入口编排: 通过 source 获取数据并生成 BBC 配置文件
-
-    参数:
-        source: 用户输入 (quest_id / team_id / URL / 压缩数据)
-        output_dir: 输出目录
-
-    返回:
-        保存的文件名，失败返回 None
-    """
-    share_data, quest_id, team_id = fetch_share_data(source)
     if not share_data:
         logger.error("[Chaldea] 数据结构提取失败。")
         return None
