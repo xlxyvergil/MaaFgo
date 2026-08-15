@@ -94,7 +94,7 @@
     "options/chaldea_team_config.json",
     "options/chapter.json",
     "options/team_index.json",
-    "bbc_team_config.json",
+    "options/bbc_team_config.json",
     "options/bbc_run_count.json",
     "options/apple_type.json",
     "options/support_order_mismatch.json",

@@ -1,0 +1,36 @@
+{
+    "刷新按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    912,
+                    116,
+                    40,
+                    29
+                ]
+            }
+        },
+        "next": [
+            "确定刷新"
+        ]
+    },
+    "确定刷新": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "是.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "助战刷新": {
+        "next": [
+            "刷新按钮"
+        ]
+    }
+}

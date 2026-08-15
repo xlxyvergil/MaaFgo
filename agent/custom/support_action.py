@@ -34,6 +34,7 @@ import json
 import os
 import re
 import sys
+import time
 
 import numpy as np
 
@@ -65,8 +66,8 @@ LEVEL_ROI = (62, 15, 118, 27)      # 英灵等级: x62-180 y15-42 -> (x,y,w,h)
 # 用该截图在模板上滑动匹配找最高分
 FACE_POLY = [(58, 40), (161, 42), (162, 84), (143, 85), (142, 105), (35, 109), (35, 60)]
 TH_FACE = 0.75
-CE_ANCHOR_NORMAL = (89, 157)       # 普通助战 礼装
-CE_ANCHOR_GRAND = [(261, 61), (269, 153)]   # 冠位助战 礼装1/礼装2
+CE_ANCHOR_NORMAL = (9, 131)        # 普通助战 礼装 左上角(160x50 窗口)
+CE_ANCHOR_GRAND = [(182, 35), (182, 129)]   # 冠位助战 礼装1/礼装2 左上角(160x50 窗口)
 BOND_ROI = (177, 79, 35, 35)          # 冠位助战 羁绊区域: 中心(194,96) 35x35 (相对框, 199,96 左移5px)
 BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> skill 模板(带绿幕)
 TH_BOND = 0.70
@@ -81,7 +82,7 @@ OCR_REC_ONNX = os.path.join(OCR_EN_DIR, "rec.onnx")
 OCR_REC_KEYS = os.path.join(OCR_EN_DIR, "keys.txt")
 
 # ---------------- ROI 尺寸 ----------------
-CE_WIN = 48            # 礼装窗口(锚点中心)
+CE_ROI = (160, 50)        # 礼装匹配窗口(w,h): 锚点为中心, 与礼装模板(约153x40)同量级
 DIGIT_OFF = (-2, -22)    # 技能等级数字: ROI 左上角相对数字左下角锚点的偏移(锚点x左移2px, 向上22px)
 DIGIT_SIZE = (30, 20)   # 技能等级数字 ROI 尺寸 (w, h): 30x20, 右上角 (锚点x+30, 锚点y-20)
 
@@ -93,6 +94,17 @@ NP_SCALES = (0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.5, 2.0)
 
 # 主动/被动视图切换点击坐标(全屏 1280x720): 点1次切被动, 点2次切回主动
 VIEW_SWITCH_POS = (846, 127)
+
+# 未匹配时滑动+刷新循环
+SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到终点
+SWIPE_END = (559, 44)           # 滑动终点(全屏)
+SWIPE_DURATION = 800            # 滑动持续时间(ms), 300ms 太短容易触发误触/失败
+MAX_SWIPE_BEFORE_REFRESH = 6    # 连续滑动6次未匹配 -> 执行"助战刷新"流水线
+REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
+CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
+TH_WHITE = 245                  # 纯白判定阈值(灰度 >= 该值视为白)
+# 实测: 正常助战列表该区域白占比 0-0.3%, 连接中约 33%; 阈值取 10% 区分度充足
+WHITE_RATIO = 0.10              # 白像素占比 >= 10% 表示正在连接, 不能继续检测
 
 # 空礼装标记(选此项则不进行礼装匹配)
 EMPTY_CE = ("", "空.png")
@@ -149,11 +161,6 @@ def _roi(img, bx, by, rx, ry, rw, rh):
     if x1 <= x0 or y1 <= y0:
         return None
     return img[y0:y1, x0:x1]
-
-
-def _anchor_roi(img, bx, by, ax, ay, win):
-    """以框内锚点(ax,ay)为中心取 win x win 窗口"""
-    return _roi(img, bx, by, ax - win // 2, ay - win // 2, win, win)
 
 
 def parse_skill(s):
@@ -232,12 +239,20 @@ class SupportAction(CustomAction):
             mfaalog.info("[SupportAction] 礼装为空(跳过匹配)")
             return True
         tpl = _imread(os.path.join(ce_dir, ce_name), gray=True)
-        roi = _anchor_roi(img, bx, by, anchor[0], anchor[1], CE_WIN)
+        if tpl is None:
+            return False
+        # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
+        # 模板保持原尺寸在窗口内滑动匹配, 避免 resize 到小窗导致变形
+        roi = _roi(img, bx, by, anchor[0], anchor[1], CE_ROI[0], CE_ROI[1])
         if roi is None:
             return False
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        t = cv2.resize(tpl, (roi_gray.shape[1], roi_gray.shape[0]),
-                       interpolation=cv2.INTER_CUBIC)
+        t = tpl
+        # 模板超出窗口则等比缩小到窗口内
+        if t.shape[0] > roi_gray.shape[0] or t.shape[1] > roi_gray.shape[1]:
+            sc = min(roi_gray.shape[1] / t.shape[1], roi_gray.shape[0] / t.shape[0])
+            t = cv2.resize(t, (round(t.shape[1] * sc), round(t.shape[0] * sc)),
+                           interpolation=cv2.INTER_AREA)
         score = float(cv2.matchTemplate(roi_gray, t, cv2.TM_CCOEFF_NORMED).max())
         mfaalog.info(f"[SupportAction] 礼装 {ce_name}: score={score:.3f}")
         return score >= TH_CE
@@ -492,6 +507,25 @@ class SupportAction(CustomAction):
             return False
         return True
 
+    # ---------- 刷新后连接中检测 ----------
+    @staticmethod
+    def _is_connecting(controller):
+        """刷新后判断是否仍在连接: (1158,623)-(1259,709) 区域白像素占比 >= 50% 表示连接中;
+        截图失败视为已连接完成(避免卡死), 交由后续识别流程处理"""
+        import cv2
+        img = _norm_img(controller.post_screencap().wait().get())
+        if img is None:
+            return False
+        x0, y0 = CONNECT_ROI[0], CONNECT_ROI[1]
+        x1 = min(img.shape[1], x0 + CONNECT_ROI[2])
+        y1 = min(img.shape[0], y0 + CONNECT_ROI[3])
+        if x1 <= x0 or y1 <= y0:
+            return False
+        gray = cv2.cvtColor(img[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY)
+        white = float((gray >= TH_WHITE).mean())
+        mfaalog.info(f"[SupportAction] 刷新连接检测: 白像素占比={white:.2f}")
+        return white >= WHITE_RATIO
+
     # ---------- 主流程 ----------
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         try:
@@ -539,8 +573,9 @@ class SupportAction(CustomAction):
             resource_package = str((cfg.get("attach") or {}).get("resource_package") or "").strip()
             pkg = "cn" if resource_package == "cn" else "base"
             base_dir = os.path.join(_ROOT_DIR, "resource", pkg, "image")
-            face_dir = os.path.join(base_dir, "servant_face")
-            ce_dir = os.path.join(base_dir, "lizhuang")
+            # 英灵头像/礼装模板不分 pkg, 统一放在 agent/utils 下
+            face_dir = os.path.join(_AGENT_DIR, "utils", "servant_face")
+            ce_dir = os.path.join(_AGENT_DIR, "utils", "lizhuang")
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
             skill_dir = os.path.join(base_dir, "skill")   # 视图判断模板(主动/被动), 按 pkg 动态选择
             mfaalog.info(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
@@ -566,54 +601,83 @@ class SupportAction(CustomAction):
             detector = SupportDetector(SUPPORT_MODEL_PATH)
 
             controller = context.tasker.controller
-            img = _norm_img(controller.post_screencap().wait().get())
-            if img is None:
-                mfaalog.error("[SupportAction] 截图失败")
-                return CustomAction.RunResult(success=False)
-            boxes = detector.detect(img)
-            mfaalog.info(f"[SupportAction] 检测到 {len(boxes)} 个助战条目")
-            if not boxes:
-                mfaalog.error("[SupportAction] 未检测到助战条目")
-                return CustomAction.RunResult(success=False)
 
-            for (bx, by, bx2, by2, conf) in boxes:
-                mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
-                if not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
-                    continue
-                if not all(self._match_ce(img, ce_dir, bx, by, name, anc)
-                           for name, anc in ce_targets):
-                    continue
-                # 冠位助战羁绊判断(50np/original/any)
-                if support_type == "grand" and not self._match_bond(img, skill_dir, bx, by, ce_bond):
-                    continue
-                # 主动视图(主动技能+宝具+英灵等级): 单帧判定, 失败跳过该条目
-                if not self._check_active_view(img, bx, by, active, np_dir, np_level, level):
-                    continue
+            # 识别一次: 截图->YOLO检测->逐个框判定; 命中点击条目并返回 True(未命中 False)
+            def try_match():
+                img = _norm_img(controller.post_screencap().wait().get())
+                if img is None:
+                    mfaalog.error("[SupportAction] 截图失败")
+                    return False
+                boxes = detector.detect(img)
+                mfaalog.info(f"[SupportAction] 检测到 {len(boxes)} 个助战条目")
+                if not boxes:
+                    mfaalog.error("[SupportAction] 未检测到助战条目")
+                    return False
 
-                # 主动/宝具/等级 均满足, 剩被动
-                if not passive_need:
+                for (bx, by, bx2, by2, conf) in boxes:
+                    mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
+                    if not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
+                        continue
+                    if not all(self._match_ce(img, ce_dir, bx, by, name, anc)
+                               for name, anc in ce_targets):
+                        continue
+                    # 冠位助战羁绊判断(50np/original/any)
+                    if support_type == "grand" and not self._match_bond(img, skill_dir, bx, by, ce_bond):
+                        continue
+                    # 主动视图(主动技能+宝具+英灵等级): 单帧判定, 失败跳过该条目
+                    if not self._check_active_view(img, bx, by, active, np_dir, np_level, level):
+                        continue
+
+                    # 主动/宝具/等级 均满足, 剩被动
+                    if not passive_need:
+                        cx, cy = (bx + bx2) // 2, (by + by2) // 2
+                        controller.post_click(cx, cy).wait()
+                        mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
+                        return True
+
+                    # 需要被动: 点击1次切到被动视图 -> 单帧识别
+                    controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                    img = _norm_img(controller.post_screencap().wait().get())
+                    if img is None:
+                        return False
+                    passive_ok = self._match_passive(img, bx, by, passive)
+
+                    # 被动识别结束, 无论是否点击条目, 点击2次(846,127)切回主动视图
+                    controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                    controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+
+                    if not passive_ok:
+                        continue
                     cx, cy = (bx + bx2) // 2, (by + by2) // 2
                     controller.post_click(cx, cy).wait()
                     mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
-                    return CustomAction.RunResult(success=True)
+                    return True
 
-                # 需要被动: 点击1次切到被动视图 -> 单帧识别
-                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
-                img = _norm_img(controller.post_screencap().wait().get())
-                if img is None:
-                    return CustomAction.RunResult(success=False)
-                passive_ok = self._match_passive(img, bx, by, passive)
+                return False
 
-                # 被动识别结束, 无论是否点击条目, 点击2次(846,127)切回主动视图
-                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
-                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
-
-                if not passive_ok:
-                    continue
-                cx, cy = (bx + bx2) // 2, (by + by2) // 2
-                controller.post_click(cx, cy).wait()
-                mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
+            # 首次识别(主动视图)
+            if try_match():
                 return CustomAction.RunResult(success=True)
+
+            # 整体未匹配: 滑动->重新识别循环; 连续滑动6次未匹配 -> 执行"助战刷新"
+            mfaalog.info("[SupportAction] 首次识别无匹配, 进入滑动/刷新循环")
+            swipe_count = 0
+            while True:
+                controller.post_swipe(SWIPE_START[0], SWIPE_START[1],
+                                      SWIPE_END[0], SWIPE_END[1], SWIPE_DURATION).wait()
+                swipe_count += 1
+                mfaalog.info(f"[SupportAction] 第 {swipe_count} 次滑动, 重新识别")
+                if try_match():
+                    return CustomAction.RunResult(success=True)
+                if swipe_count >= MAX_SWIPE_BEFORE_REFRESH:
+                    swipe_count = 0
+                    mfaalog.info(f"[SupportAction] 连续{MAX_SWIPE_BEFORE_REFRESH}次滑动未匹配, 执行{REFRESH_TASK}")
+                    context.run_task(REFRESH_TASK)
+                    # 刷新后持续检测连接状态: 连接区纯白占比>=50% 时不能继续检测, 等待其消失
+                    mfaalog.info("[SupportAction] 等待刷新连接完成...")
+                    while self._is_connecting(controller):
+                        time.sleep(0.5)
+                    mfaalog.info("[SupportAction] 刷新完成, 继续检测")
 
             mfaalog.error("[SupportAction] 无满足全部条件的助战条目")
             return CustomAction.RunResult(success=False)
