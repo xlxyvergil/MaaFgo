@@ -1,0 +1,644 @@
+{
+  "战斗_卡1": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          75,
+          529,
+          138,
+          98
+        ],
+        "expected": [
+          "力击",
+          "迅击",
+          "技击"
+        ]
+      }
+    }
+  },
+  "战斗_卡2": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          320,
+          529,
+          136,
+          98
+        ],
+        "expected": [
+          "力击",
+          "迅击",
+          "技击"
+        ]
+      }
+    }
+  },
+  "战斗_卡3": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          578,
+          529,
+          136,
+          98
+        ],
+        "expected": [
+          "力击",
+          "迅击",
+          "技击"
+        ]
+      }
+    }
+  },
+  "战斗_卡4": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          842,
+          529,
+          127,
+          98
+        ],
+        "expected": [
+          "力击",
+          "迅击",
+          "技击"
+        ]
+      }
+    }
+  },
+  "战斗_卡5": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          1097,
+          529,
+          129,
+          98
+        ],
+        "expected": [
+          "力击",
+          "迅击",
+          "技击"
+        ]
+      }
+    }
+  },
+  "战斗_NP卡1": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          228,
+          658,
+          43,
+          19
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_NP卡2": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          546,
+          658,
+          43,
+          19
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_NP卡3": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          863,
+          658,
+          43,
+          20
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_技能目标子屏": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          564,
+          170,
+          161,
+          48
+        ],
+        "expected": [
+          "请选择对象"
+        ]
+      }
+    }
+  },
+  "战斗_技能使用弹窗": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          556,
+          156,
+          146,
+          42
+        ],
+        "expected": [
+          "技能使用"
+        ]
+      }
+    }
+  },
+  "战斗_换人界面": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          339,
+          134,
+          625,
+          63
+        ],
+        "expected": [
+          "请从首发成员和候补成员中"
+        ]
+      }
+    }
+  },
+  "战斗_选卡场景": {
+    "recognition": "TemplateMatch",
+    "roi": [
+      1135,
+      656,
+      128,
+      51
+    ],
+    "template": "battle/scene_command_selection.png",
+    "green_mask": true
+  },
+  "战斗_主界面": {
+    "recognition": "TemplateMatch",
+    "roi": [
+      1058,
+      508,
+      152,
+      54
+    ],
+    "template": "battle/scene_main_battle.png",
+    "green_mask": true
+  },
+  "战斗_胜利": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "下一步.png",
+        "threshold": 0.8
+      }
+    }
+  },
+  "战斗_失败": {
+    "recognition": "TemplateMatch",
+    "roi": [
+      507,
+      361,
+      269,
+      74
+    ],
+    "template": "battle/scene_defeat.png",
+    "green_mask": true
+  },
+  "战斗_未知弹窗": {
+    "action": "DoNothing"
+  },
+  "战斗_从者1技能1_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          50,
+          555,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者1技能2_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          137,
+          554,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者1技能3_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          225,
+          555,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者2技能1_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          368,
+          555,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者2技能2_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          453,
+          552,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者2技能3_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          544,
+          555,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者3技能1_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          685,
+          554,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者3技能2_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          772,
+          553,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_从者3技能3_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          861,
+          554,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_御主技能1_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          882,
+          287,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 50
+      }
+    }
+  },
+  "战斗_御主技能2_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          971,
+          285,
+          48,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 50
+      }
+    }
+  },
+  "战斗_御主技能3_CD": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          1060,
+          286,
+          49,
+          34
+        ],
+        "method": 4,
+        "lower": [
+          0,
+          0,
+          0
+        ],
+        "upper": [
+          100,
+          100,
+          100
+        ],
+        "count": 50
+      }
+    }
+  },
+  "战斗_敌人1": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          7,
+          2,
+          242,
+          89
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_敌人1_选中": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          0,
+          0,
+          90,
+          95
+        ],
+        "method": 40,
+        "lower": [
+          95,
+          80,
+          80
+        ],
+        "upper": [
+          115,
+          255,
+          255
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_敌人2": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          257,
+          1,
+          242,
+          90
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_敌人2_选中": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          245,
+          0,
+          100,
+          95
+        ],
+        "method": 40,
+        "lower": [
+          95,
+          80,
+          80
+        ],
+        "upper": [
+          115,
+          255,
+          255
+        ],
+        "count": 100
+      }
+    }
+  },
+  "战斗_敌人3": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          499,
+          0,
+          242,
+          89
+        ],
+        "expected": "\\d+"
+      }
+    }
+  },
+  "战斗_敌人3_选中": {
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          495,
+          0,
+          100,
+          95
+        ],
+        "method": 40,
+        "lower": [
+          95,
+          80,
+          80
+        ],
+        "upper": [
+          115,
+          255,
+          255
+        ],
+        "count": 100
+      }
+    }
+  }
+}
