@@ -86,12 +86,7 @@ def install_resource():
         install_path,
     )
     
-    # MXU: 复制 bbc_team_config.json（使用 scan_select 类型）
-    mxu_config = working_dir / "assets" / "bbc_team_config.json"
-    shutil.copy2(
-        mxu_config,
-        install_path / "bbc_team_config.json",
-    )
+    # MXU: bbc_team_config.json 已统一放入 options 目录, 由上方 options 复制覆盖
 
     # 更新 interface.json 中的版本号和 mirrorchyan 配置
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:
