@@ -34,7 +34,6 @@ import json
 import os
 import re
 import sys
-import time
 
 import numpy as np
 
@@ -68,7 +67,9 @@ FACE_POLY = [(58, 40), (161, 42), (162, 84), (143, 85), (142, 105), (35, 109), (
 TH_FACE = 0.75
 CE_ANCHOR_NORMAL = (89, 157)       # 普通助战 礼装
 CE_ANCHOR_GRAND = [(261, 61), (269, 153)]   # 冠位助战 礼装1/礼装2
-CE_ANCHOR_BOND = (262, 106)        # 冠位助战 羁绊(暂不处理, 仅保留)
+BOND_ROI = (177, 79, 35, 35)          # 冠位助战 羁绊区域: 中心(194,96) 35x35 (相对框, 199,96 左移5px)
+BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> skill 模板(带绿幕)
+TH_BOND = 0.70
 SKILL_ACTIVE = [(793, 175), (836, 175), (882, 175)]       # 主动技能 1-3 (数字左下角锚点)
 SKILL_PASSIVE = [(794, 177), (832, 177), (869, 177), (907, 177), (945, 177)]  # 被动技能 1-5 (数字左下角锚点)
 NP_ROI = (200, 74, 580, 94)        # 宝具: x200-780 y74-168 -> (x,y,w,h)
@@ -90,14 +91,8 @@ TH_NP = 0.70
 # np_level 模板为小图标(约40x40), 需在宝具 ROI 内多尺度滑动匹配
 NP_SCALES = (0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.5, 2.0)
 
-# 被动技能切换流水线节点名(需与助战.json 的节点名一致; 流水线内自动按国服/日服切换资源)
-PASSIVE_SWITCH_TASK = "被动技能切换"
-# 被动识别截图参数: 切换后被动视图短暂显示, 随后游戏内主动/被动自动轮回, 需多帧捕捉
-PASSIVE_SHOTS = 5        # 切换后连截帧数
-PASSIVE_INTERVAL = 0.5   # 截图间隔(秒)
-# 主动视图截图参数: 技能显示存在主动/被动自动轮回, 主动技能/宝具/等级识别同样需多帧确认
-ACTIVE_SHOTS = 5         # 主动视图补截帧数
-ACTIVE_INTERVAL = 0.5    # 截图间隔(秒)
+# 主动/被动视图切换点击坐标(全屏 1280x720): 点1次切被动, 点2次切回主动
+VIEW_SWITCH_POS = (846, 127)
 
 # 空礼装标记(选此项则不进行礼装匹配)
 EMPTY_CE = ("", "空.png")
@@ -246,6 +241,29 @@ class SupportAction(CustomAction):
         score = float(cv2.matchTemplate(roi_gray, t, cv2.TM_CCOEFF_NORMED).max())
         mfaalog.info(f"[SupportAction] 礼装 {ce_name}: score={score:.3f}")
         return score >= TH_CE
+
+    # ---------- 冠位羁绊判断 ----------
+    def _match_bond(self, img, skill_dir, bx, by, bond_opt):
+        """羁绊区域(中心(194,96) 35x35)与 skill/{50np,羁绊}.png 匹配
+        模板带绿幕, 先抠掉绿幕背景再与截图区域灰度滑动匹配"""
+        import cv2
+        if bond_opt not in BOND_TEMPLATES:
+            return True
+        t_bgr = _imread(os.path.join(skill_dir, BOND_TEMPLATES[bond_opt]))
+        crop = _roi(img, bx, by, BOND_ROI[0], BOND_ROI[1], BOND_ROI[2], BOND_ROI[3])
+        if t_bgr is None or crop is None:
+            return False
+        # 抠绿幕: 绿色像素置白(模板背景为绿幕, 截图区域为正常图案)
+        b = t_bgr[:, :, 0].astype(int)
+        g = t_bgr[:, :, 1].astype(int)
+        r = t_bgr[:, :, 2].astype(int)
+        green = (g > 100) & (g > b + 30) & (g > r + 30)
+        t = cv2.cvtColor(t_bgr, cv2.COLOR_BGR2GRAY)
+        t[green] = 255
+        g_roi = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        score = float(cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED).max())
+        mfaalog.info(f"[SupportAction] 羁绊({bond_opt}): score={score:.3f}")
+        return score >= TH_BOND
 
     # ---------- 技能等级匹配 ----------
     def _match_skill(self, img, bx, by, anchor, expect):
@@ -491,6 +509,7 @@ class SupportAction(CustomAction):
             ce = str(attach.get("ce") or "").strip()
             ce_1 = str(attach.get("ce_1") or "").strip()
             ce_2 = str(attach.get("ce_2") or "").strip()
+            ce_bond = str(attach.get("ce_bond") or "").strip()
             skill_active = str(attach.get("skill_active") or "").strip()
             skill_passive = str(attach.get("skill_passive") or "").strip()
             try:
@@ -557,7 +576,6 @@ class SupportAction(CustomAction):
                 mfaalog.error("[SupportAction] 未检测到助战条目")
                 return CustomAction.RunResult(success=False)
 
-            passive_view = False
             for (bx, by, bx2, by2, conf) in boxes:
                 mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
                 if not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
@@ -565,23 +583,12 @@ class SupportAction(CustomAction):
                 if not all(self._match_ce(img, ce_dir, bx, by, name, anc)
                            for name, anc in ce_targets):
                     continue
-                # 主动视图(主动技能+宝具+英灵等级): 单帧失败则间隔补截多帧确认
-                # (技能显示存在主动/被动自动轮回, 多帧捕捉主动视图)
+                # 冠位助战羁绊判断(50np/original/any)
+                if support_type == "grand" and not self._match_bond(img, skill_dir, bx, by, ce_bond):
+                    continue
+                # 主动视图(主动技能+宝具+英灵等级): 单帧判定, 失败跳过该条目
                 if not self._check_active_view(img, bx, by, active, np_dir, np_level, level):
-                    ok = False
-                    for _ in range(ACTIVE_SHOTS):
-                        time.sleep(ACTIVE_INTERVAL)
-                        img = _norm_img(controller.post_screencap().wait().get())
-                        if img is None:
-                            return CustomAction.RunResult(success=False)
-                        # 视图已切到被动, 主动视图不会再现, 停止等待
-                        if self._match_view(img, bx, by, skill_dir) == "passive":
-                            break
-                        if self._check_active_view(img, bx, by, active, np_dir, np_level, level):
-                            ok = True
-                            break
-                    if not ok:
-                        continue
+                    continue
 
                 # 主动/宝具/等级 均满足, 剩被动
                 if not passive_need:
@@ -590,31 +597,17 @@ class SupportAction(CustomAction):
                     mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                     return CustomAction.RunResult(success=True)
 
-                # 需要被动: 切换流水线 -> 间隔 PASSIVE_INTERVAL 连截 PASSIVE_SHOTS 帧,
-                # 任一帧被动匹配成功即通过(点击后被动视图短暂显示, 随后主动/被动自动轮回)
-                if not passive_view:
-                    mfaalog.info(f"[SupportAction] 运行被动切换流水线: {PASSIVE_SWITCH_TASK}")
-                    try:
-                        context.run_task(PASSIVE_SWITCH_TASK)
-                    except Exception as e:
-                        mfaalog.warning(f"[SupportAction] 被动切换流水线异常: {e}")
-                    passive_view = True
+                # 需要被动: 点击1次切到被动视图 -> 单帧识别
+                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                img = _norm_img(controller.post_screencap().wait().get())
+                if img is None:
+                    return CustomAction.RunResult(success=False)
+                passive_ok = self._match_passive(img, bx, by, passive)
 
-                passive_ok = False
-                for i in range(PASSIVE_SHOTS):
-                    img = _norm_img(controller.post_screencap().wait().get())
-                    if img is None:
-                        return CustomAction.RunResult(success=False)
-                    # 仍是主动视图则等待被动轮回(避免在主动视图上误匹配)
-                    if self._match_view(img, bx, by, skill_dir) == "active":
-                        if i < PASSIVE_SHOTS - 1:
-                            time.sleep(PASSIVE_INTERVAL)
-                        continue
-                    if self._match_passive(img, bx, by, passive):
-                        passive_ok = True
-                        break
-                    if i < PASSIVE_SHOTS - 1:
-                        time.sleep(PASSIVE_INTERVAL)
+                # 被动识别结束, 无论是否点击条目, 点击2次(846,127)切回主动视图
+                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+
                 if not passive_ok:
                     continue
                 cx, cy = (bx + bx2) // 2, (by + by2) // 2
