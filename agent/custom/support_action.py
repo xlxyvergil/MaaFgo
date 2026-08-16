@@ -660,16 +660,19 @@ class SupportAction(CustomAction):
                         mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                         return True
 
-                    # 需要被动: 点击1次切到被动视图 -> 单帧识别
+                    # 需要被动: 点击1次切到被动视图, 间隔0.5s稳定后再单帧识别
                     controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                    time.sleep(0.5)
                     img = _norm_img(controller.post_screencap().wait().get())
                     if img is None:
                         return False
                     passive_ok = self._match_passive(img, bx, by, passive)
 
-                    # 被动识别结束, 无论是否点击条目, 点击2次(846,127)切回主动视图
+                    # 被动识别结束, 无论是否点击条目, 点击2次(846,127)切回主动视图, 每次间隔0.5s
                     controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                    time.sleep(0.5)
                     controller.post_click(VIEW_SWITCH_POS[0], VIEW_SWITCH_POS[1]).wait()
+                    time.sleep(0.5)
 
                     if not passive_ok:
                         continue
