@@ -1,0 +1,721 @@
+{
+    "执行整理礼物盒": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "execute_boxtask"
+            }
+        },
+        "attach": {
+            "aqf": true,
+            "keep3": false,
+            "keep3_num": 5,
+            "keep4": false,
+            "keep4_num": 5,
+            "keep5": false,
+            "keep5_num": 5,
+            "one_key3": true,
+            "one_key4": true,
+            "one_key5": true,
+            "sell3": false,
+            "sell4": false,
+            "sell5": false
+        },
+        "next": [
+            "整理礼物盒完成"
+        ]
+    },
+    "整理礼物盒": {
+        "next": [
+            "执行整理礼物盒"
+        ]
+    },
+    "整理礼物盒-一键领取完成": {},
+    "整理礼物盒-一键领取循环": {
+        "next": [
+            "整理礼物盒-礼物盒满结束",
+            "整理礼物盒-点全部领取",
+            "整理礼物盒-领取完成"
+        ]
+    },
+    "整理礼物盒-回主界面再导航": {
+        "next": [
+            "[JumpBack]整理礼物盒-执行回主界面",
+            "整理礼物盒-点礼物盒图标"
+        ]
+    },
+    "整理礼物盒-回主界面再导航到灵基变还": {
+        "next": [
+            "整理礼物盒-点菜单到灵基变还",
+            "[JumpBack]回主界面"
+        ]
+    },
+    "整理礼物盒-导航到灵基变还": {
+        "next": [
+            "整理礼物盒-已在灵基变还",
+            "整理礼物盒-回主界面再导航到灵基变还"
+        ]
+    },
+    "整理礼物盒-导航到灵基变还完成": {},
+    "整理礼物盒-导航到礼物盒": {
+        "next": [
+            "整理礼物盒-已在礼物盒",
+            "整理礼物盒-回主界面再导航"
+        ]
+    },
+    "整理礼物盒-导航完成": {},
+    "整理礼物盒-已在灵基变还": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    0,
+                    0,
+                    1280,
+                    200
+                ],
+                "template": [
+                    "整理礼物盒/灵基变还界面标志.png"
+                ],
+                "threshold": 0.65
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "整理礼物盒-导航到灵基变还完成"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "已进入灵基变还界面"
+        }
+    },
+    "整理礼物盒-已在灵基变还-点击缩放按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    19,
+                    670,
+                    11,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "整理礼物盒-已在灵基图标大小检测": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    2,
+                    598,
+                    110,
+                    122
+                ],
+                "template": [
+                    "整理礼物盒/图标缩放按钮小.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "图标大小正常"
+        }
+    },
+    "整理礼物盒-已在礼物盒": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    189,
+                    5,
+                    328,
+                    145
+                ],
+                "template": [
+                    "整理礼物盒/礼物盒界面标志.png"
+                ],
+                "threshold": 0.65
+            }
+        },
+        "next": [
+            "整理礼物盒-导航完成"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "已进入礼物盒界面"
+        }
+    },
+    "整理礼物盒-执行回主界面": {
+        "max_hit": 1,
+        "next": [
+            "回主界面"
+        ]
+    },
+    "整理礼物盒-点全部领取": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1047,
+                    193,
+                    120,
+                    53
+                ],
+                "template": "整理礼物盒/全部领取按钮可领取.png",
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "整理礼物盒-点领取确认",
+            "[JumpBack]整理礼物盒-一键领取循环"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "还有狗粮可领，点击「全部领取」"
+        }
+    },
+    "整理礼物盒-点商店到灵基变还": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/商店图标.png",
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3500,
+        "next": [
+            "整理礼物盒-点灵基变还入口"
+        ]
+    },
+    "整理礼物盒-点灵基变还入口": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/灵基变还入口.png",
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "整理礼物盒-已在灵基变还"
+        ]
+    },
+    "整理礼物盒-点礼物盒图标": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    429,
+                    671,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "整理礼物盒-已在礼物盒"
+        ]
+    },
+    "整理礼物盒-点菜单到灵基变还": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单2.png",
+                    "菜单.png"
+                ],
+                "green_mask": false,
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "整理礼物盒-点商店到灵基变还"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "找到菜单，点击进入商店"
+        }
+    },
+    "整理礼物盒-点领取确认": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/领取确认按钮.png",
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]整理礼物盒-一键领取循环"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "点击「领取」确认"
+        }
+    },
+    "整理礼物盒-礼物盒满结束": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    785,
+                    389,
+                    287,
+                    130
+                ],
+                "template": [
+                    "整理礼物盒/礼物盒已满提示.png"
+                ],
+                "threshold": 0.65
+            }
+        },
+        "next": [
+            "整理礼物盒-一键领取完成"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">礼物盒已满，结束一键领取</span>"
+        }
+    },
+    "整理礼物盒-筛上划": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1000,
+                    400,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1000,
+                        600,
+                        1,
+                        1
+                    ]
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛重置"
+        ]
+    },
+    "整理礼物盒-筛下滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1089,
+                    519,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1080,
+                        367,
+                        1,
+                        1
+                    ]
+                ]
+            }
+        },
+        "post_delay": 500
+    },
+    "整理礼物盒-筛从者经验值": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    534,
+                    248,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛下滑"
+        ]
+    },
+    "整理礼物盒-筛卖下滑找经验值": {
+        "max_hit": 10,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    1070,
+                    499,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        1064,
+                        300,
+                        1,
+                        1
+                    ]
+                ]
+            }
+        },
+        "post_delay": 500
+    },
+    "整理礼物盒-筛卖准备": {
+        "next": [
+            "整理礼物盒-筛卖点筛选按钮"
+        ]
+    },
+    "整理礼物盒-筛卖找经验值": {
+        "next": [
+            "整理礼物盒-筛卖点经验值",
+            "[JumpBack]整理礼物盒-筛卖下滑找经验值"
+        ]
+    },
+    "整理礼物盒-筛卖点3星": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "整理礼物盒/3星未选中.png"
+                ],
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖选4星"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "选择 3 星狗粮"
+        }
+    },
+    "整理礼物盒-筛卖点4星": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/4星未选中.png",
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖选5星"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "选择 4 星狗粮"
+        }
+    },
+    "整理礼物盒-筛卖点5星": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/5星未选中.png",
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖找经验值"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "选择 5 星狗粮"
+        }
+    },
+    "整理礼物盒-筛卖点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "整理礼物盒/贩卖-筛选决定按钮.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "整理礼物盒-已在灵基图标大小检测",
+            "[JumpBack]整理礼物盒-已在灵基变还-点击缩放按钮"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "筛选完成，确认决定"
+        }
+    },
+    "整理礼物盒-筛卖点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "整理礼物盒-筛卖点顶部"
+        ]
+    },
+    "整理礼物盒-筛卖点经验值": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    532,
+                    53,
+                    222,
+                    611
+                ],
+                "template": [
+                    "整理礼物盒/变还_从者经验值未选中.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖点决定"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "选择「从者经验值」"
+        }
+    },
+    "整理礼物盒-筛卖点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖重置筛选"
+        ]
+    },
+    "整理礼物盒-筛卖选3星": {
+        "next": [
+            "整理礼物盒-筛卖选4星"
+        ]
+    },
+    "整理礼物盒-筛卖选4星": {
+        "next": [
+            "整理礼物盒-筛卖选5星"
+        ]
+    },
+    "整理礼物盒-筛卖选5星": {
+        "next": [
+            "整理礼物盒-筛卖找经验值"
+        ]
+    },
+    "整理礼物盒-筛卖重置筛选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "整理礼物盒/初始设定按钮.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "整理礼物盒-筛卖选3星"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "重置筛选选项"
+        }
+    },
+    "整理礼物盒-筛点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1157,
+                    128,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "整理礼物盒-筛上划"
+        ]
+    },
+    "整理礼物盒-筛选准备": {
+        "next": [
+            "整理礼物盒-筛点筛选按钮"
+        ]
+    },
+    "整理礼物盒-筛重置": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    225,
+                    637,
+                    1,
+                    1
+                ]
+            }
+        },
+        "repeat": 3,
+        "repeat_delay": 400,
+        "next": [
+            "整理礼物盒-筛从者经验值"
+        ]
+    },
+    "整理礼物盒-贩关奖励": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "整理礼物盒/变还关闭按钮.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "整理礼物盒-贩卖确认完成"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "贩卖完成，关闭奖励弹窗"
+        }
+    },
+    "整理礼物盒-贩卖确认完成": {},
+    "整理礼物盒-贩处理QP满": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/QP已满提示.png",
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    920,
+                    560,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]整理礼物盒-贩等结果"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">QP 已满，自动点掉继续</span>"
+        }
+    },
+    "整理礼物盒-贩点贩卖": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/销毁按钮.png",
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "整理礼物盒-贩等结果"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "确认变还（销毁）"
+        }
+    },
+    "整理礼物盒-贩等结果": {
+        "next": [
+            "整理礼物盒-贩处理QP满",
+            "整理礼物盒-贩关奖励"
+        ]
+    },
+    "整理礼物盒-领取完成": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1047,
+                    193,
+                    120,
+                    53
+                ],
+                "template": "整理礼物盒/全部领取按钮已领完.png",
+                "threshold": 0.65
+            }
+        },
+        "next": [
+            "整理礼物盒-一键领取完成"
+        ],
+        "focus": {
+            "Node.Recognition.Succeeded": "全部领取按钮已变灰，一键领取完成"
+        }
+    },
+    "整理礼物盒完成": {}
+}

@@ -1,0 +1,690 @@
+{
+    "强化从者": {
+        "next": [
+            "执行强化从者"
+        ]
+    },
+    "强化从者-回菜单导航": {
+        "next": [
+            "强化从者-点菜单进强化",
+            "[JumpBack]强化从者-点后退"
+        ]
+    },
+    "强化从者-图标大小检测": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    2,
+                    598,
+                    110,
+                    122
+                ],
+                "template": [
+                    "整理礼物盒/图标缩放按钮大.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "图标大小正常"
+        },
+        "next": [
+            "强化从者-删除活动筛选",
+            "[JumpBack]强化从者-删除活动筛选点击"
+        ]
+    },
+    "强化从者-导航到强化界面": {
+        "next": [
+            "强化从者-已在强化界面",
+            "强化从者-已在强化列表",
+            "强化从者-回菜单导航"
+        ]
+    },
+    "强化从者-导航完成": {},
+    "强化从者-已在强化从者-点击缩放按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    19,
+                    670,
+                    11,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "强化从者-已在强化列表": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/强化界面判定.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "已在从者列表，可直接筛选"
+        },
+        "next": [
+            "强化从者-导航完成"
+        ]
+    },
+    "强化从者-已在强化界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    77,
+                    293,
+                    240,
+                    216
+                ],
+                "template": [
+                    "强化从者/强化界面标志.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "next": [
+            "强化从者-导航完成"
+        ]
+    },
+    "强化从者-开启自动填充": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/自动加载未选中.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-点喂狗粮决定",
+            "强化从者-开启自动填充"
+        ]
+    },
+    "强化从者-强化一次": {
+        "post_delay": 1000,
+        "next": [
+            "强化从者-突破链",
+            "强化从者-没有狗粮",
+            "强化从者-强化确认",
+            "强化从者-道具不足"
+        ]
+    },
+    "强化从者-强化一次完成": {},
+    "强化从者-强化二次确认": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "决定.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "强化从者-突破已完成",
+            "强化从者-强化完成标记",
+            "[JumpBack]强化从者-断网重连",
+            "[JumpBack]强化从者-跳过动画2"
+        ]
+    },
+    "强化从者-强化完成标记": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/强化完成界面.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        },
+        "next": [
+            "强化从者-突破已完成",
+            "强化从者-强化一次完成"
+        ]
+    },
+    "强化从者-强化确认": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/强化按钮.png",
+                    "从者技能强化/强化按钮2.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1200,
+        "next": [
+            "强化从者-强化二次确认",
+            "强化从者-限时从者强化确认"
+        ]
+    },
+    "强化从者-执行自动填充": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1090,
+                    163,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "强化从者-开启自动填充",
+            "强化从者-点喂狗粮决定"
+        ]
+    },
+    "强化从者-断网重连": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "断网重连.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000
+    },
+    "强化从者-没有狗粮": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    394,
+                    194,
+                    80,
+                    84
+                ],
+                "template": [
+                    "强化从者/槽位标志.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-执行自动填充"
+        ]
+    },
+    "强化从者-点从者强化条": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/从者强化条.png"
+                ],
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "强化从者-已在强化界面",
+            "强化从者-点从者强化条"
+        ]
+    },
+    "强化从者-点后退": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/返回强化菜单按钮.png",
+                    "后退按钮.png"
+                ],
+                "threshold": [
+                    0.75
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800
+    },
+    "强化从者-点喂狗粮决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/自动加载已选中.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    840,
+                    633,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "强化从者-还是没有狗粮",
+            "强化从者-还是没有狗粮2",
+            "强化从者-强化确认",
+            "强化从者-道具不足"
+        ]
+    },
+    "强化从者-点强化按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    473,
+                    598,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 800,
+        "next": [
+            "强化从者-点从者强化条"
+        ]
+    },
+    "强化从者-点突破": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1050,
+                    557,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "强化从者-强化确认",
+            "强化从者-道具不足"
+        ]
+    },
+    "强化从者-点菜单进强化": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "菜单2.png",
+                    "菜单.png"
+                ],
+                "green_mask": false,
+                "threshold": 0.65
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 800,
+        "next": [
+            "强化从者-点强化按钮"
+        ]
+    },
+    "强化从者-狗粮消耗完毕": {},
+    "强化从者-突破已完成": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/突破完成标记.png",
+                    "强化从者/突破完成标记2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1019,
+                    277,
+                    55,
+                    14
+                ]
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "突破完成，回到强化界面"
+        },
+        "next": [
+            "强化从者-强化一次完成"
+        ]
+    },
+    "强化从者-突破链": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "强化从者/突破素材按钮.png",
+                    "强化从者/连续突破按钮.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "next": [
+            "强化从者-点突破"
+        ]
+    },
+    "强化从者-筛点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "强化从者-图标大小检测",
+            "[JumpBack]强化从者-已在强化从者-点击缩放按钮"
+        ]
+    },
+    "强化从者-筛点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "强化从者-筛点顶部"
+        ]
+    },
+    "强化从者-筛点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "强化从者-筛重置"
+        ]
+    },
+    "强化从者-筛选准备": {
+        "next": [
+            "强化从者-筛点筛选按钮"
+        ]
+    },
+    "强化从者-筛选完成": {},
+    "强化从者-筛选星级": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/5星未选中.png",
+                "threshold": [
+                    0.9
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "强化从者-筛选职介"
+        ]
+    },
+    "强化从者-筛选职介": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/职介-剑士.png",
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "强化从者-筛点决定"
+        ]
+    },
+    "强化从者-筛重置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "强化从者-筛选星级"
+        ]
+    },
+    "强化从者-跳过动画2": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1227,
+                    73,
+                    24,
+                    17
+                ]
+            }
+        },
+        "repeat": 3,
+        "repeat_delay": 400,
+        "post_delay": 500,
+        "next": [
+            "强化从者-强化一次完成"
+        ]
+    },
+    "强化从者-还是没有狗粮": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    394,
+                    194,
+                    80,
+                    84
+                ],
+                "template": [
+                    "强化从者/槽位标志.png"
+                ]
+            }
+        },
+        "next": [
+            "强化从者-狗粮消耗完毕"
+        ]
+    },
+    "强化从者-还是没有狗粮2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    478,
+                    508,
+                    311,
+                    105
+                ],
+                "template": [
+                    "强化从者/关闭按钮.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-还是没有狗粮2-关闭界面"
+        ]
+    },
+    "强化从者-还是没有狗粮2-关闭界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    285,
+                    586,
+                    318,
+                    86
+                ],
+                "template": [
+                    "强化从者/关闭按钮.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-狗粮消耗完毕"
+        ]
+    },
+    "强化从者-道具不足": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/无法强化.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        }
+    },
+    "强化从者-限时从者强化确认": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "实行按钮.png"
+                ],
+                "threshold": [
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-强化二次确认"
+        ]
+    },
+    "强化从者完成": {},
+    "执行强化从者": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "execute_servant_up"
+            }
+        },
+        "attach": {
+            "servant_id": "",
+            "servant_name": "",
+            "target_level": 0
+        },
+        "next": [
+            "强化从者完成"
+        ]
+    },
+    "强化从者-删除活动筛选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    624,
+                    80,
+                    276,
+                    85
+                ],
+                "template": [
+                    "强化从者/无活动筛选.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "强化从者-筛选完成"
+        ]
+    },
+    "强化从者-删除活动筛选点击": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    753,
+                    118,
+                    44,
+                    17
+                ]
+            }
+        },
+        "post_delay": 1000
+    }
+}
