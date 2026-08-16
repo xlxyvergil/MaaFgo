@@ -205,6 +205,14 @@ class SupportAction(CustomAction):
     """助战查询 Action: 全部条件满足才点击对应条目"""
 
     _servant_map = None
+    _detector = None
+
+    @classmethod
+    def _get_detector(cls):
+        """懒加载并缓存 YOLO 检测器, 避免每次 run 重复加载模型"""
+        if cls._detector is None:
+            cls._detector = SupportDetector(SUPPORT_MODEL_PATH)
+        return cls._detector
 
     @classmethod
     def _get_servant_map(cls):
@@ -510,7 +518,7 @@ class SupportAction(CustomAction):
     # ---------- 刷新后连接中检测 ----------
     @staticmethod
     def _is_connecting(controller):
-        """刷新后判断是否仍在连接: (1158,623)-(1259,709) 区域白像素占比 >= 50% 表示连接中;
+        """刷新后判断是否仍在连接: (1158,623)-(1259,709) 区域白像素占比 >= 10%(WHITE_RATIO) 表示连接中;
         截图失败视为已连接完成(避免卡死), 交由后续识别流程处理"""
         import cv2
         img = _norm_img(controller.post_screencap().wait().get())
@@ -598,7 +606,7 @@ class SupportAction(CustomAction):
             else:
                 ce_targets.append((ce, CE_ANCHOR_NORMAL))
 
-            detector = SupportDetector(SUPPORT_MODEL_PATH)
+            detector = self._get_detector()
 
             controller = context.tasker.controller
 
