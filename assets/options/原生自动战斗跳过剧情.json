@@ -9,14 +9,14 @@
                     "name": "skip",
                     "label": "跳过剧情",
                     "option": [
-                        "助战方式"
+                        "原生自动战斗助战方式"
                     ]
                 },
                 {
                     "name": "noskip",
                     "label": "不跳过剧情",
                     "option": [
-                        "助战方式"
+                        "原生自动战斗助战方式"
                     ],
                     "pipeline_override": {
                         "跳过剧情-点击跳过": {
