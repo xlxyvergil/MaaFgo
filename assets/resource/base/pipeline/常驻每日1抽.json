@@ -50,20 +50,7 @@
             "[JumpBack]常驻每日1抽-点击空白"
         ]
     },
-    "常驻每日1抽-召唤": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "召唤.png",
-                    "召唤2.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 3000,
+    "常驻每日1抽-召唤开始": {
         "next": [
             "[JumpBack]常驻每日1抽-寻找免费图标",
             "常驻每日1抽-完成",
@@ -82,7 +69,8 @@
                 ],
                 "template": [
                     "召唤2次.png",
-                    "召唤1次.png"
+                    "召唤1次.png",
+                    "召唤1次(无护符).png"
                 ]
             }
         },
@@ -102,7 +90,10 @@
                 ]
             }
         },
-        "post_delay": 2000
+        "post_delay": 2000,
+        "next": [
+            "常驻每日1抽-结束任务"
+        ]
     },
     "常驻每日1抽-寻找免费图标": {
         "max_hit": 1,
@@ -193,6 +184,11 @@
             "常驻每日1抽-完成返回"
         ]
     },
+    "常驻每日1抽-结束任务": {
+        "action": {
+            "type": "StopTask"
+        }
+    },
     "常驻每日1抽-菜单": {
         "recognition": {
             "type": "TemplateMatch",
@@ -218,8 +214,49 @@
             "Node.Recognition.Starting": "开始常驻每日1抽"
         },
         "next": [
+            "常驻每日1抽-已经在抽卡界面",
             "[JumpBack]常驻每日1抽-先回主界面",
             "常驻每日1抽-菜单"
+        ]
+    },
+    "常驻每日1抽-已经在抽卡界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "友情池1抽.png",
+                    "免费常驻池.png",
+                    "召唤1次.png",
+                    "召唤1次(无护符).png",
+                    "召唤2次.png",
+                    "免费友情池.png",
+                    "免费常驻池2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "常驻每日1抽-召唤开始"
+        ]
+    },
+    "常驻每日1抽-召唤": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "召唤.png",
+                    "召唤2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "常驻每日1抽-召唤开始"
         ]
     }
 }

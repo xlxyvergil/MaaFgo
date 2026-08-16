@@ -83,7 +83,8 @@
             "追加强化-等级识别1-2",
             "追加强化-等级识别-满级",
             "[JumpBack]追加强化-点击强化按钮（通用）",
-            "[JumpBack]追加强化-需要先解放技能"
+            "[JumpBack]追加强化-需要先解放技能",
+            "追加强化-全部完成"
         ]
     },
     "追加强化-技能2": {
@@ -107,7 +108,8 @@
             "追加强化-等级识别2-2",
             "追加强化-等级识别-满级",
             "[JumpBack]追加强化-点击强化按钮（技能2）",
-            "[JumpBack]追加强化-需要先解放技能（技能2）"
+            "[JumpBack]追加强化-需要先解放技能（技能2）",
+            "追加强化-全部完成"
         ]
     },
     "追加强化-技能3": {
@@ -131,7 +133,8 @@
             "追加强化-等级识别3-2",
             "追加强化-等级识别-满级",
             "[JumpBack]追加强化-点击强化按钮（技能3）",
-            "[JumpBack]追加强化-需要先解放技能（技能3）"
+            "[JumpBack]追加强化-需要先解放技能（技能3）",
+            "追加强化-全部完成"
         ]
     },
     "追加强化-技能4": {
@@ -155,7 +158,8 @@
             "追加强化-等级识别4-2",
             "追加强化-等级识别-满级",
             "[JumpBack]追加强化-点击强化按钮（技能4）",
-            "[JumpBack]追加强化-需要先解放技能（技能4）"
+            "[JumpBack]追加强化-需要先解放技能（技能4）",
+            "追加强化-全部完成"
         ]
     },
     "追加强化-技能5": {
@@ -179,7 +183,8 @@
             "追加强化-等级识别5-2",
             "追加强化-等级识别-满级",
             "[JumpBack]追加强化-点击强化按钮（技能5）",
-            "[JumpBack]追加强化-需要先解放技能（技能5）"
+            "[JumpBack]追加强化-需要先解放技能（技能5）",
+            "追加强化-全部完成"
         ]
     },
     "追加强化-断网重连": {
@@ -329,12 +334,31 @@
         "action": {
             "type": "Click"
         },
-        "post_delay": 3000,
+        "post_delay": 500,
+        "next": [
+            "追加强化-快速点击"
+        ]
+    },
+    "追加强化-快速点击": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1217,
+                    269,
+                    36,
+                    82
+                ]
+            }
+        },
+        "repeat": 3,
+        "repeat_delay": 400,
+        "post_delay": 2000,
         "next": [
             "[JumpBack]追加强化-断网重连",
             "追加强化-回到强化界面",
-            "[JumpBack]追加强化-点击空白跳过",
-            "追加强化-全部完成"
+            "追加强化-全部完成",
+            "[JumpBack]追加强化-点击空白跳过"
         ]
     },
     "追加强化-等级识别-满级": {
@@ -616,6 +640,62 @@
             "Node.Recognition.Succeeded": "技能未解锁，跳过强化"
         }
     },
+    "追加强化-识别未解锁时不强化（技能2）": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/解放按钮.png"
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "追加技能2未解锁，跳过强化"
+        }
+    },
+    "追加强化-识别未解锁时不强化（技能3）": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/解放按钮.png"
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "追加技能3未解锁，跳过强化"
+        }
+    },
+    "追加强化-识别未解锁时不强化（技能4）": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/解放按钮.png"
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "追加技能4未解锁，跳过强化"
+        }
+    },
+    "追加强化-识别未解锁时不强化（技能5）": {
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "从者技能强化/解放按钮.png"
+                ]
+            }
+        },
+        "focus": {
+            "Node.Recognition.Succeeded": "追加技能5未解锁，跳过强化"
+        }
+    },
     "追加强化-需要先解放技能": {
         "enabled": true,
         "recognition": {
@@ -636,20 +716,6 @@
         "next": [
             "追加强化-确定"
         ]
-    },
-    "追加强化-识别未解锁时不强化（技能2）": {
-        "enabled": false,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "从者技能强化/解放按钮.png"
-                ]
-            }
-        },
-        "focus": {
-            "Node.Recognition.Succeeded": "追加技能2未解锁，跳过强化"
-        }
     },
     "追加强化-需要先解放技能（技能2）": {
         "enabled": true,
@@ -672,20 +738,6 @@
             "追加强化-确定"
         ]
     },
-    "追加强化-识别未解锁时不强化（技能3）": {
-        "enabled": false,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "从者技能强化/解放按钮.png"
-                ]
-            }
-        },
-        "focus": {
-            "Node.Recognition.Succeeded": "追加技能3未解锁，跳过强化"
-        }
-    },
     "追加强化-需要先解放技能（技能3）": {
         "enabled": true,
         "recognition": {
@@ -707,20 +759,6 @@
             "追加强化-确定"
         ]
     },
-    "追加强化-识别未解锁时不强化（技能4）": {
-        "enabled": false,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "从者技能强化/解放按钮.png"
-                ]
-            }
-        },
-        "focus": {
-            "Node.Recognition.Succeeded": "追加技能4未解锁，跳过强化"
-        }
-    },
     "追加强化-需要先解放技能（技能4）": {
         "enabled": true,
         "recognition": {
@@ -741,20 +779,6 @@
         "next": [
             "追加强化-确定"
         ]
-    },
-    "追加强化-识别未解锁时不强化（技能5）": {
-        "enabled": false,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "从者技能强化/解放按钮.png"
-                ]
-            }
-        },
-        "focus": {
-            "Node.Recognition.Succeeded": "追加技能5未解锁，跳过强化"
-        }
     },
     "追加强化-需要先解放技能（技能5）": {
         "enabled": true,

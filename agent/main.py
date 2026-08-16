@@ -22,10 +22,14 @@ import bbc_action
 import bbc_start
 import bbc_stop
 import bbc_stop_listener
+import box_action
 import chaldea_import_action
+import servant_up_action
 import general_navigation_action
 import ocr_logger
 import support_action
+import auto_battle_action
+import auto_battle_repeat_action
 
 
 def main():

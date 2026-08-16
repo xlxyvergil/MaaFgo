@@ -1,4 +1,24 @@
 {
+    "自动登录_蓝屏检测继续": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "点击画面继续.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 5000,
+        "focus": {
+            "Node.Recognition.Failed": "尚未检测到登录成功"
+        },
+        "next": [
+            "自动登录2"
+        ]
+    },
     "打开游戏": {
         "action": {
             "type": "StartApp",
@@ -9,9 +29,11 @@
         "post_delay": 3000,
         "next": [
             "自动登录",
+            "自动登录_蓝屏检测继续",
             "[JumpBack]是否要更新",
             "[JumpBack]异常启动弹窗",
             "登录-已经在主界面",
+            "自动登录2",
             "[JumpBack]等待更新完成"
         ]
     },
@@ -37,6 +59,12 @@
         "recognition": {
             "type": "OCR",
             "param": {
+                "roi": [
+                    367,
+                    611,
+                    528,
+                    97
+                ],
                 "expected": [
                     "タッチして"
                 ]
@@ -260,5 +288,13 @@
             "type": "Click"
         },
         "post_delay": 3000
+    },
+    "新建节点6": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": ""
+            }
+        }
     }
 }

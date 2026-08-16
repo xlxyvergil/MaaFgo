@@ -1,0 +1,13 @@
+{
+  "助战选择-确认按钮锚点": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "roi": [1020, 165, 195, 545],
+        "template": "support/助战编入确认.png",
+        "threshold": 0.8,
+        "order_by": "Vertical"
+      }
+    }
+  }
+}

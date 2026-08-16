@@ -1,0 +1,381 @@
+{
+    "option": {
+        "整理礼物盒-整理大类": {
+            "type": "select",
+            "label": "整理礼物盒",
+            "default": "on",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不整理",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "one_key3": false,
+                                "one_key4": false,
+                                "one_key5": false,
+                                "keep3": false,
+                                "keep4": false,
+                                "keep5": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "on",
+                    "label": "整理",
+                    "option": [
+                        "整理礼物盒-一键领取三星",
+                        "整理礼物盒-一键领取四星",
+                        "整理礼物盒-一键领取五星",
+                        "整理礼物盒-保留三星",
+                        "整理礼物盒-保留四星",
+                        "整理礼物盒-保留五星"
+                    ]
+                }
+            ]
+        },
+        "整理礼物盒-贩卖大类": {
+            "type": "select",
+            "label": "贩卖狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不贩卖",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "sell3": false,
+                                "sell4": false,
+                                "sell5": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "on",
+                    "label": "贩卖",
+                    "option": [
+                        "整理礼物盒-贩卖三星",
+                        "整理礼物盒-贩卖四星",
+                        "整理礼物盒-贩卖五星",
+                        "整理礼物盒-QP满处理"
+                    ]
+                }
+            ]
+        },
+        "整理礼物盒-一键领取三星": {
+            "type": "select",
+            "label": "一键领取三星狗粮",
+            "default": "on",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不领",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "one_key3": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "on",
+                    "label": "领取"
+                }
+            ]
+        },
+        "整理礼物盒-一键领取四星": {
+            "type": "select",
+            "label": "一键领取四星狗粮",
+            "default": "on",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不领",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "one_key4": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "on",
+                    "label": "领取"
+                }
+            ]
+        },
+        "整理礼物盒-一键领取五星": {
+            "type": "select",
+            "label": "一键领取五星狗粮",
+            "default": "on",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不领",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "one_key5": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "on",
+                    "label": "领取"
+                }
+            ]
+        },
+        "整理礼物盒-保留三星": {
+            "type": "select",
+            "label": "保留三星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不保留"
+                },
+                {
+                    "name": "on",
+                    "label": "保留",
+                    "option": [
+                        "整理礼物盒-保留三星数量"
+                    ],
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "keep3": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-保留四星": {
+            "type": "select",
+            "label": "保留四星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不保留"
+                },
+                {
+                    "name": "on",
+                    "label": "保留",
+                    "option": [
+                        "整理礼物盒-保留四星数量"
+                    ],
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "keep4": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-保留五星": {
+            "type": "select",
+            "label": "保留五星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不保留"
+                },
+                {
+                    "name": "on",
+                    "label": "保留",
+                    "option": [
+                        "整理礼物盒-保留五星数量"
+                    ],
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "keep5": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-保留三星数量": {
+            "type": "input",
+            "label": "保留三星数量",
+            "inputs": [
+                {
+                    "name": "keep3_num",
+                    "label": "保留数量（2-50）",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^([2-9]|[1-4][0-9]|50)$"
+                }
+            ],
+            "pipeline_override": {
+                "执行整理礼物盒": {
+                    "attach": {
+                        "keep3_num": "{keep3_num}"
+                    }
+                }
+            }
+        },
+        "整理礼物盒-保留四星数量": {
+            "type": "input",
+            "label": "保留四星数量",
+            "inputs": [
+                {
+                    "name": "keep4_num",
+                    "label": "保留数量（2-50）",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^([2-9]|[1-4][0-9]|50)$"
+                }
+            ],
+            "pipeline_override": {
+                "执行整理礼物盒": {
+                    "attach": {
+                        "keep4_num": "{keep4_num}"
+                    }
+                }
+            }
+        },
+        "整理礼物盒-保留五星数量": {
+            "type": "input",
+            "label": "保留五星数量",
+            "inputs": [
+                {
+                    "name": "keep5_num",
+                    "label": "保留数量（2-50）",
+                    "default": "5",
+                    "pipeline_type": "int",
+                    "verify": "^([2-9]|[1-4][0-9]|50)$"
+                }
+            ],
+            "pipeline_override": {
+                "执行整理礼物盒": {
+                    "attach": {
+                        "keep5_num": "{keep5_num}"
+                    }
+                }
+            }
+        },
+        "整理礼物盒-贩卖三星": {
+            "type": "select",
+            "label": "贩卖三星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不卖"
+                },
+                {
+                    "name": "on",
+                    "label": "贩卖",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "sell3": true
+                            }
+                        },
+                        "整理礼物盒-筛卖选3星": {
+                            "next": [
+                                "整理礼物盒-筛卖点3星"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-贩卖四星": {
+            "type": "select",
+            "label": "贩卖四星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不卖"
+                },
+                {
+                    "name": "on",
+                    "label": "贩卖",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "sell4": true
+                            }
+                        },
+                        "整理礼物盒-筛卖选4星": {
+                            "next": [
+                                "整理礼物盒-筛卖点4星"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-贩卖五星": {
+            "type": "select",
+            "label": "贩卖五星狗粮",
+            "default": "off",
+            "cases": [
+                {
+                    "name": "off",
+                    "label": "不卖"
+                },
+                {
+                    "name": "on",
+                    "label": "贩卖",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "sell5": true
+                            }
+                        },
+                        "整理礼物盒-筛卖选5星": {
+                            "next": [
+                                "整理礼物盒-筛卖点5星"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        "整理礼物盒-QP满处理": {
+            "type": "select",
+            "label": "贩卖时 QP 满自动处理",
+            "default": "on",
+            "cases": [
+                {
+                    "name": "on",
+                    "label": "自动点掉继续"
+                },
+                {
+                    "name": "off",
+                    "label": "停止贩卖",
+                    "pipeline_override": {
+                        "执行整理礼物盒": {
+                            "attach": {
+                                "aqf": false
+                            }
+                        },
+                        "整理礼物盒-贩处理QP满": {
+                            "action": {
+                                "type": "DoNothing"
+                            },
+                            "next": [
+                                "整理礼物盒-贩卖确认完成"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

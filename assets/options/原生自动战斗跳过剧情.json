@@ -1,0 +1,24 @@
+{
+    "option": {
+        "原生自动战斗跳过剧情": {
+            "type": "select",
+            "label": "跳过剧情",
+            "default": "skip",
+            "cases": [
+                {
+                    "name": "skip",
+                    "label": "跳过剧情"
+                },
+                {
+                    "name": "noskip",
+                    "label": "不跳过剧情",
+                    "pipeline_override": {
+                        "跳过剧情-点击跳过": {
+                            "enabled": false
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

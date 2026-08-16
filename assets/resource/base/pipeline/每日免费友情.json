@@ -50,23 +50,11 @@
             "[JumpBack]每日免费友情-点击空白"
         ]
     },
-    "每日免费友情-召唤": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "召唤.png",
-                    "召唤2.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 3000,
+    "每日免费友情-召唤开始": {
         "next": [
             "[JumpBack]每日免费友情-寻找友情图标",
             "每日免费友情-完成",
+            "每日免费友情-完成2",
             "[JumpBack]每日免费友情-下一个卡池"
         ]
     },
@@ -79,6 +67,28 @@
                     436,
                     272,
                     161
+                ],
+                "template": [
+                    "友情池1抽.png"
+                ]
+            }
+        },
+        "focus": {
+            "Node.Action.Succeeded": "每日免费友情完成"
+        },
+        "next": [
+            "回主界面"
+        ]
+    },
+    "每日免费友情-完成2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    356,
+                    437,
+                    216,
+                    99
                 ],
                 "template": [
                     "友情池1抽.png"
@@ -213,8 +223,49 @@
             "Node.Recognition.Starting": "开始每日免费友情"
         },
         "next": [
+            "每日免费友情-已经在抽卡界面",
             "[JumpBack]每日免费友情-先回主界面",
             "每日免费友情-菜单"
+        ]
+    },
+    "每日免费友情-召唤": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "召唤.png",
+                    "召唤2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "每日免费友情-召唤开始"
+        ]
+    },
+    "每日免费友情-已经在抽卡界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "友情池1抽.png",
+                    "免费常驻池.png",
+                    "召唤1次.png",
+                    "召唤1次(无护符).png",
+                    "召唤2次.png",
+                    "免费友情池.png",
+                    "免费常驻池2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "每日免费友情-召唤开始"
         ]
     }
 }

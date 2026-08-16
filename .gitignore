@@ -468,3 +468,18 @@ debug
 
 venv/
 assets/config.json
+bbcdll/*
+.claude/*
+.codex/*
+.agents/*
+
+# 本地环境配置与工具目录
+.env
+.env.example
+.dev/
+
+# 本地数据生成脚本（含本机绝对路径，仅本地用，不提交）
+tools/gen_servant_data.py
+tools/gen_servant_up_options.py
+tools/copy_servant_up_templates.py
+
