@@ -681,14 +681,13 @@ class SupportAction(CustomAction):
                     swipe_count = 0
                     mfaalog.info(f"[SupportAction] 连续{MAX_SWIPE_BEFORE_REFRESH}次滑动未匹配, 执行{REFRESH_TASK}")
                     context.run_task(REFRESH_TASK)
-                    # 刷新后持续检测连接状态: 连接区纯白占比>=50% 时不能继续检测, 等待其消失
+                    # 刷新后持续检测连接状态: 连接区白像素占比>=10%(WHITE_RATIO) 时不能继续检测, 等待其消失
                     mfaalog.info("[SupportAction] 等待刷新连接完成...")
                     while self._is_connecting(controller):
                         time.sleep(0.5)
                     mfaalog.info("[SupportAction] 刷新完成, 继续检测")
-
-            mfaalog.error("[SupportAction] 无满足全部条件的助战条目")
-            return CustomAction.RunResult(success=False)
+                    # 说明: 本循环仅在命中助战条目时 return True 退出;
+                    # 持续未命中时靠任务停止/中断机制结束, 不会走到循环外
         except Exception as e:
             import traceback
             mfaalog.error(f"[SupportAction] 异常: {e}\n{traceback.format_exc()}")
