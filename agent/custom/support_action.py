@@ -102,6 +102,11 @@ DIGIT_SIZE = (30, 20)   # 技能等级数字 ROI 尺寸 (w, h): 30x20, 右上角
 
 # ---------------- 匹配阈值 ----------------
 TH_CE = 0.70
+# 礼装右下角形态校验: 满破/非满破等仅右下角不同的礼装, 取卡面右下角约30x30区域与模板右下角匹配
+CE_BR_SIZE = 30
+TH_CE_BR = 0.90              # 右下角形态匹配高阈值(形态不一致时通常 <0.5, 高阈值防误匹配)
+# 礼装模板尺寸可能与卡面实际显示不一致(如非满破模板偏小), 整卡匹配需多尺度放大对齐
+CE_SCALES = tuple(round(0.7 + 0.01 * i, 2) for i in range(int((1.5 - 0.7) / 0.01) + 1))
 TH_NP = 0.70
 # np_level 模板为小图标(约40x40), 需在宝具 ROI 内多尺度滑动匹配
 NP_SCALES = (0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.5, 2.0)
@@ -257,20 +262,37 @@ class SupportAction(CustomAction):
             mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} (目录 {ce_dir})")
             return False
         # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
-        # 模板保持原尺寸在窗口内滑动匹配, 避免 resize 到小窗导致变形
+        # 多尺度整卡匹配: 模板尺寸可能与卡面实际显示不一致(如非满破模板偏小), 缩放对齐后滑动匹配
         roi = _roi(img, bx, by, anchor[0], anchor[1], CE_ROI[0], CE_ROI[1])
         if roi is None:
             return False
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        t = tpl
-        # 模板超出窗口则等比缩小到窗口内
-        if t.shape[0] > roi_gray.shape[0] or t.shape[1] > roi_gray.shape[1]:
-            sc = min(roi_gray.shape[1] / t.shape[1], roi_gray.shape[0] / t.shape[0])
-            t = cv2.resize(t, (round(t.shape[1] * sc), round(t.shape[0] * sc)),
-                           interpolation=cv2.INTER_AREA)
-        score = float(cv2.matchTemplate(roi_gray, t, cv2.TM_CCOEFF_NORMED).max())
-        mfaalog.info(f"[SupportAction] 礼装 {ce_name}: score={score:.3f}")
-        return score >= TH_CE
+        hw, ww = roi_gray.shape[:2]
+        best = (-1.0, None, None)
+        for sc in CE_SCALES:
+            tw = max(1, round(tpl.shape[1] * sc))
+            th = max(1, round(tpl.shape[0] * sc))
+            if th > hw or tw > ww:
+                continue
+            t = (cv2.resize(tpl, (tw, th), interpolation=cv2.INTER_AREA)
+                 if (tw, th) != (tpl.shape[1], tpl.shape[0]) else tpl)
+            res = cv2.matchTemplate(roi_gray, t, cv2.TM_CCOEFF_NORMED)
+            _, s, _, loc = cv2.minMaxLoc(res)
+            if s > best[0]:
+                best = (s, t, loc)
+        score, t, (mx, my) = best
+        if score < TH_CE:
+            mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}(未过)")
+            return False
+        # 右下角形态校验: 满破/非满破等仅右下角不同的礼装整卡主体相同得分均高,
+        # 在最佳匹配位置取卡面右下角约30x30区域与模板右下角匹配, 高阈值确认形态一致
+        h, w = t.shape[:2]
+        s2 = min(CE_BR_SIZE, h, w)
+        card_br = roi_gray[my + h - s2: my + h, mx + w - s2: mx + w]
+        tpl_br = t[h - s2: h, w - s2: w]
+        score_br = float(cv2.matchTemplate(card_br, tpl_br, cv2.TM_CCOEFF_NORMED).max())
+        mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} 右下角={score_br:.3f}")
+        return score_br >= TH_CE_BR
 
     # ---------- 冠位羁绊判断 ----------
     def _match_bond(self, img, skill_dir, bx, by, bond_opt):
