@@ -86,9 +86,9 @@ CLASS_TABS = {
     "魔术师": (434, 130),
     "暗杀者": (497, 130),
     "狂战士": (565, 130),
+    "OTHER": (629, 130),   # 盾/裁定者/复仇者/降临者/兽/他人格/伪装者/月之癌 共用
+    "ALL": (91, 130),      # all 阶(职介筛选选项选 ALL 时点击)
 }
-CLASS_TAB_OTHERS = (629, 130)   # 盾/裁定者/复仇者/降临者/兽/他人格/伪装者/月之癌 共用一个 tab
-CLASS_TAB_ALL = (91, 130)       # all 阶 tab(职介筛选选项选 ALL 时点击)
 
 # ---------------- OCR 资源(打包后位于 resource/model/ocr, 与 MaaFramework 标准模型目录一致) ----------------
 OCR_EN_DIR = os.path.join(_ROOT_DIR, "resource", "model", "ocr")
@@ -553,26 +553,20 @@ class SupportAction(CustomAction):
                     param = {}
             support_type = param.get("support_type", "normal")
 
-            node = context.get_node_data(argv.node_name) or {}
-            attach = node.get("attach") or {}
-            class_name = str(attach.get("class_name") or "").strip()  # 玩家点击的职介(英灵选择 各职介 case 固定 attach)
-            class_all = str(attach.get("class_all") or "").strip()    # 职介筛选=ALL(1) 或 默认(0)
-            servant_id = str(attach.get("servant") or "").strip()
-            ce = str(attach.get("ce") or "").strip()
-            ce_1 = str(attach.get("ce_1") or "").strip()
-            ce_2 = str(attach.get("ce_2") or "").strip()
-            ce_bond = str(attach.get("ce_bond") or "").strip()
-            # 技能等级: 独立键(选项各 case 固定 attach), 缺省 0=不要求
-            active = [int(attach.get(f"skill_active_{i}") or 0) for i in range(1, 4)]
-            passive = [int(attach.get(f"skill_passive_{i}") or 0) for i in range(1, 6)]
-            try:
-                np_level = int(attach.get("np_level") or 0)
-            except (TypeError, ValueError):
-                np_level = 0
-            try:
-                level = int(attach.get("level") or 0)
-            except (TypeError, ValueError):
-                level = 0
+            node = context.get_node_data(argv.node_name)
+            attach = node["attach"]
+            class_name = str(attach["class_name"]).strip()   # 玩家点击的职介(英灵选择 各职介 case 固定 attach)
+            class_all = str(attach["class_all"]).strip()     # 职介筛选: "all"=ALL 阶, "def"=按职介
+            servant_id = str(attach["servant"]).strip()
+            ce = str(attach["ce"]).strip()
+            ce_1 = str(attach["ce_1"]).strip()
+            ce_2 = str(attach["ce_2"]).strip()
+            ce_bond = str(attach["ce_bond"]).strip()
+            # 技能等级: 独立键(选项各 case 固定 attach, 0-10; 0=不要求)
+            active = [int(attach[f"skill_active_{i}"]) for i in range(1, 4)]
+            passive = [int(attach[f"skill_passive_{i}"]) for i in range(1, 6)]
+            np_level = int(attach["np_level"])   # 宝具等级(选项 select 1-5 固定 attach)
+            level = int(attach["level"])         # 英灵等级(选项 input 固定 attach)
 
             passive_need = any(v > 0 for v in passive)
 
@@ -581,8 +575,7 @@ class SupportAction(CustomAction):
                          f"礼装={ce or ce_1 or ce_2 or '(空)'} 主动={active} 被动={passive} "
                          f"宝具={np_level} 等级={level}")
 
-            cfg = context.get_node_data("资源包配置") or {}
-            resource_package = str((cfg.get("attach") or {}).get("resource_package") or "").strip()
+            resource_package = str(context.get_node_data("资源包配置")["attach"]["resource_package"])
             pkg = "cn" if resource_package == "cn" else "base"
             base_dir = os.path.join(_ROOT_DIR, "resource", pkg, "image")
             # 英灵头像/礼装固定放 base, 不用 pkg 区分
@@ -616,10 +609,10 @@ class SupportAction(CustomAction):
 
             # 执行所有助战选择前, 先点击对应职介的筛选 tab(全屏坐标); 间隔0.5s点击3次
             if class_name:
-                if class_all:
-                    tab = CLASS_TAB_ALL    # ALL 阶: 不按具体职介
+                if "all" in class_all:
+                    tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
                 else:
-                    tab = CLASS_TABS.get(class_name, CLASS_TAB_OTHERS)
+                    tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
                 for _ in range(3):
                     controller.post_click(tab[0], tab[1]).wait()
                     time.sleep(0.5)

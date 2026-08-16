@@ -229,7 +229,7 @@
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_all": "1"
+                                "class_all": "all"
                             }
                         }
                     }
@@ -240,7 +240,7 @@
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_all": "0"
+                                "class_all": "def"
                             }
                         }
                     }
