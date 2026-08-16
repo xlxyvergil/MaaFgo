@@ -1,0 +1,20 @@
+{
+    "option": {
+        "bbc_team_config": {
+            "type": "scan_select",
+            "label": "BBC 队伍配置",
+            "description": "选择 BBC 队伍配置文件",
+            "default": "",
+            "scan_dir": "BBchannel/settings",
+            "scan_filter": "*.json",
+            "cases": [],
+            "pipeline_override": {
+                "执行BBC任务": {
+                    "attach": {
+                        "bbc_team_config": "{bbc_team_config}"
+                    }
+                }
+            }
+        }
+    }
+}

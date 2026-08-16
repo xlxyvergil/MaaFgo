@@ -1,0 +1,143 @@
+{
+    "option": {
+        "伪装者": {
+            "type": "select",
+            "label": "英灵",
+            "default": "2800400",
+            "cases": [
+                {
+                    "name": "2800400",
+                    "label": "九纹龙伊丽莎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800700",
+                    "label": "亚历山德罗·迪·卡利奥斯特罗",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800600",
+                    "label": "凯特·库·米可科尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800500",
+                    "label": "特拉洛克",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800200",
+                    "label": "赫费斯提翁",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800800",
+                    "label": "阿比盖尔·威廉姆斯〔圣诞〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800900",
+                    "label": "Phantasmoon",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2801000",
+                    "label": "但丁·阿利吉耶里",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2801000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2801100",
+                    "label": "堤丰·厄斐墨洛斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2801100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800100",
+                    "label": "奥伯龙",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2801200",
+                    "label": "所罗门",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2801200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2800300",
+                    "label": "阿瓦隆女士",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800300"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

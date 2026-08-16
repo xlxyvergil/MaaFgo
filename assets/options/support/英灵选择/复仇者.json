@@ -1,0 +1,242 @@
+{
+    "option": {
+        "复仇者": {
+            "type": "select",
+            "label": "英灵",
+            "default": "1100100",
+            "cases": [
+                {
+                    "name": "1100100",
+                    "label": "安哥拉曼纽",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100600",
+                    "label": "安东尼奥·萨列里",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101600",
+                    "label": "克洛伊·冯·爱因兹贝伦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101400",
+                    "label": "宇津见绘里濑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100400",
+                    "label": "戈耳工",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101900",
+                    "label": "方巿",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1102200",
+                    "label": "终结之伊丽莎白",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1102200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1102100",
+                    "label": "藤堂平助",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1102100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101200",
+                    "label": "谜之兰丸X",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100500",
+                    "label": "黑森·罗伯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100900",
+                    "label": "太空伊什塔尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101500",
+                    "label": "尼托克丽丝〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100200",
+                    "label": "岩窟王",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101700",
+                    "label": "岩窟王　基督山",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101000",
+                    "label": "平景清",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1102000",
+                    "label": "无地王约翰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1102000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101800",
+                    "label": "源赖光／丑御前",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101300",
+                    "label": "玛丽·安托瓦内特〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100700",
+                    "label": "织田信长",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1100300",
+                    "label": "贞德〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1101100",
+                    "label": "迦摩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

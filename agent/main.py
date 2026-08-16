@@ -27,6 +27,7 @@ import chaldea_import_action
 import servant_up_action
 import general_navigation_action
 import ocr_logger
+import support_action
 import auto_battle_action
 import auto_battle_repeat_action
 

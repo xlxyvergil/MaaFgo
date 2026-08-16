@@ -1,0 +1,231 @@
+{
+    "option": {
+        "他人格": {
+            "type": "select",
+            "label": "英灵",
+            "default": "1001400",
+            "cases": [
+                {
+                    "name": "1001400",
+                    "label": "方巿",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000100",
+                    "label": "Passionlip",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001200",
+                    "label": "太岁星君",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000400",
+                    "label": "机械伊丽亲",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000500",
+                    "label": "机械伊丽亲Ⅱ号机",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001900",
+                    "label": "热内斯·克莱恩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1002000",
+                    "label": "芙萝拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1002000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001800",
+                    "label": "Kazuradrop",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000900",
+                    "label": "Kingprotea",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000200",
+                    "label": "Meltryllis",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000700",
+                    "label": "冲田总司〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001700",
+                    "label": "响＆千键",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001600",
+                    "label": "幼体／提亚马特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000800",
+                    "label": "志度内",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001500",
+                    "label": "格里戈里·拉斯普京",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1000300",
+                    "label": "瞑生院祈荒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1000300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001000",
+                    "label": "芦屋道满",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001300",
+                    "label": "超级班扬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1002200",
+                    "label": "阿斯卡拉福斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1002200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001100",
+                    "label": "马纳南·麦克·利尔〔巴泽特〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

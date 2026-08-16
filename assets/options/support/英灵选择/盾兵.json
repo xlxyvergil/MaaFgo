@@ -1,0 +1,22 @@
+{
+    "option": {
+        "盾兵": {
+            "type": "select",
+            "label": "英灵",
+            "default": "800100",
+            "cases": [
+                {
+                    "name": "800100",
+                    "label": "玛修·基列莱特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "800100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

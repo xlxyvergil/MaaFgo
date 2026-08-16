@@ -1,0 +1,539 @@
+{
+    "option": {
+        "暗杀者": {
+            "type": "select",
+            "label": "英灵",
+            "default": "600100",
+            "cases": [
+                {
+                    "name": "600100",
+                    "label": "佐佐木小次郎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603800",
+                    "label": "夏洛特·科黛",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601400",
+                    "label": "玛塔·哈丽",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601300",
+                    "label": "剧院魅影",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600200",
+                    "label": "咒腕哈桑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601200",
+                    "label": "夏尔·亨利·桑松",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600700",
+                    "label": "亨利·杰基尔＆海德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603300",
+                    "label": "冈田以藏",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601100",
+                    "label": "匕见",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600300",
+                    "label": "百貌哈桑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600900",
+                    "label": "静谧哈桑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601900",
+                    "label": "风魔小太郎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602300",
+                    "label": "两仪式",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604000",
+                    "label": "冲田·J·总司",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603000",
+                    "label": "加藤段藏",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601700",
+                    "label": "卡米拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601500",
+                    "label": "卫宫〔Assassin〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602700",
+                    "label": "周照",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604300",
+                    "label": "奥特琳德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602800",
+                    "label": "尼托克丽丝",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604400",
+                    "label": "希露德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602400",
+                    "label": "斯卡哈",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601000",
+                    "label": "斯忒诺",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604500",
+                    "label": "斯露德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602900",
+                    "label": "望月千代女",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603900",
+                    "label": "格蕾",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604800",
+                    "label": "洛库斯塔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602600",
+                    "label": "燕青",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603400",
+                    "label": "牛若丸",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "605000",
+                    "label": "耀星哈桑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "605000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "605200",
+                    "label": "蛇女房",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "605200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603500",
+                    "label": "雏罂",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604100",
+                    "label": "鬼一法眼",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602500",
+                    "label": "“山中老人”",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604200",
+                    "label": "光之高扬斯卡娅",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600800",
+                    "label": "克娄巴特拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603100",
+                    "label": "刑部姬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604600",
+                    "label": "吾绰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603200",
+                    "label": "塞弥拉弥斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603600",
+                    "label": "李书文",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604900",
+                    "label": "果心居士",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "605100",
+                    "label": "河上彦斋",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "605100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "604700",
+                    "label": "特斯卡特利波卡",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "604700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "601800",
+                    "label": "谜之女主角X",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "601800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "603700",
+                    "label": "迦摩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "603700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "602100",
+                    "label": "酒吞童子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "602100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "600500",
+                    "label": "雾都弃子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "600500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1002100",
+                    "label": "哈桑·萨巴赫",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1002100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

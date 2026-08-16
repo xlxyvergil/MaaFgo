@@ -111,12 +111,7 @@ def install_resource():
             dirs_exist_ok=True,
         )
     
-    # MWU: 复制 bbc_team_config.json 到根目录
-    if (working_dir / "assets" / "bbc_team_config.json").exists():
-        shutil.copy2(
-            working_dir / "assets" / "bbc_team_config.json",
-            install_path / "bbc_team_config.json",
-        )
+    # MWU: bbc_team_config.json 已统一放入 options 目录, 由上方 options 复制覆盖
 
     # 更新 interface.json 中的版本号和 agent 配置
     with open(install_path / "interface.json", "r", encoding="utf-8") as f:

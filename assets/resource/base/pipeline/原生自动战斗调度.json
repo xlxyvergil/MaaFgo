@@ -1,51 +1,4 @@
 {
-    "原生自动战斗调度": {
-        "next": [
-            "[JumpBack]执行进本",
-            "[JumpBack]跳过剧情-点击跳过",
-            "[JumpBack]执行原生自动战斗",
-            "执行战斗结束_不回主界面"
-        ]
-    },
-    "原生自动战斗_多次_第一场": {
-        "next": [
-            "[JumpBack]执行进本",
-            "[JumpBack]跳过剧情-点击跳过",
-            "[JumpBack]执行原生自动战斗",
-            "执行战斗结束_连续出击继续"
-        ]
-    },
-    "原生自动战斗_多次_下一场": {
-        "next": [
-            "[JumpBack]跳过剧情-点击跳过",
-            "[JumpBack]执行原生自动战斗",
-            "执行战斗结束_连续出击继续"
-        ]
-    },
-    "原生自动战斗_多次_最后一场": {
-        "next": [
-            "[JumpBack]跳过剧情-点击跳过",
-            "[JumpBack]执行原生自动战斗",
-            "执行战斗结束_不回主界面"
-        ]
-    },
-    "作战成功_连续出击": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "下一步.png",
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "好友申请界面_不回主界面",
-            "跳过剧情-点击跳过",
-            "连续出击_继续"
-        ]
-    },
     "作战成功_结束战斗": {
         "recognition": {
             "type": "TemplateMatch",
@@ -65,39 +18,122 @@
             "可能已经结束战斗_不回主界面"
         ]
     },
-    "执行战斗结束_不回主界面": {
-        "max_hit": 1,
+    "作战成功_连续出击": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "下一步.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
         "next": [
-            "结束战斗_不回主界面"
-        ]
-    },
-    "结束战斗_不回主界面": {
-        "next": [
-            "作战成功_结束战斗",
             "好友申请界面_不回主界面",
-            "战斗失败_不回主界面",
-            "失败2_不回主界面",
-            "撤退_不回主界面",
-            "战斗结束关闭_不回主界面",
-            "可能已经结束战斗_不回主界面"
-        ]
-    },
-    "执行战斗结束_连续出击继续": {
-        "max_hit": 1,
-        "next": [
-            "结束战斗_连续出击继续"
-        ]
-    },
-    "结束战斗_连续出击继续": {
-        "next": [
-            "作战成功_连续出击",
-            "好友申请界面_不回主界面",
-            "战斗失败_不回主界面",
-            "失败2_不回主界面",
-            "撤退_不回主界面",
-            "战斗结束关闭_不回主界面",
-            "可能已经结束战斗_不回主界面",
+            "跳过剧情-点击跳过",
             "连续出击_继续"
+        ]
+    },
+    "关闭连续出击_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "close_botton.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "全局空节点"
+        ]
+    },
+    "原生自动战斗_多次_下一场": {
+        "next": [
+            "[JumpBack]跳过剧情-点击跳过",
+            "[JumpBack]执行原生自动战斗",
+            "执行战斗结束_连续出击继续"
+        ]
+    },
+    "原生自动战斗_多次_最后一场": {
+        "next": [
+            "[JumpBack]跳过剧情-点击跳过",
+            "[JumpBack]执行原生自动战斗",
+            "执行战斗结束_不回主界面"
+        ]
+    },
+    "原生自动战斗_多次_第一场": {
+        "next": [
+            "[JumpBack]执行进本",
+            "[JumpBack]跳过剧情-点击跳过",
+            "[JumpBack]执行原生自动战斗",
+            "执行战斗结束_连续出击继续"
+        ]
+    },
+    "原生自动战斗调度": {
+        "next": [
+            "[JumpBack]执行进本",
+            "[JumpBack]跳过剧情-点击跳过",
+            "[JumpBack]执行原生自动战斗",
+            "执行战斗结束_不回主界面"
+        ]
+    },
+    "可能已经结束战斗_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    4,
+                    499,
+                    620,
+                    219
+                ],
+                "template": "task.png",
+                "green_mask": true
+            }
+        },
+        "next": [
+            "全局空节点"
+        ]
+    },
+    "失败2_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "撤退决定.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "撤退_不回主界面"
+        ]
+    },
+    "好友申请界面_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    125,
+                    521,
+                    399,
+                    187
+                ],
+                "template": "关闭好友申请.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "连续出击_继续",
+            "关闭连续出击_不回主界面",
+            "全局空节点"
         ]
     },
     "好友申请界面_连续出击继续": {
@@ -122,10 +158,34 @@
             "关闭连续出击"
         ]
     },
-    "执行进本": {
-        "max_hit": 1,
+    "战斗失败_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "撤退.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
         "next": [
-            "进本流程"
+            "失败2_不回主界面"
+        ]
+    },
+    "战斗结束关闭_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "close_botton.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "全局空节点"
         ]
     },
     "执行原生自动战斗": {
@@ -134,12 +194,101 @@
             "原生自动战斗入口"
         ]
     },
-    "进本流程": {
+    "执行战斗结束_不回主界面": {
+        "max_hit": 1,
         "next": [
-            "进本-队伍确认",
-            "进本-选择助战",
+            "结束战斗_不回主界面"
+        ]
+    },
+    "执行战斗结束_连续出击继续": {
+        "max_hit": 1,
+        "next": [
+            "结束战斗_连续出击继续"
+        ]
+    },
+    "执行进本": {
+        "max_hit": 1,
+        "next": [
+            "进本流程"
+        ]
+    },
+    "撤退_不回主界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "close_botton.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
             "全局空节点"
         ]
+    },
+    "结束战斗_不回主界面": {
+        "next": [
+            "作战成功_结束战斗",
+            "好友申请界面_不回主界面",
+            "战斗失败_不回主界面",
+            "失败2_不回主界面",
+            "撤退_不回主界面",
+            "战斗结束关闭_不回主界面",
+            "可能已经结束战斗_不回主界面"
+        ]
+    },
+    "结束战斗_连续出击继续": {
+        "next": [
+            "作战成功_连续出击",
+            "好友申请界面_不回主界面",
+            "战斗失败_不回主界面",
+            "失败2_不回主界面",
+            "撤退_不回主界面",
+            "战斗结束关闭_不回主界面",
+            "可能已经结束战斗_不回主界面",
+            "连续出击_继续"
+        ]
+    },
+    "跳过剧情-点击跳过": {
+        "max_hit": 1,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1143,
+                    24,
+                    80,
+                    35
+                ],
+                "expected": "跳过",
+                "threshold": 0.5
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 100,
+        "next": [
+            "跳过剧情-确认跳过"
+        ]
+    },
+    "跳过剧情-确认跳过": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    756,
+                    535,
+                    144,
+                    49
+                ],
+                "template": "是.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
     },
     "进本-选择助战": {
         "recognition": {
@@ -174,23 +323,14 @@
     },
     "进本-队伍确认": {
         "recognition": {
-            "type": "Or",
+            "type": "TemplateMatch",
             "param": {
-                "any_of": [
-                    {
-                        "type": "TemplateMatch",
-                        "param": {
-                            "template": "战斗开始.png",
-                            "threshold": 0.8
-                        }
-                    },
-                    {
-                        "type": "TemplateMatch",
-                        "param": {
-                            "template": "开始任务.png",
-                            "threshold": 0.8
-                        }
-                    }
+                "template": [
+                    "开始任务.png",
+                    "战斗开始.png"
+                ],
+                "threshold": [
+                    0.8
                 ]
             }
         },
@@ -198,160 +338,38 @@
             "type": "Click"
         }
     },
-    "跳过剧情-点击跳过": {
-        "max_hit": 1,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "expected": "跳过",
-                "roi": [
-                    1143,
-                    24,
-                    80,
-                    35
-                ],
-                "threshold": 0.5
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 100,
+    "进本流程": {
         "next": [
-            "跳过剧情-确认跳过"
-        ]
-    },
-    "跳过剧情-确认跳过": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "是.png",
-                "threshold": 0.8,
-                "roi": [
-                    756,
-                    535,
-                    144,
-                    49
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        }
-    },
-    "战斗失败_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "撤退.png",
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "失败2_不回主界面"
-        ]
-    },
-    "失败2_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "撤退决定.png",
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "撤退_不回主界面"
-        ]
-    },
-    "撤退_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "close_botton.png"
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
+            "进本-队伍确认",
+            "进本-选择助战",
             "全局空节点"
         ]
     },
-    "战斗结束关闭_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "close_botton.png",
-                "threshold": 0.8
-            }
-        },
+    "助战action": {
+        "pre_delay": 0,
         "action": {
-            "type": "Click"
-        },
-        "next": [
-            "全局空节点"
-        ]
-    },
-    "可能已经结束战斗_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
+            "type": "Custom",
             "param": {
-                "roi": [
-                    4,
-                    499,
-                    620,
-                    219
-                ],
-                "template": "task.png",
-                "green_mask": true
+                "custom_action": "support_action",
+                "custom_action_param": {
+                    "support_type": "normal"
+                }
             }
         },
-        "next": [
-            "全局空节点"
-        ]
-    },
-    "好友申请界面_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    125,
-                    521,
-                    399,
-                    187
-                ],
-                "template": "关闭好友申请.png",
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
+        "post_delay": 0,
+        "attach": {
+            "ce": "",
+            "ce_1": "",
+            "ce_2": "",
+            "ce_bond": "any",
+            "level": 1,
+            "np_level": 1,
+            "servant": "",
+            "skill_active": "",
+            "skill_passive": ""
         },
         "next": [
-            "连续出击_继续",
-            "关闭连续出击_不回主界面",
-            "全局空节点"
-        ]
-    },
-    "关闭连续出击_不回主界面": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "close_botton.png",
-                "threshold": 0.8
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "next": [
-            "全局空节点"
+            "进本-队伍确认"
         ]
     }
 }

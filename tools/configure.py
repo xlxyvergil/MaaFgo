@@ -13,8 +13,10 @@ def configure_ocr_model():
 
     ocr_dir = assets_dir / "resource" / "model" / "ocr"
     if not ocr_dir.exists():   # copy default OCR model only if dir does not exist
+        # 仅复制 ppocr_v6 的 medium 档内容并铺开到 model/ocr,
+        # 保持单档布局(resource/model/ocr/rec.onnx), 与代码读取路径一致
         shutil.copytree(
-            assets_dir / "MaaCommonAssets" / "OCR" / "ppocr_v5" / "zh_cn",
+            assets_dir / "MaaCommonAssets" / "OCR" / "ppocr_v6" / "medium",
             ocr_dir,
             dirs_exist_ok=True,
         )

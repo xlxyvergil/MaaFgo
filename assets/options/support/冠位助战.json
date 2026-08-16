@@ -1,0 +1,76 @@
+{
+    "option": {
+        "冠位助战-1号礼装": {
+            "type": "scan_select",
+            "label": "1号礼装",
+            "description": "选择1号助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "冠位助战-1号礼装": "{冠位助战-1号礼装}"
+                    }
+                }
+            }
+        },
+        "冠位助战-2号礼装": {
+            "type": "scan_select",
+            "label": "2号礼装",
+            "description": "选择2号助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "冠位助战-2号礼装": "{冠位助战-2号礼装}"
+                    }
+                }
+            }
+        },
+        "冠位助战-羁绊礼装": {
+            "type": "select",
+            "label": "羁绊礼装",
+            "default": "any",
+            "cases": [
+                {
+                    "name": "50np",
+                    "label": "50np",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "ce_bond": "50np"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "original",
+                    "label": "原效果",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "ce_bond": "original"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "any",
+                    "label": "任意",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "ce_bond": "any"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -811,8 +811,6 @@ class GeneralNavigationAction(CustomAction):
         if det is None:
             agent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
             model_path = os.path.join(agent_dir, "utils", "quest_detect.pt")
-            if not os.path.exists(model_path):
-                model_path = os.path.join(agent_dir, "utils", "quest_detect.onnx")
             det = QuestDetector(model_path)
             self._det = det
             mfaalog.info(f"[导航] 检测器加载: {model_path}")

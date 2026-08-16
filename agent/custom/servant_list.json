@@ -22,805 +22,1772 @@
       "collection_no": 107,
       "name": "安哥拉曼纽",
       "class": "avenger",
-      "rarity": 0
+      "rarity": 0,
+      "images": [
+        "f_11001000.png",
+        "f_11001001.png",
+        "f_11001002.png",
+        "f_11001003.png",
+        "f_11001004.png"
+      ],
+      "name_jp": "アンリマユ"
     },
     {
       "id": "103800",
       "collection_no": 254,
       "name": "伊阿宋",
       "class": "saber",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_1038000.png",
+        "f_1038001.png",
+        "f_1038002.png",
+        "f_1038003.png",
+        "f_1038004.png"
+      ],
+      "name_jp": "イアソン"
     },
     {
       "id": "600100",
       "collection_no": 39,
       "name": "佐佐木小次郎",
       "class": "assassin",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_6001000.png",
+        "f_6001001.png",
+        "f_6001002.png",
+        "f_6001003.png",
+        "f_6001004.png"
+      ],
+      "name_jp": "佐々木小次郎"
     },
     {
       "id": "702800",
       "collection_no": 174,
       "name": "保罗·班扬",
       "class": "berserker",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_7028000.png",
+        "f_7028001.png",
+        "f_7028002.png",
+        "f_7028003.png",
+        "f_7028004.png",
+        "f_7028300.png"
+      ],
+      "name_jp": "ポール?バニヤン"
     },
     {
       "id": "603800",
       "collection_no": 259,
       "name": "夏洛特·科黛",
       "class": "assassin",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_6038000.png",
+        "f_6038001.png",
+        "f_6038002.png",
+        "f_6038003.png",
+        "f_6038004.png"
+      ],
+      "name_jp": "シャルロット?コルデー"
     },
     {
       "id": "403400",
       "collection_no": 257,
       "name": "巴沙洛缪·罗伯茨",
       "class": "rider",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_4034000.png",
+        "f_4034001.png",
+        "f_4034002.png",
+        "f_4034003.png",
+        "f_4034004.png",
+        "f_4034300.png"
+      ],
+      "name_jp": "バーソロミュー?ロバーツ"
     },
     {
       "id": "700500",
       "collection_no": 50,
       "name": "斯巴达克斯",
       "class": "berserker",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_7005000.png",
+        "f_7005001.png",
+        "f_7005002.png",
+        "f_7005003.png",
+        "f_7005004.png"
+      ],
+      "name_jp": "スパルタクス"
     },
     {
       "id": "501500",
       "collection_no": 36,
       "name": "沃尔夫冈·阿马德乌斯·莫扎特",
       "class": "caster",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_5015000.png",
+        "f_5015001.png",
+        "f_5015002.png",
+        "f_5015003.png",
+        "f_5015004.png"
+      ],
+      "name_jp": "ヴォルフガング?アマデウス?モーツァルト"
     },
     {
       "id": "304900",
       "collection_no": 341,
       "name": "玛丽·安宁",
       "class": "lancer",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_3049000.png",
+        "f_3049001.png",
+        "f_3049002.png",
+        "f_3049003.png",
+        "f_3049004.png"
+      ],
+      "name_jp": "メアリー?アニング"
     },
     {
       "id": "601400",
       "collection_no": 45,
       "name": "玛塔·哈丽",
       "class": "assassin",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_6014000.png",
+        "f_6014001.png",
+        "f_6014002.png",
+        "f_6014003.png",
+        "f_6014004.png"
+      ],
+      "name_jp": "マタ?ハリ"
     },
     {
       "id": "204100",
       "collection_no": 294,
       "name": "织田信胜",
       "class": "archer",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_2041000.png",
+        "f_2041001.png",
+        "f_2041002.png",
+        "f_2041003.png",
+        "f_2041004.png",
+        "f_2041300.png"
+      ],
+      "name_jp": "織田信勝"
     },
     {
       "id": "201300",
       "collection_no": 16,
       "name": "阿拉什",
       "class": "archer",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_2013000.png",
+        "f_2013001.png",
+        "f_2013002.png",
+        "f_2013003.png",
+        "f_2013004.png"
+      ],
+      "name_jp": "アーラシュ"
     },
     {
       "id": "700900",
       "collection_no": 53,
       "name": "阿斯忒里俄斯",
       "class": "berserker",
-      "rarity": 1
+      "rarity": 1,
+      "images": [
+        "f_7009000.png",
+        "f_7009001.png",
+        "f_7009002.png",
+        "f_7009003.png",
+        "f_7009004.png"
+      ],
+      "name_jp": "アステリオス"
     },
     {
       "id": "400600",
       "collection_no": 24,
       "name": "乔尔乔斯",
       "class": "rider",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_4006000.png",
+        "f_4006001.png",
+        "f_4006002.png",
+        "f_4006003.png",
+        "f_4006004.png"
+      ],
+      "name_jp": "ゲオルギウス"
     },
     {
       "id": "300900",
       "collection_no": 21,
       "name": "列奥尼达一世",
       "class": "lancer",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_3009000.png",
+        "f_3009001.png",
+        "f_3009002.png",
+        "f_3009003.png",
+        "f_3009004.png"
+      ],
+      "name_jp": "レオニダス一世"
     },
     {
       "id": "601300",
       "collection_no": 44,
       "name": "剧院魅影",
       "class": "assassin",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_6013000.png",
+        "f_6013001.png",
+        "f_6013002.png",
+        "f_6013003.png",
+        "f_6013004.png"
+      ],
+      "name_jp": "ファントム?オブ?ジ?オペラ"
     },
     {
       "id": "303900",
       "collection_no": 256,
       "name": "加雷斯",
       "class": "lancer",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_3039000.png",
+        "f_3039001.png",
+        "f_3039002.png",
+        "f_3039003.png",
+        "f_3039004.png"
+      ],
+      "name_jp": "ガレス"
     },
     {
       "id": "701000",
       "collection_no": 54,
       "name": "卡利古拉",
       "class": "berserker",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_7010000.png",
+        "f_7010001.png",
+        "f_7010002.png",
+        "f_7010003.png",
+        "f_7010004.png"
+      ],
+      "name_jp": "カリギュラ"
     },
     {
       "id": "600200",
       "collection_no": 40,
       "name": "咒腕哈桑",
       "class": "assassin",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_6002000.png",
+        "f_6002001.png",
+        "f_6002002.png",
+        "f_6002003.png",
+        "f_6002004.png"
+      ],
+      "name_jp": "呪腕のハサン"
     },
     {
       "id": "601200",
       "collection_no": 43,
       "name": "夏尔·亨利·桑松",
       "class": "assassin",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_6012000.png",
+        "f_6012001.png",
+        "f_6012002.png",
+        "f_6012003.png",
+        "f_6012004.png",
+        "f_6012300.png"
+      ],
+      "name_jp": "シャルル＝アンリ?サンソン"
     },
     {
       "id": "500700",
       "collection_no": 34,
       "name": "威廉·莎士比亚",
       "class": "caster",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_5007000.png",
+        "f_5007001.png",
+        "f_5007002.png",
+        "f_5007003.png",
+        "f_5007004.png"
+      ],
+      "name_jp": "ウィリアム?シェイクスピア"
     },
     {
       "id": "203500",
       "collection_no": 255,
       "name": "帕里斯",
       "class": "archer",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_2035000.png",
+        "f_2035001.png",
+        "f_2035002.png",
+        "f_2035003.png",
+        "f_2035004.png"
+      ],
+      "name_jp": "パリス"
     },
     {
       "id": "300600",
       "collection_no": 19,
       "name": "武藏坊弁庆",
       "class": "lancer",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_3006000.png",
+        "f_3006001.png",
+        "f_3006002.png",
+        "f_3006003.png",
+        "f_3006004.png"
+      ],
+      "name_jp": "武蔵坊弁慶"
     },
     {
       "id": "500500",
       "collection_no": 33,
       "name": "汉斯·克里斯蒂安·安徒生",
       "class": "caster",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_5005000.png",
+        "f_5005001.png",
+        "f_5005002.png",
+        "f_5005003.png",
+        "f_5005004.png"
+      ],
+      "name_jp": "ハンス?クリスチャン?アンデルセン"
     },
     {
       "id": "400800",
       "collection_no": 25,
       "name": "爱迪·萨奇",
       "class": "rider",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_4008000.png",
+        "f_4008001.png",
+        "f_4008002.png",
+        "f_4008003.png",
+        "f_4008004.png",
+        "f_4008300.png"
+      ],
+      "name_jp": "エドワード?ティーチ"
     },
     {
       "id": "703400",
       "collection_no": 260,
       "name": "莎乐美",
       "class": "berserker",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_7034000.png",
+        "f_7034001.png",
+        "f_7034002.png",
+        "f_7034003.png",
+        "f_7034004.png"
+      ],
+      "name_jp": "サロメ"
     },
     {
       "id": "701500",
       "collection_no": 57,
       "name": "血斧埃里克",
       "class": "berserker",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_7015000.png",
+        "f_7015001.png",
+        "f_7015002.png",
+        "f_7015003.png",
+        "f_7015004.png"
+      ],
+      "name_jp": "エイリーク?ブラッドアクス"
     },
     {
       "id": "504400",
       "collection_no": 258,
       "name": "陈宫",
       "class": "caster",
-      "rarity": 2
+      "rarity": 2,
+      "images": [
+        "f_5044000.png",
+        "f_5044001.png",
+        "f_5044002.png",
+        "f_5044003.png",
+        "f_5044004.png"
+      ],
+      "name_jp": "陳宮"
     },
     {
       "id": "403100",
       "collection_no": 231,
       "name": "丹驹",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4031000.png",
+        "f_4031001.png",
+        "f_4031002.png",
+        "f_4031003.png",
+        "f_4031004.png"
+      ],
+      "name_jp": "赤兎馬"
     },
     {
       "id": "401500",
       "collection_no": 28,
       "name": "亚历山大",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4015000.png",
+        "f_4015001.png",
+        "f_4015002.png",
+        "f_4015003.png",
+        "f_4015004.png"
+      ],
+      "name_jp": "アレキサンダー"
     },
     {
       "id": "600700",
       "collection_no": 81,
       "name": "亨利·杰基尔＆海德",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6007000.png",
+        "f_6007001.png",
+        "f_6007002.png",
+        "f_6007003.png",
+        "f_6007004.png",
+        "f_6007100.png",
+        "f_6007101.png",
+        "f_6007102.png",
+        "f_6007103.png",
+        "f_6007104.png"
+      ],
+      "name_jp": "ヘンリー?ジキル＆ハイド"
     },
     {
       "id": "201400",
       "collection_no": 125,
       "name": "俵藤太",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2014000.png",
+        "f_2014001.png",
+        "f_2014002.png",
+        "f_2014003.png",
+        "f_2014004.png"
+      ],
+      "name_jp": "俵藤太"
     },
     {
       "id": "402500",
       "collection_no": 172,
       "name": "克里斯托弗·哥伦布",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4025000.png",
+        "f_4025001.png",
+        "f_4025002.png",
+        "f_4025003.png",
+        "f_4025004.png"
+      ],
+      "name_jp": "クリストファー?コロンブス"
     },
     {
       "id": "603300",
       "collection_no": 210,
       "name": "冈田以藏",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6033000.png",
+        "f_6033001.png",
+        "f_6033002.png",
+        "f_6033003.png",
+        "f_6033004.png",
+        "f_6033300.png",
+        "f_6033400.png"
+      ],
+      "name_jp": "岡田以蔵"
     },
     {
       "id": "501000",
       "collection_no": 79,
       "name": "冯·霍恩海姆·帕拉塞尔苏斯",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5010000.png",
+        "f_5010001.png",
+        "f_5010002.png",
+        "f_5010003.png",
+        "f_5010004.png",
+        "f_5010300.png"
+      ],
+      "name_jp": "ヴァン?ホーエンハイム?パラケルスス"
     },
     {
       "id": "601100",
       "collection_no": 42,
       "name": "匕见",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6011000.png",
+        "f_6011001.png",
+        "f_6011002.png",
+        "f_6011003.png",
+        "f_6011004.png"
+      ],
+      "name_jp": "荊軻"
     },
     {
       "id": "102200",
       "collection_no": 9,
       "name": "吉尔·德·雷",
       "class": "saber",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_1022000.png",
+        "f_1022001.png",
+        "f_1022002.png",
+        "f_1022003.png",
+        "f_1022004.png"
+      ],
+      "name_jp": "ジル?ド?レェ"
     },
     {
       "id": "500200",
       "collection_no": 32,
       "name": "吉尔·德·雷",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5002000.png",
+        "f_5002001.png",
+        "f_5002002.png",
+        "f_5002003.png",
+        "f_5002004.png"
+      ],
+      "name_jp": "ジル?ド?レェ"
     },
     {
       "id": "200600",
       "collection_no": 63,
       "name": "大卫",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2006000.png",
+        "f_2006001.png",
+        "f_2006002.png",
+        "f_2006003.png",
+        "f_2006004.png"
+      ],
+      "name_jp": "ダビデ"
     },
     {
       "id": "701100",
       "collection_no": 55,
       "name": "大流士三世",
       "class": "berserker",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_7011000.png",
+        "f_7011001.png",
+        "f_7011002.png",
+        "f_7011003.png",
+        "f_7011004.png"
+      ],
+      "name_jp": "ダレイオス三世"
     },
     {
       "id": "203400",
       "collection_no": 246,
       "name": "威廉·退尔",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2034000.png",
+        "f_2034001.png",
+        "f_2034002.png",
+        "f_2034003.png",
+        "f_2034004.png"
+      ],
+      "name_jp": "ウィリアム?テル"
     },
     {
       "id": "1100600",
       "collection_no": 204,
       "name": "安东尼奥·萨列里",
       "class": "avenger",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_11006000.png",
+        "f_11006001.png",
+        "f_11006002.png",
+        "f_11006003.png",
+        "f_11006004.png"
+      ],
+      "name_jp": "アントニオ?サリエリ"
     },
     {
       "id": "301400",
       "collection_no": 186,
       "name": "宝藏院胤舜",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3014000.png",
+        "f_3014001.png",
+        "f_3014002.png",
+        "f_3014003.png",
+        "f_3014004.png"
+      ],
+      "name_jp": "宝蔵院胤舜"
     },
     {
       "id": "201200",
       "collection_no": 15,
       "name": "尤瑞艾莉",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2012000.png",
+        "f_2012001.png",
+        "f_2012002.png",
+        "f_2012003.png",
+        "f_2012004.png",
+        "f_2012300.png"
+      ],
+      "name_jp": "エウリュアレ"
     },
     {
       "id": "401100",
       "collection_no": 26,
       "name": "布狄卡",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4011000.png",
+        "f_4011001.png",
+        "f_4011002.png",
+        "f_4011003.png",
+        "f_4011004.png"
+      ],
+      "name_jp": "ブーディカ"
     },
     {
       "id": "201800",
       "collection_no": 95,
       "name": "幼吉尔",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2018000.png",
+        "f_2018001.png",
+        "f_2018002.png",
+        "f_2018003.png",
+        "f_2018004.png"
+      ],
+      "name_jp": "子ギル"
     },
     {
       "id": "300100",
       "collection_no": 17,
       "name": "库·丘林",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3001000.png",
+        "f_3001001.png",
+        "f_3001002.png",
+        "f_3001003.png",
+        "f_3001004.png"
+      ],
+      "name_jp": "クー?フーリン"
     },
     {
       "id": "502100",
       "collection_no": 38,
       "name": "库·丘林",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5021000.png",
+        "f_5021001.png",
+        "f_5021002.png",
+        "f_5021003.png",
+        "f_5021004.png"
+      ],
+      "name_jp": "クー?フーリン"
     },
     {
       "id": "300700",
       "collection_no": 20,
       "name": "库·丘林〔Prototype〕",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3007000.png",
+        "f_3007001.png",
+        "f_3007002.png",
+        "f_3007003.png",
+        "f_3007004.png"
+      ],
+      "name_jp": "クー?フーリン〔プロトタイプ〕"
     },
     {
       "id": "101400",
       "collection_no": 72,
       "name": "弗格斯·马克·罗伊",
       "class": "saber",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_1014000.png",
+        "f_1014001.png",
+        "f_1014002.png",
+        "f_1014003.png",
+        "f_1014004.png"
+      ],
+      "name_jp": "フェルグス?マック?ロイ"
     },
     {
       "id": "505100",
       "collection_no": 348,
       "name": "张角",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5051000.png",
+        "f_5051001.png",
+        "f_5051002.png",
+        "f_5051003.png",
+        "f_5051004.png"
+      ],
+      "name_jp": "張角"
     },
     {
       "id": "105800",
       "collection_no": 396,
       "name": "忒修斯",
       "class": "saber",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_1058000.png",
+        "f_1058001.png",
+        "f_1058002.png",
+        "f_1058003.png",
+        "f_1058004.png"
+      ],
+      "name_jp": "テセウス"
     },
     {
       "id": "1001400",
       "collection_no": 352,
       "name": "方巿",
       "class": "alterEgo",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_10014000.png",
+        "f_10014001.png",
+        "f_10014002.png",
+        "f_10014003.png",
+        "f_10014004.png"
+      ],
+      "name_jp": "徐福"
     },
     {
       "id": "403900",
       "collection_no": 273,
       "name": "曼迪卡尔多",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4039000.png",
+        "f_4039001.png",
+        "f_4039002.png",
+        "f_4039003.png",
+        "f_4039004.png",
+        "f_4039300.png"
+      ],
+      "name_jp": "マンドリカルド"
     },
     {
       "id": "205100",
       "collection_no": 395,
       "name": "杉谷善住坊",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2051000.png",
+        "f_2051001.png",
+        "f_2051002.png",
+        "f_2051003.png",
+        "f_2051004.png"
+      ],
+      "name_jp": "杉谷善住坊"
     },
     {
       "id": "501600",
       "collection_no": 104,
       "name": "杰罗尼莫",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5016000.png",
+        "f_5016001.png",
+        "f_5016002.png",
+        "f_5016003.png",
+        "f_5016004.png"
+      ],
+      "name_jp": "ジェロニモ"
     },
     {
       "id": "501100",
       "collection_no": 80,
       "name": "查尔斯·巴贝奇",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5011000.png",
+        "f_5011001.png",
+        "f_5011002.png",
+        "f_5011003.png",
+        "f_5011004.png"
+      ],
+      "name_jp": "チャールズ?バベッジ"
     },
     {
       "id": "501400",
       "collection_no": 35,
       "name": "梅菲斯托费勒斯",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5014000.png",
+        "f_5014001.png",
+        "f_5014002.png",
+        "f_5014003.png",
+        "f_5014004.png"
+      ],
+      "name_jp": "メフィストフェレス"
     },
     {
       "id": "703500",
       "collection_no": 251,
       "name": "森长可",
       "class": "berserker",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_7035000.png",
+        "f_7035001.png",
+        "f_7035002.png",
+        "f_7035003.png",
+        "f_7035004.png"
+      ],
+      "name_jp": "森長可"
     },
     {
       "id": "400100",
       "collection_no": 23,
       "name": "歌果",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4001000.png",
+        "f_4001001.png",
+        "f_4001002.png",
+        "f_4001003.png",
+        "f_4001004.png",
+        "f_4001300.png"
+      ],
+      "name_jp": "メドゥーサ"
     },
     {
       "id": "201000",
       "collection_no": 105,
       "name": "比利小子",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2010000.png",
+        "f_2010001.png",
+        "f_2010002.png",
+        "f_2010003.png",
+        "f_2010004.png"
+      ],
+      "name_jp": "ビリー?ザ?キッド"
     },
     {
       "id": "701300",
       "collection_no": 56,
       "name": "清姬",
       "class": "berserker",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_7013000.png",
+        "f_7013001.png",
+        "f_7013002.png",
+        "f_7013003.png",
+        "f_7013004.png",
+        "f_7013300.png"
+      ],
+      "name_jp": "清姫"
     },
     {
       "id": "401400",
       "collection_no": 27,
       "name": "牛若丸",
       "class": "rider",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_4014000.png",
+        "f_4014001.png",
+        "f_4014002.png",
+        "f_4014003.png",
+        "f_4014004.png",
+        "f_4014300.png"
+      ],
+      "name_jp": "牛若丸"
     },
     {
       "id": "800100",
       "collection_no": 1,
       "name": "玛修·基列莱特",
       "class": "shielder",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_8001000.png",
+        "f_8001001.png",
+        "f_8001002.png",
+        "f_8001003.png",
+        "f_8001004.png",
+        "f_8001010.png",
+        "f_8001011.png",
+        "f_8001012.png",
+        "f_8001013.png",
+        "f_8001020.png",
+        "f_8001021.png",
+        "f_8001022.png",
+        "f_8001023.png",
+        "f_8001300.png",
+        "f_8001400.png",
+        "f_8001404.png",
+        "f_8001500.png",
+        "f_8001510.png",
+        "f_8001600.png",
+        "f_8001700.png",
+        "f_8001900.png",
+        "f_8001904.png",
+        "f_8002000.png"
+      ],
+      "name_jp": "マシュ?キリエライト"
     },
     {
       "id": "600300",
       "collection_no": 110,
       "name": "百貌哈桑",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6003000.png",
+        "f_6003001.png",
+        "f_6003002.png",
+        "f_6003003.png",
+        "f_6003004.png"
+      ],
+      "name_jp": "百貌のハサン"
     },
     {
       "id": "101300",
       "collection_no": 7,
       "name": "盖乌斯·尤利乌斯·恺撒",
       "class": "saber",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_1013000.png",
+        "f_1013001.png",
+        "f_1013002.png",
+        "f_1013003.png",
+        "f_1013004.png"
+      ],
+      "name_jp": "ガイウス?ユリウス?カエサル"
     },
     {
       "id": "200300",
       "collection_no": 13,
       "name": "罗宾汉",
       "class": "archer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_2003000.png",
+        "f_2003001.png",
+        "f_2003002.png",
+        "f_2003003.png",
+        "f_2003004.png",
+        "f_2003300.png"
+      ],
+      "name_jp": "ロビンフッド"
     },
     {
       "id": "301000",
       "collection_no": 22,
       "name": "罗穆路斯",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3010000.png",
+        "f_3010001.png",
+        "f_3010002.png",
+        "f_3010003.png",
+        "f_3010004.png"
+      ],
+      "name_jp": "ロムルス"
     },
     {
       "id": "500100",
       "collection_no": 31,
       "name": "美狄亚",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5001000.png",
+        "f_5001001.png",
+        "f_5001002.png",
+        "f_5001003.png",
+        "f_5001004.png"
+      ],
+      "name_jp": "メディア"
     },
     {
       "id": "700300",
       "collection_no": 49,
       "name": "虎狼",
       "class": "berserker",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_7003000.png",
+        "f_7003001.png",
+        "f_7003002.png",
+        "f_7003003.png",
+        "f_7003004.png"
+      ],
+      "name_jp": "呂布奉先"
     },
     {
       "id": "302800",
       "collection_no": 148,
       "name": "豹人",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3028000.png",
+        "f_3028001.png",
+        "f_3028002.png",
+        "f_3028003.png",
+        "f_3028004.png"
+      ],
+      "name_jp": "ジャガーマン"
     },
     {
       "id": "101200",
       "collection_no": 126,
       "name": "贝德维尔",
       "class": "saber",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_1012000.png",
+        "f_1012001.png",
+        "f_1012002.png",
+        "f_1012003.png",
+        "f_1012004.png",
+        "f_1012300.png"
+      ],
+      "name_jp": "ベディヴィエール"
     },
     {
       "id": "301600",
       "collection_no": 64,
       "name": "赫克托耳",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3016000.png",
+        "f_3016001.png",
+        "f_3016002.png",
+        "f_3016003.png",
+        "f_3016004.png"
+      ],
+      "name_jp": "ヘクトール"
     },
     {
       "id": "300200",
       "collection_no": 71,
       "name": "迪尔姆德·奥迪那",
       "class": "lancer",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_3002000.png",
+        "f_3002001.png",
+        "f_3002002.png",
+        "f_3002003.png",
+        "f_3002004.png"
+      ],
+      "name_jp": "ディルムッド?オディナ"
     },
     {
       "id": "504300",
       "collection_no": 249,
       "name": "阿斯克勒庇俄斯",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5043000.png",
+        "f_5043001.png",
+        "f_5043002.png",
+        "f_5043003.png",
+        "f_5043004.png",
+        "f_5043300.png"
+      ],
+      "name_jp": "アスクレピオス"
     },
     {
       "id": "503600",
       "collection_no": 203,
       "name": "阿维斯布隆",
       "class": "caster",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_5036000.png",
+        "f_5036001.png",
+        "f_5036002.png",
+        "f_5036003.png",
+        "f_5036004.png"
+      ],
+      "name_jp": "アヴィケブロン"
     },
     {
       "id": "600900",
       "collection_no": 124,
       "name": "静谧哈桑",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6009000.png",
+        "f_6009001.png",
+        "f_6009002.png",
+        "f_6009003.png",
+        "f_6009004.png",
+        "f_6009300.png"
+      ],
+      "name_jp": "静謐のハサン"
     },
     {
       "id": "601900",
       "collection_no": 117,
       "name": "风魔小太郎",
       "class": "assassin",
-      "rarity": 3
+      "rarity": 3,
+      "images": [
+        "f_6019000.png",
+        "f_6019001.png",
+        "f_6019002.png",
+        "f_6019003.png",
+        "f_6019004.png",
+        "f_6019300.png"
+      ],
+      "name_jp": "風魔小太郎"
     },
     {
       "id": "2300100",
       "collection_no": 166,
       "name": "BB",
       "class": "moonCancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_23001000.png",
+        "f_23001001.png",
+        "f_23001002.png",
+        "f_23001003.png",
+        "f_23001004.png"
+      ],
+      "name_jp": "ＢＢ"
     },
     {
       "id": "1000100",
       "collection_no": 164,
       "name": "Passionlip",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10001000.png",
+        "f_10001001.png",
+        "f_10001002.png",
+        "f_10001003.png",
+        "f_10001004.png",
+        "f_10001300.png"
+      ],
+      "name_jp": "パッションリップ"
     },
     {
       "id": "602300",
       "collection_no": 92,
       "name": "两仪式",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6023000.png",
+        "f_6023001.png",
+        "f_6023002.png",
+        "f_6023003.png",
+        "f_6023004.png"
+      ],
+      "name_jp": "両儀式"
     },
     {
       "id": "2800400",
       "collection_no": 367,
       "name": "九纹龙伊丽莎",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28004000.png",
+        "f_28004001.png",
+        "f_28004002.png",
+        "f_28004003.png",
+        "f_28004004.png"
+      ],
+      "name_jp": "九紋竜エリザ"
     },
     {
       "id": "2800700",
       "collection_no": 410,
       "name": "亚历山德罗·迪·卡利奥斯特罗",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28007000.png",
+        "f_28007001.png",
+        "f_28007002.png",
+        "f_28007003.png",
+        "f_28007004.png"
+      ],
+      "name_jp": "アレッサンドロ?ディ?カリオストロ"
     },
     {
       "id": "300500",
       "collection_no": 18,
       "name": "伊丽莎白·巴托里",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3005000.png",
+        "f_3005001.png",
+        "f_3005002.png",
+        "f_3005003.png",
+        "f_3005004.png"
+      ],
+      "name_jp": "エリザベート?バートリー"
     },
     {
       "id": "502600",
       "collection_no": 61,
       "name": "伊丽莎白·巴托里〔万圣节〕",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5026000.png",
+        "f_5026001.png",
+        "f_5026002.png",
+        "f_5026003.png",
+        "f_5026004.png"
+      ],
+      "name_jp": "エリザベート?バートリー〔ハロウィン〕"
     },
     {
       "id": "101000",
       "collection_no": 138,
       "name": "伊丽莎白·巴托里〔勇者〕",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1010000.png",
+        "f_1010001.png",
+        "f_1010002.png",
+        "f_1010003.png",
+        "f_1010004.png"
+      ],
+      "name_jp": "エリザベート?バートリー〔ブレイブ〕"
     },
     {
       "id": "404600",
       "collection_no": 326,
       "name": "伊丽莎白·巴托里〔灰姑娘〕",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4046000.png",
+        "f_4046001.png",
+        "f_4046002.png",
+        "f_4046003.png",
+        "f_4046004.png"
+      ],
+      "name_jp": "エリザベート?バートリー〔シンデレラ〕"
     },
     {
       "id": "402600",
       "collection_no": 182,
       "name": "伊什塔尔",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4026000.png",
+        "f_4026001.png",
+        "f_4026002.png",
+        "f_4026003.png",
+        "f_4026004.png"
+      ],
+      "name_jp": "イシュタル"
     },
     {
       "id": "204200",
       "collection_no": 286,
       "name": "伊莉雅丝菲尔·冯·爱因兹贝伦",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2042000.png",
+        "f_2042001.png",
+        "f_2042002.png",
+        "f_2042003.png",
+        "f_2042004.png"
+      ],
+      "name_jp": "イリヤスフィール?フォン?アインツベルン"
     },
     {
       "id": "202700",
       "collection_no": 137,
       "name": "克洛伊·冯·爱因兹贝伦",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2027000.png",
+        "f_2027001.png",
+        "f_2027002.png",
+        "f_2027003.png",
+        "f_2027004.png"
+      ],
+      "name_jp": "クロエ?フォン?アインツベルン"
     },
     {
       "id": "1101600",
       "collection_no": 388,
       "name": "克洛伊·冯·爱因兹贝伦",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11016000.png",
+        "f_11016001.png",
+        "f_11016002.png",
+        "f_11016003.png",
+        "f_11016004.png",
+        "f_11016300.png"
+      ],
+      "name_jp": "クロエ?フォン?アインツベルン"
     },
     {
       "id": "704200",
       "collection_no": 345,
       "name": "克里姆希尔德",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7042000.png",
+        "f_7042001.png",
+        "f_7042002.png",
+        "f_7042003.png",
+        "f_7042004.png"
+      ],
+      "name_jp": "クリームヒルト"
     },
     {
       "id": "405800",
       "collection_no": 446,
       "name": "克里姆希尔德",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4058000.png",
+        "f_4058001.png",
+        "f_4058002.png",
+        "f_4058003.png",
+        "f_4058004.png"
+      ],
+      "name_jp": "クリームヒルト"
     },
     {
       "id": "700200",
       "collection_no": 48,
       "name": "兰斯洛特",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7002000.png",
+        "f_7002001.png",
+        "f_7002002.png",
+        "f_7002003.png",
+        "f_7002004.png"
+      ],
+      "name_jp": "ランスロット"
     },
     {
       "id": "102000",
       "collection_no": 121,
       "name": "兰斯洛特",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1020000.png",
+        "f_1020001.png",
+        "f_1020002.png",
+        "f_1020003.png",
+        "f_1020004.png",
+        "f_1020300.png"
+      ],
+      "name_jp": "ランスロット"
     },
     {
       "id": "103600",
       "collection_no": 227,
       "name": "兰陵王",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1036000.png",
+        "f_1036001.png",
+        "f_1036002.png",
+        "f_1036003.png",
+        "f_1036004.png",
+        "f_1036300.png"
+      ],
+      "name_jp": "蘭陵王"
     },
     {
       "id": "604000",
       "collection_no": 267,
       "name": "冲田·J·总司",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6040000.png",
+        "f_6040001.png",
+        "f_6040002.png",
+        "f_6040003.png",
+        "f_6040004.png"
+      ],
+      "name_jp": "オキタ?Ｊ?ソウジ"
     },
     {
       "id": "304100",
       "collection_no": 279,
       "name": "凯妮斯",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3041000.png",
+        "f_3041001.png",
+        "f_3041002.png",
+        "f_3041003.png",
+        "f_3041004.png"
+      ],
+      "name_jp": "カイニス"
     },
     {
       "id": "404500",
       "collection_no": 322,
       "name": "凯妮斯",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4045000.png",
+        "f_4045001.png",
+        "f_4045002.png",
+        "f_4045003.png",
+        "f_4045004.png"
+      ],
+      "name_jp": "カイニス"
     },
     {
       "id": "2800600",
       "collection_no": 392,
       "name": "凯特·库·米可科尔",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28006000.png",
+        "f_28006001.png",
+        "f_28006002.png",
+        "f_28006003.png",
+        "f_28006004.png"
+      ],
+      "name_jp": "ケット?クー?ミコケル"
     },
     {
       "id": "203600",
       "collection_no": 262,
       "name": "刑部姬",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2036000.png",
+        "f_2036001.png",
+        "f_2036002.png",
+        "f_2036003.png",
+        "f_2036004.png"
+      ],
+      "name_jp": "刑部姫"
     },
     {
       "id": "603000",
       "collection_no": 188,
       "name": "加藤段藏",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6030000.png",
+        "f_6030001.png",
+        "f_6030002.png",
+        "f_6030003.png",
+        "f_6030004.png"
+      ],
+      "name_jp": "加藤段蔵"
     },
     {
       "id": "105400",
       "collection_no": 354,
       "name": "加雷斯",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1054000.png",
+        "f_1054001.png",
+        "f_1054002.png",
+        "f_1054003.png",
+        "f_1054004.png"
+      ],
+      "name_jp": "ガレス"
     },
     {
       "id": "203900",
       "collection_no": 271,
       "name": "南丁格尔〔圣诞〕",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2039000.png",
+        "f_2039001.png",
+        "f_2039002.png",
+        "f_2039003.png",
+        "f_2039004.png"
+      ],
+      "name_jp": "ナイチンゲール〔サンタ〕"
     },
     {
       "id": "601700",
       "collection_no": 46,
       "name": "卡米拉",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6017000.png",
+        "f_6017001.png",
+        "f_6017002.png",
+        "f_6017003.png",
+        "f_6017004.png"
+      ],
+      "name_jp": "カーミラ"
     },
     {
       "id": "403600",
       "collection_no": 263,
       "name": "卡米拉",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4036000.png",
+        "f_4036001.png",
+        "f_4036002.png",
+        "f_4036003.png",
+        "f_4036004.png"
+      ],
+      "name_jp": "カーミラ"
     },
     {
       "id": "200100",
       "collection_no": 11,
       "name": "卫宫",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2001000.png",
+        "f_2001001.png",
+        "f_2001002.png",
+        "f_2001003.png",
+        "f_2001004.png",
+        "f_2001300.png"
+      ],
+      "name_jp": "エミヤ"
     },
     {
       "id": "201600",
       "collection_no": 157,
       "name": "卫宫〔Alter〕",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2016000.png",
+        "f_2016001.png",
+        "f_2016002.png",
+        "f_2016003.png",
+        "f_2016004.png"
+      ],
+      "name_jp": "エミヤ〔オルタ〕"
     },
     {
       "id": "601500",
       "collection_no": 109,
       "name": "卫宫〔Assassin〕",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6015000.png",
+        "f_6015001.png",
+        "f_6015002.png",
+        "f_6015003.png",
+        "f_6015004.png"
+      ],
+      "name_jp": "エミヤ〔アサシン〕"
     },
     {
       "id": "306100",
       "collection_no": 455,
       "name": "原田左之助",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3061000.png",
+        "f_3061001.png",
+        "f_3061002.png",
+        "f_3061003.png",
+        "f_3061004.png"
+      ],
+      "name_jp": "原田左之助"
     },
     {
       "id": "501800",
       "collection_no": 145,
       "name": "吉尔伽美什",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5018000.png",
+        "f_5018001.png",
+        "f_5018002.png",
+        "f_5018003.png",
+        "f_5018004.png",
+        "f_5018300.png"
+      ],
+      "name_jp": "ギルガメッシュ"
     },
     {
       "id": "705200",
       "collection_no": 447,
       "name": "吾绰",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7052000.png",
+        "f_7052001.png",
+        "f_7052002.png",
+        "f_7052003.png",
+        "f_7052004.png"
+      ],
+      "name_jp": "呼延灼"
     },
     {
       "id": "602700",
       "collection_no": 170,
       "name": "周照",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6027000.png",
+        "f_6027001.png",
+        "f_6027002.png",
+        "f_6027003.png",
+        "f_6027004.png"
+      ],
+      "name_jp": "武則天"
     },
     {
       "id": "505200",
       "collection_no": 358,
       "name": "周照",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5052000.png",
+        "f_5052001.png",
+        "f_5052002.png",
+        "f_5052003.png",
+        "f_5052004.png"
+      ],
+      "name_jp": "武則天"
     },
     {
       "id": "404200",
       "collection_no": 315,
       "name": "哈贝特洛特",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4042000.png",
+        "f_4042001.png",
+        "f_4042002.png",
+        "f_4042003.png",
+        "f_4042004.png"
+      ],
+      "name_jp": "ハベトロット"
     },
     {
       "id": "2801300",
@@ -834,140 +1801,303 @@
       "collection_no": 207,
       "name": "喀戎",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2030000.png",
+        "f_2030001.png",
+        "f_2030002.png",
+        "f_2030003.png",
+        "f_2030004.png"
+      ],
+      "name_jp": "ケイローン"
     },
     {
       "id": "503300",
       "collection_no": 192,
       "name": "喀耳刻",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5033000.png",
+        "f_5033001.png",
+        "f_5033002.png",
+        "f_5033003.png",
+        "f_5033004.png"
+      ],
+      "name_jp": "キルケー"
     },
     {
       "id": "403000",
       "collection_no": 211,
       "name": "坂本龙马",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4030000.png",
+        "f_4030001.png",
+        "f_4030002.png",
+        "f_4030003.png",
+        "f_4030004.png"
+      ],
+      "name_jp": "坂本龍馬"
     },
     {
       "id": "402300",
       "collection_no": 115,
       "name": "坂田金时",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4023000.png",
+        "f_4023001.png",
+        "f_4023002.png",
+        "f_4023003.png",
+        "f_4023004.png"
+      ],
+      "name_jp": "坂田金時"
     },
     {
       "id": "305100",
       "collection_no": 347,
       "name": "堂·吉诃德",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3051000.png",
+        "f_3051001.png",
+        "f_3051002.png",
+        "f_3051003.png",
+        "f_3051004.png"
+      ],
+      "name_jp": "ドン?キホーテ"
     },
     {
       "id": "901500",
       "collection_no": 364,
       "name": "壹与",
       "class": "ruler",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_9015000.png",
+        "f_9015001.png",
+        "f_9015002.png",
+        "f_9015003.png",
+        "f_9015004.png",
+        "f_9015010.png",
+        "f_9015300.png"
+      ],
+      "name_jp": "壱与"
     },
     {
       "id": "504800",
       "collection_no": 319,
       "name": "夏洛特·科黛",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5048000.png",
+        "f_5048001.png",
+        "f_5048002.png",
+        "f_5048003.png",
+        "f_5048004.png"
+      ],
+      "name_jp": "シャルロット?コルデー"
     },
     {
       "id": "404400",
       "collection_no": 332,
       "name": "多布雷尼亚·尼基季奇",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4044000.png",
+        "f_4044001.png",
+        "f_4044002.png",
+        "f_4044003.png",
+        "f_4044004.png"
+      ],
+      "name_jp": "ドブルイニャ?ニキチッチ"
     },
     {
       "id": "305500",
       "collection_no": 419,
       "name": "多布雷尼亚·尼基季奇",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3055000.png",
+        "f_3055001.png",
+        "f_3055002.png",
+        "f_3055003.png",
+        "f_3055004.png"
+      ],
+      "name_jp": "ドブルイニャ?ニキチッチ"
     },
     {
       "id": "504700",
       "collection_no": 340,
       "name": "大黑天",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5047000.png",
+        "f_5047001.png",
+        "f_5047002.png",
+        "f_5047003.png",
+        "f_5047004.png"
+      ],
+      "name_jp": "大黒天"
     },
     {
       "id": "1001200",
       "collection_no": 338,
       "name": "太岁星君",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10012000.png",
+        "f_10012001.png",
+        "f_10012002.png",
+        "f_10012003.png",
+        "f_10012004.png"
+      ],
+      "name_jp": "太歳星君"
     },
     {
       "id": "604300",
       "collection_no": 361,
       "name": "奥特琳德",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6043000.png",
+        "f_6043001.png",
+        "f_6043002.png",
+        "f_6043003.png",
+        "f_6043004.png",
+        "f_6043300.png"
+      ],
+      "name_jp": "オルトリンデ"
     },
     {
       "id": "103400",
       "collection_no": 221,
       "name": "女王梅芙",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1034000.png",
+        "f_1034001.png",
+        "f_1034002.png",
+        "f_1034003.png",
+        "f_1034004.png"
+      ],
+      "name_jp": "女王メイヴ"
     },
     {
       "id": "204300",
       "collection_no": 311,
       "name": "妖精骑士崔斯坦",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2043000.png",
+        "f_2043001.png",
+        "f_2043002.png",
+        "f_2043003.png",
+        "f_2043004.png"
+      ],
+      "name_jp": "妖精騎士トリスタン"
     },
     {
       "id": "105000",
       "collection_no": 310,
       "name": "妖精骑士高文",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1050000.png",
+        "f_1050001.png",
+        "f_1050002.png",
+        "f_1050003.png",
+        "f_1050004.png"
+      ],
+      "name_jp": "妖精騎士ガウェイン"
     },
     {
       "id": "304300",
       "collection_no": 283,
       "name": "宇津见绘里濑",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3043000.png",
+        "f_3043001.png",
+        "f_3043002.png",
+        "f_3043003.png",
+        "f_3043004.png"
+      ],
+      "name_jp": "宇津見エリセ"
     },
     {
       "id": "1101400",
       "collection_no": 356,
       "name": "宇津见绘里濑",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11014000.png",
+        "f_11014001.png",
+        "f_11014002.png",
+        "f_11014003.png",
+        "f_11014004.png"
+      ],
+      "name_jp": "宇津見エリセ"
     },
     {
       "id": "400900",
       "collection_no": 66,
       "name": "安妮·伯妮＆玛莉·瑞德",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4009000.png",
+        "f_4009001.png",
+        "f_4009002.png",
+        "f_4009003.png",
+        "f_4009004.png"
+      ],
+      "name_jp": "アン?ボニー＆メアリー?リード"
     },
     {
       "id": "202500",
       "collection_no": 131,
       "name": "安妮·伯妮＆玛莉·瑞德",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2025000.png",
+        "f_2025001.png",
+        "f_2025002.png",
+        "f_2025003.png",
+        "f_2025004.png"
+      ],
+      "name_jp": "アン?ボニー＆メアリー?リード"
     },
     {
       "id": "106000",
       "collection_no": 405,
       "name": "宫本伊织",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1060000.png",
+        "f_1060001.png",
+        "f_1060002.png",
+        "f_1060003.png",
+        "f_1060004.png"
+      ],
+      "name_jp": "宮本伊織"
     },
     {
       "id": "205600",
@@ -981,259 +2111,563 @@
       "collection_no": 120,
       "name": "尼托克丽丝",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5012000.png",
+        "f_5012001.png",
+        "f_5012002.png",
+        "f_5012003.png",
+        "f_5012004.png",
+        "f_5012300.png"
+      ],
+      "name_jp": "ニトクリス"
     },
     {
       "id": "602800",
       "collection_no": 177,
       "name": "尼托克丽丝",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6028000.png",
+        "f_6028001.png",
+        "f_6028002.png",
+        "f_6028003.png",
+        "f_6028004.png"
+      ],
+      "name_jp": "ニトクリス"
     },
     {
       "id": "100500",
       "collection_no": 5,
       "name": "尼禄·克劳狄乌斯",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1005000.png",
+        "f_1005001.png",
+        "f_1005002.png",
+        "f_1005003.png",
+        "f_1005004.png",
+        "f_1005300.png",
+        "f_1005400.png",
+        "f_1005500.png"
+      ],
+      "name_jp": "ネロ?クラウディウス"
     },
     {
       "id": "405300",
       "collection_no": 401,
       "name": "尼莫〔圣诞〕",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4053000.png",
+        "f_4053001.png",
+        "f_4053002.png",
+        "f_4053003.png",
+        "f_4053004.png"
+      ],
+      "name_jp": "ネモ〔サンタ〕"
     },
     {
       "id": "105500",
       "collection_no": 363,
       "name": "山南敬助",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1055000.png",
+        "f_1055001.png",
+        "f_1055002.png",
+        "f_1055003.png",
+        "f_1055004.png"
+      ],
+      "name_jp": "山南敬助"
     },
     {
       "id": "2300700",
       "collection_no": 424,
       "name": "岸波白野",
       "class": "moonCancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_23007000.png",
+        "f_23007001.png",
+        "f_23007002.png",
+        "f_23007003.png",
+        "f_23007004.png"
+      ],
+      "name_jp": "岸波白野"
     },
     {
       "id": "2300800",
       "collection_no": 425,
       "name": "岸波白野",
       "class": "moonCancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_23008000.png",
+        "f_23008001.png",
+        "f_23008002.png",
+        "f_23008003.png",
+        "f_23008004.png"
+      ],
+      "name_jp": "岸波白野"
     },
     {
       "id": "200800",
       "collection_no": 122,
       "name": "崔斯坦",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2008000.png",
+        "f_2008001.png",
+        "f_2008002.png",
+        "f_2008003.png",
+        "f_2008004.png",
+        "f_2008300.png"
+      ],
+      "name_jp": "トリスタン"
     },
     {
       "id": "202100",
       "collection_no": 184,
       "name": "巴御前",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2021000.png",
+        "f_2021001.png",
+        "f_2021002.png",
+        "f_2021003.png",
+        "f_2021004.png"
+      ],
+      "name_jp": "巴御前"
     },
     {
       "id": "104500",
       "collection_no": 290,
       "name": "巴御前",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1045000.png",
+        "f_1045001.png",
+        "f_1045002.png",
+        "f_1045003.png",
+        "f_1045004.png"
+      ],
+      "name_jp": "巴御前"
     },
     {
       "id": "703800",
       "collection_no": 287,
       "name": "布伦希尔德",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7038000.png",
+        "f_7038001.png",
+        "f_7038002.png",
+        "f_7038003.png",
+        "f_7038004.png"
+      ],
+      "name_jp": "ブリュンヒルデ"
     },
     {
       "id": "405600",
       "collection_no": 468,
       "name": "希波吕忒",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4056000.png",
+        "f_4056001.png",
+        "f_4056002.png",
+        "f_4056003.png"
+      ],
+      "name_jp": "ヒッポリュテ"
     },
     {
       "id": "604400",
       "collection_no": 360,
       "name": "希露德",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6044000.png",
+        "f_6044001.png",
+        "f_6044002.png",
+        "f_6044003.png",
+        "f_6044004.png",
+        "f_6044300.png"
+      ],
+      "name_jp": "ヒルド"
     },
     {
       "id": "303000",
       "collection_no": 183,
       "name": "帕尔瓦蒂",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3030000.png",
+        "f_3030001.png",
+        "f_3030002.png",
+        "f_3030003.png",
+        "f_3030004.png",
+        "f_3030300.png"
+      ],
+      "name_jp": "パールヴァティー"
     },
     {
       "id": "700400",
       "collection_no": 82,
       "name": "弗兰肯斯坦",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7004000.png",
+        "f_7004001.png",
+        "f_7004002.png",
+        "f_7004003.png",
+        "f_7004004.png"
+      ],
+      "name_jp": "フランケンシュタイン"
     },
     {
       "id": "103100",
       "collection_no": 176,
       "name": "弗兰肯斯坦",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1031000.png",
+        "f_1031001.png",
+        "f_1031002.png",
+        "f_1031003.png",
+        "f_1031004.png"
+      ],
+      "name_jp": "フランケンシュタイン"
     },
     {
       "id": "300300",
       "collection_no": 140,
       "name": "弗拉德三世〔EXTRA〕",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3003000.png",
+        "f_3003001.png",
+        "f_3003002.png",
+        "f_3003003.png",
+        "f_3003004.png"
+      ],
+      "name_jp": "ヴラド三世〔EXTRA〕"
     },
     {
       "id": "702700",
       "collection_no": 171,
       "name": "彭忒西勒亚",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7027000.png",
+        "f_7027001.png",
+        "f_7027002.png",
+        "f_7027003.png",
+        "f_7027004.png",
+        "f_7027300.png"
+      ],
+      "name_jp": "ペンテシレイア"
     },
     {
       "id": "303500",
       "collection_no": 228,
       "name": "忠贞",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3035000.png",
+        "f_3035001.png",
+        "f_3035002.png",
+        "f_3035003.png",
+        "f_3035004.png"
+      ],
+      "name_jp": "秦良玉"
     },
     {
       "id": "1100400",
       "collection_no": 147,
       "name": "戈耳工",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11004000.png",
+        "f_11004001.png",
+        "f_11004002.png",
+        "f_11004003.png",
+        "f_11004004.png"
+      ],
+      "name_jp": "ゴルゴーン"
     },
     {
       "id": "502500",
       "collection_no": 103,
       "name": "托马斯·爱迪生",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5025000.png",
+        "f_5025001.png",
+        "f_5025002.png",
+        "f_5025003.png",
+        "f_5025004.png"
+      ],
+      "name_jp": "トーマス?エジソン"
     },
     {
       "id": "103900",
       "collection_no": 245,
       "name": "拉克什米·芭伊",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1039000.png",
+        "f_1039001.png",
+        "f_1039002.png",
+        "f_1039003.png",
+        "f_1039004.png"
+      ],
+      "name_jp": "ラクシュミー?バーイー"
     },
     {
       "id": "104400",
       "collection_no": 293,
       "name": "斋藤一",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1044000.png",
+        "f_1044001.png",
+        "f_1044002.png",
+        "f_1044003.png",
+        "f_1044004.png",
+        "f_1044300.png"
+      ],
+      "name_jp": "斎藤一"
     },
     {
       "id": "602400",
       "collection_no": 133,
       "name": "斯卡哈",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6024000.png",
+        "f_6024001.png",
+        "f_6024002.png",
+        "f_6024003.png",
+        "f_6024004.png"
+      ],
+      "name_jp": "スカサハ"
     },
     {
       "id": "601000",
       "collection_no": 41,
       "name": "斯忒诺",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6010000.png",
+        "f_6010001.png",
+        "f_6010002.png",
+        "f_6010003.png",
+        "f_6010004.png"
+      ],
+      "name_jp": "ステンノ"
     },
     {
       "id": "604500",
       "collection_no": 359,
       "name": "斯露德",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6045000.png",
+        "f_6045001.png",
+        "f_6045002.png",
+        "f_6045003.png",
+        "f_6045004.png",
+        "f_6045300.png"
+      ],
+      "name_jp": "スルーズ"
     },
     {
       "id": "1101900",
       "collection_no": 420,
       "name": "方巿",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11019000.png",
+        "f_11019001.png",
+        "f_11019002.png",
+        "f_11019003.png",
+        "f_11019004.png"
+      ],
+      "name_jp": "徐福"
     },
     {
       "id": "602900",
       "collection_no": 185,
       "name": "望月千代女",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6029000.png",
+        "f_6029001.png",
+        "f_6029002.png",
+        "f_6029003.png",
+        "f_6029004.png"
+      ],
+      "name_jp": "望月千代女"
     },
     {
       "id": "1000400",
       "collection_no": 190,
       "name": "机械伊丽亲",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10004000.png",
+        "f_10004001.png",
+        "f_10004002.png",
+        "f_10004003.png",
+        "f_10004004.png"
+      ],
+      "name_jp": "メカエリチャン"
     },
     {
       "id": "1000500",
       "collection_no": 191,
       "name": "机械伊丽亲Ⅱ号机",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10005000.png",
+        "f_10005001.png",
+        "f_10005002.png",
+        "f_10005003.png",
+        "f_10005004.png"
+      ],
+      "name_jp": "メカエリチャンⅡ号機"
     },
     {
       "id": "205200",
       "collection_no": 399,
       "name": "杂贺孙一",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2052000.png",
+        "f_2052001.png",
+        "f_2052002.png",
+        "f_2052003.png",
+        "f_2052004.png"
+      ],
+      "name_jp": "雑賀孫一"
     },
     {
       "id": "301700",
       "collection_no": 102,
       "name": "李书文",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3017000.png",
+        "f_3017001.png",
+        "f_3017002.png",
+        "f_3017003.png",
+        "f_3017004.png"
+      ],
+      "name_jp": "李書文"
     },
     {
       "id": "103200",
       "collection_no": 187,
       "name": "柳生但马守宗矩",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1032000.png",
+        "f_1032001.png",
+        "f_1032002.png",
+        "f_1032003.png",
+        "f_1032004.png"
+      ],
+      "name_jp": "柳生但馬守宗矩"
     },
     {
       "id": "603900",
       "collection_no": 243,
       "name": "格蕾",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6039000.png",
+        "f_6039001.png",
+        "f_6039002.png",
+        "f_6039003.png",
+        "f_6039004.png"
+      ],
+      "name_jp": "グレイ"
     },
     {
       "id": "106700",
       "collection_no": 472,
       "name": "格蕾·Lily",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1067000.png",
+        "f_1067001.png",
+        "f_1067002.png",
+        "f_1067003.png"
+      ],
+      "name_jp": "グレイ?リリィ"
     },
     {
       "id": "306300",
       "collection_no": 473,
       "name": "格蕾·Lily",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3063000.png",
+        "f_3063001.png",
+        "f_3063002.png",
+        "f_3063003.png"
+      ],
+      "name_jp": "グレイ?リリィ"
     },
     {
       "id": "305600",
       "collection_no": 428,
       "name": "梵高〔矿工〕",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3056000.png",
+        "f_3056001.png",
+        "f_3056002.png",
+        "f_3056003.png",
+        "f_3056004.png",
+        "f_3056300.png"
+      ],
+      "name_jp": "ヴァン?ゴッホ〔マイナー〕"
     },
     {
       "id": "506000",
@@ -1247,700 +2681,1519 @@
       "collection_no": 398,
       "name": "永仓新八",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7048000.png",
+        "f_7048001.png",
+        "f_7048002.png",
+        "f_7048003.png",
+        "f_7048004.png"
+      ],
+      "name_jp": "永倉新八"
     },
     {
       "id": "604800",
       "collection_no": 378,
       "name": "洛库斯塔",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6048000.png",
+        "f_6048001.png",
+        "f_6048002.png",
+        "f_6048003.png",
+        "f_6048004.png"
+      ],
+      "name_jp": "ロクスタ"
     },
     {
       "id": "202900",
       "collection_no": 200,
       "name": "浅上藤乃",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2029000.png",
+        "f_2029001.png",
+        "f_2029002.png",
+        "f_2029003.png",
+        "f_2029004.png"
+      ],
+      "name_jp": "浅上藤乃"
     },
     {
       "id": "502300",
       "collection_no": 100,
       "name": "海伦娜·布拉瓦茨基",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5023000.png",
+        "f_5023001.png",
+        "f_5023002.png",
+        "f_5023003.png",
+        "f_5023004.png",
+        "f_5023300.png"
+      ],
+      "name_jp": "エレナ?ブラヴァツキー"
     },
     {
       "id": "202800",
       "collection_no": 180,
       "name": "海伦娜·布拉瓦茨基",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2028000.png",
+        "f_2028001.png",
+        "f_2028002.png",
+        "f_2028003.png",
+        "f_2028004.png"
+      ],
+      "name_jp": "エレナ?ブラヴァツキー"
     },
     {
       "id": "302500",
       "collection_no": 134,
       "name": "清姬",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3025000.png",
+        "f_3025001.png",
+        "f_3025002.png",
+        "f_3025003.png",
+        "f_3025004.png"
+      ],
+      "name_jp": "清姫"
     },
     {
       "id": "704100",
       "collection_no": 323,
       "name": "清少纳言",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7041000.png",
+        "f_7041001.png",
+        "f_7041002.png",
+        "f_7041003.png",
+        "f_7041004.png"
+      ],
+      "name_jp": "清少納言"
     },
     {
       "id": "104700",
       "collection_no": 298,
       "name": "渡边纲",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1047000.png",
+        "f_1047001.png",
+        "f_1047002.png",
+        "f_1047003.png",
+        "f_1047004.png"
+      ],
+      "name_jp": "渡辺綱"
     },
     {
       "id": "302900",
       "collection_no": 181,
       "name": "源赖光",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3029000.png",
+        "f_3029001.png",
+        "f_3029002.png",
+        "f_3029003.png",
+        "f_3029004.png"
+      ],
+      "name_jp": "源頼光"
     },
     {
       "id": "203700",
       "collection_no": 269,
       "name": "灾星简",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2037000.png",
+        "f_2037001.png",
+        "f_2037002.png",
+        "f_2037003.png",
+        "f_2037004.png"
+      ],
+      "name_jp": "カラミティ?ジェーン"
     },
     {
       "id": "1001900",
       "collection_no": 451,
       "name": "热内斯·克莱恩",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10019000.png",
+        "f_10019001.png",
+        "f_10019002.png",
+        "f_10019003.png",
+        "f_10019004.png"
+      ],
+      "name_jp": "ジュネス?クレーン"
     },
     {
       "id": "602600",
       "collection_no": 159,
       "name": "燕青",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6026000.png",
+        "f_6026001.png",
+        "f_6026002.png",
+        "f_6026003.png",
+        "f_6026004.png",
+        "f_6026300.png"
+      ],
+      "name_jp": "燕青"
     },
     {
       "id": "502000",
       "collection_no": 111,
       "name": "爱丽丝菲尔〔天之衣〕",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5020000.png",
+        "f_5020001.png",
+        "f_5020002.png",
+        "f_5020003.png",
+        "f_5020004.png"
+      ],
+      "name_jp": "アイリスフィール〔天の衣〕"
     },
     {
       "id": "603400",
       "collection_no": 218,
       "name": "牛若丸",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6034000.png",
+        "f_6034001.png",
+        "f_6034002.png",
+        "f_6034003.png",
+        "f_6034004.png"
+      ],
+      "name_jp": "牛若丸"
     },
     {
       "id": "2800500",
       "collection_no": 372,
       "name": "特拉洛克",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28005000.png",
+        "f_28005001.png",
+        "f_28005002.png",
+        "f_28005003.png",
+        "f_28005004.png"
+      ],
+      "name_jp": "トラロック"
     },
     {
       "id": "2301000",
       "collection_no": 422,
       "name": "特诺奇蒂特兰",
       "class": "moonCancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_23010000.png",
+        "f_23010001.png",
+        "f_23010002.png",
+        "f_23010003.png",
+        "f_23010004.png"
+      ],
+      "name_jp": "テノチティトラン"
     },
     {
       "id": "701600",
       "collection_no": 58,
       "name": "玉藻猫",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7016000.png",
+        "f_7016001.png",
+        "f_7016002.png",
+        "f_7016003.png",
+        "f_7016004.png",
+        "f_7016300.png"
+      ],
+      "name_jp": "タマモキャット"
     },
     {
       "id": "401700",
       "collection_no": 29,
       "name": "玛丽·安托瓦内特",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4017000.png",
+        "f_4017001.png",
+        "f_4017002.png",
+        "f_4017003.png",
+        "f_4017004.png"
+      ],
+      "name_jp": "マリー?アントワネット"
     },
     {
       "id": "502700",
       "collection_no": 130,
       "name": "玛丽·安托瓦内特",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5027000.png",
+        "f_5027001.png",
+        "f_5027002.png",
+        "f_5027003.png",
+        "f_5027004.png"
+      ],
+      "name_jp": "マリー?アントワネット"
     },
     {
       "id": "401900",
       "collection_no": 30,
       "name": "玛尔达",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4019000.png",
+        "f_4019001.png",
+        "f_4019002.png",
+        "f_4019003.png",
+        "f_4019004.png"
+      ],
+      "name_jp": "マルタ"
     },
     {
       "id": "900400",
       "collection_no": 135,
       "name": "玛尔达",
       "class": "ruler",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_9004000.png",
+        "f_9004001.png",
+        "f_9004002.png",
+        "f_9004003.png",
+        "f_9004004.png"
+      ],
+      "name_jp": "マルタ"
     },
     {
       "id": "505000",
       "collection_no": 330,
       "name": "玛尔达〔圣诞〕",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5050000.png",
+        "f_5050001.png",
+        "f_5050002.png",
+        "f_5050003.png",
+        "f_5050004.png"
+      ],
+      "name_jp": "マルタ〔サンタ〕"
     },
     {
       "id": "304700",
       "collection_no": 313,
       "name": "珀西瓦尔",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3047000.png",
+        "f_3047001.png",
+        "f_3047002.png",
+        "f_3047003.png",
+        "f_3047004.png",
+        "f_3047300.png"
+      ],
+      "name_jp": "パーシヴァル"
     },
     {
       "id": "105700",
       "collection_no": 379,
       "name": "瑟坦特",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1057000.png",
+        "f_1057001.png",
+        "f_1057002.png",
+        "f_1057003.png",
+        "f_1057004.png",
+        "f_1057010.png"
+      ],
+      "name_jp": "セタンタ"
     },
     {
       "id": "303300",
       "collection_no": 214,
       "name": "瓦尔基里",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3033000.png",
+        "f_3033001.png",
+        "f_3033002.png",
+        "f_3033003.png",
+        "f_3033004.png"
+      ],
+      "name_jp": "ワルキューレ"
     },
     {
       "id": "505400",
       "collection_no": 404,
       "name": "由井正雪",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5054000.png",
+        "f_5054001.png",
+        "f_5054002.png",
+        "f_5054003.png",
+        "f_5054004.png"
+      ],
+      "name_jp": "由井正雪"
     },
     {
       "id": "503400",
       "collection_no": 194,
       "name": "示巴女王",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5034000.png",
+        "f_5034001.png",
+        "f_5034002.png",
+        "f_5034003.png",
+        "f_5034004.png"
+      ],
+      "name_jp": "シバの女王"
     },
     {
       "id": "500400",
       "collection_no": 74,
       "name": "童谣",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5004000.png",
+        "f_5004001.png",
+        "f_5004002.png",
+        "f_5004003.png",
+        "f_5004004.png"
+      ],
+      "name_jp": "ナーサリー?ライム"
     },
     {
       "id": "404100",
       "collection_no": 291,
       "name": "紫式部",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4041000.png",
+        "f_4041001.png",
+        "f_4041002.png",
+        "f_4041003.png",
+        "f_4041004.png"
+      ],
+      "name_jp": "紫式部"
     },
     {
       "id": "202400",
       "collection_no": 69,
       "name": "织田信长",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2024000.png",
+        "f_2024001.png",
+        "f_2024002.png",
+        "f_2024003.png",
+        "f_2024004.png"
+      ],
+      "name_jp": "織田信長"
     },
     {
       "id": "702900",
       "collection_no": 178,
       "name": "织田信长",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7029000.png",
+        "f_7029001.png",
+        "f_7029002.png",
+        "f_7029003.png",
+        "f_7029004.png"
+      ],
+      "name_jp": "織田信長"
     },
     {
       "id": "1102200",
       "collection_no": 458,
       "name": "终结之伊丽莎白",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11022000.png",
+        "f_11022001.png",
+        "f_11022002.png",
+        "f_11022003.png",
+        "f_11022004.png"
+      ],
+      "name_jp": "終わりのエリザベート"
     },
     {
       "id": "104300",
       "collection_no": 344,
       "name": "罗兰",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1043000.png",
+        "f_1043001.png",
+        "f_1043002.png",
+        "f_1043003.png",
+        "f_1043004.png"
+      ],
+      "name_jp": "ローラン"
     },
     {
       "id": "101900",
       "collection_no": 101,
       "name": "罗摩",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1019000.png",
+        "f_1019001.png",
+        "f_1019002.png",
+        "f_1019003.png",
+        "f_1019004.png"
+      ],
+      "name_jp": "ラーマ"
     },
     {
       "id": "302700",
       "collection_no": 146,
       "name": "美杜莎",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3027000.png",
+        "f_3027001.png",
+        "f_3027002.png",
+        "f_3027003.png",
+        "f_3027004.png"
+      ],
+      "name_jp": "メドゥーサ"
     },
     {
       "id": "504100",
       "collection_no": 236,
       "name": "美游·艾德费尔特",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5041000.png",
+        "f_5041001.png",
+        "f_5041002.png",
+        "f_5041003.png",
+        "f_5041004.png"
+      ],
+      "name_jp": "美遊?エーデルフェルト"
     },
     {
       "id": "306000",
       "collection_no": 449,
       "name": "美游·艾德费尔特",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3060000.png",
+        "f_3060001.png",
+        "f_3060002.png",
+        "f_3060003.png",
+        "f_3060004.png"
+      ],
+      "name_jp": "美遊?エーデルフェルト"
     },
     {
       "id": "501700",
       "collection_no": 67,
       "name": "美狄亚〔Lily〕",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5017000.png",
+        "f_5017001.png",
+        "f_5017002.png",
+        "f_5017003.png",
+        "f_5017004.png"
+      ],
+      "name_jp": "メディア〔リリィ〕"
     },
     {
       "id": "605000",
       "collection_no": 408,
       "name": "耀星哈桑",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6050000.png",
+        "f_6050001.png",
+        "f_6050002.png",
+        "f_6050003.png",
+        "f_6050004.png"
+      ],
+      "name_jp": "耀星のハサン"
     },
     {
       "id": "1002000",
       "collection_no": 464,
       "name": "芙萝拉",
       "class": "alterEgo",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_10020000.png",
+        "f_10020001.png",
+        "f_10020002.png",
+        "f_10020003.png",
+        "f_10020004.png"
+      ],
+      "name_jp": "フローラ"
     },
     {
       "id": "204500",
       "collection_no": 325,
       "name": "芝诺比阿",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2045000.png",
+        "f_2045001.png",
+        "f_2045002.png",
+        "f_2045003.png",
+        "f_2045004.png"
+      ],
+      "name_jp": "ゼノビア"
     },
     {
       "id": "301100",
       "collection_no": 87,
       "name": "芬恩·麦克库尔",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3011000.png",
+        "f_3011001.png",
+        "f_3011002.png",
+        "f_3011003.png",
+        "f_3011004.png"
+      ],
+      "name_jp": "フィン?マックール"
     },
     {
       "id": "702200",
       "collection_no": 116,
       "name": "茨木童子",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7022000.png",
+        "f_7022001.png",
+        "f_7022002.png",
+        "f_7022003.png",
+        "f_7022004.png"
+      ],
+      "name_jp": "茨木童子"
     },
     {
       "id": "303400",
       "collection_no": 217,
       "name": "茨木童子",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3034000.png",
+        "f_3034001.png",
+        "f_3034002.png",
+        "f_3034003.png",
+        "f_3034004.png"
+      ],
+      "name_jp": "茨木童子"
     },
     {
       "id": "702600",
       "collection_no": 162,
       "name": "茶茶",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7026000.png",
+        "f_7026001.png",
+        "f_7026002.png",
+        "f_7026003.png",
+        "f_7026004.png"
+      ],
+      "name_jp": "茶々"
     },
     {
       "id": "402400",
       "collection_no": 132,
       "name": "莫德雷德",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4024000.png",
+        "f_4024001.png",
+        "f_4024002.png",
+        "f_4024003.png",
+        "f_4024004.png"
+      ],
+      "name_jp": "モードレッド"
     },
     {
       "id": "901200",
       "collection_no": 320,
       "name": "莱昂纳多·达·芬奇",
       "class": "ruler",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_9012000.png",
+        "f_9012001.png",
+        "f_9012002.png",
+        "f_9012003.png",
+        "f_9012004.png"
+      ],
+      "name_jp": "レオナルド?ダ?ヴィンチ"
     },
     {
       "id": "303100",
       "collection_no": 193,
       "name": "莲偶",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3031000.png",
+        "f_3031001.png",
+        "f_3031002.png",
+        "f_3031003.png",
+        "f_3031004.png"
+      ],
+      "name_jp": "哪吒"
     },
     {
       "id": "104000",
       "collection_no": 264,
       "name": "葛饰北斋",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1040000.png",
+        "f_1040001.png",
+        "f_1040002.png",
+        "f_1040003.png",
+        "f_1040004.png"
+      ],
+      "name_jp": "葛飾北斎"
     },
     {
       "id": "1102100",
       "collection_no": 454,
       "name": "藤堂平助",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11021000.png",
+        "f_11021001.png",
+        "f_11021002.png",
+        "f_11021003.png",
+        "f_11021004.png"
+      ],
+      "name_jp": "藤堂平助"
     },
     {
       "id": "605200",
       "collection_no": 463,
       "name": "蛇女房",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6052000.png",
+        "f_6052001.png",
+        "f_6052002.png",
+        "f_6052003.png",
+        "f_6052004.png"
+      ],
+      "name_jp": "蛇女房"
     },
     {
       "id": "2501200",
       "collection_no": 389,
       "name": "诺克娜蕾·雅兰杜",
       "class": "foreigner",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_25012000.png",
+        "f_25012001.png",
+        "f_25012002.png",
+        "f_25012003.png",
+        "f_25012004.png"
+      ],
+      "name_jp": "ノクナレア?ヤラアーンドゥ"
     },
     {
       "id": "304000",
       "collection_no": 266,
       "name": "谜之Alterego·Λ",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3040000.png",
+        "f_3040001.png",
+        "f_3040002.png",
+        "f_3040003.png",
+        "f_3040004.png",
+        "f_3040300.png"
+      ],
+      "name_jp": "謎のアルターエゴ?Λ"
     },
     {
       "id": "2500800",
       "collection_no": 308,
       "name": "谜之偶像X〔Alter〕",
       "class": "foreigner",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_25008000.png",
+        "f_25008001.png",
+        "f_25008002.png",
+        "f_25008003.png",
+        "f_25008004.png"
+      ],
+      "name_jp": "謎のアイドルX〔オルタ〕"
     },
     {
       "id": "1101200",
       "collection_no": 328,
       "name": "谜之兰丸X",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11012000.png",
+        "f_11012001.png",
+        "f_11012002.png",
+        "f_11012003.png",
+        "f_11012004.png"
+      ],
+      "name_jp": "謎の蘭丸X"
     },
     {
       "id": "2500300",
       "collection_no": 222,
       "name": "谜之女主角XX",
       "class": "foreigner",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_25003000.png",
+        "f_25003001.png",
+        "f_25003002.png",
+        "f_25003003.png",
+        "f_25003004.png"
+      ],
+      "name_jp": "謎のヒロインXX"
     },
     {
       "id": "2501600",
       "collection_no": 423,
       "name": "谜之女主角XX〔Alter〕",
       "class": "foreigner",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_25016000.png",
+        "f_25016001.png",
+        "f_25016002.png",
+        "f_25016003.png",
+        "f_25016004.png"
+      ],
+      "name_jp": "謎のヒロインXX〔オルタ〕"
     },
     {
       "id": "700800",
       "collection_no": 89,
       "name": "贝奥武夫",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7008000.png",
+        "f_7008001.png",
+        "f_7008002.png",
+        "f_7008003.png",
+        "f_7008004.png"
+      ],
+      "name_jp": "ベオウルフ"
     },
     {
       "id": "302600",
       "collection_no": 141,
       "name": "贞德·Alter·Santa·Lily",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3026000.png",
+        "f_3026001.png",
+        "f_3026002.png",
+        "f_3026003.png",
+        "f_3026004.png"
+      ],
+      "name_jp": "ジャンヌ?ダルク?オルタ?サンタ?リリィ"
     },
     {
       "id": "703100",
       "collection_no": 219,
       "name": "贞德〔Alter〕",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7031000.png",
+        "f_7031001.png",
+        "f_7031002.png",
+        "f_7031003.png",
+        "f_7031004.png"
+      ],
+      "name_jp": "ジャンヌ?ダルク〔オルタ〕"
     },
     {
       "id": "700100",
       "collection_no": 47,
       "name": "赫拉克勒斯",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7001000.png",
+        "f_7001001.png",
+        "f_7001002.png",
+        "f_7001003.png",
+        "f_7001004.png"
+      ],
+      "name_jp": "ヘラクレス"
     },
     {
       "id": "2800200",
       "collection_no": 335,
       "name": "赫费斯提翁",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28002000.png",
+        "f_28002001.png",
+        "f_28002002.png",
+        "f_28002003.png",
+        "f_28002004.png"
+      ],
+      "name_jp": "ヘファイスティオン"
     },
     {
       "id": "104800",
       "collection_no": 301,
       "name": "迦尔纳〔圣诞〕",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1048000.png",
+        "f_1048001.png",
+        "f_1048002.png",
+        "f_1048003.png",
+        "f_1048004.png"
+      ],
+      "name_jp": "カルナ〔サンタ〕"
     },
     {
       "id": "103500",
       "collection_no": 223,
       "name": "迪尔姆德·奥迪那",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1035000.png",
+        "f_1035001.png",
+        "f_1035002.png",
+        "f_1035003.png",
+        "f_1035004.png"
+      ],
+      "name_jp": "ディルムッド?オディナ"
     },
     {
       "id": "504000",
       "collection_no": 225,
       "name": "酒吞童子",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5040000.png",
+        "f_5040001.png",
+        "f_5040002.png",
+        "f_5040003.png",
+        "f_5040004.png"
+      ],
+      "name_jp": "酒呑童子"
     },
     {
       "id": "103000",
       "collection_no": 165,
       "name": "铃鹿御前",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1030000.png",
+        "f_1030001.png",
+        "f_1030002.png",
+        "f_1030003.png",
+        "f_1030004.png"
+      ],
+      "name_jp": "鈴鹿御前"
     },
     {
       "id": "405000",
       "collection_no": 387,
       "name": "铃鹿御前〔暑假〕",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4050000.png",
+        "f_4050001.png",
+        "f_4050002.png",
+        "f_4050003.png",
+        "f_4050004.png"
+      ],
+      "name_jp": "鈴鹿御前〔サマバケ〕"
     },
     {
       "id": "303800",
       "collection_no": 252,
       "name": "长尾景虎",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3038000.png",
+        "f_3038001.png",
+        "f_3038002.png",
+        "f_3038003.png",
+        "f_3038004.png",
+        "f_3038300.png"
+      ],
+      "name_jp": "長尾景虎"
     },
     {
       "id": "200500",
       "collection_no": 14,
       "name": "阿塔兰忒",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2005000.png",
+        "f_2005001.png",
+        "f_2005002.png",
+        "f_2005003.png",
+        "f_2005004.png"
+      ],
+      "name_jp": "アタランテ"
     },
     {
       "id": "703000",
       "collection_no": 202,
       "name": "阿塔兰忒〔Alter〕",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7030000.png",
+        "f_7030001.png",
+        "f_7030002.png",
+        "f_7030003.png",
+        "f_7030004.png"
+      ],
+      "name_jp": "アタランテ〔オルタ〕"
     },
     {
       "id": "100200",
       "collection_no": 3,
       "name": "阿尔托莉雅·潘德拉贡〔Alter〕",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1002000.png",
+        "f_1002001.png",
+        "f_1002002.png",
+        "f_1002003.png",
+        "f_1002004.png",
+        "f_1002300.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン〔オルタ〕"
     },
     {
       "id": "301900",
       "collection_no": 78,
       "name": "阿尔托莉雅·潘德拉贡〔Alter〕",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3019000.png",
+        "f_3019001.png",
+        "f_3019002.png",
+        "f_3019003.png",
+        "f_3019004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン〔オルタ〕"
     },
     {
       "id": "100300",
       "collection_no": 4,
       "name": "阿尔托莉雅·潘德拉贡〔Lily〕",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1003000.png",
+        "f_1003001.png",
+        "f_1003002.png",
+        "f_1003003.png",
+        "f_1003004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン〔リリィ〕"
     },
     {
       "id": "402200",
       "collection_no": 73,
       "name": "阿尔托莉雅·潘德拉贡〔圣诞Alter〕",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4022000.png",
+        "f_4022001.png",
+        "f_4022002.png",
+        "f_4022003.png",
+        "f_4022004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン〔サンタオルタ〕"
     },
     {
       "id": "400400",
       "collection_no": 94,
       "name": "阿斯托尔福",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4004000.png",
+        "f_4004001.png",
+        "f_4004002.png",
+        "f_4004003.png",
+        "f_4004004.png",
+        "f_4004300.png"
+      ],
+      "name_jp": "アストルフォ"
     },
     {
       "id": "900800",
       "collection_no": 242,
       "name": "阿斯特赖亚",
       "class": "ruler",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_9008000.png",
+        "f_9008001.png",
+        "f_9008002.png",
+        "f_9008003.png",
+        "f_9008004.png"
+      ],
+      "name_jp": "アストライア"
     },
     {
       "id": "2800800",
       "collection_no": 430,
       "name": "阿比盖尔·威廉姆斯〔圣诞〕",
       "class": "pretender",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_28008000.png",
+        "f_28008001.png",
+        "f_28008002.png",
+        "f_28008003.png",
+        "f_28008004.png"
+      ],
+      "name_jp": "アビゲイル?ウィリアムズ〔サンタ〕"
     },
     {
       "id": "204400",
       "collection_no": 318,
       "name": "阿纳斯塔西娅＆维",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2044000.png",
+        "f_2044001.png",
+        "f_2044002.png",
+        "f_2044003.png",
+        "f_2044004.png"
+      ],
+      "name_jp": "アナスタシア＆ヴィイ"
     },
     {
       "id": "305800",
       "collection_no": 439,
       "name": "阿育王",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3058000.png",
+        "f_3058001.png",
+        "f_3058002.png",
+        "f_3058003.png",
+        "f_3058004.png"
+      ],
+      "name_jp": "アショカ王"
     },
     {
       "id": "202200",
       "collection_no": 197,
       "name": "阿蒂拉·the·San〔ta〕",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2022000.png",
+        "f_2022001.png",
+        "f_2022002.png",
+        "f_2022003.png",
+        "f_2022004.png"
+      ],
+      "name_jp": "アルテラ?ザ?サン〔タ〕"
     },
     {
       "id": "704600",
       "collection_no": 382,
       "name": "难敌",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7046000.png",
+        "f_7046001.png",
+        "f_7046002.png",
+        "f_7046003.png",
+        "f_7046004.png"
+      ],
+      "name_jp": "ドゥリーヨダナ"
     },
     {
       "id": "603500",
       "collection_no": 230,
       "name": "雏罂",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6035000.png",
+        "f_6035001.png",
+        "f_6035002.png",
+        "f_6035003.png",
+        "f_6035004.png"
+      ],
+      "name_jp": "虞美人"
     },
     {
       "id": "304400",
       "collection_no": 288,
       "name": "雏罂",
       "class": "lancer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_3044000.png",
+        "f_3044001.png",
+        "f_3044002.png",
+        "f_3044003.png",
+        "f_3044004.png"
+      ],
+      "name_jp": "虞美人"
     },
     {
       "id": "704900",
       "collection_no": 414,
       "name": "静希草十郎",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7049000.png",
+        "f_7049001.png",
+        "f_7049002.png",
+        "f_7049003.png",
+        "f_7049004.png"
+      ],
+      "name_jp": "静希草十郎"
     },
     {
       "id": "203300",
       "collection_no": 248,
       "name": "马嘶",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2033000.png",
+        "f_2033001.png",
+        "f_2033002.png",
+        "f_2033003.png",
+        "f_2033004.png"
+      ],
+      "name_jp": "アシュヴァッターマン"
     },
     {
       "id": "102600",
       "collection_no": 10,
       "name": "骑士迪昂",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1026000.png",
+        "f_1026001.png",
+        "f_1026002.png",
+        "f_1026003.png",
+        "f_1026004.png"
+      ],
+      "name_jp": "シュヴァリエ?デオン"
     },
     {
       "id": "100700",
       "collection_no": 123,
       "name": "高文",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1007000.png",
+        "f_1007001.png",
+        "f_1007002.png",
+        "f_1007003.png",
+        "f_1007004.png",
+        "f_1007300.png",
+        "f_1007400.png"
+      ],
+      "name_jp": "ガウェイン"
     },
     {
       "id": "604100",
       "collection_no": 304,
       "name": "鬼一法眼",
       "class": "assassin",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_6041000.png",
+        "f_6041001.png",
+        "f_6041002.png",
+        "f_6041003.png",
+        "f_6041004.png"
+      ],
+      "name_jp": "鬼一法眼"
     },
     {
       "id": "703700",
       "collection_no": 282,
       "name": "鬼女红叶",
       "class": "berserker",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_7037000.png",
+        "f_7037001.png",
+        "f_7037002.png",
+        "f_7037003.png",
+        "f_7037004.png"
+      ],
+      "name_jp": "鬼女紅葉"
     },
     {
       "id": "900700",
       "collection_no": 233,
       "name": "魁札尔·科亚特尔〔桑巴／圣诞〕",
       "class": "ruler",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_9007000.png",
+        "f_9007001.png",
+        "f_9007002.png",
+        "f_9007003.png",
+        "f_9007004.png",
+        "f_9007300.png",
+        "f_9007400.png"
+      ],
+      "name_jp": "ケツァル?コアトル〔サンバ／サンタ〕"
     },
     {
       "id": "404900",
       "collection_no": 366,
       "name": "黄飞虎",
       "class": "rider",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_4049000.png",
+        "f_4049001.png",
+        "f_4049002.png",
+        "f_4049003.png",
+        "f_4049004.png"
+      ],
+      "name_jp": "黄飛虎"
     },
     {
       "id": "106200",
       "collection_no": 434,
       "name": "黑姬",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1062000.png",
+        "f_1062001.png",
+        "f_1062002.png",
+        "f_1062003.png",
+        "f_1062004.png"
+      ],
+      "name_jp": "黒姫"
     },
     {
       "id": "1100500",
       "collection_no": 158,
       "name": "黑森·罗伯",
       "class": "avenger",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_11005000.png",
+        "f_11005001.png",
+        "f_11005002.png",
+        "f_11005003.png",
+        "f_11005004.png"
+      ],
+      "name_jp": "ヘシアン?ロボ"
     },
     {
       "id": "503800",
       "collection_no": 208,
       "name": "齐格",
       "class": "caster",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_5038000.png",
+        "f_5038001.png",
+        "f_5038002.png",
+        "f_5038003.png",
+        "f_5038004.png"
+      ],
+      "name_jp": "ジーク"
     },
     {
       "id": "100800",
       "collection_no": 6,
       "name": "齐格飞",
       "class": "saber",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_1008000.png",
+        "f_1008001.png",
+        "f_1008002.png",
+        "f_1008003.png",
+        "f_1008004.png",
+        "f_1008300.png"
+      ],
+      "name_jp": "ジークフリート"
     },
     {
       "id": "204900",
       "collection_no": 391,
       "name": "ＵＤＫ－巴格斯特",
       "class": "archer",
-      "rarity": 4
+      "rarity": 4,
+      "images": [
+        "f_2049000.png",
+        "f_2049001.png",
+        "f_2049002.png",
+        "f_2049003.png",
+        "f_2049004.png"
+      ],
+      "name_jp": "ＵＤＫ－バーゲスト"
     },
     {
       "id": "2300500",
       "collection_no": 351,
       "name": "Archetype：Earth",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23005000.png",
+        "f_23005001.png",
+        "f_23005002.png",
+        "f_23005003.png",
+        "f_23005004.png"
+      ],
+      "name_jp": "アーキタイプ：アース"
     },
     {
       "id": "2300200",
       "collection_no": 220,
       "name": "BB",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23002000.png",
+        "f_23002001.png",
+        "f_23002002.png",
+        "f_23002003.png",
+        "f_23002004.png",
+        "f_23002300.png",
+        "f_23002400.png"
+      ],
+      "name_jp": "ＢＢ"
     },
     {
       "id": "1001800",
       "collection_no": 426,
       "name": "Kazuradrop",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10018000.png",
+        "f_10018001.png",
+        "f_10018002.png",
+        "f_10018003.png",
+        "f_10018004.png",
+        "f_10018300.png"
+      ],
+      "name_jp": "カズラドロップ"
     },
     {
       "id": "1000900",
       "collection_no": 238,
       "name": "Kingprotea",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10009000.png",
+        "f_10009001.png",
+        "f_10009002.png",
+        "f_10009003.png",
+        "f_10009004.png",
+        "f_10009300.png",
+        "f_10009400.png"
+      ],
+      "name_jp": "キングプロテア"
     },
     {
       "id": "2301200",
@@ -1961,245 +4214,536 @@
       "collection_no": 163,
       "name": "Meltryllis",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10002000.png",
+        "f_10002001.png",
+        "f_10002002.png",
+        "f_10002003.png",
+        "f_10002004.png"
+      ],
+      "name_jp": "メルトリリス"
     },
     {
       "id": "106300",
       "collection_no": 445,
       "name": "Passionlip",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1063000.png",
+        "f_1063001.png",
+        "f_1063002.png",
+        "f_1063003.png",
+        "f_1063004.png"
+      ],
+      "name_jp": "パッションリップ"
     },
     {
       "id": "2800900",
       "collection_no": 431,
       "name": "Phantasmoon",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28009000.png",
+        "f_28009001.png",
+        "f_28009002.png",
+        "f_28009003.png",
+        "f_28009004.png"
+      ],
+      "name_jp": "ファンタズムーン"
     },
     {
       "id": "602500",
       "collection_no": 154,
       "name": "“山中老人”",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6025000.png",
+        "f_6025001.png",
+        "f_6025002.png",
+        "f_6025003.png",
+        "f_6025004.png"
+      ],
+      "name_jp": "“山の翁”"
     },
     {
       "id": "901800",
       "collection_no": 400,
       "name": "上杉谦信",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9018000.png",
+        "f_9018001.png",
+        "f_9018002.png",
+        "f_9018003.png",
+        "f_9018004.png"
+      ],
+      "name_jp": "上杉謙信"
     },
     {
       "id": "102800",
       "collection_no": 91,
       "name": "两仪式",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1028000.png",
+        "f_1028001.png",
+        "f_1028002.png",
+        "f_1028003.png",
+        "f_1028004.png",
+        "f_1028300.png",
+        "f_1028400.png",
+        "f_1028500.png"
+      ],
+      "name_jp": "両儀式"
     },
     {
       "id": "505500",
       "collection_no": 415,
       "name": "久远寺有珠",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5055000.png",
+        "f_5055001.png",
+        "f_5055002.png",
+        "f_5055003.png",
+        "f_5055004.png"
+      ],
+      "name_jp": "久遠寺有珠"
     },
     {
       "id": "205500",
       "collection_no": 470,
       "name": "乌尔德",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2055000.png",
+        "f_2055001.png",
+        "f_2055002.png",
+        "f_2055003.png"
+      ],
+      "name_jp": "ウルズ"
     },
     {
       "id": "102900",
       "collection_no": 160,
       "name": "亚瑟·潘德拉贡〔Prototype〕",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1029000.png",
+        "f_1029001.png",
+        "f_1029002.png",
+        "f_1029003.png",
+        "f_1029004.png",
+        "f_1029300.png"
+      ],
+      "name_jp": "アーサー?ペンドラゴン〔プロトタイプ〕"
     },
     {
       "id": "306200",
       "collection_no": 457,
       "name": "伊丽莎白·巴托里",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3062000.png",
+        "f_3062001.png",
+        "f_3062002.png",
+        "f_3062003.png",
+        "f_3062004.png"
+      ],
+      "name_jp": "エリザベート?バートリー"
     },
     {
       "id": "202000",
       "collection_no": 142,
       "name": "伊什塔尔",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2020000.png",
+        "f_2020001.png",
+        "f_2020002.png",
+        "f_2020003.png",
+        "f_2020004.png"
+      ],
+      "name_jp": "イシュタル"
     },
     {
       "id": "402800",
       "collection_no": 205,
       "name": "伊凡雷帝",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4028000.png",
+        "f_4028001.png",
+        "f_4028002.png",
+        "f_4028003.png",
+        "f_4028004.png"
+      ],
+      "name_jp": "イヴァン雷帝"
     },
     {
       "id": "104600",
       "collection_no": 299,
       "name": "伊吹童子",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1046000.png",
+        "f_1046001.png",
+        "f_1046002.png",
+        "f_1046003.png",
+        "f_1046004.png",
+        "f_1046300.png"
+      ],
+      "name_jp": "伊吹童子"
     },
     {
       "id": "704300",
       "collection_no": 355,
       "name": "伊吹童子",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7043000.png",
+        "f_7043001.png",
+        "f_7043002.png",
+        "f_7043003.png",
+        "f_7043004.png",
+        "f_7043300.png"
+      ],
+      "name_jp": "伊吹童子"
     },
     {
       "id": "400200",
       "collection_no": 108,
       "name": "伊斯坎达尔",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4002000.png",
+        "f_4002001.png",
+        "f_4002002.png",
+        "f_4002003.png",
+        "f_4002004.png"
+      ],
+      "name_jp": "イスカンダル"
     },
     {
       "id": "502800",
       "collection_no": 136,
       "name": "伊莉雅丝菲尔·冯·爱因兹贝伦",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5028000.png",
+        "f_5028001.png",
+        "f_5028002.png",
+        "f_5028003.png",
+        "f_5028004.png",
+        "f_5028300.png"
+      ],
+      "name_jp": "イリヤスフィール?フォン?アインツベルン"
     },
     {
       "id": "2300300",
       "collection_no": 244,
       "name": "伟大的石像神",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23003000.png",
+        "f_23003001.png",
+        "f_23003002.png",
+        "f_23003003.png",
+        "f_23003004.png"
+      ],
+      "name_jp": "大いなる石像神"
     },
     {
       "id": "703900",
       "collection_no": 306,
       "name": "伽拉忒亚",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7039000.png",
+        "f_7039001.png",
+        "f_7039002.png",
+        "f_7039003.png",
+        "f_7039004.png"
+      ],
+      "name_jp": "ガラテア"
     },
     {
       "id": "2801000",
       "collection_no": 437,
       "name": "但丁·阿利吉耶里",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28010000.png",
+        "f_28010001.png",
+        "f_28010002.png",
+        "f_28010003.png",
+        "f_28010004.png"
+      ],
+      "name_jp": "ダンテ?アリギエーリ"
     },
     {
       "id": "200900",
       "collection_no": 60,
       "name": "俄里翁",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2009000.png",
+        "f_2009001.png",
+        "f_2009002.png",
+        "f_2009003.png",
+        "f_2009004.png"
+      ],
+      "name_jp": "オリオン"
     },
     {
       "id": "604200",
       "collection_no": 314,
       "name": "光之高扬斯卡娅",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6042000.png",
+        "f_6042001.png",
+        "f_6042002.png",
+        "f_6042003.png",
+        "f_6042004.png",
+        "f_6042300.png"
+      ],
+      "name_jp": "光のコヤンスカヤ"
     },
     {
       "id": "600800",
       "collection_no": 139,
       "name": "克娄巴特拉",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6008000.png",
+        "f_6008001.png",
+        "f_6008002.png",
+        "f_6008003.png",
+        "f_6008004.png"
+      ],
+      "name_jp": "クレオパトラ"
     },
     {
       "id": "504600",
       "collection_no": 307,
       "name": "克莱恩小姐",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5046000.png",
+        "f_5046001.png",
+        "f_5046002.png",
+        "f_5046003.png",
+        "f_5046004.png"
+      ],
+      "name_jp": "ミス?クレーン"
     },
     {
       "id": "102700",
       "collection_no": 68,
       "name": "冲田总司",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1027000.png",
+        "f_1027001.png",
+        "f_1027002.png",
+        "f_1027003.png",
+        "f_1027004.png",
+        "f_1027300.png"
+      ],
+      "name_jp": "沖田総司"
     },
     {
       "id": "1000700",
       "collection_no": 209,
       "name": "冲田总司〔Alter〕",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10007000.png",
+        "f_10007001.png",
+        "f_10007002.png",
+        "f_10007003.png",
+        "f_10007004.png",
+        "f_10007300.png"
+      ],
+      "name_jp": "沖田総司〔オルタ〕"
     },
     {
       "id": "105100",
       "collection_no": 317,
       "name": "冲田总司〔Alter〕",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1051000.png",
+        "f_1051001.png",
+        "f_1051002.png",
+        "f_1051003.png",
+        "f_1051004.png"
+      ],
+      "name_jp": "沖田総司〔オルタ〕"
     },
     {
       "id": "504900",
       "collection_no": 327,
       "name": "出云阿国",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5049000.png",
+        "f_5049001.png",
+        "f_5049002.png",
+        "f_5049003.png",
+        "f_5049004.png"
+      ],
+      "name_jp": "出雲阿国"
     },
     {
       "id": "603100",
       "collection_no": 189,
       "name": "刑部姬",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6031000.png",
+        "f_6031001.png",
+        "f_6031002.png",
+        "f_6031003.png",
+        "f_6031004.png",
+        "f_6031300.png",
+        "f_6031400.png"
+      ],
+      "name_jp": "刑部姫"
     },
     {
       "id": "704400",
       "collection_no": 362,
       "name": "千利休",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7044000.png",
+        "f_7044001.png",
+        "f_7044002.png",
+        "f_7044003.png",
+        "f_7044004.png"
+      ],
+      "name_jp": "千利休"
     },
     {
       "id": "104900",
       "collection_no": 302,
       "name": "千子村正",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1049000.png",
+        "f_1049001.png",
+        "f_1049002.png",
+        "f_1049003.png",
+        "f_1049004.png"
+      ],
+      "name_jp": "千子村正"
     },
     {
       "id": "901000",
       "collection_no": 292,
       "name": "卑弥呼",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9010000.png",
+        "f_9010001.png",
+        "f_9010002.png",
+        "f_9010003.png",
+        "f_9010004.png"
+      ],
+      "name_jp": "卑弥呼"
     },
     {
       "id": "701400",
       "collection_no": 97,
       "name": "南丁格尔",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7014000.png",
+        "f_7014001.png",
+        "f_7014002.png",
+        "f_7014003.png",
+        "f_7014004.png"
+      ],
+      "name_jp": "ナイチンゲール"
     },
     {
       "id": "200200",
       "collection_no": 12,
       "name": "吉尔伽美什",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2002000.png",
+        "f_2002001.png",
+        "f_2002002.png",
+        "f_2002003.png",
+        "f_2002004.png"
+      ],
+      "name_jp": "ギルガメッシュ"
     },
     {
       "id": "404700",
       "collection_no": 342,
       "name": "君士坦丁十一世",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4047000.png",
+        "f_4047001.png",
+        "f_4047002.png",
+        "f_4047003.png",
+        "f_4047004.png"
+      ],
+      "name_jp": "コンスタンティノス11世"
     },
     {
       "id": "604600",
       "collection_no": 365,
       "name": "吾绰",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6046000.png",
+        "f_6046001.png",
+        "f_6046002.png",
+        "f_6046003.png",
+        "f_6046004.png"
+      ],
+      "name_jp": "呼延灼"
     },
     {
       "id": "605300",
@@ -2213,364 +4757,800 @@
       "collection_no": 416,
       "name": "响＆千键",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10017000.png",
+        "f_10017001.png",
+        "f_10017002.png",
+        "f_10017003.png",
+        "f_10017004.png"
+      ],
+      "name_jp": "ひびき＆千鍵"
     },
     {
       "id": "305900",
       "collection_no": 442,
       "name": "因陀罗",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3059000.png",
+        "f_3059001.png",
+        "f_3059002.png",
+        "f_3059003.png",
+        "f_3059004.png"
+      ],
+      "name_jp": "インドラ"
     },
     {
       "id": "205300",
       "collection_no": 427,
       "name": "图坦卡蒙",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2053000.png",
+        "f_2053001.png",
+        "f_2053002.png",
+        "f_2053003.png",
+        "f_2053004.png"
+      ],
+      "name_jp": "ツタンカーメン"
     },
     {
       "id": "702500",
       "collection_no": 161,
       "name": "土方岁三",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7025000.png",
+        "f_7025001.png",
+        "f_7025002.png",
+        "f_7025003.png",
+        "f_7025004.png"
+      ],
+      "name_jp": "土方歳三"
     },
     {
       "id": "305000",
       "collection_no": 329,
       "name": "坂本龙马",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3050000.png",
+        "f_3050001.png",
+        "f_3050002.png",
+        "f_3050003.png",
+        "f_3050004.png"
+      ],
+      "name_jp": "坂本龍馬"
     },
     {
       "id": "700600",
       "collection_no": 51,
       "name": "坂田金时",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7006000.png",
+        "f_7006001.png",
+        "f_7006002.png",
+        "f_7006003.png",
+        "f_7006004.png",
+        "f_7006300.png"
+      ],
+      "name_jp": "坂田金時"
     },
     {
       "id": "303200",
       "collection_no": 196,
       "name": "埃列什基伽勒",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3032000.png",
+        "f_3032001.png",
+        "f_3032002.png",
+        "f_3032003.png",
+        "f_3032004.png",
+        "f_3032300.png"
+      ],
+      "name_jp": "エレシュキガル"
     },
     {
       "id": "3300200",
       "collection_no": 417,
       "name": "埃列什基伽勒",
       "class": "beast",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_33002000.png",
+        "f_33002001.png",
+        "f_33002002.png",
+        "f_33002003.png",
+        "f_33002004.png"
+      ],
+      "name_jp": "エレシュキガル"
     },
     {
       "id": "2801100",
       "collection_no": 441,
       "name": "堤丰·厄斐墨洛斯",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28011000.png",
+        "f_28011001.png",
+        "f_28011002.png",
+        "f_28011003.png",
+        "f_28011004.png"
+      ],
+      "name_jp": "テュフォン?エフェメロス"
     },
     {
       "id": "603200",
       "collection_no": 199,
       "name": "塞弥拉弥斯",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6032000.png",
+        "f_6032001.png",
+        "f_6032002.png",
+        "f_6032003.png",
+        "f_6032004.png"
+      ],
+      "name_jp": "セミラミス"
     },
     {
       "id": "900500",
       "collection_no": 173,
       "name": "夏洛克·福尔摩斯",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9005000.png",
+        "f_9005001.png",
+        "f_9005002.png",
+        "f_9005003.png",
+        "f_9005004.png"
+      ],
+      "name_jp": "シャーロック?ホームズ"
     },
     {
       "id": "105900",
       "collection_no": 402,
       "name": "大和武尊",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1059000.png",
+        "f_1059001.png",
+        "f_1059002.png",
+        "f_1059003.png",
+        "f_1059004.png"
+      ],
+      "name_jp": "ヤマトタケル"
     },
     {
       "id": "900200",
       "collection_no": 93,
       "name": "天草四郎",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9002000.png",
+        "f_9002001.png",
+        "f_9002002.png",
+        "f_9002003.png",
+        "f_9002004.png",
+        "f_9002300.png"
+      ],
+      "name_jp": "天草四郎"
     },
     {
       "id": "404300",
       "collection_no": 331,
       "name": "太公望",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4043000.png",
+        "f_4043001.png",
+        "f_4043002.png",
+        "f_4043003.png",
+        "f_4043004.png"
+      ],
+      "name_jp": "太公望"
     },
     {
       "id": "1100900",
       "collection_no": 268,
       "name": "太空伊什塔尔",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11009000.png",
+        "f_11009001.png",
+        "f_11009002.png",
+        "f_11009003.png",
+        "f_11009004.png",
+        "f_11009300.png"
+      ],
+      "name_jp": "スペース?イシュタル"
     },
     {
       "id": "2800100",
       "collection_no": 316,
       "name": "奥伯龙",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28001000.png",
+        "f_28001001.png",
+        "f_28001002.png",
+        "f_28001003.png",
+        "f_28001004.png",
+        "f_28001300.png",
+        "f_28001400.png"
+      ],
+      "name_jp": "オベロン"
     },
     {
       "id": "403800",
       "collection_no": 277,
       "name": "奥德修斯",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4038000.png",
+        "f_4038001.png",
+        "f_4038001d.png",
+        "f_4038002.png",
+        "f_4038003.png",
+        "f_4038004.png",
+        "f_4038300.png",
+        "f_4038400.png"
+      ],
+      "name_jp": "オデュッセウス"
     },
     {
       "id": "401200",
       "collection_no": 118,
       "name": "奥斯曼狄斯",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4012000.png",
+        "f_4012001.png",
+        "f_4012002.png",
+        "f_4012003.png",
+        "f_4012004.png"
+      ],
+      "name_jp": "オジマンディアス"
     },
     {
       "id": "901600",
       "collection_no": 374,
       "name": "女教皇若安",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9016000.png",
+        "f_9016001.png",
+        "f_9016002.png",
+        "f_9016003.png",
+        "f_9016004.png"
+      ],
+      "name_jp": "女教皇ヨハンナ"
     },
     {
       "id": "401300",
       "collection_no": 99,
       "name": "女王梅芙",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4013000.png",
+        "f_4013001.png",
+        "f_4013002.png",
+        "f_4013003.png",
+        "f_4013004.png",
+        "f_4013300.png",
+        "f_4013400.png"
+      ],
+      "name_jp": "女王メイヴ"
     },
     {
       "id": "304800",
       "collection_no": 312,
       "name": "妖精骑士兰斯洛特",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3048000.png",
+        "f_3048001.png",
+        "f_3048002.png",
+        "f_3048003.png",
+        "f_3048004.png",
+        "f_3048005.png",
+        "f_3048300.png",
+        "f_3048400.png",
+        "f_3048500.png"
+      ],
+      "name_jp": "妖精騎士ランスロット"
     },
     {
       "id": "705000",
       "collection_no": 429,
       "name": "娄希",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7050000.png",
+        "f_7050001.png",
+        "f_7050002.png",
+        "f_7050003.png",
+        "f_7050004.png"
+      ],
+      "name_jp": "ロウヒ"
     },
     {
       "id": "405500",
       "collection_no": 406,
       "name": "安德洛墨达",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4055000.png",
+        "f_4055001.png",
+        "f_4055002.png",
+        "f_4055003.png",
+        "f_4055004.png"
+      ],
+      "name_jp": "アンドロメダ"
     },
     {
       "id": "101700",
       "collection_no": 153,
       "name": "宫本武藏",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1017000.png",
+        "f_1017001.png",
+        "f_1017002.png",
+        "f_1017003.png",
+        "f_1017004.png"
+      ],
+      "name_jp": "宮本武蔵"
     },
     {
       "id": "703600",
       "collection_no": 261,
       "name": "宫本武藏",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7036000.png",
+        "f_7036001.png",
+        "f_7036002.png",
+        "f_7036003.png",
+        "f_7036004.png",
+        "f_7036300.png"
+      ],
+      "name_jp": "宮本武蔵"
     },
     {
       "id": "505800",
       "collection_no": 435,
       "name": "小野小町",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5058000.png",
+        "f_5058001.png",
+        "f_5058002.png",
+        "f_5058003.png",
+        "f_5058004.png"
+      ],
+      "name_jp": "小野小町"
     },
     {
       "id": "201100",
       "collection_no": 77,
       "name": "尼古拉·特斯拉",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2011000.png",
+        "f_2011001.png",
+        "f_2011002.png",
+        "f_2011003.png",
+        "f_2011004.png"
+      ],
+      "name_jp": "ニコラ?テスラ"
     },
     {
       "id": "1101500",
       "collection_no": 370,
       "name": "尼托克丽丝〔Alter〕",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11015000.png",
+        "f_11015001.png",
+        "f_11015002.png",
+        "f_11015003.png",
+        "f_11015004.png"
+      ],
+      "name_jp": "ニトクリス〔オルタ〕"
     },
     {
       "id": "503200",
       "collection_no": 175,
       "name": "尼禄·克劳狄乌斯",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5032000.png",
+        "f_5032001.png",
+        "f_5032002.png",
+        "f_5032003.png",
+        "f_5032004.png"
+      ],
+      "name_jp": "ネロ?クラウディウス"
     },
     {
       "id": "100600",
       "collection_no": 90,
       "name": "尼禄·克劳狄乌斯〔新娘〕",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1006000.png",
+        "f_1006001.png",
+        "f_1006002.png",
+        "f_1006003.png",
+        "f_1006004.png"
+      ],
+      "name_jp": "ネロ?クラウディウス〔ブライド〕"
     },
     {
       "id": "403700",
       "collection_no": 296,
       "name": "尼莫",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4037000.png",
+        "f_4037001.png",
+        "f_4037002.png",
+        "f_4037003.png",
+        "f_4037004.png",
+        "f_4037300.png"
+      ],
+      "name_jp": "ネモ"
     },
     {
       "id": "405700",
       "collection_no": 452,
       "name": "尼莫／诺亚",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4057000.png",
+        "f_4057001.png",
+        "f_4057002.png",
+        "f_4057003.png",
+        "f_4057004.png"
+      ],
+      "name_jp": "ネモ／ノア"
     },
     {
       "id": "503000",
       "collection_no": 169,
       "name": "山鲁佐德",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5030000.png",
+        "f_5030001.png",
+        "f_5030002.png",
+        "f_5030003.png",
+        "f_5030004.png"
+      ],
+      "name_jp": "シェヘラザード"
     },
     {
       "id": "1100200",
       "collection_no": 96,
       "name": "岩窟王",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11002000.png",
+        "f_11002001.png",
+        "f_11002002.png",
+        "f_11002003.png",
+        "f_11002004.png",
+        "f_11002300.png"
+      ],
+      "name_jp": "巌窟王"
     },
     {
       "id": "1101700",
       "collection_no": 409,
       "name": "岩窟王　基督山",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11017000.png",
+        "f_11017001.png",
+        "f_11017002.png",
+        "f_11017003.png",
+        "f_11017004.png"
+      ],
+      "name_jp": "巌窟王　モンテ?クリスト"
     },
     {
       "id": "301200",
       "collection_no": 88,
       "name": "布伦希尔德",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3012000.png",
+        "f_3012001.png",
+        "f_3012002.png",
+        "f_3012003.png",
+        "f_3012004.png"
+      ],
+      "name_jp": "ブリュンヒルデ"
     },
     {
       "id": "303600",
       "collection_no": 232,
       "name": "布拉达曼特",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3036000.png",
+        "f_3036001.png",
+        "f_3036002.png",
+        "f_3036003.png",
+        "f_3036004.png"
+      ],
+      "name_jp": "ブラダマンテ"
     },
     {
       "id": "305300",
       "collection_no": 368,
       "name": "布里托玛特",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3053000.png",
+        "f_3053001.png",
+        "f_3053002.png",
+        "f_3053003.png",
+        "f_3053004.png"
+      ],
+      "name_jp": "ブリトマート"
     },
     {
       "id": "1101000",
       "collection_no": 303,
       "name": "平景清",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11010000.png",
+        "f_11010001.png",
+        "f_11010002.png",
+        "f_11010003.png",
+        "f_11010004.png"
+      ],
+      "name_jp": "平景清"
     },
     {
       "id": "1001600",
       "collection_no": 376,
       "name": "幼体／提亚马特",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10016000.png",
+        "f_10016001.png",
+        "f_10016002.png",
+        "f_10016003.png",
+        "f_10016004.png"
+      ],
+      "name_jp": "ラーヴァ／ティアマト"
     },
     {
       "id": "205400",
       "collection_no": 450,
       "name": "幼体／提亚马特",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2054000.png",
+        "f_2054001.png",
+        "f_2054002.png",
+        "f_2054003.png",
+        "f_2054004.png"
+      ],
+      "name_jp": "ラーヴァ／ティアマト"
     },
     {
       "id": "702000",
       "collection_no": 98,
       "name": "库·丘林〔Alter〕",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7020000.png",
+        "f_7020001.png",
+        "f_7020002.png",
+        "f_7020003.png",
+        "f_7020004.png",
+        "f_7020300.png"
+      ],
+      "name_jp": "クー?フーリン〔オルタ〕"
     },
     {
       "id": "2501100",
       "collection_no": 373,
       "name": "库库尔坎",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25011000.png",
+        "f_25011001.png",
+        "f_25011002.png",
+        "f_25011003.png",
+        "f_25011004.png"
+      ],
+      "name_jp": "ククルカン"
     },
     {
       "id": "700700",
       "collection_no": 52,
       "name": "弗拉德三世",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7007000.png",
+        "f_7007001.png",
+        "f_7007002.png",
+        "f_7007003.png",
+        "f_7007004.png"
+      ],
+      "name_jp": "ヴラド三世"
     },
     {
       "id": "400300",
       "collection_no": 65,
       "name": "弗朗西斯·德雷克",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4003000.png",
+        "f_4003001.png",
+        "f_4003002.png",
+        "f_4003003.png",
+        "f_4003004.png"
+      ],
+      "name_jp": "フランシス?ドレイク"
     },
     {
       "id": "304600",
       "collection_no": 300,
       "name": "弗栗多",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3046000.png",
+        "f_3046001.png",
+        "f_3046002.png",
+        "f_3046003.png",
+        "f_3046004.png"
+      ],
+      "name_jp": "ヴリトラ"
     },
     {
       "id": "105300",
       "collection_no": 337,
       "name": "征氏姐妹",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1053000.png",
+        "f_1053001.png",
+        "f_1053002.png",
+        "f_1053003.png",
+        "f_1053004.png"
+      ],
+      "name_jp": "徴姉妹"
     },
     {
       "id": "306400",
       "collection_no": 465,
       "name": "得墨忒耳",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3064000.png",
+        "f_3064001.png",
+        "f_3064002.png",
+        "f_3064003.png",
+        "f_3064004.png"
+      ],
+      "name_jp": "デメテル"
     },
     {
       "id": "1000800",
       "collection_no": 224,
       "name": "志度内",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10008000.png",
+        "f_10008001.png",
+        "f_10008002.png",
+        "f_10008003.png",
+        "f_10008004.png"
+      ],
+      "name_jp": "シトナイ"
     },
     {
       "id": "305400",
       "collection_no": 381,
       "name": "怖军",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3054000.png",
+        "f_3054001.png",
+        "f_3054002.png",
+        "f_3054003.png",
+        "f_3054004.png"
+      ],
+      "name_jp": "ビーマ"
     },
     {
       "id": "300800",
       "collection_no": 143,
       "name": "恩奇都",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3008000.png",
+        "f_3008001.png",
+        "f_3008002.png",
+        "f_3008003.png",
+        "f_3008004.png",
+        "f_3008300.png"
+      ],
+      "name_jp": "エルキドゥ"
     },
     {
       "id": "3300100",
       "collection_no": 377,
       "name": "所多玛之兽／德拉科",
       "class": "beast",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_33001000.png",
+        "f_33001001.png",
+        "f_33001002.png",
+        "f_33001003.png",
+        "f_33001004.png"
+      ],
+      "name_jp": "ソドムズビースト／ドラコー"
     },
     {
       "id": "9935530",
@@ -2584,301 +5564,658 @@
       "collection_no": 459,
       "name": "所罗门",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28012000.png",
+        "f_28012001.png",
+        "f_28012002.png",
+        "f_28012003.png",
+        "f_28012004.png"
+      ],
+      "name_jp": "ソロモン"
     },
     {
       "id": "205000",
       "collection_no": 394,
       "name": "托勒密",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2050000.png",
+        "f_2050001.png",
+        "f_2050002.png",
+        "f_2050003.png",
+        "f_2050004.png",
+        "f_2050005.png"
+      ],
+      "name_jp": "プトレマイオス"
     },
     {
       "id": "203100",
       "collection_no": 212,
       "name": "拿破仑",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2031000.png",
+        "f_2031001.png",
+        "f_2031002.png",
+        "f_2031003.png",
+        "f_2031004.png"
+      ],
+      "name_jp": "ナポレオン"
     },
     {
       "id": "704000",
       "collection_no": 309,
       "name": "摩根",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7040000.png",
+        "f_7040001.png",
+        "f_7040002.png",
+        "f_7040003.png",
+        "f_7040004.png",
+        "f_7040300.png"
+      ],
+      "name_jp": "モルガン"
     },
     {
       "id": "301300",
       "collection_no": 70,
       "name": "斯卡哈",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3013000.png",
+        "f_3013001.png",
+        "f_3013002.png",
+        "f_3013003.png",
+        "f_3013004.png",
+        "f_3013300.png"
+      ],
+      "name_jp": "スカサハ"
     },
     {
       "id": "503900",
       "collection_no": 215,
       "name": "斯卡哈·斯卡蒂",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5039000.png",
+        "f_5039001.png",
+        "f_5039002.png",
+        "f_5039003.png",
+        "f_5039004.png"
+      ],
+      "name_jp": "スカサハ＝スカディ"
     },
     {
       "id": "901400",
       "collection_no": 357,
       "name": "斯卡哈·斯卡蒂",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9014000.png",
+        "f_9014001.png",
+        "f_9014002.png",
+        "f_9014003.png",
+        "f_9014004.png",
+        "f_9014300.png"
+      ],
+      "name_jp": "スカサハ＝スカディ"
     },
     {
       "id": "2500500",
       "collection_no": 281,
       "name": "旅行者",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25005000.png",
+        "f_25005001.png",
+        "f_25005002.png",
+        "f_25005003.png",
+        "f_25005004.png"
+      ],
+      "name_jp": "ボイジャー"
     },
     {
       "id": "1102000",
       "collection_no": 469,
       "name": "无地王约翰",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11020000.png",
+        "f_11020001.png",
+        "f_11020002.png",
+        "f_11020003.png"
+      ],
+      "name_jp": "ジョン?ラックランド"
     },
     {
       "id": "2501300",
       "collection_no": 393,
       "name": "旺吉娜",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25013000.png",
+        "f_25013001.png",
+        "f_25013002.png",
+        "f_25013003.png",
+        "f_25013004.png",
+        "f_25013300.png"
+      ],
+      "name_jp": "ワンジナ"
     },
     {
       "id": "505600",
       "collection_no": 467,
       "name": "普勒拉蒂",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5056000.png",
+        "f_5056001.png",
+        "f_5056002.png",
+        "f_5056003.png",
+        "f_5057000.png",
+        "f_5057001.png",
+        "f_5057002.png",
+        "f_5057003.png"
+      ],
+      "name_jp": "フランソワ?プレラーティ"
     },
     {
       "id": "2500900",
       "collection_no": 334,
       "name": "暗之高扬斯卡娅",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25009000.png",
+        "f_25009001.png",
+        "f_25009002.png",
+        "f_25009003.png",
+        "f_25009004.png"
+      ],
+      "name_jp": "闇のコヤンスカヤ"
     },
     {
       "id": "404800",
       "collection_no": 349,
       "name": "曲亭马琴",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4048000.png",
+        "f_4048001.png",
+        "f_4048002.png",
+        "f_4048003.png",
+        "f_4048004.png"
+      ],
+      "name_jp": "曲亭馬琴"
     },
     {
       "id": "603600",
       "collection_no": 235,
       "name": "李书文",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6036000.png",
+        "f_6036001.png",
+        "f_6036002.png",
+        "f_6036003.png",
+        "f_6036004.png",
+        "f_6036300.png",
+        "f_6036400.png"
+      ],
+      "name_jp": "李書文"
     },
     {
       "id": "204800",
       "collection_no": 383,
       "name": "杜尔伽",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2048000.png",
+        "f_2048001.png",
+        "f_2048002.png",
+        "f_2048003.png",
+        "f_2048004.png"
+      ],
+      "name_jp": "ドゥルガー"
     },
     {
       "id": "604900",
       "collection_no": 380,
       "name": "果心居士",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6049000.png",
+        "f_6049001.png",
+        "f_6049002.png",
+        "f_6049003.png",
+        "f_6049004.png"
+      ],
+      "name_jp": "果心居士"
     },
     {
       "id": "105200",
       "collection_no": 343,
       "name": "查理曼",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1052000.png",
+        "f_1052001.png",
+        "f_1052002.png",
+        "f_1052003.png",
+        "f_1052004.png",
+        "f_1052300.png"
+      ],
+      "name_jp": "シャルルマーニュ"
     },
     {
       "id": "1001500",
       "collection_no": 369,
       "name": "格里戈里·拉斯普京",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10015000.png",
+        "f_10015001.png",
+        "f_10015002.png",
+        "f_10015003.png",
+        "f_10015004.png"
+      ],
+      "name_jp": "グレゴリー?ラスプーチン"
     },
     {
       "id": "901900",
       "collection_no": 438,
       "name": "梅塔特隆·贞德",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9019000.png",
+        "f_9019001.png",
+        "f_9019002.png",
+        "f_9019003.png",
+        "f_9019004.png"
+      ],
+      "name_jp": "メタトロン?ジャンヌ"
     },
     {
       "id": "500800",
       "collection_no": 150,
       "name": "梅林",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5008000.png",
+        "f_5008001.png",
+        "f_5008002.png",
+        "f_5008003.png",
+        "f_5008004.png",
+        "f_5008300.png",
+        "f_5008400.png"
+      ],
+      "name_jp": "マーリン"
     },
     {
       "id": "901700",
       "collection_no": 390,
       "name": "梅柳齐娜",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9017000.png",
+        "f_9017001.png",
+        "f_9017002.png",
+        "f_9017003.png",
+        "f_9017004.png"
+      ],
+      "name_jp": "メリュジーヌ"
     },
     {
       "id": "2500600",
       "collection_no": 295,
       "name": "梵高",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25006000.png",
+        "f_25006001.png",
+        "f_25006002.png",
+        "f_25006003.png",
+        "f_25006004.png"
+      ],
+      "name_jp": "ヴァン?ゴッホ"
     },
     {
       "id": "404000",
       "collection_no": 274,
       "name": "欧罗巴",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4040000.png",
+        "f_4040001.png",
+        "f_4040002.png",
+        "f_4040003.png",
+        "f_4040004.png"
+      ],
+      "name_jp": "エウロペ"
     },
     {
       "id": "405200",
       "collection_no": 397,
       "name": "武田晴信",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4052000.png",
+        "f_4052001.png",
+        "f_4052002.png",
+        "f_4052003.png",
+        "f_4052004.png"
+      ],
+      "name_jp": "武田晴信"
     },
     {
       "id": "305700",
       "collection_no": 433,
       "name": "比肖内",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3057000.png",
+        "f_3057001.png",
+        "f_3057002.png",
+        "f_3057003.png",
+        "f_3057004.png"
+      ],
+      "name_jp": "ビショーネ"
     },
     {
       "id": "605100",
       "collection_no": 453,
       "name": "河上彦斋",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6051000.png",
+        "f_6051001.png",
+        "f_6051002.png",
+        "f_6051003.png",
+        "f_6051004.png"
+      ],
+      "name_jp": "河上彦斎"
     },
     {
       "id": "204000",
       "collection_no": 276,
       "name": "清少纳言",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2040000.png",
+        "f_2040001.png",
+        "f_2040002.png",
+        "f_2040003.png",
+        "f_2040004.png"
+      ],
+      "name_jp": "清少納言"
     },
     {
       "id": "204600",
       "collection_no": 350,
       "name": "源为朝",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2046000.png",
+        "f_2046001.png",
+        "f_2046002.png",
+        "f_2046003.png",
+        "f_2046004.png"
+      ],
+      "name_jp": "源為朝"
     },
     {
       "id": "702300",
       "collection_no": 114,
       "name": "源赖光",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7023000.png",
+        "f_7023001.png",
+        "f_7023002.png",
+        "f_7023003.png",
+        "f_7023004.png"
+      ],
+      "name_jp": "源頼光"
     },
     {
       "id": "1101800",
       "collection_no": 403,
       "name": "源赖光／丑御前",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11018000.png",
+        "f_11018001.png",
+        "f_11018002.png",
+        "f_11018003.png",
+        "f_11018004.png"
+      ],
+      "name_jp": "源頼光／丑御前"
     },
     {
       "id": "604700",
       "collection_no": 371,
       "name": "特斯卡特利波卡",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6047000.png",
+        "f_6047001.png",
+        "f_6047002.png",
+        "f_6047003.png",
+        "f_6047004.png",
+        "f_6047300.png"
+      ],
+      "name_jp": "テスカトリポカ"
     },
     {
       "id": "104200",
       "collection_no": 278,
       "name": "狄俄斯库里",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1042000.png",
+        "f_1042001.png",
+        "f_1042002.png",
+        "f_1042003.png",
+        "f_1042004.png"
+      ],
+      "name_jp": "ディオスクロイ"
     },
     {
       "id": "2301100",
       "collection_no": 448,
       "name": "玉兔",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23011000.png",
+        "f_23011001.png",
+        "f_23011002.png",
+        "f_23011003.png",
+        "f_23011004.png"
+      ],
+      "name_jp": "玉兎"
     },
     {
       "id": "500300",
       "collection_no": 62,
       "name": "玉藻前",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5003000.png",
+        "f_5003001.png",
+        "f_5003002.png",
+        "f_5003003.png",
+        "f_5003004.png"
+      ],
+      "name_jp": "玉藻の前"
     },
     {
       "id": "302400",
       "collection_no": 128,
       "name": "玉藻前",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3024000.png",
+        "f_3024001.png",
+        "f_3024002.png",
+        "f_3024003.png",
+        "f_3024004.png"
+      ],
+      "name_jp": "玉藻の前"
     },
     {
       "id": "1101300",
       "collection_no": 407,
       "name": "玛丽·安托瓦内特〔Alter〕",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11013000.png",
+        "f_11013001.png",
+        "f_11013002.png",
+        "f_11013003.png",
+        "f_11013004.png"
+      ],
+      "name_jp": "マリー?アントワネット〔オルタ〕"
     },
     {
       "id": "106100",
       "collection_no": 432,
       "name": "理查一世",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1061000.png",
+        "f_1061001.png",
+        "f_1061002.png",
+        "f_1061003.png",
+        "f_1061004.png"
+      ],
+      "name_jp": "リチャードⅠ世"
     },
     {
       "id": "2500400",
       "collection_no": 275,
       "name": "琰女",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25004000.png",
+        "f_25004001.png",
+        "f_25004002.png",
+        "f_25004003.png",
+        "f_25004004.png"
+      ],
+      "name_jp": "楊貴妃"
     },
     {
       "id": "1000300",
       "collection_no": 167,
       "name": "瞑生院祈荒",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10003000.png",
+        "f_10003001.png",
+        "f_10003002.png",
+        "f_10003003.png",
+        "f_10003004.png"
+      ],
+      "name_jp": "殺生院キアラ"
     },
     {
       "id": "2300400",
       "collection_no": 285,
       "name": "瞑生院祈荒",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23004000.png",
+        "f_23004001.png",
+        "f_23004002.png",
+        "f_23004003.png",
+        "f_23004004.png"
+      ],
+      "name_jp": "殺生院キアラ"
     },
     {
       "id": "900600",
       "collection_no": 229,
       "name": "祖政",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9006000.png",
+        "f_9006001.png",
+        "f_9006002.png",
+        "f_9006003.png",
+        "f_9006004.png"
+      ],
+      "name_jp": "始皇帝"
     },
     {
       "id": "504200",
       "collection_no": 237,
       "name": "紫式部",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5042000.png",
+        "f_5042001.png",
+        "f_5042002.png",
+        "f_5042003.png",
+        "f_5042004.png"
+      ],
+      "name_jp": "紫式部"
     },
     {
       "id": "103700",
       "collection_no": 234,
       "name": "红阎魔",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1037000.png",
+        "f_1037001.png",
+        "f_1037002.png",
+        "f_1037003.png",
+        "f_1037004.png"
+      ],
+      "name_jp": "紅閻魔"
     },
     {
       "id": "705300",
@@ -2892,49 +6229,111 @@
       "collection_no": 250,
       "name": "织田信长",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11007000.png",
+        "f_11007001.png",
+        "f_11007002.png",
+        "f_11007003.png",
+        "f_11007004.png"
+      ],
+      "name_jp": "織田信長"
     },
     {
       "id": "304200",
       "collection_no": 280,
       "name": "罗穆路斯·奎里努斯",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3042000.png",
+        "f_3042001.png",
+        "f_3042002.png",
+        "f_3042003.png",
+        "f_3042004.png"
+      ],
+      "name_jp": "ロムルス＝クィリヌス"
     },
     {
       "id": "105600",
       "collection_no": 384,
       "name": "美杜莎",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1056000.png",
+        "f_1056001.png",
+        "f_1056002.png",
+        "f_1056003.png",
+        "f_1056004.png"
+      ],
+      "name_jp": "メドゥーサ"
     },
     {
       "id": "1001000",
       "collection_no": 297,
       "name": "芦屋道满",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10010000.png",
+        "f_10010001.png",
+        "f_10010002.png",
+        "f_10010003.png",
+        "f_10010004.png",
+        "f_10010300.png"
+      ],
+      "name_jp": "蘆屋道満"
     },
     {
       "id": "505900",
       "collection_no": 462,
       "name": "花咲翁",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5059000.png",
+        "f_5059001.png",
+        "f_5059002.png",
+        "f_5059003.png",
+        "f_5059004.png"
+      ],
+      "name_jp": "花咲翁"
     },
     {
       "id": "2501400",
       "collection_no": 413,
       "name": "苍崎青子",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25014000.png",
+        "f_25014001.png",
+        "f_25014002.png",
+        "f_25014003.png",
+        "f_25014004.png",
+        "f_25015000.png",
+        "f_25015001.png",
+        "f_25015002.png",
+        "f_25015003.png",
+        "f_25015004.png"
+      ],
+      "name_jp": "蒼崎青子"
     },
     {
       "id": "705100",
       "collection_no": 440,
       "name": "莉莉丝",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7051000.png",
+        "f_7051001.png",
+        "f_7051002.png",
+        "f_7051003.png",
+        "f_7051004.png"
+      ],
+      "name_jp": "リリス"
     },
     {
       "id": "405900",
@@ -2948,357 +6347,824 @@
       "collection_no": 76,
       "name": "莫德雷德",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1009000.png",
+        "f_1009001.png",
+        "f_1009002.png",
+        "f_1009003.png",
+        "f_1009004.png",
+        "f_1009300.png",
+        "f_1009400.png"
+      ],
+      "name_jp": "モードレッド"
     },
     {
       "id": "403200",
       "collection_no": 241,
       "name": "莱妮丝",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4032000.png",
+        "f_4032001.png",
+        "f_4032002.png",
+        "f_4032003.png",
+        "f_4032004.png"
+      ],
+      "name_jp": "司馬懿〔ライネス〕"
     },
     {
       "id": "500900",
       "collection_no": 127,
       "name": "莱昂纳多·达·芬奇",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5009000.png",
+        "f_5009001.png",
+        "f_5009002.png",
+        "f_5009003.png",
+        "f_5009004.png"
+      ],
+      "name_jp": "レオナルド?ダ?ヴィンチ"
     },
     {
       "id": "403500",
       "collection_no": 253,
       "name": "莱昂纳多·达·芬奇",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4035000.png",
+        "f_4035001.png",
+        "f_4035002.png",
+        "f_4035003.png",
+        "f_4035004.png",
+        "f_4035300.png"
+      ],
+      "name_jp": "レオナルド?ダ?ヴィンチ"
     },
     {
       "id": "2500200",
       "collection_no": 198,
       "name": "葛饰北斋",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25002000.png",
+        "f_25002001.png",
+        "f_25002002.png",
+        "f_25002003.png",
+        "f_25002004.png"
+      ],
+      "name_jp": "葛飾北斎"
     },
     {
       "id": "502200",
       "collection_no": 113,
       "name": "西行者",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5022000.png",
+        "f_5022001.png",
+        "f_5022002.png",
+        "f_5022003.png",
+        "f_5022004.png"
+      ],
+      "name_jp": "玄奘三蔵"
     },
     {
       "id": "202300",
       "collection_no": 156,
       "name": "詹姆斯·莫里亚蒂",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2023000.png",
+        "f_2023001.png",
+        "f_2023002.png",
+        "f_2023003.png",
+        "f_2023004.png",
+        "f_2023300.png"
+      ],
+      "name_jp": "ジェームズ?モリアーティ"
     },
     {
       "id": "901300",
       "collection_no": 346,
       "name": "詹姆斯·莫里亚蒂",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9013000.png",
+        "f_9013001.png",
+        "f_9013002.png",
+        "f_9013003.png",
+        "f_9013004.png"
+      ],
+      "name_jp": "ジェームズ?モリアーティ"
     },
     {
       "id": "501900",
       "collection_no": 37,
       "name": "诸葛孔明〔埃尔梅罗Ⅱ世〕",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5019000.png",
+        "f_5019001.png",
+        "f_5019002.png",
+        "f_5019003.png",
+        "f_5019004.png"
+      ],
+      "name_jp": "諸葛孔明〔エルメロイⅡ世〕"
     },
     {
       "id": "2300900",
       "collection_no": 418,
       "name": "谜之代行者C.I.E.L",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23009000.png",
+        "f_23009001.png",
+        "f_23009002.png",
+        "f_23009003.png",
+        "f_23009004.png",
+        "f_23009300.png",
+        "f_23009400.png"
+      ],
+      "name_jp": "謎の代行者C.I.E.L"
     },
     {
       "id": "601800",
       "collection_no": 86,
       "name": "谜之女主角X",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6018000.png",
+        "f_6018001.png",
+        "f_6018002.png",
+        "f_6018003.png",
+        "f_6018004.png",
+        "f_6018300.png"
+      ],
+      "name_jp": "謎のヒロインX"
     },
     {
       "id": "702400",
       "collection_no": 155,
       "name": "谜之女主角X〔Alter〕",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7024000.png",
+        "f_7024001.png",
+        "f_7024002.png",
+        "f_7024003.png",
+        "f_7024004.png"
+      ],
+      "name_jp": "謎のヒロインX〔オルタ〕"
     },
     {
       "id": "900100",
       "collection_no": 59,
       "name": "贞德",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9001000.png",
+        "f_9001001.png",
+        "f_9001002.png",
+        "f_9001003.png",
+        "f_9001004.png",
+        "f_9001300.png"
+      ],
+      "name_jp": "ジャンヌ?ダルク"
     },
     {
       "id": "203200",
       "collection_no": 216,
       "name": "贞德",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2032000.png",
+        "f_2032001.png",
+        "f_2032002.png",
+        "f_2032003.png",
+        "f_2032004.png"
+      ],
+      "name_jp": "ジャンヌ?ダルク"
     },
     {
       "id": "1100300",
       "collection_no": 106,
       "name": "贞德〔Alter〕",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11003000.png",
+        "f_11003001.png",
+        "f_11003002.png",
+        "f_11003003.png",
+        "f_11003004.png",
+        "f_11003300.png"
+      ],
+      "name_jp": "ジャンヌ?ダルク〔オルタ〕"
     },
     {
       "id": "203800",
       "collection_no": 272,
       "name": "超人俄里翁",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2038000.png",
+        "f_2038001.png",
+        "f_2038002.png",
+        "f_2038003.png",
+        "f_2038004.png"
+      ],
+      "name_jp": "超人オリオン"
     },
     {
       "id": "1001300",
       "collection_no": 339,
       "name": "超级班扬",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10013000.png",
+        "f_10013001.png",
+        "f_10013002.png",
+        "f_10013003.png",
+        "f_10013004.png"
+      ],
+      "name_jp": "スーパーバニヤン"
     },
     {
       "id": "106400",
       "collection_no": 456,
       "name": "近藤勇",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1064000.png",
+        "f_1064001.png",
+        "f_1064002.png",
+        "f_1064003.png",
+        "f_1064004.png"
+      ],
+      "name_jp": "近藤勇"
     },
     {
       "id": "300400",
       "collection_no": 85,
       "name": "迦尔纳",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3004000.png",
+        "f_3004001.png",
+        "f_3004002.png",
+        "f_3004003.png",
+        "f_3004004.png",
+        "f_3004300.png",
+        "f_3004400.png",
+        "f_3004500.png"
+      ],
+      "name_jp": "カルナ"
     },
     {
       "id": "603700",
       "collection_no": 239,
       "name": "迦摩",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6037000.png",
+        "f_6037001.png",
+        "f_6037002.png",
+        "f_6037003.png",
+        "f_6037004.png"
+      ],
+      "name_jp": "カーマ"
     },
     {
       "id": "1101100",
       "collection_no": 321,
       "name": "迦摩",
       "class": "avenger",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_11011000.png",
+        "f_11011001.png",
+        "f_11011002.png",
+        "f_11011003.png",
+        "f_11011004.png"
+      ],
+      "name_jp": "カーマ"
     },
     {
       "id": "602100",
       "collection_no": 112,
       "name": "酒吞童子",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6021000.png",
+        "f_6021001.png",
+        "f_6021002.png",
+        "f_6021003.png",
+        "f_6021004.png",
+        "f_6021300.png"
+      ],
+      "name_jp": "酒呑童子"
     },
     {
       "id": "703200",
       "collection_no": 226,
       "name": "重瞳",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7032000.png",
+        "f_7032001.png",
+        "f_7032002.png",
+        "f_7032003.png",
+        "f_7032004.png"
+      ],
+      "name_jp": "項羽"
     },
     {
       "id": "201500",
       "collection_no": 84,
       "name": "阿周那",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2015000.png",
+        "f_2015001.png",
+        "f_2015002.png",
+        "f_2015003.png",
+        "f_2015004.png",
+        "f_2015300.png"
+      ],
+      "name_jp": "アルジュナ"
     },
     {
       "id": "703300",
       "collection_no": 247,
       "name": "阿周那〔Alter〕",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7033000.png",
+        "f_7033001.png",
+        "f_7033002.png",
+        "f_7033003.png",
+        "f_7033004.png",
+        "f_7033300.png",
+        "f_7033400.png"
+      ],
+      "name_jp": "アルジュナ〔オルタ〕"
     },
     {
       "id": "402900",
       "collection_no": 206,
       "name": "阿喀琉斯",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4029000.png",
+        "f_4029001.png",
+        "f_4029002.png",
+        "f_4029003.png",
+        "f_4029004.png",
+        "f_4029300.png"
+      ],
+      "name_jp": "アキレウス"
     },
     {
       "id": "504500",
       "collection_no": 284,
       "name": "阿尔托莉雅·卡斯特",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5045000.png",
+        "f_5045001.png",
+        "f_5045002.png",
+        "f_5045003.png",
+        "f_5045004.png"
+      ],
+      "name_jp": "アルトリア?キャスター"
     },
     {
       "id": "704700",
       "collection_no": 386,
       "name": "阿尔托莉雅·卡斯特",
       "class": "berserker",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_7047000.png",
+        "f_7047001.png",
+        "f_7047002.png",
+        "f_7047003.png",
+        "f_7047004.png"
+      ],
+      "name_jp": "アルトリア?キャスター"
     },
     {
       "id": "100100",
       "collection_no": 2,
       "name": "阿尔托莉雅·潘德拉贡",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1001000.png",
+        "f_1001001.png",
+        "f_1001002.png",
+        "f_1001003.png",
+        "f_1001004.png",
+        "f_1001300.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン"
     },
     {
       "id": "302000",
       "collection_no": 119,
       "name": "阿尔托莉雅·潘德拉贡",
       "class": "lancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_3020000.png",
+        "f_3020001.png",
+        "f_3020002.png",
+        "f_3020003.png",
+        "f_3020004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン"
     },
     {
       "id": "202600",
       "collection_no": 129,
       "name": "阿尔托莉雅·潘德拉贡",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2026000.png",
+        "f_2026001.png",
+        "f_2026002.png",
+        "f_2026003.png",
+        "f_2026004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン"
     },
     {
       "id": "900900",
       "collection_no": 265,
       "name": "阿尔托莉雅·潘德拉贡",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9009000.png",
+        "f_9009001.png",
+        "f_9009002.png",
+        "f_9009003.png",
+        "f_9009004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン"
     },
     {
       "id": "402700",
       "collection_no": 179,
       "name": "阿尔托莉雅·潘德拉贡〔Alter〕",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4027000.png",
+        "f_4027001.png",
+        "f_4027002.png",
+        "f_4027003.png",
+        "f_4027004.png"
+      ],
+      "name_jp": "アルトリア?ペンドラゴン〔オルタ〕"
     },
     {
       "id": "901100",
       "collection_no": 305,
       "name": "阿摩耳〔卡莲〕",
       "class": "ruler",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_9011000.png",
+        "f_9011001.png",
+        "f_9011002.png",
+        "f_9011003.png",
+        "f_9011004.png",
+        "f_9011300.png"
+      ],
+      "name_jp": "アムール〔カレン〕"
     },
     {
       "id": "1002200",
       "collection_no": 471,
       "name": "阿斯卡拉福斯",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10022000.png",
+        "f_10022001.png",
+        "f_10022002.png",
+        "f_10022003.png"
+      ],
+      "name_jp": "アスカラポス"
     },
     {
       "id": "104100",
       "collection_no": 270,
       "name": "阿斯托尔福",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1041000.png",
+        "f_1041001.png",
+        "f_1041002.png",
+        "f_1041003.png",
+        "f_1041004.png"
+      ],
+      "name_jp": "アストルフォ"
     },
     {
       "id": "2500100",
       "collection_no": 195,
       "name": "阿比盖尔·威廉姆斯",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25001000.png",
+        "f_25001001.png",
+        "f_25001002.png",
+        "f_25001003.png",
+        "f_25001004.png"
+      ],
+      "name_jp": "アビゲイル?ウィリアムズ"
     },
     {
       "id": "2500700",
       "collection_no": 289,
       "name": "阿比盖尔·威廉姆斯〔夏〕",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25007000.png",
+        "f_25007001.png",
+        "f_25007002.png",
+        "f_25007003.png",
+        "f_25007004.png"
+      ],
+      "name_jp": "アビゲイル?ウィリアムズ〔夏〕"
     },
     {
       "id": "2800300",
       "collection_no": 353,
       "name": "阿瓦隆女士",
       "class": "pretender",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_28003000.png",
+        "f_28003001.png",
+        "f_28003002.png",
+        "f_28003003.png",
+        "f_28003004.png"
+      ],
+      "name_jp": "レディ?アヴァロン"
     },
     {
       "id": "503500",
       "collection_no": 201,
       "name": "阿纳斯塔西娅",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5035000.png",
+        "f_5035001.png",
+        "f_5035002.png",
+        "f_5035003.png",
+        "f_5035004.png"
+      ],
+      "name_jp": "アナスタシア"
     },
     {
       "id": "101800",
       "collection_no": 8,
       "name": "阿蒂拉",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1018000.png",
+        "f_1018001.png",
+        "f_1018002.png",
+        "f_1018003.png",
+        "f_1018004.png",
+        "f_1018300.png"
+      ],
+      "name_jp": "アルテラ"
     },
     {
       "id": "2501000",
       "collection_no": 324,
       "name": "雅克·德·莫莱",
       "class": "foreigner",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_25010000.png",
+        "f_25010001.png",
+        "f_25010002.png",
+        "f_25010003.png",
+        "f_25010004.png"
+      ],
+      "name_jp": "ジャック?ド?モレー"
     },
     {
       "id": "106600",
       "collection_no": 466,
       "name": "雅克·德·莫莱",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1066000.png",
+        "f_1066001.png",
+        "f_1066002.png",
+        "f_1066003.png",
+        "f_1066004.png"
+      ],
+      "name_jp": "ジャック?ド?モレー"
     },
     {
       "id": "505300",
       "collection_no": 385,
       "name": "雨之魔女梣",
       "class": "caster",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_5053000.png",
+        "f_5053001.png",
+        "f_5053002.png",
+        "f_5053003.png",
+        "f_5053004.png"
+      ],
+      "name_jp": "雨の魔女トネリコ"
     },
     {
       "id": "600500",
       "collection_no": 75,
       "name": "雾都弃子",
       "class": "assassin",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_6005000.png",
+        "f_6005001.png",
+        "f_6005002.png",
+        "f_6005003.png",
+        "f_6005004.png"
+      ],
+      "name_jp": "ジャック?ザ?リッパー"
     },
     {
       "id": "106500",
       "collection_no": 461,
       "name": "领主洛格雷斯",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1065000.png",
+        "f_1065001.png",
+        "f_1065002.png",
+        "f_1065003.png",
+        "f_1065004.png"
+      ],
+      "name_jp": "ロード?ログレス"
     },
     {
       "id": "1001100",
       "collection_no": 336,
       "name": "马纳南·麦克·利尔〔巴泽特〕",
       "class": "alterEgo",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_10011000.png",
+        "f_10011001.png",
+        "f_10011002.png",
+        "f_10011003.png",
+        "f_10011004.png"
+      ],
+      "name_jp": "マナナン?マク?リール〔バゼット〕"
     },
     {
       "id": "204700",
       "collection_no": 375,
       "name": "高杉晋作",
       "class": "archer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_2047000.png",
+        "f_2047001.png",
+        "f_2047002.png",
+        "f_2047003.png",
+        "f_2047004.png"
+      ],
+      "name_jp": "高杉晋作"
     },
     {
       "id": "401800",
       "collection_no": 144,
       "name": "魁札尔·科亚特尔",
       "class": "rider",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_4018000.png",
+        "f_4018001.png",
+        "f_4018002.png",
+        "f_4018003.png",
+        "f_4018004.png"
+      ],
+      "name_jp": "ケツァル?コアトル"
     },
     {
       "id": "103300",
       "collection_no": 213,
       "name": "齐格鲁德",
       "class": "saber",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_1033000.png",
+        "f_1033001.png",
+        "f_1033002.png",
+        "f_1033003.png",
+        "f_1033004.png",
+        "f_1033300.png"
+      ],
+      "name_jp": "シグルド"
     },
     {
       "id": "2300600",
       "collection_no": 421,
       "name": "ＢＢ迪拜",
       "class": "moonCancer",
-      "rarity": 5
+      "rarity": 5,
+      "images": [
+        "f_23006000.png",
+        "f_23006001.png",
+        "f_23006002.png",
+        "f_23006003.png",
+        "f_23006004.png"
+      ],
+      "name_jp": "ＢＢドバイ"
+    },
+    {
+      "id": "1002100",
+      "name": "哈桑·萨巴赫",
+      "class": "assassin",
+      "rarity": 0,
+      "images": [
+        "f_10021000.png",
+        "f_10021001.png",
+        "f_10021002.png",
+        "f_10021003.png",
+        "f_10021004.png"
+      ],
+      "name_jp": "ハサン・サッバーハ"
+    },
+    {
+      "id": "1700100",
+      "name": "所罗门",
+      "class": "loreGrandCaster",
+      "rarity": 0,
+      "images": [
+        "f_17001000.png",
+        "f_17001004.png"
+      ],
+      "name_jp": "ソロモン"
+    },
+    {
+      "id": "4000100",
+      "name": "Ｕ－奥尔加玛丽",
+      "class": "unBeastOlgaMarie",
+      "rarity": 0,
+      "images": [
+        "f_40001000.png",
+        "f_40001001.png",
+        "f_40001002.png",
+        "f_40001003.png",
+        "f_40001004.png"
+      ],
+      "name_jp": "Ｕ－オルガマリー"
     }
   ]
 }

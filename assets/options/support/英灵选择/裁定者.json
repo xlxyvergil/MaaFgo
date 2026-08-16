@@ -1,0 +1,209 @@
+{
+    "option": {
+        "裁定者": {
+            "type": "select",
+            "label": "英灵",
+            "default": "901500",
+            "cases": [
+                {
+                    "name": "901500",
+                    "label": "壹与",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900400",
+                    "label": "玛尔达",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901200",
+                    "label": "莱昂纳多·达·芬奇",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900800",
+                    "label": "阿斯特赖亚",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900700",
+                    "label": "魁札尔·科亚特尔〔桑巴／圣诞〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901800",
+                    "label": "上杉谦信",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901000",
+                    "label": "卑弥呼",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900500",
+                    "label": "夏洛克·福尔摩斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900200",
+                    "label": "天草四郎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901600",
+                    "label": "女教皇若安",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901400",
+                    "label": "斯卡哈·斯卡蒂",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901900",
+                    "label": "梅塔特隆·贞德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901700",
+                    "label": "梅柳齐娜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900600",
+                    "label": "祖政",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901300",
+                    "label": "詹姆斯·莫里亚蒂",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900100",
+                    "label": "贞德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "900900",
+                    "label": "阿尔托莉雅·潘德拉贡",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "900900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "901100",
+                    "label": "阿摩耳〔卡莲〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "901100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

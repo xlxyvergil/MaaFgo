@@ -4,3 +4,4 @@ numpy
 psutil
 highspy
 ultralytics
+onnxruntime

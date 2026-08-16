@@ -1,0 +1,251 @@
+{
+    "option": {
+        "英灵选择": {
+            "type": "select",
+            "label": "英灵选择",
+            "default": "他人格",
+            "cases": [
+                {
+                    "name": "他人格",
+                    "label": "他人格",
+                    "option": [
+                        "他人格"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "他人格"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "伪装者",
+                    "label": "伪装者",
+                    "option": [
+                        "伪装者"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "伪装者"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "兽",
+                    "label": "兽",
+                    "option": [
+                        "兽"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "兽"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "剑士",
+                    "label": "剑士",
+                    "option": [
+                        "剑士"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "剑士"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "复仇者",
+                    "label": "复仇者",
+                    "option": [
+                        "复仇者"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "复仇者"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "弓兵",
+                    "label": "弓兵",
+                    "option": [
+                        "弓兵"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "弓兵"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "暗杀者",
+                    "label": "暗杀者",
+                    "option": [
+                        "暗杀者"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "暗杀者"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "月之癌",
+                    "label": "月之癌",
+                    "option": [
+                        "月之癌"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "月之癌"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "枪兵",
+                    "label": "枪兵",
+                    "option": [
+                        "枪兵"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "枪兵"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "狂战士",
+                    "label": "狂战士",
+                    "option": [
+                        "狂战士"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "狂战士"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "盾兵",
+                    "label": "盾兵",
+                    "option": [
+                        "盾兵"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "盾兵"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "裁定者",
+                    "label": "裁定者",
+                    "option": [
+                        "裁定者"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "裁定者"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "降临者",
+                    "label": "降临者",
+                    "option": [
+                        "降临者"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "降临者"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "骑兵",
+                    "label": "骑兵",
+                    "option": [
+                        "骑兵"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "骑兵"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "魔术师",
+                    "label": "魔术师",
+                    "option": [
+                        "魔术师"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "魔术师"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "职介筛选": {
+            "type": "select",
+            "label": "职介筛选",
+            "description": "选择职介筛选方式: ALL=点击 all 阶(91,130), 默认=按所选英灵职介点击对应 tab",
+            "default": "默认",
+            "cases": [
+                {
+                    "name": "all",
+                    "label": "ALL",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_all": "all"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "默认",
+                    "label": "默认",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_all": "def"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

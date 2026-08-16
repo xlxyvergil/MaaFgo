@@ -1,0 +1,572 @@
+{
+    "option": {
+        "弓兵": {
+            "type": "select",
+            "label": "英灵",
+            "default": "204100",
+            "cases": [
+                {
+                    "name": "204100",
+                    "label": "织田信胜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201300",
+                    "label": "阿拉什",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203500",
+                    "label": "帕里斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201400",
+                    "label": "俵藤太",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200600",
+                    "label": "大卫",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203400",
+                    "label": "威廉·退尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201200",
+                    "label": "尤瑞艾莉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201800",
+                    "label": "幼吉尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205100",
+                    "label": "杉谷善住坊",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201000",
+                    "label": "比利小子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200300",
+                    "label": "罗宾汉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204200",
+                    "label": "伊莉雅丝菲尔·冯·爱因兹贝伦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202700",
+                    "label": "克洛伊·冯·爱因兹贝伦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203600",
+                    "label": "刑部姬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203900",
+                    "label": "南丁格尔〔圣诞〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200100",
+                    "label": "卫宫",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201600",
+                    "label": "卫宫〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203000",
+                    "label": "喀戎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204300",
+                    "label": "妖精骑士崔斯坦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202500",
+                    "label": "安妮·伯妮＆玛莉·瑞德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200800",
+                    "label": "崔斯坦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202100",
+                    "label": "巴御前",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205200",
+                    "label": "杂贺孙一",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202900",
+                    "label": "浅上藤乃",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202800",
+                    "label": "海伦娜·布拉瓦茨基",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203700",
+                    "label": "灾星简",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202400",
+                    "label": "织田信长",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204500",
+                    "label": "芝诺比阿",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200500",
+                    "label": "阿塔兰忒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204400",
+                    "label": "阿纳斯塔西娅＆维",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202200",
+                    "label": "阿蒂拉·the·San〔ta〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203300",
+                    "label": "马嘶",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204900",
+                    "label": "ＵＤＫ－巴格斯特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205500",
+                    "label": "乌尔德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202000",
+                    "label": "伊什塔尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200900",
+                    "label": "俄里翁",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "200200",
+                    "label": "吉尔伽美什",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "200200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205300",
+                    "label": "图坦卡蒙",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201100",
+                    "label": "尼古拉·特斯拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205400",
+                    "label": "幼体／提亚马特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "205000",
+                    "label": "托勒密",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "205000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203100",
+                    "label": "拿破仑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204800",
+                    "label": "杜尔伽",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204000",
+                    "label": "清少纳言",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204600",
+                    "label": "源为朝",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202300",
+                    "label": "詹姆斯·莫里亚蒂",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203200",
+                    "label": "贞德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "203800",
+                    "label": "超人俄里翁",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "203800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "201500",
+                    "label": "阿周那",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "201500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "202600",
+                    "label": "阿尔托莉雅·潘德拉贡",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "202600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "204700",
+                    "label": "高杉晋作",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "204700"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
