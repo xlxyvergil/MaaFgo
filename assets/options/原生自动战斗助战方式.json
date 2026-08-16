@@ -1,0 +1,33 @@
+{
+    "option": {
+        "助战方式": {
+            "type": "select",
+            "label": "助战方式",
+            "default": "自定义助战",
+            "cases": [
+                {
+                    "name": "自定义助战",
+                    "label": "自定义助战",
+                    "pipeline_override": {
+                        "进本流程": {
+                            "next": [
+                                "助战action"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "首个助战",
+                    "label": "首个助战",
+                    "pipeline_override": {
+                        "进本流程": {
+                            "next": [
+                                "进本-选择助战"
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

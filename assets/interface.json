@@ -156,7 +156,8 @@
     "options/强化从者.json",
     "tasks/原生自动战斗.json",
     "options/原生自动战斗次数.json",
-    "options/原生自动战斗跳过剧情.json"
+    "options/原生自动战斗跳过剧情.json",
+    "options/原生自动战斗助战方式.json"
   ],
   "agent": {
     "child_exec": "python",
