@@ -111,8 +111,8 @@ VIEW_SWITCH_POS = (846, 127)
 
 # 未匹配时滑动+刷新循环
 SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到终点
-SWIPE_END = (559, 44)           # 滑动终点(全屏)
-SWIPE_DURATION = 800            # 滑动持续时间(ms), 300ms 太短容易触发误触/失败
+SWIPE_END = (559, 269)           # 滑动终点(全屏): 垂直向上滑动 400px
+SWIPE_DURATION = 500            # 滑动持续时间(ms)
 SWIPE_SETTLE = 0.8              # 滑动结束后等待列表稳定再识别(秒), 避免惯性滚动导致识别不准
 MAX_SWIPE_BEFORE_REFRESH = 6    # 连续滑动6次未匹配 -> 执行"助战刷新"流水线
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
@@ -688,6 +688,10 @@ class SupportAction(CustomAction):
             mfaalog.info("[SupportAction] 首次识别无匹配, 进入滑动/刷新循环")
             swipe_count = 0
             while True:
+                # 监听停止信号: MXU 点停止后立即中断查找流程
+                if context.tasker.stopping:
+                    mfaalog.info("[SupportAction] 检测到任务停止信号, 中断助战查找")
+                    return CustomAction.RunResult(success=False)
                 controller.post_swipe(SWIPE_START[0], SWIPE_START[1],
                                       SWIPE_END[0], SWIPE_END[1], SWIPE_DURATION).wait()
                 swipe_count += 1
@@ -702,6 +706,9 @@ class SupportAction(CustomAction):
                     # 刷新后持续检测连接状态: 连接区白像素占比>=10%(WHITE_RATIO) 时不能继续检测, 等待其消失
                     mfaalog.info("[SupportAction] 等待刷新连接完成...")
                     while self._is_connecting(controller):
+                        if context.tasker.stopping:
+                            mfaalog.info("[SupportAction] 检测到任务停止信号, 中断助战查找")
+                            return CustomAction.RunResult(success=False)
                         time.sleep(0.5)
                     mfaalog.info("[SupportAction] 刷新完成, 继续检测")
                     # 说明: 本循环仅在命中助战条目时 return True 退出;

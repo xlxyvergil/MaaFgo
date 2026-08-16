@@ -1,31 +1,4 @@
 {
-    "助战action": {
-        "pre_delay": 0,
-        "action": {
-            "type": "Custom",
-            "param": {
-                "custom_action": "support_action",
-                "custom_action_param": {
-                    "support_type": "normal"
-                }
-            }
-        },
-        "post_delay": 0,
-        "attach": {
-            "ce": "",
-            "ce_1": "",
-            "ce_2": "",
-            "ce_bond": "any",
-            "level": 1,
-            "np_level": 1,
-            "servant": "",
-            "skill_active": "",
-            "skill_passive": ""
-        },
-        "next": [
-            "进本-队伍确认"
-        ]
-    },
     "作战成功_结束战斗": {
         "recognition": {
             "type": "TemplateMatch",
@@ -350,23 +323,14 @@
     },
     "进本-队伍确认": {
         "recognition": {
-            "type": "Or",
+            "type": "TemplateMatch",
             "param": {
-                "any_of": [
-                    {
-                        "param": {
-                            "template": "战斗开始.png",
-                            "threshold": 0.8
-                        },
-                        "type": "TemplateMatch"
-                    },
-                    {
-                        "param": {
-                            "template": "开始任务.png",
-                            "threshold": 0.8
-                        },
-                        "type": "TemplateMatch"
-                    }
+                "template": [
+                    "开始任务.png",
+                    "战斗开始.png"
+                ],
+                "threshold": [
+                    0.8
                 ]
             }
         },
@@ -379,6 +343,33 @@
             "进本-队伍确认",
             "进本-选择助战",
             "全局空节点"
+        ]
+    },
+    "助战action": {
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "support_action",
+                "custom_action_param": {
+                    "support_type": "normal"
+                }
+            }
+        },
+        "post_delay": 0,
+        "attach": {
+            "ce": "",
+            "ce_1": "",
+            "ce_2": "",
+            "ce_bond": "any",
+            "level": 1,
+            "np_level": 1,
+            "servant": "",
+            "skill_active": "",
+            "skill_passive": ""
+        },
+        "next": [
+            "进本-队伍确认"
         ]
     }
 }
