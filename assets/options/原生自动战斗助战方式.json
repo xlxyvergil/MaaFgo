@@ -3,7 +3,7 @@
         "助战方式": {
             "type": "select",
             "label": "助战方式",
-            "default": "自定义助战",
+            "default": "首个助战",
             "cases": [
                 {
                     "name": "自定义助战",
