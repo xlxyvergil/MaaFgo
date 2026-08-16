@@ -456,6 +456,9 @@ class AutoBattleRuntime:
         mfaalog.info(f"[AutoBattle] _wait_until() scenes={[s.name for s in scenes]} timeout={timeout_s}s")
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
+            if self.ctx.tasker.stopping:
+                mfaalog.info("[AutoBattle] _wait_until() detected stop signal, aborting wait")
+                return False
             img = self.controller.post_screencap().wait().get()
             scene = perception.detect_scene(self.ctx, img)
             if scene in scenes:
