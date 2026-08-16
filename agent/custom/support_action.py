@@ -14,9 +14,9 @@
                  attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入
                  与框内(95,76)中心 60x60 头像窗口匹配, 任一模板满足即可
      b. 礼装   : 普通 ce / 冠位 ce_1+ce_2(lizhuang 模板; 空/空.png 跳过)
-     c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 == 期望
-     d. 宝具等级: np_level/{ch|jp} 模板匹配 == 期望(目录按资源包选择)
-     e. 英灵等级: 等级区域 x62-180,y15-42 数字拼接识别 == 期望
+     c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 >= 期望
+     d. 宝具等级: np_level/{ch|jp} 模板匹配, 识别等级 >= 期望(目录按资源包选择)
+     e. 英灵等级: 等级区域 x62-180,y15-42 数字拼接识别 >= 期望
      f. 被动技能: skill_passive_1~5 独立键: 全0跳过;
                  有非0 -> 运行被动切换流水线 -> 重新截图 -> 按被动锚点匹配
   3. 全部条件满足 -> 点击该框中心; 否则判定下一框
@@ -113,6 +113,7 @@ VIEW_SWITCH_POS = (846, 127)
 SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到终点
 SWIPE_END = (559, 44)           # 滑动终点(全屏)
 SWIPE_DURATION = 800            # 滑动持续时间(ms), 300ms 太短容易触发误触/失败
+SWIPE_SETTLE = 0.8              # 滑动结束后等待列表稳定再识别(秒), 避免惯性滚动导致识别不准
 MAX_SWIPE_BEFORE_REFRESH = 6    # 连续滑动6次未匹配 -> 执行"助战刷新"流水线
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
 CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
@@ -253,6 +254,7 @@ class SupportAction(CustomAction):
             return True
         tpl = _imread(os.path.join(ce_dir, ce_name), gray=True)
         if tpl is None:
+            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} (目录 {ce_dir})")
             return False
         # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
         # 模板保持原尺寸在窗口内滑动匹配, 避免 resize 到小窗导致变形
@@ -295,7 +297,7 @@ class SupportAction(CustomAction):
 
     # ---------- 技能等级匹配 ----------
     def _match_skill(self, img, bx, by, anchor, expect):
-        """expect>0 时用 OCR 识别技能数字与期望比对; expect=0(未配置)视为匹配"""
+        """expect>0 时用 OCR 识别技能数字, 识别等级 >= 期望视为匹配; expect=0(不要求)直接通过"""
         if expect <= 0:
             return True
         roi = _roi(img, bx, by, anchor[0] + DIGIT_OFF[0], anchor[1] + DIGIT_OFF[1],
@@ -303,8 +305,8 @@ class SupportAction(CustomAction):
         if roi is None:
             return False
         got = SupportAction._ocr_skill_text(roi)
-        ok = got is not None and got == str(expect)
-        mfaalog.info(f"[SupportAction] 技能({anchor}) 期望={expect} "
+        ok = got is not None and int(got) >= expect
+        mfaalog.info(f"[SupportAction] 技能({anchor}) 期望>={expect} "
                      f"OCR识别={got or '(无数字)'} -> {'OK' if ok else 'NO'}")
         return ok
 
@@ -342,8 +344,8 @@ class SupportAction(CustomAction):
         if best[1] is None:
             mfaalog.warning("[SupportAction] 宝具等级无命中")
             return False
-        ok = best[1] == expect
-        mfaalog.info(f"[SupportAction] 宝具 期望={expect} 识别=lv{best[1]}({best[2]}) "
+        ok = best[1] >= expect
+        mfaalog.info(f"[SupportAction] 宝具 期望>={expect} 识别=lv{best[1]}({best[2]}) "
                      f"score={best[0]:.3f} -> {'OK' if ok else 'NO'}")
         return ok
 
@@ -463,8 +465,8 @@ class SupportAction(CustomAction):
         if roi is None:
             return False
         got = SupportAction._ocr_level_text(roi)
-        ok = got == expect
-        mfaalog.info(f"[SupportAction] 英灵等级 期望={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
+        ok = got is not None and got >= expect
+        mfaalog.info(f"[SupportAction] 英灵等级 期望>={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
         return ok
 
     # ---------- 被动技能匹配(切换后视图) ----------
@@ -558,10 +560,17 @@ class SupportAction(CustomAction):
             class_name = str(attach["class_name"]).strip()   # 玩家点击的职介(英灵选择 各职介 case 固定 attach)
             class_all = str(attach["class_all"]).strip()     # 职介筛选: "all"=ALL 阶, "def"=按职介
             servant_id = str(attach["servant"]).strip()
-            ce = str(attach["ce"]).strip()
-            ce_1 = str(attach["ce_1"]).strip()
-            ce_2 = str(attach["ce_2"]).strip()
-            ce_bond = str(attach["ce_bond"]).strip()
+            # 礼装: scan_select 选项, MXU 将 attach 中与选项同名的 key 替换为选中文件名;
+            # 普通/冠位分支的礼装选项只在对应模式生效, 按 support_type 读取
+            if support_type == "grand":
+                ce = ""
+                ce_1 = str(attach["冠位助战-1号礼装"]).strip()
+                ce_2 = str(attach["冠位助战-2号礼装"]).strip()
+                ce_bond = str(attach["ce_bond"]).strip()
+            else:
+                ce = str(attach["普通助战-礼装"]).strip()
+                ce_1 = ce_2 = ""
+                ce_bond = ""
             # 技能等级: 独立键(选项各 case 固定 attach, 0-10; 0=不要求)
             active = [int(attach[f"skill_active_{i}"]) for i in range(1, 4)]
             passive = [int(attach[f"skill_passive_{i}"]) for i in range(1, 6)]
@@ -682,6 +691,7 @@ class SupportAction(CustomAction):
                 controller.post_swipe(SWIPE_START[0], SWIPE_START[1],
                                       SWIPE_END[0], SWIPE_END[1], SWIPE_DURATION).wait()
                 swipe_count += 1
+                time.sleep(SWIPE_SETTLE)   # 等列表惯性滚动结束, 画面稳定后再识别
                 mfaalog.info(f"[SupportAction] 第 {swipe_count} 次滑动, 重新识别")
                 if try_match():
                     return CustomAction.RunResult(success=True)
