@@ -1,0 +1,517 @@
+{
+    "option": {
+        "狂战士": {
+            "type": "select",
+            "label": "英灵",
+            "default": "702800",
+            "cases": [
+                {
+                    "name": "702800",
+                    "label": "保罗·班扬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700500",
+                    "label": "斯巴达克斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700900",
+                    "label": "阿斯忒里俄斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701000",
+                    "label": "卡利古拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703400",
+                    "label": "莎乐美",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701500",
+                    "label": "血斧埃里克",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701100",
+                    "label": "大流士三世",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703500",
+                    "label": "森长可",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701300",
+                    "label": "清姬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700300",
+                    "label": "虎狼",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704200",
+                    "label": "克里姆希尔德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700200",
+                    "label": "兰斯洛特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "705200",
+                    "label": "吾绰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "705200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703800",
+                    "label": "布伦希尔德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700400",
+                    "label": "弗兰肯斯坦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702700",
+                    "label": "彭忒西勒亚",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704800",
+                    "label": "永仓新八",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704100",
+                    "label": "清少纳言",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701600",
+                    "label": "玉藻猫",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702900",
+                    "label": "织田信长",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702200",
+                    "label": "茨木童子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702600",
+                    "label": "茶茶",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700800",
+                    "label": "贝奥武夫",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703100",
+                    "label": "贞德〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700100",
+                    "label": "赫拉克勒斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703000",
+                    "label": "阿塔兰忒〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704600",
+                    "label": "难敌",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704900",
+                    "label": "静希草十郎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703700",
+                    "label": "鬼女红叶",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704300",
+                    "label": "伊吹童子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703900",
+                    "label": "伽拉忒亚",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704400",
+                    "label": "千利休",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "701400",
+                    "label": "南丁格尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "701400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702500",
+                    "label": "土方岁三",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700600",
+                    "label": "坂田金时",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "705000",
+                    "label": "娄希",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "705000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703600",
+                    "label": "宫本武藏",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702000",
+                    "label": "库·丘林〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "700700",
+                    "label": "弗拉德三世",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "700700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704000",
+                    "label": "摩根",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702300",
+                    "label": "源赖光",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "705100",
+                    "label": "莉莉丝",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "705100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "702400",
+                    "label": "谜之女主角X〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "702400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703200",
+                    "label": "重瞳",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "703300",
+                    "label": "阿周那〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "703300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "704700",
+                    "label": "阿尔托莉雅·卡斯特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "704700"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

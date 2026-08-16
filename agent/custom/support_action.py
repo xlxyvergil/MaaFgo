@@ -10,13 +10,14 @@
 流程:
   1. 截图 -> YOLO 检测助战条目框(按 y 排序, 即条目顺序)
   2. 对每个框判定(全屏坐标 = 框左上角 + 框内锚点):
-     a. 英灵   : attach.servant(servantId) -> servant_map.json.images(f_xxx)
+     a. 英灵   : attach.servant(servantId) -> servant_list.json.images(f_xxx);
+                 attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入
                  与框内(95,76)中心 60x60 头像窗口匹配, 任一模板满足即可
      b. 礼装   : 普通 ce / 冠位 ce_1+ce_2(lizhuang 模板; 空/空.png 跳过)
-     c. 主动技能: skill_active "a-b-c" 拆分, 非0数字在锚点左下 ROI 拼接识别 == 期望
+     c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 == 期望
      d. 宝具等级: np_level/{ch|jp} 模板匹配 == 期望(目录按资源包选择)
      e. 英灵等级: 等级区域 x62-180,y15-42 数字拼接识别 == 期望
-     f. 被动技能: skill_passive "a-b-c-d-e": 全0跳过;
+     f. 被动技能: skill_passive_1~5 独立键: 全0跳过;
                  有非0 -> 运行被动切换流水线 -> 重新截图 -> 按被动锚点匹配
   3. 全部条件满足 -> 点击该框中心; 否则判定下一框
   4. 无框满足 -> 失败
@@ -26,7 +27,7 @@
   servant_face : resource/{pkg}/image/servant_face/f_*.png        (158x158, 已有)
   lizhuang     : resource/{pkg}/image/lizhuang/                    (礼装模板, 待放)
   np_level     : resource/{pkg}/image/np_level/ch|jp/              (宝具模板, 待放)
-  servant_map  : agent/utils/servant_map.json                      (已有)
+  servant_list : agent/custom/servant_list.json                    (已有)
   support_det  : agent/utils/support_det.pt                        (YOLO 模型, 待放)
 """
 
@@ -52,7 +53,7 @@ import mfaalog
 # ---------------- 路径常量 ----------------
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ROOT_DIR = os.path.dirname(_AGENT_DIR)
-SERVANT_MAP_PATH = os.path.join(_AGENT_DIR, "utils", "servant_map.json")
+SERVANT_LIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "servant_list.json")
 SUPPORT_MODEL_PATH = os.path.join(_AGENT_DIR, "utils", "support_det.pt")
 
 # ---------------- YOLO 检测参数 ----------------
@@ -76,8 +77,21 @@ SKILL_PASSIVE = [(794, 177), (832, 177), (869, 177), (907, 177), (945, 177)]  # 
 NP_ROI = (200, 74, 580, 94)        # 宝具: x200-780 y74-168 -> (x,y,w,h)
 VIEW_ROI = (782, 102, 138, 39)     # 视图判断: 技能卡 x782-920 y102-141 (相对框, 与 skill/主动|被动.png 匹配)
 
-# ---------------- OCR 资源(MaaCommonAssets ppocr_v6) ----------------
-OCR_EN_DIR = os.path.join(_ROOT_DIR, "assets", "MaaCommonAssets", "OCR", "ppocr_v6")
+# ---------------- 职介筛选 tab(全屏坐标, 助战选择界面顶部职介栏) ----------------
+CLASS_TABS = {
+    "剑士": (159, 130),
+    "弓兵": (228, 130),
+    "枪兵": (296, 130),
+    "骑兵": (362, 130),
+    "魔术师": (434, 130),
+    "暗杀者": (497, 130),
+    "狂战士": (565, 130),
+}
+CLASS_TAB_OTHERS = (629, 130)   # 盾/裁定者/复仇者/降临者/兽/他人格/伪装者/月之癌 共用一个 tab
+CLASS_TAB_ALL = (91, 130)       # all 阶 tab(职介筛选选项选 ALL 时点击)
+
+# ---------------- OCR 资源(打包后位于 resource/model/ocr, 与 MaaFramework 标准模型目录一致) ----------------
+OCR_EN_DIR = os.path.join(_ROOT_DIR, "resource", "model", "ocr")
 OCR_REC_ONNX = os.path.join(OCR_EN_DIR, "rec.onnx")
 OCR_REC_KEYS = os.path.join(OCR_EN_DIR, "keys.txt")
 
@@ -163,16 +177,6 @@ def _roi(img, bx, by, rx, ry, rw, rh):
     return img[y0:y1, x0:x1]
 
 
-def parse_skill(s):
-    """解析 "0-0-0" 格式 -> [int,...]; 解析失败返回 None"""
-    if not s:
-        return []
-    parts = [p.strip() for p in s.split("-")]
-    if not all(re.fullmatch(r"\d+", p) for p in parts):
-        return None
-    return [int(p) for p in parts]
-
-
 # ---------------- YOLO 助战条目检测 ----------------
 class SupportDetector:
     """support_entry YOLO 检测: 返回全屏框 [(x1,y1,x2,y2,conf)] 按 y 排序"""
@@ -217,8 +221,9 @@ class SupportAction(CustomAction):
     @classmethod
     def _get_servant_map(cls):
         if cls._servant_map is None:
-            with open(SERVANT_MAP_PATH, encoding="utf-8") as fp:
-                cls._servant_map = json.load(fp)
+            with open(SERVANT_LIST_PATH, encoding="utf-8") as fp:
+                data = json.load(fp)
+            cls._servant_map = {s["id"]: s for s in data.get("servants", [])}
         return cls._servant_map
 
     # ---------- 英灵匹配 ----------
@@ -550,13 +555,16 @@ class SupportAction(CustomAction):
 
             node = context.get_node_data(argv.node_name) or {}
             attach = node.get("attach") or {}
+            class_name = str(attach.get("class_name") or "").strip()  # 玩家点击的职介(英灵选择 各职介 case 固定 attach)
+            class_all = str(attach.get("class_all") or "").strip()    # 职介筛选=ALL(1) 或 默认(0)
             servant_id = str(attach.get("servant") or "").strip()
             ce = str(attach.get("ce") or "").strip()
             ce_1 = str(attach.get("ce_1") or "").strip()
             ce_2 = str(attach.get("ce_2") or "").strip()
             ce_bond = str(attach.get("ce_bond") or "").strip()
-            skill_active = str(attach.get("skill_active") or "").strip()
-            skill_passive = str(attach.get("skill_passive") or "").strip()
+            # 技能等级: 独立键(选项各 case 固定 attach), 缺省 0=不要求
+            active = [int(attach.get(f"skill_active_{i}") or 0) for i in range(1, 4)]
+            passive = [int(attach.get(f"skill_passive_{i}") or 0) for i in range(1, 6)]
             try:
                 np_level = int(attach.get("np_level") or 0)
             except (TypeError, ValueError):
@@ -566,17 +574,10 @@ class SupportAction(CustomAction):
             except (TypeError, ValueError):
                 level = 0
 
-            active = parse_skill(skill_active)
-            passive = parse_skill(skill_passive)
-            if active is None:
-                mfaalog.error(f"[SupportAction] skill_active 格式错误: {skill_active}")
-                return CustomAction.RunResult(success=False)
-            if passive is None:
-                mfaalog.error(f"[SupportAction] skill_passive 格式错误: {skill_passive}")
-                return CustomAction.RunResult(success=False)
             passive_need = any(v > 0 for v in passive)
 
-            mfaalog.info(f"[SupportAction] 助战类型={support_type} 英灵={servant_id or '(未选)'} "
+            mfaalog.info(f"[SupportAction] 助战类型={support_type} 职介={class_name or '(未选)'} "
+                         f"英灵={servant_id or '(未选)'} "
                          f"礼装={ce or ce_1 or ce_2 or '(空)'} 主动={active} 被动={passive} "
                          f"宝具={np_level} 等级={level}")
 
@@ -598,7 +599,7 @@ class SupportAction(CustomAction):
             smap = self._get_servant_map()
             srv = smap.get(servant_id)
             if not srv or not srv.get("images"):
-                mfaalog.error(f"[SupportAction] servant_map 无该英灵: {servant_id}")
+                mfaalog.error(f"[SupportAction] servant_list 无该英灵: {servant_id}")
                 return CustomAction.RunResult(success=False)
 
             # 礼装匹配目标(普通1个/冠位2个)
@@ -612,6 +613,17 @@ class SupportAction(CustomAction):
             detector = self._get_detector()
 
             controller = context.tasker.controller
+
+            # 执行所有助战选择前, 先点击对应职介的筛选 tab(全屏坐标); 间隔0.5s点击3次
+            if class_name:
+                if class_all:
+                    tab = CLASS_TAB_ALL    # ALL 阶: 不按具体职介
+                else:
+                    tab = CLASS_TABS.get(class_name, CLASS_TAB_OTHERS)
+                for _ in range(3):
+                    controller.post_click(tab[0], tab[1]).wait()
+                    time.sleep(0.5)
+                mfaalog.info(f"[SupportAction] 点击职介筛选: {class_name} @ {tab}")
 
             # 识别一次: 截图->YOLO检测->逐个框判定; 命中点击条目并返回 True(未命中 False)
             def try_match():

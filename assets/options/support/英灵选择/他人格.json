@@ -1,246 +1,226 @@
 {
     "option": {
-        "英灵选择": {
+        "他人格": {
             "type": "select",
-            "label": "英灵选择",
-            "default": "他人格",
+            "label": "英灵",
+            "default": "1001400",
             "cases": [
                 {
-                    "name": "他人格",
-                    "label": "他人格",
-                    "option": [
-                        "他人格"
-                    ],
+                    "name": "1001400",
+                    "label": "方巿",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "他人格"
+                                "servant": "1001400"
                             }
                         }
                     }
                 },
                 {
-                    "name": "伪装者",
-                    "label": "伪装者",
-                    "option": [
-                        "伪装者"
-                    ],
+                    "name": "1000100",
+                    "label": "Passionlip",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "伪装者"
+                                "servant": "1000100"
                             }
                         }
                     }
                 },
                 {
-                    "name": "兽",
-                    "label": "兽",
-                    "option": [
-                        "兽"
-                    ],
+                    "name": "1001200",
+                    "label": "太岁星君",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "兽"
+                                "servant": "1001200"
                             }
                         }
                     }
                 },
                 {
-                    "name": "剑士",
-                    "label": "剑士",
-                    "option": [
-                        "剑士"
-                    ],
+                    "name": "1000400",
+                    "label": "机械伊丽亲",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "剑士"
+                                "servant": "1000400"
                             }
                         }
                     }
                 },
                 {
-                    "name": "复仇者",
-                    "label": "复仇者",
-                    "option": [
-                        "复仇者"
-                    ],
+                    "name": "1000500",
+                    "label": "机械伊丽亲Ⅱ号机",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "复仇者"
+                                "servant": "1000500"
                             }
                         }
                     }
                 },
                 {
-                    "name": "弓兵",
-                    "label": "弓兵",
-                    "option": [
-                        "弓兵"
-                    ],
+                    "name": "1001900",
+                    "label": "热内斯·克莱恩",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "弓兵"
+                                "servant": "1001900"
                             }
                         }
                     }
                 },
                 {
-                    "name": "暗杀者",
-                    "label": "暗杀者",
-                    "option": [
-                        "暗杀者"
-                    ],
+                    "name": "1002000",
+                    "label": "芙萝拉",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "暗杀者"
+                                "servant": "1002000"
                             }
                         }
                     }
                 },
                 {
-                    "name": "月之癌",
-                    "label": "月之癌",
-                    "option": [
-                        "月之癌"
-                    ],
+                    "name": "1001800",
+                    "label": "Kazuradrop",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "月之癌"
+                                "servant": "1001800"
                             }
                         }
                     }
                 },
                 {
-                    "name": "枪兵",
-                    "label": "枪兵",
-                    "option": [
-                        "枪兵"
-                    ],
+                    "name": "1000900",
+                    "label": "Kingprotea",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "枪兵"
+                                "servant": "1000900"
                             }
                         }
                     }
                 },
                 {
-                    "name": "狂战士",
-                    "label": "狂战士",
-                    "option": [
-                        "狂战士"
-                    ],
+                    "name": "1000200",
+                    "label": "Meltryllis",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "狂战士"
+                                "servant": "1000200"
                             }
                         }
                     }
                 },
                 {
-                    "name": "盾兵",
-                    "label": "盾兵",
-                    "option": [
-                        "盾兵"
-                    ],
+                    "name": "1000700",
+                    "label": "冲田总司〔Alter〕",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "盾兵"
+                                "servant": "1000700"
                             }
                         }
                     }
                 },
                 {
-                    "name": "裁定者",
-                    "label": "裁定者",
-                    "option": [
-                        "裁定者"
-                    ],
+                    "name": "1001700",
+                    "label": "响＆千键",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "裁定者"
+                                "servant": "1001700"
                             }
                         }
                     }
                 },
                 {
-                    "name": "降临者",
-                    "label": "降临者",
-                    "option": [
-                        "降临者"
-                    ],
+                    "name": "1001600",
+                    "label": "幼体／提亚马特",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "降临者"
+                                "servant": "1001600"
                             }
                         }
                     }
                 },
                 {
-                    "name": "骑兵",
-                    "label": "骑兵",
-                    "option": [
-                        "骑兵"
-                    ],
+                    "name": "1000800",
+                    "label": "志度内",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "骑兵"
+                                "servant": "1000800"
                             }
                         }
                     }
                 },
                 {
-                    "name": "魔术师",
-                    "label": "魔术师",
-                    "option": [
-                        "魔术师"
-                    ],
+                    "name": "1001500",
+                    "label": "格里戈里·拉斯普京",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_name": "魔术师"
-                            }
-                        }
-                    }
-                }
-            ]
-        },
-        "职介筛选": {
-            "type": "select",
-            "label": "职介筛选",
-            "description": "选择职介筛选方式: ALL=点击 all 阶(91,130), 默认=按所选英灵职介点击对应 tab",
-            "default": "默认",
-            "cases": [
-                {
-                    "name": "all",
-                    "label": "ALL",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "class_all": "1"
+                                "servant": "1001500"
                             }
                         }
                     }
                 },
                 {
-                    "name": "默认",
-                    "label": "默认",
+                    "name": "1000300",
+                    "label": "瞑生院祈荒",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "class_all": "0"
+                                "servant": "1000300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001000",
+                    "label": "芦屋道满",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001300",
+                    "label": "超级班扬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1002200",
+                    "label": "阿斯卡拉福斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1002200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1001100",
+                    "label": "马纳南·麦克·利尔〔巴泽特〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1001100"
                             }
                         }
                     }

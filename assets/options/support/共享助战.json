@@ -1,59 +1,1098 @@
 {
     "option": {
-        "主动技能": {
-            "type": "input",
-            "label": "主动技能",
-            "inputs": [
+        "主动技能-1": {
+            "type": "select",
+            "label": "主动技能1",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
                 {
-                    "name": "skill_active",
-                    "label": "主动技能",
-                    "default": ""
-                }
-            ],
-            "pipeline_override": {
-                "助战action": {
-                    "attach": {
-                        "skill_active": "0-0-0"
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_1": "10"
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
-        "被动技能": {
-            "type": "input",
-            "label": "被动技能",
-            "inputs": [
+        "主动技能-2": {
+            "type": "select",
+            "label": "主动技能2",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
                 {
-                    "name": "skill_passive",
-                    "label": "被动技能",
-                    "default": ""
-                }
-            ],
-            "pipeline_override": {
-                "助战action": {
-                    "attach": {
-                        "skill_passive": "0-0-0-0-0"
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_2": "10"
+                            }
+                        }
                     }
                 }
-            }
+            ]
+        },
+        "主动技能-3": {
+            "type": "select",
+            "label": "主动技能3",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_active_3": "10"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "被动技能-1": {
+            "type": "select",
+            "label": "被动技能1",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_1": "10"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "被动技能-2": {
+            "type": "select",
+            "label": "被动技能2",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_2": "10"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "被动技能-3": {
+            "type": "select",
+            "label": "被动技能3",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_3": "10"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "被动技能-4": {
+            "type": "select",
+            "label": "被动技能4",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_4": "10"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "被动技能-5": {
+            "type": "select",
+            "label": "被动技能5",
+            "description": "0=不要求该技能, 1-10=技能等级",
+            "default": "0",
+            "cases": [
+                {
+                    "name": "0",
+                    "label": "0",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "0"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "5"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "6",
+                    "label": "6",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "6"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "7",
+                    "label": "7",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "7"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "8",
+                    "label": "8",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "8"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "9",
+                    "label": "9",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "9"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "10",
+                    "label": "10",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "skill_passive_5": "10"
+                            }
+                        }
+                    }
+                }
+            ]
         },
         "宝具等级": {
-            "type": "input",
+            "type": "select",
             "label": "宝具等级",
-            "inputs": [
+            "default": "1",
+            "cases": [
                 {
-                    "name": "np_level",
-                    "label": "宝具等级",
-                    "default": "1",
-                    "pipeline_type": "int"
-                }
-            ],
-            "pipeline_override": {
-                "助战action": {
-                    "attach": {
-                        "np_level": "1"
+                    "name": "1",
+                    "label": "1",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "np_level": "1"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2",
+                    "label": "2",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "np_level": "2"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3",
+                    "label": "3",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "np_level": "3"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4",
+                    "label": "4",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "np_level": "4"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "5",
+                    "label": "5",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "np_level": "5"
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "英灵等级": {
             "type": "input",

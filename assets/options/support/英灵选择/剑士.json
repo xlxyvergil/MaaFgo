@@ -1,0 +1,660 @@
+{
+    "option": {
+        "剑士": {
+            "type": "select",
+            "label": "英灵",
+            "default": "103800",
+            "cases": [
+                {
+                    "name": "103800",
+                    "label": "伊阿宋",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102200",
+                    "label": "吉尔·德·雷",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101400",
+                    "label": "弗格斯·马克·罗伊",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105800",
+                    "label": "忒修斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101300",
+                    "label": "盖乌斯·尤利乌斯·恺撒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101200",
+                    "label": "贝德维尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101000",
+                    "label": "伊丽莎白·巴托里〔勇者〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102000",
+                    "label": "兰斯洛特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103600",
+                    "label": "兰陵王",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105400",
+                    "label": "加雷斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103400",
+                    "label": "女王梅芙",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105000",
+                    "label": "妖精骑士高文",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106000",
+                    "label": "宫本伊织",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100500",
+                    "label": "尼禄·克劳狄乌斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105500",
+                    "label": "山南敬助",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104500",
+                    "label": "巴御前",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103100",
+                    "label": "弗兰肯斯坦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103900",
+                    "label": "拉克什米·芭伊",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104400",
+                    "label": "斋藤一",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103200",
+                    "label": "柳生但马守宗矩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106700",
+                    "label": "格蕾·Lily",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104700",
+                    "label": "渡边纲",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105700",
+                    "label": "瑟坦特",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104300",
+                    "label": "罗兰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101900",
+                    "label": "罗摩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104000",
+                    "label": "葛饰北斋",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104800",
+                    "label": "迦尔纳〔圣诞〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103500",
+                    "label": "迪尔姆德·奥迪那",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103000",
+                    "label": "铃鹿御前",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100200",
+                    "label": "阿尔托莉雅·潘德拉贡〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100300",
+                    "label": "阿尔托莉雅·潘德拉贡〔Lily〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102600",
+                    "label": "骑士迪昂",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100700",
+                    "label": "高文",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106200",
+                    "label": "黑姬",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100800",
+                    "label": "齐格飞",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106300",
+                    "label": "Passionlip",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102800",
+                    "label": "两仪式",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102900",
+                    "label": "亚瑟·潘德拉贡〔Prototype〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104600",
+                    "label": "伊吹童子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "102700",
+                    "label": "冲田总司",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "102700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105100",
+                    "label": "冲田总司〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104900",
+                    "label": "千子村正",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105900",
+                    "label": "大和武尊",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101700",
+                    "label": "宫本武藏",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100600",
+                    "label": "尼禄·克劳狄乌斯〔新娘〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105300",
+                    "label": "征氏姐妹",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105200",
+                    "label": "查理曼",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104200",
+                    "label": "狄俄斯库里",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106100",
+                    "label": "理查一世",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103700",
+                    "label": "红阎魔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "105600",
+                    "label": "美杜莎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "105600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100900",
+                    "label": "莫德雷德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106400",
+                    "label": "近藤勇",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "100100",
+                    "label": "阿尔托莉雅·潘德拉贡",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "100100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "104100",
+                    "label": "阿斯托尔福",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "104100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "101800",
+                    "label": "阿蒂拉",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "101800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106600",
+                    "label": "雅克·德·莫莱",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "106500",
+                    "label": "领主洛格雷斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "106500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "103300",
+                    "label": "齐格鲁德",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "103300"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

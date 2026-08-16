@@ -1,0 +1,132 @@
+{
+    "option": {
+        "月之癌": {
+            "type": "select",
+            "label": "英灵",
+            "default": "2300100",
+            "cases": [
+                {
+                    "name": "2300100",
+                    "label": "BB",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300700",
+                    "label": "岸波白野",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300800",
+                    "label": "岸波白野",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2301000",
+                    "label": "特诺奇蒂特兰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2301000"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300500",
+                    "label": "Archetype：Earth",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300200",
+                    "label": "BB",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300300",
+                    "label": "伟大的石像神",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2301100",
+                    "label": "玉兔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2301100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300400",
+                    "label": "瞑生院祈荒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300900",
+                    "label": "谜之代行者C.I.E.L",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2300600",
+                    "label": "ＢＢ迪拜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300600"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

@@ -8,6 +8,9 @@
                 {
                     "name": "自定义助战",
                     "label": "自定义助战",
+                    "option": [
+                        "助战类型"
+                    ],
                     "pipeline_override": {
                         "进本流程": {
                             "next": [

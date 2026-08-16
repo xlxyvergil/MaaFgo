@@ -1,0 +1,176 @@
+{
+    "option": {
+        "降临者": {
+            "type": "select",
+            "label": "英灵",
+            "default": "2501200",
+            "cases": [
+                {
+                    "name": "2501200",
+                    "label": "诺克娜蕾·雅兰杜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500800",
+                    "label": "谜之偶像X〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500800"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500300",
+                    "label": "谜之女主角XX",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2501600",
+                    "label": "谜之女主角XX〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2501100",
+                    "label": "库库尔坎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500500",
+                    "label": "旅行者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500500"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2501300",
+                    "label": "旺吉娜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501300"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500900",
+                    "label": "暗之高扬斯卡娅",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500900"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500600",
+                    "label": "梵高",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500600"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500400",
+                    "label": "琰女",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2501400",
+                    "label": "苍崎青子",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501400"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500200",
+                    "label": "葛饰北斋",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500100",
+                    "label": "阿比盖尔·威廉姆斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2500700",
+                    "label": "阿比盖尔·威廉姆斯〔夏〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500700"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "2501000",
+                    "label": "雅克·德·莫莱",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501000"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

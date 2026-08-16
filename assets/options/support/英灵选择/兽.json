@@ -1,0 +1,44 @@
+{
+    "option": {
+        "兽": {
+            "type": "select",
+            "label": "英灵",
+            "default": "3300200",
+            "cases": [
+                {
+                    "name": "3300200",
+                    "label": "埃列什基伽勒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "3300200"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "3300100",
+                    "label": "所多玛之兽／德拉科",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "3300100"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "4000100",
+                    "label": "Ｕ－奥尔加玛丽",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "4000100"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}
