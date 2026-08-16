@@ -3,9 +3,9 @@
         "普通助战-礼装": {
             "type": "scan_select",
             "label": "礼装",
-            "description": "选择助战礼装图片（agent/utils/lizhuang 下）",
+            "description": "选择助战礼装图片（resource/base/image/lizhuang 下）",
             "default": "",
-            "scan_dir": "agent/utils/lizhuang",
+            "scan_dir": "resource/base/image/lizhuang",
             "scan_filter": "*.png",
             "cases": [],
             "pipeline_override": {

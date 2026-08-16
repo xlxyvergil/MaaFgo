@@ -573,9 +573,9 @@ class SupportAction(CustomAction):
             resource_package = str((cfg.get("attach") or {}).get("resource_package") or "").strip()
             pkg = "cn" if resource_package == "cn" else "base"
             base_dir = os.path.join(_ROOT_DIR, "resource", pkg, "image")
-            # 英灵头像/礼装模板不分 pkg, 统一放在 agent/utils 下
-            face_dir = os.path.join(_AGENT_DIR, "utils", "servant_face")
-            ce_dir = os.path.join(_AGENT_DIR, "utils", "lizhuang")
+            # 英灵头像/礼装固定放 base, 不用 pkg 区分
+            face_dir = os.path.join(_ROOT_DIR, "resource", "base", "image", "servant_face")
+            ce_dir = os.path.join(_ROOT_DIR, "resource", "base", "image", "lizhuang")
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
             skill_dir = os.path.join(base_dir, "skill")   # 视图判断模板(主动/被动), 按 pkg 动态选择
             mfaalog.info(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
