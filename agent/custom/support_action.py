@@ -306,6 +306,9 @@ class SupportAction(CustomAction):
     # ---------- 宝具等级匹配 ----------
     def _match_np(self, img, np_dir, bx, by, expect):
         import cv2
+        if not os.path.isdir(np_dir):
+            mfaalog.error(f"[SupportAction] 宝具模板目录不存在: {np_dir}")
+            return False
         roi = _roi(img, bx, by, NP_ROI[0], NP_ROI[1], NP_ROI[2], NP_ROI[3])
         if roi is None:
             return False
