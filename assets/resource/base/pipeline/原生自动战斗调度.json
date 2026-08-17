@@ -19,14 +19,20 @@
         ]
     },
     "原生自动战斗_多次_下一场": {
+        "pre_delay": 10000,
         "next": [
+            "[JumpBack]点击关卡",
+            "[JumpBack]执行进本",
             "[JumpBack]跳过剧情-点击跳过",
             "[JumpBack]执行原生自动战斗",
             "执行战斗结束_连续出击继续"
         ]
     },
     "原生自动战斗_多次_最后一场": {
+        "pre_delay": 10000,
         "next": [
+            "[JumpBack]点击关卡",
+            "[JumpBack]执行进本",
             "[JumpBack]跳过剧情-点击跳过",
             "[JumpBack]执行原生自动战斗",
             "执行战斗结束_不回主界面"
@@ -34,6 +40,7 @@
     },
     "原生自动战斗_多次_第一场": {
         "next": [
+            "[JumpBack]点击关卡",
             "[JumpBack]执行进本",
             "[JumpBack]跳过剧情-点击跳过",
             "[JumpBack]执行原生自动战斗",
@@ -42,6 +49,7 @@
     },
     "原生自动战斗调度": {
         "next": [
+            "[JumpBack]点击关卡",
             "[JumpBack]执行进本",
             "[JumpBack]跳过剧情-点击跳过",
             "[JumpBack]执行原生自动战斗",
@@ -158,6 +166,14 @@
             "进本流程"
         ]
     },
+    "点击关卡": {
+        "max_hit": 1,
+        "next": [
+            "进本-点击上一次关卡",
+            "进本-点击关卡",
+            "全局空节点"
+        ]
+    },
     "结束战斗_不回主界面": {
         "next": [
             "作战成功_结束战斗",
@@ -170,13 +186,13 @@
     },
     "结束战斗_连续出击继续": {
         "next": [
+            "连续出击_继续",
             "作战成功_结束战斗",
             "好友申请界面_不回主界面",
             "战斗失败_不回主界面",
             "失败2_不回主界面",
             "战斗结束关闭_不回主界面",
             "可能已经结束战斗_不回主界面",
-            "连续出击_继续"
         ]
     },
     "跳过剧情-点击跳过": {
@@ -300,6 +316,62 @@
         },
         "next": [
             "进本-队伍确认"
+        ]
+    },
+    "进本-点击关卡": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "副本打开标记-感叹号.png"
+                ],
+                "order_by": "Vertical",
+                "index": 0,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -100,
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "[JumpBack]全局-战前吃体力",
+            "全局空节点"
+        ]
+    },
+    "进本-点击上一次关卡": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "battle/上次执行.png"
+                ],
+                "order_by": "Vertical"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    100,
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "[JumpBack]全局-战前吃体力",
+            "全局空节点"
         ]
     }
 }
