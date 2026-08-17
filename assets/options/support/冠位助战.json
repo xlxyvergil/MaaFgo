@@ -1,36 +1,76 @@
 {
     "option": {
         "冠位助战-1号礼装": {
-            "type": "scan_select",
+            "type": "select",
             "label": "1号礼装",
-            "description": "选择1号助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang 目录\n选择 空.png 表示不要求该礼装",
-            "default": "",
-            "scan_dir": "resource/base/image/lizhuang",
-            "scan_filter": "*.png",
-            "cases": [],
-            "pipeline_override": {
-                "助战action": {
-                    "attach": {
-                        "冠位助战-1号礼装": "{冠位助战-1号礼装}"
+            "description": "选择1号助战礼装是否满破，并选择对应礼装图片（resource/base/image/lizhuang/满破 或 非满破 下）\n选择 空.png 表示不要求该礼装",
+            "default": "满破",
+            "cases": [
+                {
+                    "name": "满破",
+                    "label": "满破",
+                    "option": [
+                        "冠位助战-1号礼装-满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "礼装状态": "满破"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "非满破",
+                    "label": "非满破",
+                    "option": [
+                        "冠位助战-1号礼装-非满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "礼装状态": "非满破"
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "冠位助战-2号礼装": {
-            "type": "scan_select",
+            "type": "select",
             "label": "2号礼装",
-            "description": "选择2号助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang 目录\n选择 空.png 表示不要求该礼装",
-            "default": "",
-            "scan_dir": "resource/base/image/lizhuang",
-            "scan_filter": "*.png",
-            "cases": [],
-            "pipeline_override": {
-                "助战action": {
-                    "attach": {
-                        "冠位助战-2号礼装": "{冠位助战-2号礼装}"
+            "description": "选择2号助战礼装是否满破，并选择对应礼装图片（resource/base/image/lizhuang/满破 或 非满破 下）\n选择 空.png 表示不要求该礼装",
+            "default": "满破",
+            "cases": [
+                {
+                    "name": "满破",
+                    "label": "满破",
+                    "option": [
+                        "冠位助战-2号礼装-满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "礼装状态": "满破"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "非满破",
+                    "label": "非满破",
+                    "option": [
+                        "冠位助战-2号礼装-非满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "礼装状态": "非满破"
+                            }
+                        }
                     }
                 }
-            }
+            ]
         },
         "冠位助战-羁绊礼装": {
             "type": "select",

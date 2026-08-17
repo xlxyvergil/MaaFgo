@@ -4,12 +4,11 @@
 架构分工：
 - pipeline（强化从者.json）负责「导航」「强化一次」这两段纯模板匹配+点击
   的流程（识别更稳、坐标随分辨率自适应）。
-- 本 action 负责必须动态判断的逻辑：从者名模糊匹配、筛选星级职介、
-  从者头像多阶段定位（cv2）、等级 OCR 判断、循环编排。
+- 本 action 负责必须动态判断的逻辑：从者头像多阶段定位（cv2）、
+  等级 OCR 判断、循环编排。
 
 attach 参数（pipeline 节点「执行强化从者」定义默认值，option 覆盖）：
-    servant_id    str  从者 id（联动选择时由 option 覆盖）
-    servant_name  str  从者名（手动输入时，action 内模糊匹配）
+    servant_id    str  从者 id（联动选择 / 职介列表选择时由 option 覆盖）
     target_level  int  目标等级（>= 该等级则停止）
 """
 import os
@@ -33,8 +32,6 @@ BASE_W, BASE_H = 1280, 720
 # 强化从者目录（resource/{cn|base}/image/强化从者/）
 TPL_LEVELUP = "强化完成界面.png"       # 判断已进入从者强化详情页
 TPL_SERVANT_SEL = "强化界面判定.png"   # 全图判定已在从者列表
-TPL_DECIDE = "整理礼物盒/贩卖-筛选决定按钮.png"   # 筛选面板「决定」
-TPL_RESET = "整理礼物盒/初始设定按钮.png"         # 筛选面板「初始设定」
 
 # 详情页标志（点从者头像后应出现，用于确认已进入从者详情页）
 LEVELUP_ROI = (375, 652, 144, 63)              # 强化完成界面标志（详情页底部固定元素）
@@ -44,40 +41,10 @@ TPL_NO_MATERIAL = ["从者技能强化/无法强化.png", "从者技能强化/�
 TPL_EMPTY_SLOT = "强化从者/槽位标志.png"   # 狗粮槽空 = 狗粮用完
 SLOT_ROI = (394, 194, 80, 84)              # 槽位标志 ROI（与 pipeline 一致）
 
-# 复用整理礼物盒的星级图标（筛选面板星级按钮）
-STAR_TPL = {
-    1: "整理礼物盒/1星未选中.png",
-    2: "整理礼物盒/2星未选中.png",
-    3: "整理礼物盒/3星未选中.png",
-    4: "整理礼物盒/4星未选中.png",
-    5: "整理礼物盒/5星未选中.png",
-}
-
-# 职介筛选图标（用户放到「强化从者」目录，命名「职介-{中文名}.png」）
-CLASS_TPL = {
-    "saber": "强化从者/职介-剑士.png",
-    "archer": "强化从者/职介-弓兵.png",
-    "lancer": "强化从者/职介-枪兵.png",
-    "rider": "强化从者/职介-骑兵.png",
-    "caster": "强化从者/职介-魔术师.png",
-    "assassin": "强化从者/职介-暗杀者.png",
-    "berserker": "强化从者/职介-狂战士.png",
-    "ruler": "强化从者/职介-裁定者.png",
-    "avenger": "强化从者/职介-复仇者.png",
-    "moonCancer": "强化从者/职介-月之癌.png",
-    "alterEgo": "强化从者/职介-他人格.png",
-    "foreigner": "强化从者/职介-降临者.png",
-    "pretender": "强化从者/职介-伪装者.png",
-    "shielder": "强化从者/职介-盾兵.png",
-    "beast": "强化从者/职介-兽.png",
-}
-
 # 从者头像目录（f_{servantId}{stage}.png，stage 0-3）
 SERVANT_FACE_DIR = "servant_face"
 
 # ==================== 坐标（基准 720p，待实测校准）====================
-TAP_FILTER = (972, 122)        # 从者选择界面右上角「筛选」按钮（同贩卖）
-TAP_FILTER_TOP = (1135, 99)    # 筛选面板顶部（把筛选条移到最上面）
 TAP_LEVELUP_BTN = (197, 157)   # 强化界面「强化」按钮（进入从者选择）
 # 从者列表滚动（手指上滑，列表下翻）
 SWIPE_LIST_BEGIN = (600, 560)
@@ -139,10 +106,8 @@ class ExecuteServantUp(CustomAction):
 
             node = context.get_node_data(argv.node_name) or {}
             attach = node.get("attach") or {}
-            servant_name = str(attach.get("servant_name") or "").strip()
             servant_id = str(attach.get("servant_id") or "").strip()
             target_level = int(attach.get("target_level", 0))
-            self.select_mode = str(attach.get("select_mode") or "link").strip()
 
             if target_level <= 0:
                 mfaalog.error("[强化从者] 未设置目标等级")
@@ -154,8 +119,8 @@ class ExecuteServantUp(CustomAction):
             # 坐标自适应
             self._init_scale()
 
-            # 解析从者（联动/手动输入都传 servant_name 中文名，脚本里转 ID）
-            servant = self._resolve_servant(servant_name, servant_id)
+            # 解析从者（联动选择 / 职介列表选择都传 servant_id，按 id 查表）
+            servant = self._resolve_servant(servant_id)
             if servant is None:
                 mfaalog.error("[强化从者] 未能确定目标从者")
                 return CustomAction.RunResult(success=False)
@@ -297,34 +262,9 @@ class ExecuteServantUp(CustomAction):
             mfaalog.error(f"[强化从者] 读取 servant_list.json 失败: {e}")
             return {"class_cn": {}, "servants": []}
 
-    def _resolve_servant(self, servant_name, servant_id=""):
+    def _resolve_servant(self, servant_id):
         data = self._load_servant_data()
         servants = data["servants"]
-        # 含 (ID) 后缀（同名从者用「名字(ID)」区分）→ 直接提取 ID
-        if servant_name:
-            m = re.search(r"\((\d+)\)$", servant_name)
-            if m:
-                sid = m.group(1)
-                for s in servants:
-                    if s["id"] == sid:
-                        return s
-                mfaalog.warning(f"[强化从者] 未找到 id={sid} 的从者")
-                return None
-            # 完整名精确匹配优先
-            exact = [s for s in servants if s["name"] == servant_name]
-            if exact:
-                return exact[0]
-            # 子串模糊匹配
-            fuzzy = [s for s in servants if servant_name in s["name"]]
-            if len(fuzzy) == 1:
-                return fuzzy[0]
-            if len(fuzzy) > 1:
-                mfaalog.warning(f"[强化从者] 模糊匹配到 {len(fuzzy)} 个从者，取第一个: "
-                                + ", ".join(s["name"] for s in fuzzy[:5]))
-                return fuzzy[0]
-            mfaalog.warning(f"[强化从者] 未匹配到含「{servant_name}」的从者")
-            return None
-        # 兜底：直接给 id
         if servant_id:
             for s in servants:
                 if s["id"] == servant_id:
@@ -352,59 +292,13 @@ class ExecuteServantUp(CustomAction):
             self._tap(*TAP_LEVELUP_BTN, delay=1.0)
 
     def _select_servant(self, servant):
-        """筛选星级职介 + 头像定位"""
-        if self.select_mode == "manual":
-            # 手动输入（模糊匹配）：星级职介运行时才知道，脚本动态筛选
-            self._filter_manual(servant)
-        else:
-            # 联动选择：星级职介图标由 option 静态注入，走 pipeline 筛选（有识别日志）
-            try:
-                self._context.run_task("强化从者-筛选准备")
-            except Exception as e:
-                mfaalog.warning(f"[强化从者] 筛选 pipeline 异常: {e}")
+        """筛选星级职介（option 静态注入模板，走 pipeline）+ 头像定位"""
+        try:
+            self._context.run_task("强化从者-筛选准备")
+        except Exception as e:
+            mfaalog.warning(f"[强化从者] 筛选 pipeline 异常: {e}")
         # 头像定位
         return self._find_servant(servant)
-
-    def _filter_manual(self, servant):
-        """手动输入场景的脚本动态筛选"""
-        star = servant["rarity"]
-        cls = servant["class"]
-        # 点筛选按钮，等决定按钮出现
-        for _ in range(5):
-            self._tap(*TAP_FILTER, delay=1.0)
-            if self._match(TPL_DECIDE) is not None:
-                break
-        # 点顶部（移到筛选条最上面）
-        self._tap(*TAP_FILTER_TOP, delay=0.5)
-        # 重置筛选
-        m = self._match(TPL_RESET)
-        if m is not None:
-            self._controller.post_click(m[1], m[2]).wait()
-            time.sleep(0.5)
-        else:
-            mfaalog.warning("[强化从者] 未识别到初始设定按钮，跳过重置")
-        # 点目标星级（高阈值避免误匹配相邻星）
-        self._tap_tpl(STAR_TPL.get(star), f"{star}星", threshold=0.9)
-        # 点目标职介
-        self._tap_tpl(CLASS_TPL.get(cls), cls, threshold=0.8)
-        # 点决定
-        m = self._match(TPL_DECIDE)
-        if m is not None:
-            self._controller.post_click(m[1], m[2]).wait()
-            time.sleep(1.0)
-
-    def _tap_tpl(self, name, label, threshold=TH_TEMPLATE):
-        """匹配模板并点击（匹配中心）；name 可能为 None"""
-        if not name:
-            mfaalog.warning(f"[强化从者] 无模板图: {label}")
-            return
-        m = self._match(name, threshold=threshold)
-        if m is not None:
-            mfaalog.info(f"[强化从者] {label} 匹配 {m[0]:.3f} @ ({m[1]},{m[2]})")
-            self._controller.post_click(m[1], m[2]).wait()
-            time.sleep(0.5)
-        else:
-            mfaalog.warning(f"[强化从者] 未识别到 {label} 按钮")
 
     def _find_servant(self, servant):
         """头像多阶段匹配 + 滚动查找，找到点击进入"""

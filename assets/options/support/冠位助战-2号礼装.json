@@ -1,0 +1,36 @@
+{
+    "option": {
+        "冠位助战-2号礼装-满破": {
+            "type": "scan_select",
+            "label": "2号礼装(满破)",
+            "description": "选择2号满破助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang/满破 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang/满破",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "冠位助战-2号礼装-满破": "{冠位助战-2号礼装-满破}"
+                    }
+                }
+            }
+        },
+        "冠位助战-2号礼装-非满破": {
+            "type": "scan_select",
+            "label": "2号礼装(非满破)",
+            "description": "选择2号非满破助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang/非满破 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang/非满破",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "冠位助战-2号礼装-非满破": "{冠位助战-2号礼装-非满破}"
+                    }
+                }
+            }
+        }
+    }
+}

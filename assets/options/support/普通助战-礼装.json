@@ -1,0 +1,36 @@
+{
+    "option": {
+        "普通助战-礼装-满破": {
+            "type": "scan_select",
+            "label": "满破礼装",
+            "description": "选择满破助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang/满破 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang/满破",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "普通助战-礼装-满破": "{普通助战-礼装-满破}"
+                    }
+                }
+            }
+        },
+        "普通助战-礼装-非满破": {
+            "type": "scan_select",
+            "label": "非满破礼装",
+            "description": "选择非满破助战礼装图片\n礼装图片需放入 resource/base/image/lizhuang/非满破 目录\n选择 空.png 表示不要求该礼装",
+            "default": "",
+            "scan_dir": "resource/base/image/lizhuang/非满破",
+            "scan_filter": "*.png",
+            "cases": [],
+            "pipeline_override": {
+                "助战action": {
+                    "attach": {
+                        "普通助战-礼装-非满破": "{普通助战-礼装-非满破}"
+                    }
+                }
+            }
+        }
+    }
+}

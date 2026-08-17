@@ -127,7 +127,7 @@ TH_WHITE = 245                  # 纯白判定阈值(灰度 >= 该值视为白)
 WHITE_RATIO = 0.10              # 白像素占比 >= 10% 表示正在连接, 不能继续检测
 
 # 空礼装标记(选此项则不进行礼装匹配)
-EMPTY_CE = ("", "空.png")
+EMPTY_CE = ("空.png",)
 
 
 # ---------------- 通用工具 ----------------
@@ -252,14 +252,15 @@ class SupportAction(CustomAction):
         return False
 
     # ---------- 礼装匹配 ----------
-    def _match_ce(self, img, ce_dir, bx, by, ce_name, anchor):
+    def _match_ce(self, img, ce_dir, bx, by, ce_name, anchor, ce_sub=""):
         import cv2
         if ce_name in EMPTY_CE:
             mfaalog.info("[SupportAction] 礼装为空(跳过匹配)")
             return True
-        tpl = _imread(os.path.join(ce_dir, ce_name), gray=True)
+        tpl_path = os.path.join(ce_dir, ce_sub, ce_name) if ce_sub else os.path.join(ce_dir, ce_name)
+        tpl = _imread(tpl_path, gray=True)
         if tpl is None:
-            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} (目录 {ce_dir})")
+            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} (目录 {os.path.dirname(tpl_path)})")
             return False
         # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
         # 多尺度整卡匹配: 模板尺寸可能与卡面实际显示不一致(如非满破模板偏小), 缩放对齐后滑动匹配
@@ -582,17 +583,18 @@ class SupportAction(CustomAction):
             class_name = str(attach["class_name"]).strip()   # 玩家点击的职介(英灵选择 各职介 case 固定 attach)
             class_all = str(attach["class_all"]).strip()     # 职介筛选: "all"=ALL 阶, "def"=按职介
             servant_id = str(attach["servant"]).strip()
-            # 礼装: scan_select 选项, MXU 将 attach 中与选项同名的 key 替换为选中文件名;
-            # 普通/冠位分支的礼装选项只在对应模式生效, 按 support_type 读取
+            # 礼装: support_type 决定槽位, 礼装状态(满破/非满破) 决定文件名键后缀与子目录, 直接读取对应键
+            ce_dir = str(attach["礼装状态"]).strip()
             if support_type == "grand":
-                ce = ""
-                ce_1 = str(attach["冠位助战-1号礼装"]).strip()
-                ce_2 = str(attach["冠位助战-2号礼装"]).strip()
                 ce_bond = str(attach["ce_bond"]).strip()
+                ce_targets = [
+                    (str(attach[f"冠位助战-1号礼装-{ce_dir}"]).strip(), CE_ANCHOR_GRAND[0], ce_dir),
+                    (str(attach[f"冠位助战-2号礼装-{ce_dir}"]).strip(), CE_ANCHOR_GRAND[1], ce_dir),
+                ]
             else:
-                ce = str(attach["普通助战-礼装"]).strip()
-                ce_1 = ce_2 = ""
-                ce_bond = ""
+                ce_targets = [
+                    (str(attach[f"普通助战-礼装-{ce_dir}"]).strip(), CE_ANCHOR_NORMAL, ce_dir),
+                ]
             # 技能等级: 独立键(选项各 case 固定 attach, 0-10; 0=不要求)
             active = [int(attach[f"skill_active_{i}"]) for i in range(1, 4)]
             passive = [int(attach[f"skill_passive_{i}"]) for i in range(1, 6)]
@@ -601,9 +603,10 @@ class SupportAction(CustomAction):
 
             passive_need = any(v > 0 for v in passive)
 
+            ce_names = [n for n, _, _ in ce_targets if n]
             mfaalog.info(f"[SupportAction] 助战类型={support_type} 职介={class_name or '(未选)'} "
                          f"英灵={servant_id or '(未选)'} "
-                         f"礼装={ce or ce_1 or ce_2 or '(空)'} 主动={active} 被动={passive} "
+                         f"礼装={'/'.join(ce_names) if ce_names else '(空)'} 主动={active} 被动={passive} "
                          f"宝具={np_level} 等级={level}")
 
             resource_package = str(context.get_node_data("资源包配置")["attach"]["resource_package"])
@@ -625,14 +628,6 @@ class SupportAction(CustomAction):
             if not srv or not srv.get("images"):
                 mfaalog.error(f"[SupportAction] servant_list 无该英灵: {servant_id}")
                 return CustomAction.RunResult(success=False)
-
-            # 礼装匹配目标(普通1个/冠位2个)
-            ce_targets = []
-            if support_type == "grand":
-                ce_targets.append((ce_1, CE_ANCHOR_GRAND[0]))
-                ce_targets.append((ce_2, CE_ANCHOR_GRAND[1]))
-            else:
-                ce_targets.append((ce, CE_ANCHOR_NORMAL))
 
             detector = self._get_detector()
 
@@ -665,8 +660,8 @@ class SupportAction(CustomAction):
                     mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
                     if not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
                         continue
-                    if not all(self._match_ce(img, ce_dir, bx, by, name, anc)
-                               for name, anc in ce_targets):
+                    if not all(self._match_ce(img, ce_dir, bx, by, name, anc, sub)
+                               for name, anc, sub in ce_targets):
                         continue
                     # 冠位助战羁绊判断(50np/original/any)
                     if support_type == "grand" and not self._match_bond(img, skill_dir, bx, by, ce_bond):
