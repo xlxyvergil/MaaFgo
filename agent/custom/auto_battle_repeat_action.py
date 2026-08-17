@@ -10,7 +10,7 @@
            → 连续出击_继续(点继续按钮) → auto_battle (第 3 场)
   ...
  最后 1 场: auto_battle → 结束战斗 → 作战成功(点下一步)
-           → 关闭连续出击 → 战斗完成-回主界面
+           → 战斗结束关闭_不回主界面 → 战斗完成-回主界面
 
 节点参数（custom_action_param，JSON）示例：
   {"battle_count": 5}
@@ -18,6 +18,8 @@
 
 参数说明：
   battle_count (int): 战斗次数，默认 1，范围 1~999
+  reset_hit_nodes (list[str], 可选): 每场战斗前需要重置命中计数的节点列表。
+    默认值为包含 max_hit=1 的关键节点，确保多场战斗时节点可重复触发。
   其余参数（chaldea_import_source / max_turns / strategy_profile / card_policy / skill_policy）
   会透传给 auto_battle custom action。
 """
@@ -43,6 +45,16 @@ _NODE_LAST_BATTLE = "原生自动战斗_多次_最后一场"
 # 安全上限
 _MAX_BATTLE_COUNT = 999
 
+# 默认需要重置命中计数的节点（所有 max_hit=1 且跨场复用的节点）
+# 这些节点在第 1 场战斗后命中计数达到上限，第 2 场起会被跳过
+_DEFAULT_RESET_HIT_NODES = [
+    "执行原生自动战斗",
+    "执行战斗结束_不回主界面",
+    "执行战斗结束_连续出击继续",
+    "执行进本",
+    "跳过剧情-点击跳过",
+]
+
 
 @AgentServer.custom_action("auto_battle_repeat")
 class AutoBattleRepeatAction(CustomAction):
@@ -51,14 +63,15 @@ class AutoBattleRepeatAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         param = _load_param(argv.custom_action_param)
         battle_count = _parse_battle_count(param)
+        reset_hit_nodes = _parse_reset_hit_nodes(param)
 
-        # 需要透传给内层 auto_battle 的参数（去掉 battle_count 自身）
-        inner_param = {k: v for k, v in param.items() if k != "battle_count"}
+        # 需要透传给内层 auto_battle 的参数（去掉 battle_count 和 reset_hit_nodes）
+        inner_param = {k: v for k, v in param.items() if k not in ("battle_count", "reset_hit_nodes")}
         battle_override = _build_battle_override(inner_param)
 
         mfaalog.info(
             f"[auto_battle_repeat] start battle_count={battle_count} "
-            f"has_override={bool(battle_override)}"
+            f"has_override={bool(battle_override)} reset_nodes={len(reset_hit_nodes)}"
         )
 
         success_count = 0
@@ -83,6 +96,9 @@ class AutoBattleRepeatAction(CustomAction):
             else:
                 # 中间场：战斗 → 结算 → 连续出击继续
                 entry = _NODE_NEXT_BATTLE
+
+            # 在每场战斗前重置节点命中计数（修复 bug：Context.task_state_ 是共享的）
+            _reset_hit_counts(context, reset_hit_nodes)
 
             try:
                 detail = context.run_task(entry, pipeline_override=battle_override)
@@ -170,6 +186,58 @@ def _parse_battle_count(param: dict) -> int:
     except (ValueError, TypeError):
         return 1
     return max(1, min(count, _MAX_BATTLE_COUNT))
+
+
+def _parse_reset_hit_nodes(param: dict) -> list[str]:
+    """解析需要重置命中计数的节点列表。
+    
+    Args:
+        param: custom_action_param 字典
+    
+    Returns:
+        节点名列表。若参数未提供或为空，返回默认列表。
+    """
+    nodes = param.get("reset_hit_nodes")
+    
+    # 未提供或为 None：使用默认列表
+    if nodes is None:
+        return _DEFAULT_RESET_HIT_NODES.copy()
+    
+    # 提供了但不是 list：使用默认列表（容错）
+    if not isinstance(nodes, list):
+        mfaalog.warn(f"[auto_battle_repeat] reset_hit_nodes 应为 list，实际类型 {type(nodes)}，使用默认值")
+        return _DEFAULT_RESET_HIT_NODES.copy()
+    
+    # 提供了空列表：尊重用户意图，不重置任何节点
+    if not nodes:
+        mfaalog.info("[auto_battle_repeat] reset_hit_nodes=[] 显式指定，将不重置任何节点")
+        return []
+    
+    # 过滤出字符串元素（容错）
+    valid_nodes = [n for n in nodes if isinstance(n, str) and n.strip()]
+    if len(valid_nodes) != len(nodes):
+        mfaalog.warn(
+            f"[auto_battle_repeat] reset_hit_nodes 中有非字符串元素，"
+            f"已过滤（{len(nodes)} -> {len(valid_nodes)}）"
+        )
+    
+    return valid_nodes
+
+
+def _reset_hit_counts(context: Context, node_names: list[str]) -> None:
+    """重置指定节点的命中计数。
+    
+    Args:
+        context: MaaFramework Context 对象
+        node_names: 节点名列表
+    """
+    if not node_names:
+        return
+    
+    for node_name in node_names:
+        context.clear_hit_count(node_name)
+    
+    mfaalog.debug(f"[auto_battle_repeat] 已重置 {len(node_names)} 个节点的命中计数")
 
 
 def _build_battle_override(inner_param: dict) -> dict:
