@@ -20,7 +20,7 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "是.png"
+                    "battle/是.png"
                 ]
             }
         },

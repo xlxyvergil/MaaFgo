@@ -3,7 +3,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "下一步.png",
+                "template": "battle/下一步.png",
                 "threshold": 0.8
             }
         },
@@ -78,7 +78,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "撤退决定.png",
+                "template": "battle/撤退决定.png",
                 "threshold": 0.8
             }
         },
@@ -99,7 +99,7 @@
                     399,
                     187
                 ],
-                "template": "关闭好友申请.png",
+                "template": "battle/关闭好友申请.png",
                 "threshold": 0.8
             }
         },
@@ -116,7 +116,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "撤退.png",
+                "template": "battle/撤退.png",
                 "threshold": 0.8
             }
         },
@@ -228,7 +228,7 @@
                     144,
                     49
                 ],
-                "template": "是.png",
+                "template": "battle/是.png",
                 "threshold": 0.8
             }
         },
@@ -272,8 +272,8 @@
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "开始任务.png",
-                    "战斗开始.png"
+                    "battle/开始任务.png",
+                    "battle/战斗开始.png"
                 ],
                 "threshold": [
                     0.8

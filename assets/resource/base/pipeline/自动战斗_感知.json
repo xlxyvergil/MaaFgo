@@ -205,7 +205,7 @@
     "recognition": {
       "type": "TemplateMatch",
       "param": {
-        "template": "下一步.png",
+        "template": "battle/下一步.png",
         "threshold": 0.8
       }
     }
