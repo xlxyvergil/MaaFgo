@@ -1,10 +1,47 @@
 {
-    "通用大活动-坐标导航": {
-        "focus": {
-            "Node.Recognition.Starting": "开始选择副本"
+    "通用大活动-上回挑战卡片": {
+        "max_hit": 3,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "event/卡片上回挑战.png"
+                ]
+            }
         },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    99,
+                    0,
+                    -1,
+                    -1
+                ]
+            }
+        },
+        "post_delay": 3000,
         "next": [
-            "通用大活动-先下滑到最上面"
+            "通用大活动-助战确认",
+            "[JumpBack]全局-战前吃体力",
+            "通用大活动-上回挑战卡片"
+        ]
+    },
+    "通用大活动-主界面入口进入": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    908,
+                    369,
+                    32,
+                    20
+                ]
+            }
+        },
+        "post_delay": 2000,
+        "next": [
+            "通用大活动-地图查找上回副本"
         ]
     },
     "通用大活动-先下滑到最上面": {
@@ -33,6 +70,12 @@
             "通用大活动-进入第一个副本"
         ]
     },
+    "通用大活动-判断是否要回主界面": {
+        "max_hit": 1,
+        "next": [
+            "主界面判断-main-ui"
+        ]
+    },
     "通用大活动-助战确认": {
         "recognition": {
             "type": "TemplateMatch",
@@ -42,6 +85,109 @@
                 ]
             }
         }
+    },
+    "通用大活动-地图查找上回副本": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "event/地图上次挑战标记.png"
+                ],
+                "green_mask": true,
+                "threshold": [
+                    0.5
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -100,
+                    -19,
+                    -1,
+                    -1
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "通用大活动-上回挑战卡片",
+            "[JumpBack]通用大活动-循环空节点",
+            "通用大活动-已完成副本"
+        ]
+    },
+    "通用大活动-坐标导航": {
+        "focus": {
+            "Node.Recognition.Starting": "开始选择副本"
+        },
+        "next": [
+            "通用大活动-先下滑到最上面"
+        ]
+    },
+    "通用大活动-已完成副本": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "event/已完成的副本标签.png"
+                ]
+            }
+        },
+        "post_delay": 15000,
+        "focus": {
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">【警告】因为没有发现带有上次挑战标签的副本，即将在10s后进入第一个已经完成过的副本！</span>"
+        },
+        "next": [
+            "通用大活动-已完成副本2"
+        ]
+    },
+    "通用大活动-已完成副本2": {
+        "max_hit": 3,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    597,
+                    83,
+                    641,
+                    266
+                ],
+                "template": [
+                    "event/已完成的副本标签.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    47,
+                    -58,
+                    -1,
+                    -1
+                ]
+            }
+        },
+        "post_delay": 3000,
+        "next": [
+            "通用大活动-助战确认",
+            "[JumpBack]全局-战前吃体力",
+            "通用大活动-已完成副本2"
+        ]
+    },
+    "通用大活动-开始": {
+        "focus": {
+            "Node.Recognition.Starting": "开始通用大活动"
+        },
+        "next": [
+            "[JumpBack]通用大活动-判断是否要回主界面",
+            "通用大活动-主界面入口进入"
+        ]
+    },
+    "通用大活动-循环空节点": {
+        "max_hit": 3,
+        "post_delay": 1000
     },
     "通用大活动-按次数下划": {
         "action": {
@@ -96,6 +242,7 @@
         ]
     },
     "通用大活动-进入第一个副本": {
+        "max_hit": 3,
         "action": {
             "type": "Click",
             "param": {
@@ -107,156 +254,11 @@
                 ]
             }
         },
+        "post_delay": 3000,
         "next": [
             "通用大活动-助战确认",
             "[JumpBack]全局-战前吃体力",
             "通用大活动-进入第一个副本"
-        ]
-    },
-    "通用大活动-开始": {
-        "focus": {
-            "Node.Recognition.Starting": "开始通用大活动"
-        },
-        "next": [
-            "[JumpBack]通用大活动-判断是否要回主界面",
-            "通用大活动-主界面入口进入"
-        ]
-    },
-    "通用大活动-判断是否要回主界面": {
-        "max_hit": 1,
-        "next": [
-            "主界面判断-main-ui"
-        ]
-    },
-    "通用大活动-主界面入口进入": {
-        "action": {
-            "type": "Click",
-            "param": {
-                "target": [
-                    908,
-                    369,
-                    32,
-                    20
-                ]
-            }
-        },
-        "post_delay": 2000,
-        "next": [
-            "通用大活动-地图查找上回副本"
-        ]
-    },
-    "通用大活动-地图查找上回副本": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "event/地图上次挑战标记.png"
-                ],
-                "green_mask": true,
-                "threshold": [
-                    0.5
-                ]
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target_offset": [
-                    -100,
-                    -19,
-                    -1,
-                    -1
-                ]
-            }
-        },
-        "post_delay": 1000,
-        "next": [
-            "通用大活动-上回挑战卡片",
-            "[JumpBack]通用大活动-循环空节点",
-            "通用大活动-已完成副本"
-        ]
-    },
-    "通用大活动-上回挑战卡片": {
-        "max_hit": 3,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "event/卡片上回挑战.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target_offset": [
-                    99,
-                    0,
-                    -1,
-                    -1
-                ]
-            }
-        },
-        "post_delay": 3000,
-        "next": [
-            "通用大活动-助战确认",
-            "[JumpBack]全局-战前吃体力",
-            "通用大活动-上回挑战卡片"
-        ]
-    },
-    "通用大活动-已完成副本": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "event/已完成的副本标签.png"
-                ]
-            }
-        },
-        "post_delay": 15000,
-        "focus": {
-            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">【警告】因为没有发现带有上次挑战标签的副本，即将在10s后进入第一个已经完成过的副本！</span>"
-        },
-        "next": [
-            "通用大活动-已完成副本2"
-        ]
-    },
-    "通用大活动-循环空节点": {
-        "max_hit": 3,
-        "post_delay": 1000
-    },
-    "通用大活动-已完成副本2": {
-        "max_hit": 3,
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "roi": [
-                    597,
-                    83,
-                    641,
-                    266
-                ],
-                "template": [
-                    "event/已完成的副本标签.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click",
-            "param": {
-                "target_offset": [
-                    47,
-                    -58,
-                    -1,
-                    -1
-                ]
-            }
-        },
-        "post_delay": 3000,
-        "next": [
-            "通用大活动-助战确认",
-            "[JumpBack]全局-战前吃体力",
-            "通用大活动-已完成副本2"
         ]
     }
 }

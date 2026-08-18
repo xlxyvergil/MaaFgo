@@ -26,6 +26,19 @@ body = """
                 {%- endif -%}
             {%- endfor -%}
         {%- endif %}
+        {%- set body_tags = ["feat", "fix", "docs", "perf", "refactor", "style", "test", "chore", "ci", "revert"] -%}
+        {%- if commit.body | default(value="") -%}
+            {%- for line in commit.body | split(pat="\n") -%}
+                {%- set t = line | trim -%}
+                {%- if t is starting_with("-") or t is starting_with("*") -%}
+                    {%- set t = t | trim_start_matches(pat="-") | trim_start_matches(pat="*") | trim -%}
+                {%- endif -%}
+                {%- set type = t | split(pat="(") | first | split(pat=":") | first | trim -%}
+                {%- if type in body_tags %}
+{{ "  - " ~ t }}
+                {%- endif -%}
+            {%- endfor -%}
+        {%- endif %}
 {% endmacro -%}
 
 {% if version %}\

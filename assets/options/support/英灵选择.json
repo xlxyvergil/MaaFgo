@@ -3,7 +3,7 @@
         "英灵选择": {
             "type": "select",
             "label": "英灵选择",
-            "default": "他人格",
+            "default": "剑士",
             "cases": [
                 {
                     "name": "他人格",

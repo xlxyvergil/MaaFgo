@@ -1101,7 +1101,7 @@
                 {
                     "name": "level",
                     "label": "英灵等级",
-                    "default": "1",
+                    "default": "90",
                     "pipeline_type": "int"
                 }
             ],
