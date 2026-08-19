@@ -1,7 +1,7 @@
 {
     "通用小活动-开始": {
         "focus": {
-            "Node.Recognition.Starting": "开始通用小活动"
+            "Node.Recognition.Starting": "开始小活动"
         },
         "next": [
             "[JumpBack]通用小活动-判断是否要回主界面",

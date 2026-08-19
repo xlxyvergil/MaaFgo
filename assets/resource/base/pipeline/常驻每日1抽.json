@@ -50,6 +50,24 @@
             "[JumpBack]常驻每日1抽-点击空白"
         ]
     },
+    "常驻每日1抽-召唤": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "召唤.png",
+                    "召唤2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 3000,
+        "next": [
+            "常驻每日1抽-召唤开始"
+        ]
+    },
     "常驻每日1抽-召唤开始": {
         "next": [
             "[JumpBack]常驻每日1抽-寻找免费图标",
@@ -119,6 +137,28 @@
         "next": [
             "常驻每日1抽-决定",
             "常驻每日1抽-石头不足"
+        ]
+    },
+    "常驻每日1抽-已经在抽卡界面": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "友情池1抽.png",
+                    "免费常驻池.png",
+                    "召唤1次.png",
+                    "召唤1次(无护符).png",
+                    "召唤2次.png",
+                    "免费友情池.png",
+                    "免费常驻池2.png"
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "常驻每日1抽-召唤开始"
         ]
     },
     "常驻每日1抽-断网重连": {
@@ -206,7 +246,8 @@
             "type": "Click"
         },
         "next": [
-            "常驻每日1抽-召唤"
+            "常驻每日1抽-检测是否有次数",
+            "常驻每日1抽-完成"
         ]
     },
     "常驻每日1抽开始": {
@@ -219,18 +260,16 @@
             "常驻每日1抽-菜单"
         ]
     },
-    "常驻每日1抽-已经在抽卡界面": {
+    "常驻每日1抽-检测是否有次数": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": [
-                    "友情池1抽.png",
-                    "免费常驻池.png",
-                    "召唤1次.png",
-                    "召唤1次(无护符).png",
-                    "召唤2次.png",
-                    "免费友情池.png",
-                    "免费常驻池2.png"
+                    "每日免费1抽有次数.png"
+                ],
+                "green_mask": false,
+                "threshold": [
+                    0.6
                 ]
             }
         },
@@ -238,24 +277,7 @@
             "type": "Click"
         },
         "next": [
-            "常驻每日1抽-召唤开始"
-        ]
-    },
-    "常驻每日1抽-召唤": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "召唤.png",
-                    "召唤2.png"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 3000,
-        "next": [
+            "常驻每日1抽-召唤",
             "常驻每日1抽-召唤开始"
         ]
     }

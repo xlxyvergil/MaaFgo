@@ -178,7 +178,7 @@
     },
     "通用大活动-开始": {
         "focus": {
-            "Node.Recognition.Starting": "开始通用大活动"
+            "Node.Recognition.Starting": "开始大活动"
         },
         "next": [
             "[JumpBack]通用大活动-判断是否要回主界面",

@@ -27,6 +27,24 @@
               ]
             }
           }
+        },
+        {
+          "name": "活动",
+          "option": [
+            "通用大活动-活动名"
+          ],
+          "pipeline_override": {
+            "通用大活动-主界面入口进入": {
+              "next": [
+                "地图轮巡"
+              ]
+            },
+            "地图轮巡-成功": {
+              "next": [
+                "通用大活动-坐标导航"
+              ]
+            }
+          }
         }
       ]
     },
@@ -122,6 +140,326 @@
             },
             "通用大活动-按次数下划": {
               "repeat": 4
+            }
+          }
+        }
+      ]
+    },
+    "通用大活动-活动名": {
+      "type": "select",
+      "label": "活动名",
+      "default": "カルデア南海大決戦",
+      "cases": [
+        {
+          "name": "カルデア南海大決戦",
+          "option": [
+            "通用大活动-活动副本名",
+            "通用大活动-副本顺序"
+          ]
+        }
+      ]
+    },
+    "通用大活动-活动副本名": {
+      "type": "select",
+      "label": "活动副本名",
+      "default": "アラハビーチ",
+      "cases": [
+        {
+          "name": "アラハビーチ",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "アラハビーチ"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "アラハビーチ"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "国際通り",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "国際通り"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "国際通り"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "海の家くらくら",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "海の家くらくら"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "海の家くらくら"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ニライカナイ本拠地",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "ニライカナイ本拠地"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "ニライカナイ本拠地"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "ふるさん村",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "ふるさん村"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "ふるさん村"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "百名ビーチ",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "百名ビーチ"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "百名ビーチ"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "やんばるの森",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "やんばるの森"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "やんばるの森"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "巨大樹の泉",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "巨大樹の泉"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "巨大樹の泉"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "うちなー水族館",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "うちなー水族館"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "うちなー水族館"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "城址公園",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "城址公園"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "城址公園"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "名城ビーチ",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "名城ビーチ"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "名城ビーチ"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "やちむんの里",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "やちむんの里"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "やちむんの里"
+                  ]
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "那覇港",
+          "pipeline_override": {
+            "巡-找到目标": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "那覇港"
+                  ]
+                }
+              }
+            },
+            "巡-找到目标-重试": {
+              "recognition": {
+                "param": {
+                  "expected": [
+                    "那覇港"
+                  ]
+                }
+              }
             }
           }
         }
