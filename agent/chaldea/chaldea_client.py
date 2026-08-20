@@ -11,6 +11,8 @@ import urllib.request
 import logging
 from typing import Optional, List, Tuple
 
+import mfaalog
+
 logger = logging.getLogger(__name__)
 
 CHALDEA_API = "https://worker.chaldea.center/api/v4"
@@ -87,15 +89,19 @@ def decode_content(content: str) -> Optional[dict]:
     """
     if not isinstance(content, str) or not content:
         logger.error("[Chaldea] content 为空或类型错误")
+        mfaalog.error("[Chaldea] decode_content: content 为空或类型错误")
         return None
 
     try:
         if content.startswith("G"):
             b64_data = content[1:]
+            mfaalog.info(f"[Chaldea] decode_content: V2格式, 原始长度={len(content)}")
         elif content.startswith("H4s"):
             b64_data = content
+            mfaalog.info(f"[Chaldea] decode_content: V1格式, 原始长度={len(content)}")
         else:
             logger.error(f"[Chaldea] 未知 content 格式: {content[:20]}...")
+            mfaalog.error(f"[Chaldea] decode_content: 未知格式, 前20字符={content[:20]}")
             return None
 
         # 补齐 base64 padding
@@ -105,9 +111,12 @@ def decode_content(content: str) -> Optional[dict]:
 
         raw = base64.urlsafe_b64decode(b64_data)
         decompressed = gzip.decompress(raw)
-        return json.loads(decompressed.decode("utf-8"))
+        result = json.loads(decompressed.decode("utf-8"))
+        mfaalog.info(f"[Chaldea] decode_content: 解码成功, 数据keys={list(result.keys())}")
+        return result
     except Exception as e:
         logger.error(f"[Chaldea] content 解码失败: {e}")
+        mfaalog.error(f"[Chaldea] decode_content: 解码失败: {e}")
         return None
 
 
@@ -125,23 +134,32 @@ def parse_import_source(source: str) -> Tuple[Optional[int], Optional[int], Opti
         (quest_id, team_id, direct_data)
     """
     if not isinstance(source, str) or not source.strip():
+        mfaalog.warning("[Chaldea] parse_import_source: source 为空")
         return None, None, None
 
     source = source.strip()
+    mfaalog.info(f"[Chaldea] parse_import_source: 原始输入={source[:120]}")
 
     if source.isdigit():
         num = int(source)
         if len(source) <= 6:
+            mfaalog.info(f"[Chaldea] 解析为 team_id={num}")
             return None, num, None  # team_id
         else:
+            mfaalog.info(f"[Chaldea] 解析为 quest_id={num}")
             return num, None, None  # quest_id
 
     match_data = re.search(r'data=([A-Za-z0-9\-_]+)', source)
     if match_data:
-        return None, None, match_data.group(1)
+        data_val = match_data.group(1)
+        mfaalog.info(f"[Chaldea] 解析为 data= 离线数据, 长度={len(data_val)}")
+        return None, None, data_val
 
     match_id = re.search(r'id=(\d+)', source)
     if match_id:
-        return None, int(match_id.group(1)), None
+        id_val = int(match_id.group(1))
+        mfaalog.info(f"[Chaldea] 解析URL中 id={id_val}")
+        return None, id_val, None
 
+    mfaalog.warning(f"[Chaldea] 无法解析输入来源: {source[:120]}")
     return None, None, None

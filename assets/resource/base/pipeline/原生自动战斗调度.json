@@ -325,6 +325,12 @@
                 "template": [
                     "副本打开标记-感叹号.png"
                 ],
+                "roi": [
+                    1115,
+                    38,
+                    165,
+                    682
+                ],
                 "order_by": "Vertical",
                 "index": 0,
                 "green_mask": true

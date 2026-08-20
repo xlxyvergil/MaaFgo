@@ -9,6 +9,8 @@ import os
 import logging
 from typing import Optional
 
+import mfaalog
+
 from .chaldea_client import (
     fetch_teams_by_quest, fetch_team_by_id, select_best_team,
     decode_content, parse_import_source,
@@ -32,30 +34,42 @@ def fetch_share_data(source: str):
         - quest_id / team_id: 解析出的展示用标识（str），供命名等使用
     """
     quest_id, team_id, direct_data = parse_import_source(source)
+    mfaalog.info(f"[Chaldea] parse_import_source: quest_id={quest_id} team_id={team_id} direct_data={'有' if direct_data else '无'}")
     share_data = None
 
     if direct_data:
         logger.info("[Chaldea] 匹配到长链接数据特征，开启离线解码...")
+        mfaalog.info("[Chaldea] 离线解码 direct_data...")
         share_data = decode_content(direct_data)
         team_id = "offline"
         quest_id = (share_data.get("quest") or {}).get("id", "0") if share_data else "0"
     elif team_id:
+        mfaalog.info(f"[Chaldea] 按 team_id={team_id} 下载队伍...")
         team_resp = fetch_team_by_id(team_id)
         if team_resp and "content" in team_resp:
+            mfaalog.info(f"[Chaldea] 队伍下载成功, 开始解码 content")
             share_data = decode_content(team_resp["content"])
             quest_id = team_resp.get("questId", "0")
         else:
             logger.error("[Chaldea] 队伍接口无匹配数据。")
+            mfaalog.error(f"[Chaldea] 队伍接口无匹配数据: team_id={team_id}")
     elif quest_id:
+        mfaalog.info(f"[Chaldea] 按 quest_id={quest_id} 搜索队伍...")
         teams = fetch_teams_by_quest(quest_id, 3, 10)
+        mfaalog.info(f"[Chaldea] 获取到 {len(teams)} 个队伍")
         best = select_best_team(teams)
         if best and "content" in best:
+            mfaalog.info(f"[Chaldea] 选择最佳队伍 id={best.get('id')}, 开始解码 content")
             share_data = decode_content(best["content"])
             team_id = best.get("id", "top")
         else:
             logger.error("[Chaldea] 该关卡无可用队伍数据。")
+            mfaalog.error(f"[Chaldea] 该关卡无可用队伍数据: quest_id={quest_id}")
     else:
         logger.error("[Chaldea] 无法解析输入来源。")
+        mfaalog.error(f"[Chaldea] 无法解析输入来源: {source[:100]}")
+
+    mfaalog.info(f"[Chaldea] fetch_share_data 完成: share_data={'有' if share_data else '无'} quest_id={quest_id} team_id={team_id}")
 
     return share_data, quest_id, team_id
 

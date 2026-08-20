@@ -74,6 +74,8 @@ class AutoBattleRepeatAction(CustomAction):
             f"[auto_battle_repeat] start battle_count={battle_count} "
             f"has_override={bool(battle_override)} reset_nodes={len(reset_hit_nodes)}"
         )
+        if inner_param:
+            mfaalog.info(f"[auto_battle_repeat] inner_param: {json.dumps(inner_param, ensure_ascii=False)[:200]}")
 
         success_count = 0
         last_error = ""

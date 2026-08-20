@@ -21,6 +21,8 @@ from __future__ import annotations
 
 from typing import List, Optional, Tuple
 
+import mfaalog
+
 from ..core.models import (BattlePlan, MasterSkillAction, OrderChangeAction,
                            ServantSkillAction, TurnPlan)
 
@@ -61,7 +63,11 @@ def convert_chaldea_actions_to_battle_plan(
         永远返回非空 BattlePlan；无任何回合时返回 1 个空回合。
     """
     if not isinstance(actions, list):
+        mfaalog.warning(f"[chaldea_converter] actions 不是列表, 类型={type(actions).__name__}")
         return BattlePlan(turns=(TurnPlan(),))
+
+    mfaalog.info(f"[chaldea_converter] 开始转换: actions={len(actions)}条, "
+                 f"mystic_code_id={mystic_code_id}, delegate={'有' if delegate else '无'}")
 
     # 换人信息：delegate.replaceMemberIndexes -> [(front,back), ...]（0-based）
     replace_members: List[List[int]] = []
@@ -89,12 +95,16 @@ def convert_chaldea_actions_to_battle_plan(
     def _flush() -> None:
         """把当前累积的回合内容结算成 TurnPlan。"""
         nonlocal cur_skills, cur_masters, cur_np, cur_order_change
-        turns.append(TurnPlan(
+        turn = TurnPlan(
             servant_skills=tuple(cur_skills),
             master_skills=tuple(cur_masters),
             np_order=tuple(cur_np),
             order_change=cur_order_change,
-        ))
+        )
+        mfaalog.info(f"[chaldea_converter] 回合{turns.__len__() + 1}: "
+                     f"servant_skills={len(cur_skills)} master_skills={len(cur_masters)} "
+                     f"np_order={cur_np} order_change={'有' if cur_order_change else '无'}")
+        turns.append(turn)
         cur_skills = []
         cur_masters = []
         cur_np = []
@@ -107,15 +117,15 @@ def convert_chaldea_actions_to_battle_plan(
 
         if action_type == "skill":
             skill_idx = action.get("skill")
-            if not isinstance(skill_idx, int) or not (1 <= skill_idx <= 3):
+            if not isinstance(skill_idx, int) or not (0 <= skill_idx <= 2):
                 continue
             target = _parse_target(action.get("options"))
 
             svt_idx = action.get("svt")
             if svt_idx is None:
                 # 御主技能
-                if skill_idx == 3 and is_order_change and replace_ptr < len(replace_members):
-                    # 换人服第 3 技能 = 换人
+                if skill_idx == 2 and is_order_change and replace_ptr < len(replace_members):
+                    # 换人服第 3 技能 = 换人（Chaldea 0-based: skill=2）
                     front, back = replace_members[replace_ptr]
                     replace_ptr += 1
                     cur_order_change = OrderChangeAction(
@@ -123,11 +133,11 @@ def convert_chaldea_actions_to_battle_plan(
                         sub_member_idx=back + 1,
                     )
                 else:
-                    cur_masters.append(MasterSkillAction(skill_idx, target_ally=target))
+                    cur_masters.append(MasterSkillAction(skill_idx + 1, target_ally=target))
             elif isinstance(svt_idx, int) and 0 <= svt_idx <= 2:
                 cur_skills.append(ServantSkillAction(
                     servant_slot=svt_idx + 1,
-                    skill_index=skill_idx,
+                    skill_index=skill_idx + 1,
                     target_ally=target,
                 ))
 

@@ -68,11 +68,14 @@ def _plan_from_chaldea_share(param: dict) -> BattlePlan | None:
     """
     share = param.get("chaldea_share")
     if isinstance(share, dict):
+        mfaalog.info(f"[auto_battle] 使用离线注入的 chaldea_share")
         return _build_plan_from_share(share)
 
     source = param.get("chaldea_import_source")
     if isinstance(source, str) and source.strip():
-        share_data, _quest_id, _team_id = fetch_share_data(source.strip())
+        mfaalog.info(f"[auto_battle] chaldea_import_source 开始下载/解码: {source[:100]}...")
+        share_data, quest_id, team_id = fetch_share_data(source.strip())
+        mfaalog.info(f"[auto_battle] fetch_share_data 结果: ok={share_data is not None} quest_id={quest_id} team_id={team_id}")
         if not share_data:
             mfaalog.info("[auto_battle] chaldea_import_source 下载/解码失败")
             return None
@@ -85,9 +88,11 @@ def _build_plan_from_share(share: dict) -> BattlePlan:
     """把 BattleShareData actions 转成 BattlePlan。"""
     actions = share.get("actions")
     mystic_code_id = (share.get("mysticCode") or {}).get("id")
+    delegate = share.get("delegate")
+    mfaalog.info(f"[auto_battle] 构建 BattlePlan: actions={len(actions) if actions else 0}条 mysticCode={mystic_code_id} delegate={'有' if delegate else '无'}")
     plan = convert_chaldea_actions_to_battle_plan(
         actions,
-        delegate=share.get("delegate"),
+        delegate=delegate,
         mystic_code_id=mystic_code_id,
     )
     mfaalog.info(f"[auto_battle] chaldea_share -> plan turns={len(plan.turns)}")

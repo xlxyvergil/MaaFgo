@@ -229,10 +229,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          50,
-          555,
-          48,
-          34
+          44,
+          553,
+          58,
+          59
         ],
         "method": 4,
         "lower": [
@@ -254,10 +254,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          137,
-          554,
-          48,
-          34
+          134,
+          551,
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -279,10 +279,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          225,
-          555,
-          48,
-          34
+          221,
+          548,
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -304,10 +304,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          368,
+          364,
           555,
-          48,
-          34
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -329,10 +329,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          453,
+          450,
           552,
-          48,
-          34
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -354,10 +354,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          544,
-          555,
-          48,
-          34
+          538,
+          549,
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -379,10 +379,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          685,
-          554,
-          48,
-          34
+          680,
+          552,
+          59,
+          61
         ],
         "method": 4,
         "lower": [
@@ -404,10 +404,10 @@
       "type": "ColorMatch",
       "param": {
         "roi": [
-          772,
-          553,
-          48,
-          34
+          767,
+          549,
+          59,
+          61
         ],
         "method": 4,
         "lower": [

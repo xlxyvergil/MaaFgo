@@ -178,7 +178,8 @@ class AutoBattleRuntime:
                     return BattleResult.fail(
                         f"invalid_card_action:{verdict.reason}", turns
                     )
-                if not verdict.ok and verdict.reason == "np_not_present":
+                has_plan = hasattr(self.decider, 'plan') and self.decider.plan is not None
+                if not verdict.ok and verdict.reason == "np_not_present" and not has_plan:
                     action = self._replace_unavailable_np_picks(action, state)
                     verdict = validate_card_action(action, state, self.profile)
                     mfaalog.info(
@@ -225,8 +226,40 @@ class AutoBattleRuntime:
         mfaalog.info("[AutoBattle] _observe() -> post_screencap")
         img = self.controller.post_screencap().wait().get()
         result = perception.build(self.ctx, img)
+
+        # 有 Chaldea 计划时：技能 CD 检测无意义（计划已精确指定何时放技能），
+        # 且 ColorMatch ROI 可能因分辨率/缩放偏移导致误判为 CD。
+        # 将所有技能标记为可用，避免被安全门过滤掉。
+        has_plan = hasattr(self.decider, 'plan') and self.decider.plan is not None
+        if has_plan:
+            result = self._patch_skills_available(result)
+            mfaalog.info("[AutoBattle] _observe() -> plan active, all skills patched to available")
+
         mfaalog.info(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
         return result
+
+    def _patch_skills_available(self, state: BattleState) -> BattleState:
+        """将所有从者技能和御主技能标记为可用。"""
+        from dataclasses import replace as dc_replace
+
+        # 从者技能
+        patched_servants = tuple(
+            dc_replace(srv, skills=tuple(
+                dc_replace(sk, available=True)
+                for sk in srv.skills
+            ))
+            for srv in state.servants
+        )
+        # 御主技能
+        patched_master = tuple(
+            dc_replace(sk, available=True)
+            for sk in state.master_skills
+        )
+        return dc_replace(
+            state,
+            servants=patched_servants,
+            master_skills=patched_master,
+        )
 
     def _mark_action(self, action: str) -> None:
         mfaalog.info(f"[AutoBattle] action: {action}")
@@ -326,6 +359,19 @@ class AutoBattleRuntime:
         return False
 
     def _execute_skills(self, action) -> bool:
+        # 日志：输出实际要执行的技能队列（安全门过滤后）
+        if action.servant_skills or action.master_skills or action.order_change:
+            parts = []
+            for sk in action.servant_skills:
+                target = f"->从者{sk.target_ally}" if sk.target_ally else ""
+                parts.append(f"从者{sk.servant_slot}技能{sk.skill_index}{target}")
+            for sk in action.master_skills:
+                target = f"->从者{sk.target_ally}" if sk.target_ally else ""
+                parts.append(f"御主技能{sk.skill_index}{target}")
+            if action.order_change:
+                parts.append(f"换人: {action.order_change.starting_member_idx}↔{action.order_change.sub_member_idx}")
+            mfaalog.info(f"[AutoBattle] 执行技能队列: {' | '.join(parts)}")
+
         for sk in action.servant_skills:
             if not (
                 is_slot(sk.servant_slot, 1, 3)
@@ -346,7 +392,8 @@ class AutoBattleRuntime:
                 return False
 
         for sk in action.master_skills:
-            if not self.battle_policy.skill.use_master_skills:
+            has_plan = hasattr(self.decider, 'plan') and self.decider.plan is not None
+            if not has_plan and not self.battle_policy.skill.use_master_skills:
                 mfaalog.info(
                     f"[AutoBattle] master skill skipped (use_master_skills=False): "
                     f"idx={sk.skill_index}"

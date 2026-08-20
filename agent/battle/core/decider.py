@@ -19,6 +19,8 @@ from .models import (BattleAction, BattlePlan, BattleState, CardPick,
                      CommandCard, ServantSkillAction, TurnPlan, is_slot)
 from .policy import BattlePolicy, CardPolicy, Goal, SkillPolicy
 
+import mfaalog
+
 _GOAL_COLOR = {
     Goal.FINISH_WAVE: CardColor.BUSTER,
     Goal.BUILD_NP: CardColor.ARTS,
@@ -76,6 +78,10 @@ class RuleDecider:
         # 计划中指定的敌人目标优先。技能状态过滤由 Runtime 的统一安全门处理，
         # 保证 RuleDecider 与未来其他 Decider 使用同一套跳过策略。
         enemy = tp.target_enemy if tp.target_enemy is not None else target
+
+        # 日志：输出 Chaldea 计划的本回合技能队列
+        _log_plan_turn(turn_index, tp)
+
         return BattleAction(
             target_enemy=enemy,
             picks=(),
@@ -100,6 +106,7 @@ class RuleDecider:
             for slot in tp.np_order:
                 if slot not in {pick.slot for pick in np_picks} and len(np_picks) < 3:
                     np_picks.append(CardPick(PrimitiveKind.SELECT_NP, slot))
+            mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 计划宝具顺序={tp.np_order} 实际np_picks={[p.slot for p in np_picks]}")
         elif self.card_policy.np_first:
             # 无计划：有宝具就优先出
             np_picks = [CardPick(PrimitiveKind.SELECT_NP, c.servant_slot)
@@ -214,3 +221,28 @@ def _best_face_order(cards: Tuple[CommandCard, ...], need: int, policy: CardPoli
 
     best = max(permutations(cards, need), key=score)
     return [c.ui_slot for c in best]
+
+
+def _log_plan_turn(turn_index: int, tp: TurnPlan) -> None:
+    """输出 Chaldea 计划的本回合技能队列日志。"""
+    if not tp:
+        return
+
+    parts = []
+    for sk in tp.servant_skills:
+        target = f"->从者{sk.target_ally}" if sk.target_ally else ""
+        parts.append(f"从者{sk.servant_slot}技能{sk.skill_index}{target}")
+    for sk in tp.master_skills:
+        target = f"->从者{sk.target_ally}" if sk.target_ally else ""
+        parts.append(f"御主技能{sk.skill_index}{target}")
+    if tp.np_order:
+        parts.append(f"宝具顺序={'→'.join(str(s) for s in tp.np_order)}")
+    if tp.order_change:
+        parts.append(f"换人: {tp.order_change.starting_member_idx}↔{tp.order_change.sub_member_idx}")
+    if tp.target_enemy is not None:
+        parts.append(f"目标敌人={tp.target_enemy}")
+
+    if parts:
+        mfaalog.info(f"[ChaldeaPlan] 回合{turn_index}: {' | '.join(parts)}")
+    else:
+        mfaalog.info(f"[ChaldeaPlan] 回合{turn_index}: 无技能/宝具（平A）")
