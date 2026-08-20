@@ -1,0 +1,43 @@
+{
+    "option": {
+        "原生自动战斗Chaldea导入": {
+            "type": "input",
+            "label": "Chaldea 队伍导入（可选）",
+            "description": "填写 Chaldea 的分享链接、队伍ID或关卡ID，自动下载攻略并执行战斗。留空则使用默认策略。",
+            "inputs": [
+                {
+                    "name": "chaldea_import_source",
+                    "label": "分享链接 / 队伍ID / 关卡ID（留空=默认策略）",
+                    "default": "",
+                    "verify": ".*"
+                }
+            ],
+            "pipeline_override": {
+                "原生自动战斗入口": {
+                    "action": {
+                        "type": "Custom",
+                        "param": {
+                            "custom_action": "auto_battle",
+                            "custom_action_param": {
+                                "chaldea_import_source": "{chaldea_import_source}",
+                                "max_turns": 20
+                            }
+                        }
+                    }
+                },
+                "原生自动战斗_多次入口": {
+                    "action": {
+                        "type": "Custom",
+                        "param": {
+                            "custom_action": "auto_battle_repeat",
+                            "custom_action_param": {
+                                "chaldea_import_source": "{chaldea_import_source}",
+                                "max_turns": 20
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
