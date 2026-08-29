@@ -312,8 +312,8 @@ class QuestDetector:
     LOW_CONF = 0.2    # 低置信兜底阈值
 
     def __init__(self, model_path):
-        from ultralytics import YOLO
-        self.model = YOLO(model_path)
+        from utils.yolo_onnx import YoloOnnx
+        self.model = YoloOnnx(model_path, imgsz=self.IMGSZ)
 
     @staticmethod
     def _norm_img(img):
@@ -347,11 +347,9 @@ class QuestDetector:
         return arr
 
     def _infer(self, img, conf):
-        r = self.model(img, conf=conf, imgsz=self.IMGSZ, verbose=False)[0]
         out = []
-        for b in r.boxes:
-            x1, y1, x2, y2 = map(int, b.xyxy[0].tolist())
-            out.append((x1, y1, x2, y2, float(b.conf[0]), int(b.cls[0])))
+        for (x1, y1, x2, y2, c, cl) in self.model.detect(img, conf=conf):
+            out.append((x1, y1, x2, y2, c, cl))
         return out
 
     @staticmethod
@@ -792,10 +790,8 @@ class GeneralNavigationAction(CustomAction):
         det = self._detector()
         raw = []
         for conf in (det.CONF, WIN_CONF):
-            r = det.model(win, conf=conf, imgsz=det.IMGSZ, verbose=False)[0]
-            for b in r.boxes:
-                x1, y1, x2, y2 = map(int, b.xyxy[0].tolist())
-                raw.append((x1, y1, x2 - x1, y2 - y1, float(b.conf[0]), int(b.cls[0])))
+            for (x1, y1, x2, y2, c, cl) in det.model.detect(win, conf=conf):
+                raw.append((x1, y1, x2 - x1, y2 - y1, c, cl))
         names = [(x, y, w, h, c) for x, y, w, h, c, cl in raw if cl == 0]
         dedup = []
         for (x, y, w, h, c) in sorted(names, key=lambda t: -t[4]):
@@ -810,7 +806,7 @@ class GeneralNavigationAction(CustomAction):
         det = getattr(self, "_det", None)
         if det is None:
             agent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-            model_path = os.path.join(agent_dir, "utils", "quest_detect.pt")
+            model_path = os.path.join(agent_dir, "utils", "quest_detect.onnx")
             det = QuestDetector(model_path)
             self._det = det
             mfaalog.info(f"[导航] 检测器加载: {model_path}")

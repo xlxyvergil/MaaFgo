@@ -1,7 +1,7 @@
 maafw
-opencv-python
+opencv-python-headless
 numpy
 psutil
 highspy
-ultralytics
 onnxruntime
+Pillow

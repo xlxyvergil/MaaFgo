@@ -28,7 +28,7 @@
   lizhuang     : resource/{pkg}/image/lizhuang/                    (礼装模板, 待放)
   np_level     : resource/{pkg}/image/np_level/ch|jp/              (宝具模板, 待放)
   servant_list : agent/custom/servant_list.json                    (已有)
-  support_det  : agent/utils/support_det.pt                        (YOLO 模型, 待放)
+  support_det  : agent/utils/support_det.onnx                       (YOLO ONNX 模型)
 """
 
 import json
@@ -54,7 +54,7 @@ import mfaalog
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 _ROOT_DIR = os.path.dirname(_AGENT_DIR)
 SERVANT_LIST_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "servant_list.json")
-SUPPORT_MODEL_PATH = os.path.join(_AGENT_DIR, "utils", "support_det.pt")
+SUPPORT_MODEL_PATH = os.path.join(_AGENT_DIR, "utils", "support_det.onnx")
 
 # ---------------- YOLO 检测参数 ----------------
 IMGSZ = 640          # support_det 训练尺寸
@@ -189,25 +189,17 @@ class SupportDetector:
     """support_entry YOLO 检测: 返回全屏框 [(x1,y1,x2,y2,conf)] 按 y 排序"""
 
     def __init__(self, model_path):
-        from ultralytics import YOLO
-        self.model = YOLO(model_path)
+        from utils.yolo_onnx import YoloOnnx
+        self.model = YoloOnnx(model_path, imgsz=IMGSZ)
 
     def detect(self, img):
-        r = self.model(img, conf=CONF, imgsz=IMGSZ, verbose=False)[0]
-        boxes = []
-        for b in r.boxes:
-            x1, y1, x2, y2 = map(int, b.xyxy[0].tolist())
-            boxes.append((x1, y1, x2, y2, float(b.conf[0])))
+        boxes = self.model.detect(img, conf=CONF)
         if not boxes:
             # 低置信兜底
-            r = self.model(img, conf=LOW_CONF, imgsz=IMGSZ, verbose=False)[0]
-            boxes = []
-            for b in r.boxes:
-                x1, y1, x2, y2 = map(int, b.xyxy[0].tolist())
-                boxes.append((x1, y1, x2, y2, float(b.conf[0])))
+            boxes = self.model.detect(img, conf=LOW_CONF)
         # 按 y 排序(条目顺序)
         boxes.sort(key=lambda b: (b[1], b[0]))
-        return boxes
+        return [(x1, y1, x2, y2, c) for (x1, y1, x2, y2, c, _cl) in boxes]
 
 
 # ---------------- 助战 Action ----------------
