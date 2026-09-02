@@ -15,7 +15,7 @@ from dataclasses import dataclass, replace
 
 from ..core.decider import Decider
 from ..core.enums import PrimitiveKind, Scene
-from ..core.models import CardPick, is_slot
+from ..core.models import BattleState, CardPick, is_slot
 from ..core.policy import BattlePolicy, StrategyProfile
 from ..core.validator import (
     skip_unusable_servant_skills,
@@ -459,14 +459,15 @@ class AutoBattleRuntime:
         cast_callable()
         time.sleep(0.2)
         img = self.controller.post_screencap().wait().get()
-        # 一次 detect_scene 替代两次串行 is_scene，省掉一次 run_recognition
+        # 先查覆盖层弹窗（subscene，按需检测），再判基础场景（目标子屏/主界面）
+        sub = perception.detect_subscene(self.ctx, img)
+        if sub is not None:
+            subscene, detail = sub
+            if self.executor.dismiss_special_dialog(subscene, detail):
+                mfaalog.info(f"[AutoBattle] special dialog '{subscene.value}' handled; skill skipped")
+                return True
         post_scene = perception.detect_scene(self.ctx, img)
-        if post_scene is Scene.SKILL_USE_DIALOG:
-            mfaalog.info("[AutoBattle] skill-use dialog detected; closing and continuing")
-            self.executor.close_skill_use_dialog()
-            time.sleep(0.5)
-            return True
-        elif post_scene is Scene.SKILL_TARGET_SELECTION:
+        if post_scene is Scene.SKILL_TARGET_SELECTION:
             mfaalog.info("[AutoBattle] skill target sub-screen detected")
             target = target_ally if target_ally is not None else default_target
             mfaalog.info(f"[AutoBattle] selecting skill target ally={target}")

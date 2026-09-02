@@ -163,6 +163,21 @@
       }
     }
   },
+  "战斗_技能无法使用弹窗": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "roi": [
+          800,
+          0,
+          480,
+          250
+        ],
+        "template": "close_botton.png",
+        "threshold": 0.8
+      }
+    }
+  },
   "战斗_换人界面": {
     "recognition": {
       "type": "OCR",
