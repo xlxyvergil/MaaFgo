@@ -14,14 +14,8 @@
             ],
             "pipeline_override": {
                 "原生自动战斗_多次入口": {
-                    "action": {
-                        "type": "Custom",
-                        "param": {
-                            "custom_action": "auto_battle_repeat",
-                            "custom_action_param": {
-                                "battle_count": "{battle_count}"
-                            }
-                        }
+                    "attach": {
+                        "battle_count": "{battle_count}"
                     }
                 }
             }

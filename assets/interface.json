@@ -178,7 +178,7 @@
     "options/原生自动战斗次数.json",
     "options/原生自动战斗跳过剧情.json",
     "options/原生自动战斗助战方式.json",
-    "options/本地队伍选择.json"
+    "options/Chaldea导入手动输入.json"
   ],
   "agent": {
     "child_exec": "python",

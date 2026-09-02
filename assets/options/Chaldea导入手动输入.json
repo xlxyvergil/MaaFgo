@@ -1,22 +1,9 @@
 {
     "option": {
-        "本地队伍选择": {
-            "type": "select",
-            "label": "Chaldea 队伍选择",
-            "description": "选择本地缓存的 Chaldea 队伍，或选\"手动输入\"填分享链接/队伍ID/关卡ID/本地文件。下载过队伍后重启界面即可出现在下拉中。",
-            "default": "manual",
-            "cases": [
-                {
-                    "name": "manual",
-                    "label": "✍ 手动输入（链接 / 队伍ID / 关卡ID / 文件）",
-                    "option": ["Chaldea导入手动输入"]
-                }
-            ]
-        },
         "Chaldea导入手动输入": {
             "type": "input",
-            "label": "手动导入（可选）",
-            "description": "填写 Chaldea 的分享链接、队伍ID、关卡ID，或点击浏览按钮从本地选择队伍 JSON 文件。留空则使用默认策略。",
+            "label": "Chaldea 队伍导入（可选）",
+            "description": "填写 Chaldea 的分享链接、队伍ID、关卡ID，或点击浏览按钮从本地选择队伍 JSON 文件。下载过的队伍缓存文件名（config/Battle 下，如\"诺100奥_77210_94149047\"）也可以直接填。留空则使用默认策略。",
             "inputs": [
                 {
                     "name": "chaldea_import_source",
@@ -52,7 +39,9 @@
                     }
                 },
                 "执行自动编队": {
-                    "attach": {"chaldea_import_source": "{chaldea_import_source}"}
+                    "attach": {
+                        "chaldea_import_source": "{chaldea_import_source}"
+                    }
                 }
             }
         }

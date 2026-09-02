@@ -225,302 +225,338 @@
     "action": "DoNothing"
   },
   "战斗_从者1技能1_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          44,
-          553,
-          58,
-          59
+          82,
+          585,
+          35,
+          37
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者1技能2_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          134,
-          551,
-          59,
-          61
+          169,
+          584,
+          35,
+          37
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者1技能3_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          221,
-          548,
-          59,
-          61
+          259,
+          580,
+          35,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者2技能1_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          364,
-          555,
-          59,
-          61
+          398,
+          581,
+          36,
+          41
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者2技能2_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          450,
-          552,
-          59,
-          61
+          485,
+          581,
+          35,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者2技能3_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          538,
-          549,
-          59,
-          61
+          575,
+          579,
+          35,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者3技能1_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          680,
-          552,
-          59,
-          61
+          717,
+          581,
+          35,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者3技能2_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          767,
-          549,
-          59,
-          61
+          802,
+          582,
+          35,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_从者3技能3_CD": {
+    "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板。ROI 较窄, 取按钮数字区",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          861,
-          554,
-          48,
-          34
+          892,
+          579,
+          36,
+          42
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 100
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_御主技能1_CD": {
+    "doc": "御主技能菜单展开时按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板。菜单收起时 ROI 无数字不命中, 由执行层兜底",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          882,
-          287,
-          48,
-          34
+          901,
+          315,
+          46,
+          38
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 50
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_御主技能2_CD": {
+    "doc": "御主技能菜单展开时按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板。菜单收起时 ROI 无数字不命中, 由执行层兜底",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          971,
-          285,
-          48,
-          34
+          991,
+          312,
+          45,
+          38
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 50
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },
   "战斗_御主技能3_CD": {
+    "doc": "御主技能菜单展开时按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板。菜单收起时 ROI 无数字不命中, 由执行层兜底",
     "recognition": {
-      "type": "ColorMatch",
+      "type": "TemplateMatch",
       "param": {
+        "template": [
+          "battle/digits/0.png",
+          "battle/digits/1.png",
+          "battle/digits/2.png",
+          "battle/digits/3.png",
+          "battle/digits/4.png",
+          "battle/digits/5.png",
+          "battle/digits/6.png",
+          "battle/digits/7.png",
+          "battle/digits/8.png",
+          "battle/digits/9.png"
+        ],
         "roi": [
-          1060,
-          286,
-          49,
-          34
+          1078,
+          312,
+          46,
+          38
         ],
-        "method": 4,
-        "lower": [
-          0,
-          0,
-          0
-        ],
-        "upper": [
-          100,
-          100,
-          100
-        ],
-        "count": 50
+        "threshold": 0.8,
+        "green_mask": true
       }
     }
   },

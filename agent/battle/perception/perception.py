@@ -193,9 +193,10 @@ def _count(reco) -> int:
 def _detect_servants(context, img) -> Tuple[ServantState, ...]:
     """检测前排从者的技能可用性。
 
-    识别逻辑：OCR 读取技能按钮上的 CD 节点，若命中数字（剩余回合数）则技能
-    在冷却、不可用；否则（没有任何 CD 数字）技能可用。FGO 里可用技能的按钮上
-    没有 CD 数字，所以"未命中 CD"就是可用的直接信号，不应再标记为未知而被
+    识别逻辑：TemplateMatch 在技能按钮 ROI 内滑动窗口匹配 digits 目录的
+    0-9 数字模板（任一命中），命中数字（剩余回合数）则技能在冷却、不可用；
+    否则（没有 CD 数字）技能可用。FGO 里可用技能的按钮上没有 CD 数字，
+    所以"未命中 CD"就是可用的直接信号，不应再标记为未知而被
     safety gate 跳过。
     """
     out: List[ServantState] = []
@@ -205,12 +206,12 @@ def _detect_servants(context, img) -> Tuple[ServantState, ...]:
             cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
             cd_result = _reco(context, cd_node, img)
             if cd_result and cd_result.hit:
-                # 命中 CD "剩余" 文字 → 技能在冷却，不可用。
+                # 命中 CD 数字模板 → 技能在冷却，不可用。
                 score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
-                skills.append(SkillState(False, Confidence(float(score), "ocr:cd")))
+                skills.append(SkillState(False, Confidence(float(score), "template:cd")))
                 continue
-            # 未命中任何 CD 文字 → 技能可用。
-            skills.append(SkillState(True, Confidence(1.0, "ocr:no_cd")))
+            # 未命中任何 CD 数字 → 技能可用。
+            skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
         out.append(ServantState(slot, tuple(skills), Confidence(1.0, "composite")))
     return tuple(out)
 
@@ -218,10 +219,10 @@ def _detect_servants(context, img) -> Tuple[ServantState, ...]:
 def _detect_master_skills(context, img) -> Tuple[SkillState, ...]:
     """检测御主技能 1..3 的可用性。
 
-    识别逻辑与从者技能一致：命中 CD 节点（"剩余"或数字）→ 不可用；
-    否则可用。御主技能菜单默认收起，CD 文字在展开前不可见；感知层
+    识别逻辑与从者技能一致：TemplateMatch 命中 CD 数字模板 → 不可用；
+    否则可用。御主技能菜单默认收起，CD 数字在展开前不可见；感知层
     仅在 MAIN_BATTLE 场景下检测，此时菜单可能收起，CD 节点 ROI 区域
-    无文字 → 不命中 → 判定为可用。这是保守行为：若技能实际在冷却但
+    无数字 → 不命中 → 判定为可用。这是保守行为：若技能实际在冷却但
     菜单收起，会误判为可用，由执行层/安全门兜底。
     """
     out: List[SkillState] = []
@@ -229,10 +230,10 @@ def _detect_master_skills(context, img) -> Tuple[SkillState, ...]:
         cd_node = config.MASTER_SKILL_CD_NODE.format(skill_index=idx)
         cd_result = _reco(context, cd_node, img)
         if cd_result and cd_result.hit:
-            # 命中 CD "剩余" 文字 → 技能在冷却，不可用。
+            # 命中 CD 数字模板 → 技能在冷却，不可用。
             score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
-            out.append(SkillState(False, Confidence(float(score), "ocr:cd")))
+            out.append(SkillState(False, Confidence(float(score), "template:cd")))
             continue
-        # 未命中任何 CD 文字 → 技能可用。
-        out.append(SkillState(True, Confidence(1.0, "ocr:no_cd")))
+        # 未命中任何 CD 数字 → 技能可用。
+        out.append(SkillState(True, Confidence(1.0, "template:no_cd")))
     return tuple(out)

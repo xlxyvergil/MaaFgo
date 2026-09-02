@@ -164,7 +164,7 @@ current[i] = {
   `fetch_share_data`，而非再次实现链接/短 ID/压缩数据解析。
 - `agent/chaldea/bbc_formatter.py` 已有 `onFieldSvts + backupSvts` 的顺序转换，
   自动编队应抽取/复用相同的队伍规格构造逻辑，避免两个入口的槽位解释漂移。
-- 原生自动战斗当前通过 `本地队伍选择`（含手动导入输入框）把
+- 原生自动战斗当前通过 `Chaldea导入手动输入` 输入框把
   `chaldea_import_source` 注入 `auto_battle`。新增自动编队节点应在
   “执行原生自动战斗”之前使用同一参数，并将已解码的队伍规格传给后续步骤，
   避免重复下载。

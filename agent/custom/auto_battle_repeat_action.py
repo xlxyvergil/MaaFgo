@@ -17,7 +17,8 @@
   {"battle_count": 3, "chaldea_import_source": "https://chaldea.center/team?id=17300", "max_turns": 20}
 
 参数说明：
-  battle_count (int): 战斗次数，默认 1，范围 1~999
+  battle_count (int): 战斗次数，默认 1，范围 1~999。可通过 custom_action_param
+    或入口节点（原生自动战斗_多次入口）的 attach.battle_count 注入，前者优先。
   reset_hit_nodes (list[str], 可选): 每场战斗前需要重置命中计数的节点列表。
     默认值为包含 max_hit=1 的关键节点，确保多场战斗时节点可重复触发。
   其余参数（chaldea_import_source / max_turns / strategy_profile / card_policy / skill_policy）
@@ -63,6 +64,20 @@ class AutoBattleRepeatAction(CustomAction):
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         param = _load_param(argv.custom_action_param)
+
+        # "原生自动战斗次数" option 通过 attach 注入 battle_count（attach 与 action
+        # 是不同字段, 不会被 "Chaldea导入" 等 option 对 action 的 override 覆盖）。
+        # 优先级: custom_action_param > 节点 attach。
+        if "battle_count" not in param:
+            try:
+                node_data = context.get_node_data("原生自动战斗_多次入口") or {}
+                attach = node_data.get("attach") or {}
+                if "battle_count" in attach:
+                    param["battle_count"] = attach["battle_count"]
+                    mfaalog.info(f"[auto_battle_repeat] battle_count 来自节点 attach: {attach['battle_count']}")
+            except Exception as e:
+                mfaalog.warn(f"[auto_battle_repeat] 读取节点 attach 失败: {e}")
+
         battle_count = _parse_battle_count(param)
         reset_hit_nodes = _parse_reset_hit_nodes(param)
 
