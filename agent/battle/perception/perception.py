@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from typing import List, Optional, Tuple
 
-from ..core.enums import CardColor, Scene, Subscene
+from ..core.enums import CardColor, Scene
 from ..core.models import (BattleState, CommandCard, Confidence, EnemyState,
                            NpCard, ServantState, SkillState)
 from . import config
@@ -36,7 +36,7 @@ def build(context, img, screenshot_id: str = "") -> BattleState:
                 unknown.append(f"card[{c.ui_slot}]")
             if c.owner_slot is None:
                 unknown.append(f"card[{c.ui_slot}].owner_slot")
-    elif scene in (Scene.MAIN_BATTLE, Scene.SKILL_TARGET_SELECTION):
+    elif scene is Scene.MAIN_BATTLE:
         servants = _detect_servants(context, img)
         for servant in servants:
             for index, skill in enumerate(servant.skills, start=1):
@@ -82,20 +82,6 @@ def detect_scene(context, img) -> Scene:
     """轻量版：只检测场景，不做卡牌/技能/敌人等完整感知。用于轮询等待。"""
     scene, _ = _detect_scene(context, img)
     return scene
-
-
-def detect_subscene(context, img) -> Optional[Tuple[Subscene, object]]:
-    """检测叠加层弹窗子场景。按需调用（如技能点击后验证），不进 detect_scene 轮询。
-
-    返回 (命中的 Subscene, RecognitionDetail)，无覆盖层返回 None。
-    detail 供关闭动作使用（如按识别结果的 box 点击关闭钮）。
-    注意：基础场景仍是弹窗底下的 MAIN_BATTLE 等，detect_scene 结果不受覆盖层影响。
-    """
-    for sub_key, node in config.SUBSCENE_NODES.items():
-        r = _reco(context, node, img)
-        if r and r.hit:
-            return Subscene(sub_key), r
-    return None
 
 
 def _detect_scene(context, img) -> Tuple[Scene, float]:

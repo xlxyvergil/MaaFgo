@@ -131,53 +131,6 @@
       }
     }
   },
-  "战斗_技能目标子屏": {
-    "recognition": {
-      "type": "OCR",
-      "param": {
-        "roi": [
-          564,
-          170,
-          161,
-          48
-        ],
-        "expected": [
-          "请选择对象"
-        ]
-      }
-    }
-  },
-  "战斗_技能使用弹窗": {
-    "recognition": {
-      "type": "OCR",
-      "param": {
-        "roi": [
-          556,
-          156,
-          146,
-          42
-        ],
-        "expected": [
-          "技能使用"
-        ]
-      }
-    }
-  },
-  "战斗_技能无法使用弹窗": {
-    "recognition": {
-      "type": "TemplateMatch",
-      "param": {
-        "roi": [
-          800,
-          0,
-          480,
-          250
-        ],
-        "template": "close_botton.png",
-        "threshold": 0.8
-      }
-    }
-  },
   "战斗_换人界面": {
     "recognition": {
       "type": "OCR",

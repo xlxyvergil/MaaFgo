@@ -16,19 +16,15 @@ from __future__ import annotations
 # 场景检测节点（按序尝试，先命中者定场景）
 SCENE_NODES = {
     "command_selection": "战斗_选卡场景",   # TemplateMatch：选卡界面特征（如卡区/返回钮）
-    "skill_target_selection": "战斗_技能目标子屏",  # OCR："请选择对象"
     "order_change": "战斗_换人界面",          # OCR："请从首发成员和候补成员中"
     "main_battle": "战斗_主界面",            # TemplateMatch：主界面攻击钮
     "victory": "战斗_胜利",
     "defeat": "战斗_失败",
 }
 
-# 子场景（覆盖层弹窗）识别节点：不参与 detect_scene 轮询，
-# 只由关心它的流程（如技能点击后验证）按需调用 detect_subscene。
-SUBSCENE_NODES = {
-    "skill_use_dialog": "战斗_技能使用弹窗",      # OCR："技能使用"
-    "skill_unusable_dialog": "战斗_技能无法使用弹窗",  # TemplateMatch：close_botton.png
-}
+# 技能特殊覆盖层（弹窗/目标选择/专属技能流程）的识别已下沉到
+# assets/resource/base/pipeline/自动战斗_特殊技能.json，由 runtime 按需 run_task 驱动，
+# 感知层不再维护对应的 Python 侧注册表。
 
 # 参数化节点名模板
 CARD_NODE = "战斗_卡{ui_slot}"               # OCR，识别 "力击"/"迅击"/"技击"

@@ -11,14 +11,10 @@ from . import coords
 
 import time
 
-from ..core.enums import Subscene
-
 
 # 两步点击之间的固定间隔；配合 controller 时序保证点击生效
 _MASTER_SKILL_MENU_DELAY_S = 0.5
 _ORDER_CHANGE_STEP_DELAY_S = 0.3
-# 关闭特殊弹窗后等待关闭动画的时间
-_DIALOG_CLOSE_DELAY_S = 0.5
 
 
 class Executor:
@@ -84,31 +80,12 @@ class Executor:
             self._click(coords.TOP_RIGHT_CLOSE)
         return True
 
-    # ---- 技能特殊弹窗总入口 ----
-    # 注册表：Subscene -> 关闭动作（统一签名 (detail)，可选用识别结果）。
-    # 新增特殊弹窗时：
-    #   1. enums.Subscene 加子场景值；2. config.SUBSCENE_NODES 加感知节点；
-    #   3. 在此注册关闭动作。识别只在技能流程内按需触发，不影响主循环场景检测。
-    # 关闭动作可复用现成的：固定坐标用 close_skill_use_dialog，
-    # 点击识别位置（模板识别类弹窗）直接用 close_dialog_by_detail
-    # （其底层 click_recognition 是通用原子动作，弹窗外场景也可单独调用）。
-    _DIALOG_DISMISS = {
-        Subscene.SKILL_USE_DIALOG: close_skill_use_dialog,
-        Subscene.SKILL_UNUSABLE_DIALOG: close_dialog_by_detail,
-    }
-
-    def dismiss_special_dialog(self, subscene, detail=None) -> bool:
-        """技能施放后的特殊弹窗总入口（subscene 级）。
-
-        命中已注册弹窗 -> 执行对应关闭动作（可带识别 detail）-> 返回 True（调用方应跳过该技能）。
-        未注册子场景/无覆盖层 -> 返回 False，走正常目标选择/演出流程。
-        """
-        handler = self._DIALOG_DISMISS.get(subscene)
-        if handler is None:
-            return False
-        handler(self, detail)
-        time.sleep(_DIALOG_CLOSE_DELAY_S)
-        return True
+    # ---- 技能特殊覆盖层：已下沉至 pipeline ----
+    # 弹窗关闭/目标选择/专属技能流程（仇凛色卡、库库尔坎暴击星等）的识别与点击
+    # 全部声明式定义在 assets/resource/base/pipeline/自动战斗_特殊技能.json，
+    # 由 runtime._execute_skill_cast 通过 run_task 按需驱动，新增特殊技能只需加 JSON 节点。
+    # executor 仅保留通用原子动作（click_recognition / close_dialog_by_detail /
+    # close_skill_use_dialog / select_skill_target），供其他流程单独复用。
 
     def tap_top_right_close(self) -> None:
         """点击右上角关闭按钮，用于等待时持续点击以关闭可能弹出的遮挡层。"""

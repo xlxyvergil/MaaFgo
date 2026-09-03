@@ -76,6 +76,9 @@ SKILL_TARGET_ALLY = {
     slot: center(roi) for slot, roi in SKILL_TARGET_ALLY_ROI.items()
 }
 
+# 仇凛色卡/库库尔坎暴击星等专属技能流程的点击坐标已随识别一起
+# 下沉到 assets/resource/base/pipeline/自动战斗_特殊技能.json（TODO 标定也在该文件）。
+
 # 御主技能菜单按钮
 MASTER_SKILL_MENU_ROI = (1187, 306, 9, 11)
 MASTER_SKILL_MENU_BTN = center(MASTER_SKILL_MENU_ROI)

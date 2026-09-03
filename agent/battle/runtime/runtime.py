@@ -46,7 +46,8 @@ _ORDER_CHANGE_OPEN_TIMEOUT_S = 10.0    # 换人界面出现
 _ORDER_CHANGE_RETURN_TIMEOUT_S = 25.0  # 换人完成后回主界面
 
 _TERMINAL_OR_MAIN = (Scene.MAIN_BATTLE, Scene.VICTORY, Scene.DEFEAT)
-_KNOWN_SCENES = (Scene.MAIN_BATTLE, Scene.COMMAND_SELECTION, Scene.SKILL_TARGET_SELECTION, Scene.ORDER_CHANGE, Scene.VICTORY, Scene.DEFEAT)
+_KNOWN_SCENES = (Scene.MAIN_BATTLE, Scene.COMMAND_SELECTION, Scene.ORDER_CHANGE, Scene.VICTORY, Scene.DEFEAT)
+
 
 @dataclass(frozen=True)
 class BattleResult:
@@ -449,30 +450,60 @@ class AutoBattleRuntime:
 
         return True
 
+    # 特殊技能子流水线入口与分支归类（自动战斗_特殊技能.json）
+    _SPECIAL_SKILL_PIPELINE = "战斗_特殊技能处理"
+    # 命中这些分支 = 技能未生效（弹窗关闭），应跳过该技能
+    _SKILL_SKIP_BRANCHES = ("战斗_技能使用弹窗", "战斗_技能无法使用弹窗")
+    # 命中此分支 = 技能直接释放（无任何覆盖层），无需额外处理
+    _SKILL_NO_OVERLAY_BRANCH = "战斗_特殊技能_无覆盖层"
+    # 命中这些分支 = 需要选目标，从 action 参数指定槽位（通过 pipeline_override 控制）
+    _SKILL_TARGET_BRANCH = "战斗_技能目标子屏"
+
     def _execute_skill_cast(self, label, cast_callable, target_ally, return_scenes, return_timeout,
                             default_target: int = 1):
-        """通用技能执行核：cast → sleep 0.2s → 检查子界面（技能使用弹窗/目标选择/回主界面）。
+        """通用技能执行核：cast → sleep 0.2s → 子流水线处理特殊覆盖层 → 等回主界面。
 
-        返回 True 表示本技能处理完成（含"触发 CD 提示窗而跳过后续"）；False 表示卡死/确认失败。
+        特殊覆盖层（弹窗/目标选择/专属技能流程）的识别与点击已下沉到
+        自动战斗_特殊技能.json，next 列表按序识别自动路由。
+        返回 True 表示本技能处理完成（含"触发弹窗而跳过"）；False 表示卡死/确认失败。
         """
         self._mark_action(label)
         cast_callable()
         time.sleep(0.2)
-        img = self.controller.post_screencap().wait().get()
-        # 先查覆盖层弹窗（subscene，按需检测），再判基础场景（目标子屏/主界面）
-        sub = perception.detect_subscene(self.ctx, img)
-        if sub is not None:
-            subscene, detail = sub
-            if self.executor.dismiss_special_dialog(subscene, detail):
-                mfaalog.info(f"[AutoBattle] special dialog '{subscene.value}' handled; skill skipped")
-                return True
-        post_scene = perception.detect_scene(self.ctx, img)
-        if post_scene is Scene.SKILL_TARGET_SELECTION:
-            mfaalog.info("[AutoBattle] skill target sub-screen detected")
-            target = target_ally if target_ally is not None else default_target
-            mfaalog.info(f"[AutoBattle] selecting skill target ally={target}")
-            self.executor.select_skill_target(target)
+        # 子流水线：处理技能点击后可能出现的特殊覆盖层
+        target = target_ally if target_ally is not None else default_target
+        override = {f"{self._SKILL_TARGET_BRANCH}_选从者{target}": {}}
+        entry = self._run_special_skill_pipeline(override)
+        if entry in self._SKILL_SKIP_BRANCHES:
+            mfaalog.info(f"[AutoBattle] special dialog '{entry}' handled; skill skipped")
+            return True
+        if entry == self._SKILL_NO_OVERLAY_BRANCH:
+            mfaalog.info("[AutoBattle] skill cast directly (no overlay); waiting main battle")
+        elif entry is not None:
+            mfaalog.info(f"[AutoBattle] special skill branch '{entry}' executed")
         return self._wait_until(return_scenes, return_timeout, tap_close=True)
+
+    def _run_special_skill_pipeline(self, pipeline_override=None):
+        """运行特殊技能子流水线，返回命中分支节点名（entry）；异常/未命中返回 None。
+
+        next 末尾的 DirectHit 兜底节点保证「直接释放」也在一轮识别内正常结束，
+        只有识别轮全部失败（如截图异常）才会 failed。子流水线内所有分支都只
+        处理覆盖层本身（关弹窗/选目标/选选项），不等待回主界面——那由外层
+        _wait_until 负责。
+        """
+        try:
+            detail = self.ctx.run_task(self._SPECIAL_SKILL_PIPELINE,
+                                       pipeline_override=pipeline_override)
+        except Exception as e:
+            mfaalog.error(f"[AutoBattle] special skill pipeline error: {e}")
+            return None
+        if detail is None:
+            return None
+        if detail.status.failed:
+            mfaalog.info("[AutoBattle] special skill pipeline: no overlay matched")
+            return None
+        # entry 为最终命中并执行 action 的节点名
+        return getattr(detail, "entry", None)
 
     def _drive_settlement(self, turns: int) -> BattleResult:
         """胜利后点击穿过结算多屏（掉落/羁绊/结果）直到回关卡列表/主界面。
