@@ -21,6 +21,9 @@
                     "pipeline_override": {
                         "跳过剧情-点击跳过": {
                             "enabled": false
+                        },
+                        "跳过剧情-直接点击跳过": {
+                            "enabled": false
                         }
                     }
                 }
