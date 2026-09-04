@@ -1,0 +1,66 @@
+{
+    "跳过剧情-点击跳过": {
+        "doc": "通用剧情跳过(跨文件复用: 原生自动战斗调度/进本流程/战斗完成 均引用)。OCR识别右上角'跳过'按钮并点击, 之后等'是'确认弹窗",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1143,
+                    24,
+                    80,
+                    35
+                ],
+                "expected": "跳过",
+                "threshold": 0.5
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 100,
+        "timeout": 5000,
+        "next": [
+            "跳过剧情-确认跳过",
+            "跳过剧情-确认跳过-已消失"
+        ]
+    },
+    "跳过剧情-确认跳过": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    756,
+                    535,
+                    144,
+                    49
+                ],
+                "template": "battle/是.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        }
+    },
+    "跳过剧情-确认跳过-已消失": {
+        "doc": "点击跳过后'是'弹窗未出现(部分剧情无需确认/弹窗被吞), 视为跳过完成, 链结束回跳父节点",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    756,
+                    535,
+                    144,
+                    49
+                ],
+                "template": "battle/是.png",
+                "threshold": 0.8
+            }
+        },
+        "inverse": true,
+        "timeout": 3000,
+        "on_error": [
+            "跳过剧情-点击跳过"
+        ]
+    }
+}

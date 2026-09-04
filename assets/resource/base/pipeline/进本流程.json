@@ -1,0 +1,406 @@
+{
+    "进本流程": {
+        "doc": "进本阶段调度中枢(阶段机)。阶段: 进本→剧情(跳过)→助战→剧情→编队→剧情→实际战斗。next 顺序即阶段优先级: 关弹窗→剧情→助战(严格先于编队)→编队→实际战斗(兜底终点)。弹窗/剧情以 [JumpBack] 中断形式处理, 完成后回跳本节点继续当前阶段。连续出击第2场起无编队/剧情, 仅出现助战界面, 助战后由 助战节点自身的 next 直达实际战斗。全部 miss 持续轮询至 timeout, 由 on_error 兜底重试(不用 DirectHit 兜底, 加载慢时会假装成功跳过整场战斗)",
+        "next": [
+            "[JumpBack]进本-关闭告知弹窗",
+            "[JumpBack]跳过剧情-点击跳过",
+            "进本-选择助战",
+            "进本-队伍确认",
+            "进本-战斗主界面已出现"
+        ],
+        "on_error": [
+            "进本流程-超时重试"
+        ],
+        "timeout": 30000
+    },
+    "进本流程-超时重试": {
+        "doc": "30s内未见助战/队伍确认界面, 可能是加载慢或中途卡死, 回到轮询重试一轮",
+        "next": [
+            "进本流程"
+        ]
+    },
+    "进本-选择助战": {
+        "doc": "助战阶段(首个助战): 识别助战界面并点击第一个条目。next 为助战后判分: 弹窗/剧情中断 + 第1场→编队, 连续出击第2场→直接实际战斗; 自引用重试应对点击后界面未刷新",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1020,
+                    165,
+                    195,
+                    545
+                ],
+                "template": [
+                    "support/助战编入确认.png",
+                    "support/助战NPC.png"
+                ],
+                "green_mask": true,
+                "threshold": 0.8,
+                "order_by": "Vertical"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    591,
+                    236,
+                    63,
+                    39
+                ]
+            }
+        },
+        "post_delay": 1500,
+        "timeout": 60000,
+        "next": [
+            "[JumpBack]进本-关闭告知弹窗",
+            "[JumpBack]跳过剧情-点击跳过",
+            "进本-选择助战",
+            "进本-队伍确认",
+            "进本-战斗主界面已出现"
+        ]
+    },
+    "助战action": {
+        "doc": "助战阶段(自定义筛选): 正向识别到助战选择界面后执行 support_action。原为 DirectHit(当轮必中, 需依赖 队伍确认 前置挡枪, 且连续出击第2场会在 队伍确认 超时卡死), 现加正向识别: 可安全严格排在编队之前, 助战后进入 助战后判分(第1场→编队, 连续出击第2场→直接实际战斗)",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1020,
+                    165,
+                    195,
+                    545
+                ],
+                "template": [
+                    "support/助战编入确认.png",
+                    "support/助战NPC.png"
+                ],
+                "green_mask": true,
+                "threshold": 0.8,
+                "order_by": "Vertical"
+            }
+        },
+        "pre_delay": 0,
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "support_action",
+                "custom_action_param": {
+                    "support_type": "normal"
+                }
+            }
+        },
+        "post_delay": 0,
+        "timeout": 60000,
+        "attach": {
+            "ce": "",
+            "ce_1": "",
+            "ce_2": "",
+            "ce_bond": "any",
+            "level": 1,
+            "np_level": 1,
+            "servant": "",
+            "skill_active": "",
+            "skill_passive": ""
+        },
+        "next": [
+            "[JumpBack]进本-关闭告知弹窗",
+            "[JumpBack]跳过剧情-点击跳过",
+            "进本-队伍确认",
+            "进本-战斗主界面已出现"
+        ]
+    },
+    "进本-队伍确认": {
+        "doc": "编队阶段: 点击开始任务/战斗开始按钮",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "battle/开始任务.png",
+                    "battle/战斗开始.png"
+                ],
+                "threshold": [
+                    0.8,
+                    0.8
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "进本-开始后弹窗检查",
+            "进本-开始按钮已消失"
+        ]
+    },
+    "进本-开始后弹窗检查": {
+        "doc": "点击开始任务后, 告知弹窗可能慢几帧才出现并吞掉点击。出现弹窗则关闭并回队伍确认重点; 开始按钮消失则视为已进本, 结束进本链(JumpBack正常生效)。注意: 不能用on_error做成功出口, on_error属于错误处理路径, 会导致JumpBack失效、整条任务链失败",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "close_botton.png",
+                    "close.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "进本-开始后弹窗检查",
+            "进本-开始按钮已消失"
+        ],
+        "timeout": 10000
+    },
+    "进本-开始按钮已消失": {
+        "doc": "开始任务/战斗开始按钮不再出现, 视为已成功进入战斗加载。进入 进本-等待战斗主界面或剧情, 由其确认战斗主界面出现后才结束进本链",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "battle/开始任务.png",
+                    "battle/战斗开始.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "inverse": true,
+        "timeout": 3000,
+        "next": [
+            "进本-等待战斗主界面或剧情"
+        ]
+    },
+    "进本-等待战斗主界面或剧情": {
+        "doc": "开始按钮消失后, 剧情的跳过按钮可能还需几秒才出现, 不能立即以'按钮消失'作为进本完成。等待战斗主界面(真正进战斗)或剧情跳过按钮出现, 剧情跳完后回本节点继续等主界面",
+        "next": [
+            "进本-战斗主界面已出现",
+            "[JumpBack]跳过剧情-点击跳过"
+        ],
+        "timeout": 60000
+    },
+    "进本-战斗主界面已出现": {
+        "doc": "实际战斗阶段入口: 战斗主界面出现, 进本完成。空next正常结束, 链回溯至最近的 [JumpBack](执行进本) 回调度节点继续后续流程; 同时作为 进本流程 与 助战后判分 的兜底终点(连续出击第2场助战后直达实际战斗)",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1058,
+                    508,
+                    152,
+                    54
+                ],
+                "template": "battle/scene_main_battle.png",
+                "green_mask": true
+            }
+        }
+    },
+    "进本-关闭告知弹窗": {
+        "doc": "助战/队伍确认界面可能弹出各种告知弹窗(配置变更/活动报酬/点击继续等), 逐个关闭。空next结束链, 由调用处的 [JumpBack] 回到所属阶段调度(进本流程/助战后判分)继续, 可在不同阶段复用、连续处理多个弹窗",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "close_botton.png"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": []
+    },
+    "点击关卡": {
+        "doc": "关卡选择入口(进入进本阶段机的第一跳): 依次尝试 上一次关卡/感叹号关卡/幕间强化/任务开始",
+        "max_hit": 1,
+        "next": [
+            "进本-点击上一次关卡",
+            "进本-点击关卡",
+            "进本-识别幕间强化界面",
+            "进本-点击任务开始",
+            "全局空节点"
+        ]
+    },
+    "进本-点击关卡": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "副本打开标记-感叹号.png"
+                ],
+                "roi": [
+                    1115,
+                    38,
+                    165,
+                    682
+                ],
+                "order_by": "Vertical",
+                "index": 0,
+                "green_mask": true
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -100,
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        "post_delay": 500,
+        "post_wait_freezes": {
+            "time": 1000,
+            "timeout": 5000
+        },
+        "next": [
+            "[JumpBack]全局-战前吃体力",
+            "进本-编队提示-点击开始",
+            "进本-点击任务开始",
+            "进本-点击关卡-等待界面切换"
+        ]
+    },
+    "进本-点击上一次关卡": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "battle/上次执行.png"
+                ],
+                "order_by": "Vertical"
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    100,
+                    0,
+                    0,
+                    0
+                ]
+            }
+        },
+        "post_delay": 500,
+        "post_wait_freezes": {
+            "time": 1000,
+            "timeout": 5000
+        },
+        "next": [
+            "[JumpBack]全局-战前吃体力",
+            "进本-编队提示-点击开始",
+            "进本-点击任务开始",
+            "进本-点击关卡-等待界面切换"
+        ]
+    },
+    "进本-点击关卡-等待界面切换": {
+        "doc": "点击关卡后等待离开关卡选择界面(task.png消失), 给AP弹窗/任务弹窗出现留足轮询时间, 防止空节点过早兜底",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "task.png",
+                "green_mask": true
+            }
+        },
+        "inverse": true,
+        "timeout": 10000,
+        "on_error": [
+            "进本-点击关卡-重试"
+        ]
+    },
+    "进本-点击关卡-重试": {
+        "doc": "超时仍未离开关卡界面(点击无效), 重新点击关卡",
+        "next": [
+            "进本-点击上一次关卡",
+            "进本-点击关卡",
+            "进本-点击任务开始",
+            "全局空节点"
+        ]
+    },
+    "进本-识别幕间强化界面": {
+        "doc": "识别幕间物语/强化任务徽章并进本。徽章模板含自身底色, 无需抠绿; 蓝色底色版本将模板加入数组即可(任一命中)。强化任务匹配后直接点击固定区域进本",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "幕间物语_红.png",
+                    "强化任务_红.png"
+                ],
+                "order_by": "Vertical",
+                "index": 0
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    907,
+                    148,
+                    68,
+                    29
+                ]
+            }
+        },
+        "post_delay": 500,
+        "post_wait_freezes": {
+            "time": 1000,
+            "timeout": 5000
+        },
+        "next": [
+            "[JumpBack]全局-战前吃体力",
+            "进本-编队提示-点击开始",
+            "进本-点击任务开始",
+            "进本-点击关卡-等待界面切换"
+        ]
+    },
+    "进本-点击任务开始": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "dungeon_enter.png"
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "focus": {
+            "Node.Action.Succeeded": "进入副本完成"
+        },
+        "next": [
+            "进本流程"
+        ]
+    },
+    "进本-编队提示-点击开始": {
+        "doc": "未编队关卡点击后弹出的编队提示界面, 点击开始按钮. 之后先进剧情再进助战, 故 next 挂通用剧情跳过",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "开始.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "[JumpBack]跳过剧情-点击跳过",
+            "进本流程"
+        ]
+    },
+    "执行进本": {
+        "doc": "进本主轮询入口(阶段机: 剧情→助战→编队→实际战斗, 弹窗/剧情为各阶段可中断事件)。连续出击第2场起从 连续出击_继续 JumpBack 回调度后再次进入, 仅经历 助战→实际战斗 两阶段",
+        "max_hit": 1,
+        "next": [
+            "进本流程"
+        ]
+    }
+}
