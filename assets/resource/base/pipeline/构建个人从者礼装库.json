@@ -1,0 +1,972 @@
+{
+    "个人库存-从者列表下滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    600,
+                    560,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        600,
+                        236,
+                        1,
+                        1
+                    ]
+                ],
+                "duration": [
+                    400
+                ]
+            }
+        },
+        "post_delay": 1200
+    },
+    "个人库存-从者列表准备完成": {},
+    "个人库存-从者列表复位顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1231,
+                    186,
+                    21,
+                    6
+                ]
+            }
+        },
+        "post_delay": 1200
+    },
+    "个人库存-从者删除活动筛选": {
+        "max_hit": 5,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    753,
+                    118,
+                    44,
+                    17
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-从者图标大小检测": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    2,
+                    598,
+                    110,
+                    122
+                ],
+                "template": [
+                    "整理礼物盒/图标缩放按钮大.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        },
+        "next": [
+            "个人库存-从者无活动筛选",
+            "个人库存-从者无活动筛选2",
+            "[JumpBack]个人库存-从者删除活动筛选",
+            "个人库存-从者列表准备完成"
+        ]
+    },
+    "个人库存-从者无活动筛选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    624,
+                    80,
+                    276,
+                    85
+                ],
+                "template": [
+                    "强化从者/无活动筛选.png",
+                    "强化从者/无活动筛选-英灵一览仓库用.png"
+                ]
+            }
+        },
+        "next": [
+            "个人库存-从者列表准备完成"
+        ]
+    },
+    "个人库存-从者无活动筛选2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    624,
+                    80,
+                    276,
+                    85
+                ],
+                "expected": [
+                    "ALL",
+                    "all",
+                    "全部"
+                ]
+            }
+        },
+        "next": [
+            "个人库存-从者列表准备完成"
+        ]
+    },
+    "个人库存-从者点击缩放按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    19,
+                    670,
+                    11,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-从者筛再次点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-从者筛再次点顶部"
+        ]
+    },
+    "个人库存-从者筛再次点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-从者筛找从者"
+        ]
+    },
+    "个人库存-从者筛小幅下滑找从者": {
+        "max_hit": 30,
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    500,
+                    560,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        500,
+                        470,
+                        1,
+                        1
+                    ]
+                ],
+                "duration": [
+                    250
+                ]
+            }
+        },
+        "post_delay": 300
+    },
+    "个人库存-从者筛找从者": {
+        "next": [
+            "个人库存-从者筛点从者",
+            "[JumpBack]个人库存-从者筛小幅下滑找从者"
+        ]
+    },
+    "个人库存-从者筛清空点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-从者筛再次点筛选按钮"
+        ]
+    },
+    "个人库存-从者筛点从者": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    108,
+                    28,
+                    433,
+                    617
+                ],
+                "template": "整理礼物盒/变还_从者未选中.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-从者筛点决定"
+        ]
+    },
+    "个人库存-从者筛点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000
+    },
+    "个人库存-从者筛点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-从者筛点顶部"
+        ]
+    },
+    "个人库存-从者筛点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-从者筛重置"
+        ]
+    },
+    "个人库存-从者筛选重置": {
+        "next": [
+            "个人库存-从者筛点筛选按钮"
+        ]
+    },
+    "个人库存-从者筛重置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-从者筛清空点决定"
+        ]
+    },
+    "个人库存-从者选择返回": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    88,
+                    42,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-关闭灵基一览": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    111
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-关闭编成菜单"
+        ]
+    },
+    "个人库存-关闭编成菜单": {
+        "action": {
+            "type": "ClickKey",
+            "param": {
+                "key": [
+                    111
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-准备从者列表": {
+        "next": [
+            "个人库存-从者图标大小检测",
+            "[JumpBack]个人库存-从者点击缩放按钮"
+        ]
+    },
+    "个人库存-准备礼装列表": {
+        "next": [
+            "个人库存-礼装图标大小检测",
+            "[JumpBack]个人库存-礼装点击缩放按钮"
+        ]
+    },
+    "个人库存-切换从者仓库": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    86,
+                    121,
+                    30,
+                    17
+                ]
+            }
+        },
+        "post_delay": 1200
+    },
+    "个人库存-切换礼装仓库": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    269,
+                    118,
+                    46,
+                    21
+                ]
+            }
+        },
+        "post_delay": 1200
+    },
+    "个人库存-打开编队菜单": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    185,
+                    521,
+                    235,
+                    178
+                ],
+                "template": "team/编队.png",
+                "threshold": [
+                    0.66
+                ]
+            }
+        },
+        "pre_wait_freezes": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-点击灵基一览"
+        ]
+    },
+    "个人库存-打开菜单": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1089,
+                    599,
+                    191,
+                    86
+                ],
+                "template": "菜单.png",
+                "green_mask": true,
+                "method": 3,
+                "threshold": 0.55
+            }
+        },
+        "pre_wait_freezes": 1000,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    50,
+                    36,
+                    -96,
+                    -55
+                ]
+            }
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-打开编队菜单"
+        ]
+    },
+    "个人库存-执行构建": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "build_player_inventory"
+            }
+        },
+        "attach": {
+            "bond_equips_only": false,
+            "max_equip_swipes": 200,
+            "max_servant_swipes": 55,
+            "scan_equips": true,
+            "scan_servants": true
+        }
+    },
+    "个人库存-点击灵基一览": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    640,
+                    67,
+                    598,
+                    526
+                ],
+                "template": "强化从者/英灵一览模块.png",
+                "threshold": 0.8
+            }
+        },
+        "pre_wait_freezes": 1000,
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1500,
+        "next": [
+            "个人库存-执行构建"
+        ]
+    },
+    "个人库存-用户提示": {
+        "focus": {
+            "Node.Recognition.Starting": "正在构建个人库存"
+        }
+    },
+    "个人库存-礼装列表下滑": {
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    600,
+                    560,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        600,
+                        360,
+                        1,
+                        1
+                    ]
+                ],
+                "duration": [
+                    400
+                ]
+            }
+        },
+        "post_delay": 900
+    },
+    "个人库存-礼装列表准备完成": {},
+    "个人库存-礼装列表复位顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1231,
+                    186,
+                    21,
+                    6
+                ]
+            }
+        },
+        "post_delay": 1200
+    },
+    "个人库存-礼装删除活动筛选": {
+        "max_hit": 5,
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    753,
+                    118,
+                    44,
+                    17
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-礼装图标大小检测": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    2,
+                    598,
+                    110,
+                    122
+                ],
+                "template": [
+                    "整理礼物盒/图标缩放按钮大.png"
+                ],
+                "threshold": [
+                    0.85
+                ]
+            }
+        },
+        "next": [
+            "个人库存-礼装无活动筛选",
+            "个人库存-礼装无活动筛选2",
+            "[JumpBack]个人库存-礼装删除活动筛选",
+            "个人库存-礼装列表准备完成"
+        ]
+    },
+    "个人库存-礼装无活动筛选": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    624,
+                    80,
+                    276,
+                    85
+                ],
+                "template": [
+                    "强化从者/无活动筛选.png",
+                    "强化从者/无活动筛选-英灵一览仓库用.png"
+                ]
+            }
+        },
+        "next": [
+            "个人库存-礼装列表准备完成"
+        ]
+    },
+    "个人库存-礼装无活动筛选2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    624,
+                    80,
+                    276,
+                    85
+                ],
+                "expected": [
+                    "ALL",
+                    "all",
+                    "全部"
+                ]
+            }
+        },
+        "next": [
+            "个人库存-礼装列表准备完成"
+        ]
+    },
+    "个人库存-礼装点击缩放按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    19,
+                    670,
+                    11,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "个人库存-礼装筛五星": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/5星未选中.png",
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 400,
+        "next": [
+            "个人库存-礼装筛四星"
+        ]
+    },
+    "个人库存-礼装筛再次点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-礼装筛再次点顶部"
+        ]
+    },
+    "个人库存-礼装筛再次点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装筛五星"
+        ]
+    },
+    "个人库存-礼装筛四星": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/4星未选中.png",
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 400,
+        "next": [
+            "个人库存-礼装筛点决定"
+        ]
+    },
+    "个人库存-礼装筛清空点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-礼装筛再次点筛选按钮"
+        ]
+    },
+    "个人库存-礼装筛点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000
+    },
+    "个人库存-礼装筛点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-礼装筛点顶部"
+        ]
+    },
+    "个人库存-礼装筛点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装筛重置"
+        ]
+    },
+    "个人库存-礼装筛选仅羁绊": {
+        "next": [
+            "个人库存-礼装羁绊筛点筛选按钮"
+        ]
+    },
+    "个人库存-礼装筛选四五星": {
+        "next": [
+            "个人库存-礼装筛点筛选按钮"
+        ]
+    },
+    "个人库存-礼装筛重置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装筛清空点决定"
+        ]
+    },
+    "个人库存-礼装羁绊筛再次点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-礼装羁绊筛再次点顶部"
+        ]
+    },
+    "个人库存-礼装羁绊筛再次点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装羁绊筛连续下滑到底"
+        ]
+    },
+    "个人库存-礼装羁绊筛清空点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000,
+        "next": [
+            "个人库存-礼装羁绊筛再次点筛选按钮"
+        ]
+    },
+    "个人库存-礼装羁绊筛点决定": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 1000
+    },
+    "个人库存-礼装羁绊筛点勾选项": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    160,
+                    90,
+                    900,
+                    500
+                ],
+                "template": "EquipFaces/羁绊效果礼装勾选项.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -42,
+                    0,
+                    -55,
+                    0
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装羁绊筛点决定"
+        ]
+    },
+    "个人库存-礼装羁绊筛点筛选按钮": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    972,
+                    122,
+                    19,
+                    10
+                ]
+            }
+        },
+        "post_delay": 1200,
+        "next": [
+            "个人库存-礼装羁绊筛点顶部"
+        ]
+    },
+    "个人库存-礼装羁绊筛点顶部": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1135,
+                    99,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装羁绊筛重置"
+        ]
+    },
+    "个人库存-礼装羁绊筛连续下滑到底": {
+        "doc": "筛选面板下滑到底：沿用已实机验证的『羁绊补齐-礼装筛上滑找满破』手势，必须在内容区中央 x=600 滑动；x=1070 位于面板右缘外，手势会执行但内容不滚动。repeat=20 是有界上限，随后以『羁绊效果』模板是否命中验证确实到底。",
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    600,
+                    540,
+                    1,
+                    1
+                ],
+                "end": [
+                    [
+                        600,
+                        210,
+                        1,
+                        1
+                    ]
+                ],
+                "duration": [
+                    400
+                ]
+            }
+        },
+        "repeat": 20,
+        "repeat_delay": 250,
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装羁绊筛点勾选项"
+        ]
+    },
+    "个人库存-礼装羁绊筛重置": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "post_delay": 500,
+        "next": [
+            "个人库存-礼装羁绊筛清空点决定"
+        ]
+    },
+    "个人库存-礼装选择返回": {
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    88,
+                    42,
+                    20,
+                    20
+                ]
+            }
+        },
+        "post_delay": 1000
+    },
+    "构建个人从者礼装库": {
+        "next": [
+            "个人库存-打开菜单"
+        ]
+    }
+}

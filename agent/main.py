@@ -26,6 +26,8 @@ import box_action
 import chaldea_import_action
 import formation_action
 import bond_completion_action
+import current_bond_completion_action
+import inventory_scan_action
 import servant_up_action
 import general_navigation_action
 import ocr_logger

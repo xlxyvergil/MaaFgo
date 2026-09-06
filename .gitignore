@@ -483,3 +483,14 @@ tools/gen_servant_data.py
 tools/gen_servant_up_options.py
 tools/copy_servant_up_templates.py
 
+# 本机 MaaMCP 运行环境启动器（依赖 .workbuddy/runtime）
+tools/start_maa_mcp.ps1
+
+# 羁绊数据维护工具生成的同目录备份
+*.before-atlas-append-*.csv
+*.before-atlas-bond-sync-*.csv
+*.before-bond-archive-*.csv
+
+
+# 本地礼装图标 Skill（不提交）
+skills/fgo-equip-icon-pipeline/

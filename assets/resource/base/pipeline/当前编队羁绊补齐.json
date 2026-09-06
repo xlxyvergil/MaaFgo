@@ -1,0 +1,16 @@
+{
+  "当前编队羁绊补齐": {
+    "action": {
+      "type": "Custom",
+      "param": {"custom_action": "complete_current_bond_formation"}
+    },
+    "attach": {
+      "preferred_rarity": 5,
+      "bond_base": "1200",
+      "use_local_servant_inventory": false,
+      "use_local_equip_inventory": false,
+      "modify_all_equips": false,
+      "debug_preserve_failure": false
+    }
+  }
+}

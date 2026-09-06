@@ -8,6 +8,8 @@
       "bond_completion_enabled": false,
       "preferred_rarity": 5,
       "bond_base": "1200",
+      "use_local_servant_inventory": false,
+      "use_local_equip_inventory": false,
       "modify_unspecified_servants": true,
       "modify_unspecified_equips": true,
       "debug_preserve_failure": false,

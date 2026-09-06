@@ -1,0 +1,67 @@
+{
+  "option": {
+    "个人库存构建范围": {
+      "type": "select",
+      "label": "构建范围",
+      "description": "选择本次要重新扫描并写入本地 JSON 的库存。未选择的另一份文件不会改动。",
+      "default": "从者和礼装",
+      "cases": [
+        {
+          "name": "从者和礼装",
+          "label": "从者和礼装",
+          "option": ["个人库存礼装范围"],
+          "pipeline_override": {
+            "个人库存-执行构建": {
+              "attach": {"scan_servants": true, "scan_equips": true}
+            }
+          }
+        },
+        {
+          "name": "仅从者",
+          "label": "仅从者",
+          "pipeline_override": {
+            "个人库存-执行构建": {
+              "attach": {"scan_servants": true, "scan_equips": false}
+            }
+          }
+        },
+        {
+          "name": "仅礼装",
+          "label": "仅礼装",
+          "option": ["个人库存礼装范围"],
+          "pipeline_override": {
+            "个人库存-执行构建": {
+              "attach": {"scan_servants": false, "scan_equips": true}
+            }
+          }
+        }
+      ]
+    },
+    "个人库存礼装范围": {
+      "type": "select",
+      "label": "礼装识别范围",
+      "description": "全部礼装会扫描 4/5 星；仅羁绊礼装会在重置筛选后勾选“羁绊效果”，只扫描筛选结果。",
+      "default": "全部四五星礼装",
+      "cases": [
+        {
+          "name": "全部四五星礼装",
+          "label": "全部 4/5 星礼装",
+          "pipeline_override": {
+            "个人库存-执行构建": {
+              "attach": {"bond_equips_only": false}
+            }
+          }
+        },
+        {
+          "name": "仅羁绊礼装",
+          "label": "仅羁绊礼装",
+          "pipeline_override": {
+            "个人库存-执行构建": {
+              "attach": {"bond_equips_only": true}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

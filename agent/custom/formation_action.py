@@ -74,9 +74,8 @@ EMPTY_SLOT_STD_THRESHOLD = 25.0
 EMPTY_SLOT_CHANNEL_DELTA_THRESHOLD = 6.0
 FORMATION_CONFIRM_ROI = (724, 583, 232, 101)
 FORMATION_CONFIRM_DELAY_SECONDS = 1.0
-SERVANT_FILTER_BUTTON_ROI = (900, 90, 140, 80)
-SERVANT_FILTER_BLUE_RATIO = 0.55
-EQUIP_FILTER_ORANGE_RATIO = 0.30
+SELECT_PAGE_SCALE_ROI = (2, 598, 110, 122)
+SELECT_PAGE_SCALE_THRESHOLD = 0.85
 EQUIP_FILTER_TAG_THRESHOLD = 0.92
 EQUIP_CARD_SELECT_SETTLE_SECONDS = 0.3
 EQUIP_CONFIRM_SETTLE_SECONDS = 1.0
@@ -513,6 +512,16 @@ class AutoFormationFromChaldea(CustomAction):
         self.config_marker = self._load_named_template("battle/配置变更.png")
         if self.config_marker is None:
             raise RuntimeError("resource_missing: battle/配置变更.png")
+        self.select_page_markers = []
+        for relative in (
+            "整理礼物盒/图标缩放按钮大.png",
+            "整理礼物盒/图标缩放按钮中.png",
+            "整理礼物盒/图标缩放按钮小.png",
+        ):
+            marker = self._load_named_template(relative)
+            if marker is None:
+                raise RuntimeError(f"resource_missing: {relative}")
+            self.select_page_markers.append(marker)
         self.formation_confirm_marker = self._load_named_template("决定.png")
         self.equip_confirm_marker = self._load_named_template("EquipFaces/礼装决定.png")
         if self.equip_confirm_marker is None:
@@ -828,26 +837,22 @@ class AutoFormationFromChaldea(CustomAction):
         return self._run_pipeline("自动编队-确认从者选择界面")
 
     def _in_servant_select(self):
-        """判断是否已从编队编辑页进入“从者选择”页。
+        """通过列表页左下角的图标缩放按钮判断已进入从者选择页。"""
+        return self._in_selection_page()
 
-        编队选择页的标题与强化从者页不同，不能复用“所持サーヴァント”
-        模板。该页面右上角固定有蓝色“フィルター”按钮，因此结合“已离开
-        编队编辑页”与该蓝色区域判定，避免第二次点击落在从者卡上。
-        """
+    def _in_selection_page(self):
+        """判断是否已离开编队编辑页并进入从者或礼装选择列表。"""
         image = self._shot()
         if image is None:
             return False
         edit = self._match_template(image, self.edit_marker)
         if edit is not None and edit[0] >= 0.75:
             return False
-        x, y, width, height = self._scale_roi(SERVANT_FILTER_BUTTON_ROI)
-        region = image[y:y + height, x:x + width]
-        if region.size == 0:
-            return False
-        hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
-        blue = cv2.inRange(hsv, (85, 80, 80), (130, 255, 255))
-        ratio = float(np.count_nonzero(blue)) / blue.size
-        return ratio >= SERVANT_FILTER_BLUE_RATIO
+        return any(
+            result is not None and result[0] >= SELECT_PAGE_SCALE_THRESHOLD
+            for marker in self.select_page_markers
+            for result in [self._match_template(image, marker, SELECT_PAGE_SCALE_ROI)]
+        )
 
     def _filter_servant_list(self, servant):
         class_name = CLASS_TEMPLATE.get(servant.get("class"))
@@ -1067,25 +1072,8 @@ class AutoFormationFromChaldea(CustomAction):
         return self._run_pipeline("自动编队-确认礼装选择界面")
 
     def _in_equip_select(self):
-        """判断是否已进入“概念礼装选择”页。
-
-        该页右上角的“フィルター”是橙色，而从者选择页使用蓝色按钮。
-        不可复用 ``_in_servant_select``，否则会在已进入礼装页后错误地继续点击。
-        """
-        image = self._shot()
-        if image is None:
-            return False
-        edit = self._match_template(image, self.edit_marker)
-        if edit is not None and edit[0] >= 0.75:
-            return False
-        x, y, width, height = self._scale_roi(SERVANT_FILTER_BUTTON_ROI)
-        region = image[y:y + height, x:x + width]
-        if region.size == 0:
-            return False
-        hsv = cv2.cvtColor(region, cv2.COLOR_BGR2HSV)
-        orange = cv2.inRange(hsv, (5, 80, 80), (30, 255, 255))
-        ratio = float(np.count_nonzero(orange)) / orange.size
-        return ratio >= EQUIP_FILTER_ORANGE_RATIO
+        """通过列表页左下角的图标缩放按钮判断已进入礼装选择页。"""
+        return self._in_selection_page()
 
     def _leave_equip_select(self):
         if self._in_formation_edit():

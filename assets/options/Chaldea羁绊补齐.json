@@ -16,7 +16,7 @@
         {
           "name": "是",
           "label": "是",
-          "option": ["补齐从者优先X星", "羁绊基础值", "自动修改其他位置从者", "自动修改其他位置礼装"],
+          "option": ["补齐从者优先X星", "羁绊基础值", "使用本地从者库", "使用本地礼装库", "自动修改其他位置从者", "自动修改其他位置礼装"],
           "pipeline_override": {
             "执行羁绊补齐自动编队": {"attach": {"bond_completion_enabled": true}}
           }
@@ -35,6 +35,50 @@
         {"name": "2星", "label": "2星", "pipeline_override": {"执行羁绊补齐自动编队": {"attach": {"preferred_rarity": 2}}}},
         {"name": "1星", "label": "1星", "pipeline_override": {"执行羁绊补齐自动编队": {"attach": {"preferred_rarity": 1}}}},
         {"name": "0星", "label": "0星", "pipeline_override": {"执行羁绊补齐自动编队": {"attach": {"preferred_rarity": 0}}}}
+      ]
+    },
+    "使用本地从者库": {
+      "type": "select",
+      "label": "使用本地从者库",
+      "description": "读取构建任务生成的 player_servants.json，跳过各星级的持有收集扫描，直接规划并定位目标。文件无效时自动回退实时扫描；仓库变化后请重新构建。",
+      "default": "否",
+      "cases": [
+        {
+          "name": "否",
+          "label": "否",
+          "pipeline_override": {
+            "执行羁绊补齐自动编队": {"attach": {"use_local_servant_inventory": false}}
+          }
+        },
+        {
+          "name": "是",
+          "label": "是",
+          "pipeline_override": {
+            "执行羁绊补齐自动编队": {"attach": {"use_local_servant_inventory": true}}
+          }
+        }
+      ]
+    },
+    "使用本地礼装库": {
+      "type": "select",
+      "label": "使用本地礼装库",
+      "description": "读取构建任务生成的 player_equips.json，只在已知持有礼装中规划并跳过库存预检。满破状态仍在选择时确认；文件无效时自动回退实时扫描。",
+      "default": "否",
+      "cases": [
+        {
+          "name": "否",
+          "label": "否",
+          "pipeline_override": {
+            "执行羁绊补齐自动编队": {"attach": {"use_local_equip_inventory": false}}
+          }
+        },
+        {
+          "name": "是",
+          "label": "是",
+          "pipeline_override": {
+            "执行羁绊补齐自动编队": {"attach": {"use_local_equip_inventory": true}}
+          }
+        }
       ]
     },
     "自动修改其他位置从者": {

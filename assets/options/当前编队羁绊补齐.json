@@ -1,0 +1,65 @@
+{
+  "option": {
+    "当前编队补齐从者优先星级": {
+      "type": "select",
+      "label": "补齐从者优先星级",
+      "description": "仅用于真正的空从者位。先查找所选星级，没有可用对象时再按 5→0 星回退；已有从者不会替换。",
+      "default": "5星",
+      "cases": [
+        {"name": "5星", "label": "5星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 5}}}},
+        {"name": "4星", "label": "4星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 4}}}},
+        {"name": "3星", "label": "3星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 3}}}},
+        {"name": "2星", "label": "2星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 2}}}},
+        {"name": "1星", "label": "1星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 1}}}},
+        {"name": "0星", "label": "0星", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"preferred_rarity": 0}}}}
+      ]
+    },
+    "当前编队羁绊基础值": {
+      "type": "input",
+      "label": "羁绊基础值",
+      "description": "用于比较百分比礼装和固定值礼装，必须为正整数。",
+      "inputs": [
+        {
+          "name": "current_bond_base",
+          "label": "羁绊基础值",
+          "default": "1200",
+          "verify": "^[1-9][0-9]*$",
+          "pipeline_type": "int"
+        }
+      ],
+      "pipeline_override": {
+        "当前编队羁绊补齐": {"attach": {"bond_base": "{current_bond_base}"}}
+      }
+    },
+    "当前编队使用本地从者库": {
+      "type": "select",
+      "label": "使用本地从者库",
+      "description": "读取个人库存任务生成的 player_servants.json，直接规划需要补入的从者；文件无效时自动回退实时扫描。",
+      "default": "否",
+      "cases": [
+        {"name": "否", "label": "否", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"use_local_servant_inventory": false}}}},
+        {"name": "是", "label": "是", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"use_local_servant_inventory": true}}}}
+      ]
+    },
+    "当前编队使用本地礼装库": {
+      "type": "select",
+      "label": "使用本地礼装库",
+      "description": "读取个人库存任务生成的 player_equips.json，只在已知持有礼装中规划；文件无效时自动回退实时扫描。",
+      "default": "否",
+      "cases": [
+        {"name": "否", "label": "否", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"use_local_equip_inventory": false}}}},
+        {"name": "是", "label": "是", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"use_local_equip_inventory": true}}}}
+      ]
+    },
+    "当前编队是否修改所有礼装": {
+      "type": "select",
+      "label": "是否支持修改所有礼装",
+      "description": "选否时保留所有已有礼装，只补空礼装位；选是时所有自有从者的礼装都可卸下并按羁绊最大化重新配置。助战礼装始终不处理。",
+      "default": "否",
+      "cases": [
+        {"name": "否", "label": "否", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"modify_all_equips": false}}}},
+        {"name": "是", "label": "是", "pipeline_override": {"当前编队羁绊补齐": {"attach": {"modify_all_equips": true}}}}
+      ]
+    }
+  }
+}

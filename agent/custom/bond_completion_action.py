@@ -41,6 +41,10 @@ import mfaalog
 
 
 _CUSTOM_DIR = os.path.dirname(os.path.abspath(__file__))
+_PROJECT_DIR = os.path.dirname(os.path.dirname(_CUSTOM_DIR))
+_PLAYER_INVENTORY_DIR = os.path.join(_PROJECT_DIR, "config", "Inventory")
+_PLAYER_SERVANTS_PATH = os.path.join(_PLAYER_INVENTORY_DIR, "player_servants.json")
+_PLAYER_EQUIPS_PATH = os.path.join(_PLAYER_INVENTORY_DIR, "player_equips.json")
 
 COST_ROI = (915, 671, 154, 43)
 LIST_ROI = (70, 165, 1160, 445)
@@ -97,7 +101,12 @@ class CompleteBondFormation(AutoFormationFromChaldea):
         self.added_equips = {}
         self.available_equips = set()
         self.unavailable_equips = set()
+        self.unavailable_servants = set()
         self.owned_servants_by_rarity = {}
+        self.local_servant_ids = set()
+        self.local_equip_ids = set()
+        self.local_servant_inventory_active = False
+        self.local_equip_inventory_active = False
         try:
             node = context.get_node_data(argv.node_name) or {}
             attach = node.get("attach") or {}
@@ -116,6 +125,12 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 self.preferred_rarity = int(attach.get("preferred_rarity", 5))
                 self.rarity_order = rarity_order(self.preferred_rarity)
                 self.bond_base = int(str(attach.get("bond_base", "1200")).strip())
+                self.use_local_servant_inventory = _truthy(
+                    attach.get("use_local_servant_inventory", False)
+                )
+                self.use_local_equip_inventory = _truthy(
+                    attach.get("use_local_equip_inventory", False)
+                )
                 self.modify_unspecified_servants = _truthy(
                     attach.get("modify_unspecified_servants", True)
                 )
@@ -141,18 +156,23 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             self._load_databases()
             self._prepare_target_templates()
             self._prepare_bond_resources()
+            self._configure_local_inventories()
             self.config_marker = self._load_named_template("battle/配置变更.png")
             if self.config_marker is None:
                 return self._result_fail("bond_completion_resource_missing: battle/配置变更.png")
 
             self._focus_user(
                 f"开始羁绊优化：优先{self.preferred_rarity}星，"
+                f"从者{'本地快速' if self.local_servant_inventory_active else '实时扫描'}，"
+                f"礼装{'本地快速' if self.local_equip_inventory_active else '实时扫描'}，"
                 f"其他从者{'可调整' if self.modify_unspecified_servants else '保留'}，"
                 f"其他礼装{'可调整' if self.modify_unspecified_equips else '保留'}"
             )
             mfaalog.info(
                 f"[羁绊补齐] 开始：bond_base={self.bond_base}，"
                 f"优先星级={self.preferred_rarity}，顺序={self.rarity_order}，"
+                f"本地从者库={self.local_servant_inventory_active}，"
+                f"本地礼装库={self.local_equip_inventory_active}，"
                 f"修改其他从者={self.modify_unspecified_servants}，"
                 f"修改其他礼装={self.modify_unspecified_equips}"
             )
@@ -354,6 +374,106 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 item["cost"] = int(equip_costs[eid])
             self.equip_database[eid] = item
 
+    @staticmethod
+    def _read_player_inventory(path, expected_kind, item_key):
+        """读取一次构建完成的 schema v1 玩家库存，只返回去重 ID。"""
+        with open(path, encoding="utf-8-sig") as file:
+            document = json.load(file)
+        if not isinstance(document, dict):
+            raise ValueError("顶层不是对象")
+        if document.get("schema_version") != 1:
+            raise ValueError("schema_version 不是 1")
+        if document.get("kind") != expected_kind:
+            raise ValueError(f"kind 不是 {expected_kind}")
+        if document.get("scan_complete") is not True:
+            raise ValueError("scan_complete 不是 true")
+        items = document.get(item_key)
+        if not isinstance(items, list):
+            raise ValueError(f"缺少 {item_key} 数组")
+        ids = []
+        for index, item in enumerate(items):
+            if not isinstance(item, dict):
+                raise ValueError(f"{item_key}[{index}] 不是对象")
+            item_id = str(item.get("id") or "").strip()
+            if not item_id:
+                raise ValueError(f"{item_key}[{index}] 缺少 ID")
+            ids.append(item_id)
+        unique_ids = set(ids)
+        if len(unique_ids) != len(ids):
+            raise ValueError(f"{item_key} 包含重复 ID")
+        try:
+            declared_count = int(document.get("count"))
+        except (TypeError, ValueError) as exc:
+            raise ValueError("count 不是整数") from exc
+        if declared_count != len(unique_ids):
+            raise ValueError(f"count={declared_count} 与实际 {len(unique_ids)} 不一致")
+        return unique_ids, document
+
+    def _configure_local_inventories(self):
+        """分别启用本地从者/礼装白名单；无效类别独立回退实时扫描。"""
+        if self.use_local_servant_inventory:
+            try:
+                raw_ids, document = self._read_player_inventory(
+                    _PLAYER_SERVANTS_PATH, "servants", "servants"
+                )
+                self.local_servant_ids = raw_ids & set(self.servant_database)
+                unknown = raw_ids - self.local_servant_ids
+                self.owned_servants_by_rarity = {rarity: set() for rarity in range(6)}
+                for servant_id in self.local_servant_ids:
+                    servant = self.servant_database[servant_id]
+                    rarity = int(servant.get("rarity", -1))
+                    if rarity in self.owned_servants_by_rarity:
+                        self.owned_servants_by_rarity[rarity].add(servant_id)
+                self.local_servant_inventory_active = True
+                mfaalog.info(
+                    f"[羁绊补齐] 本地从者库已启用：{len(self.local_servant_ids)}名，"
+                    f"generated_at={document.get('generated_at') or '未知'}，"
+                    f"忽略目录外ID={len(unknown)}"
+                )
+                self._focus_user(f"已载入本地从者库：{len(self.local_servant_ids)}名")
+                if document.get("catalog_complete") is False:
+                    self._focus_user("本地从者库缺少部分模板，优化范围可能不完整", "orange")
+            except Exception as exc:
+                mfaalog.warning(
+                    f"[羁绊补齐] 本地从者库不可用，回退实时扫描：{exc}"
+                )
+                self._focus_user("本地从者库不可用，已回退实时扫描", "orange")
+
+        if self.use_local_equip_inventory:
+            try:
+                raw_ids, document = self._read_player_inventory(
+                    _PLAYER_EQUIPS_PATH, "equips", "equips"
+                )
+                self.local_equip_ids = raw_ids & set(self.equip_database)
+                unknown = raw_ids - self.local_equip_ids
+                self.available_equips.update(self.local_equip_ids)
+                self.local_equip_inventory_active = True
+                mfaalog.info(
+                    f"[羁绊补齐] 本地礼装库已启用：{len(self.local_equip_ids)}种，"
+                    f"generated_at={document.get('generated_at') or '未知'}，"
+                    f"忽略目录外ID={len(unknown)}；满破仍在选择时确认"
+                )
+                self._focus_user(f"已载入本地礼装库：{len(self.local_equip_ids)}种")
+                if document.get("catalog_complete") is False:
+                    self._focus_user("本地礼装库缺少部分模板，优化范围可能不完整", "orange")
+            except Exception as exc:
+                mfaalog.warning(
+                    f"[羁绊补齐] 本地礼装库不可用，回退实时扫描：{exc}"
+                )
+                self._focus_user("本地礼装库不可用，已回退实时扫描", "orange")
+
+    def _candidate_bond_equips(self):
+        candidates = [
+            item for item in self.bond_equips
+            if str(item["id"]) not in self.unavailable_equips
+        ]
+        if self.local_equip_inventory_active:
+            candidates = [
+                item for item in candidates
+                if str(item["id"]) in self.local_equip_ids
+            ]
+        return candidates
+
     def _prepare_bond_resources(self):
         self.bond_equips = []
         self.equip_list_templates = getattr(self, "equip_list_templates", {})
@@ -403,7 +523,12 @@ class CompleteBondFormation(AutoFormationFromChaldea):
         } | {str(item["id"]) for item in self.added_servants.values()}
         result = []
         for item in self.servant_database.values():
-            if int(item.get("rarity", -1)) != rarity or str(item.get("id")) in selected:
+            item_id = str(item.get("id"))
+            if (
+                int(item.get("rarity", -1)) != rarity
+                or item_id in selected
+                or item_id in self.unavailable_servants
+            ):
                 continue
             if "cost" not in item or not (item.get("bond") or {}).get("tags"):
                 continue
@@ -903,17 +1028,22 @@ class CompleteBondFormation(AutoFormationFromChaldea):
         return owned
 
     def _select_scanned_servant(self, servant, rarity_candidates):
+        # 记录目标定位过程中同星级全部稳定命中，供本地库目标缺失时
+        # 一次性刷新候选，避免对每个过期 ID 都重新滑到底。
+        self.last_servant_search_seen = set()
         if not self._run_pipeline("羁绊补齐-从者列表复位顶部"):
-            return False
+            return "failed"
         for round_index in range(MAX_SCAN_SWIPES + 1):
             # 最终回找时仍与同星级全部候选做横向区分。若只传入
             # 单个目标，一张外观相似的卡面只要越过绝对阈值就会被
             # 误当成目标，无法再利用 second-best margin 排除。
             hits, _image = self._stable_servant_hits(rarity_candidates)
+            self.last_servant_search_seen.update(str(item_id) for item_id in hits)
             if round_index == 0 and not hits:
                 if not self._run_pipeline("羁绊补齐-从者列表复位顶部"):
-                    return False
+                    return "failed"
                 hits, _image = self._stable_servant_hits(rarity_candidates)
+                self.last_servant_search_seen.update(str(item_id) for item_id in hits)
             hit = hits.get(str(servant["id"]))
             if hit is not None:
                 mfaalog.info(
@@ -922,10 +1052,14 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                     f"轮次={round_index + 1}"
                 )
                 self.controller.post_click(*hit[1]).wait()
-                return self._wait_for(self._in_formation_edit, 6.0)
+                return (
+                    "selected"
+                    if self._wait_for(self._in_formation_edit, 6.0)
+                    else "failed"
+                )
             if round_index < MAX_SCAN_SWIPES and not self._run_pipeline("羁绊补齐-从者列表下滑扫描"):
-                return False
-        return False
+                return "failed"
+        return "not_found"
 
     def _verify_servant_slot(self, slot, servant):
         templates = self._servant_templates(servant["id"], for_list=False)
@@ -976,22 +1110,25 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 if not candidates:
                     mfaalog.info(f"[羁绊补齐] {rarity}星没有资料与图片完整的候选")
                     continue
+                owned_ids = self.owned_servants_by_rarity.get(rarity)
+                if owned_ids is not None:
+                    source = "本地从者库" if self.local_servant_inventory_active else "复用库存扫描"
+                    mfaalog.info(f"[羁绊补齐] {source}{rarity}星候选：{len(owned_ids)}名")
+                    if not any(str(item["id"]) in owned_ids for item in candidates):
+                        mfaalog.info(f"[羁绊补齐] {source}{rarity}星无匹配，切换下一星级")
+                        continue
                 if not self._filter_servant_rarity(rarity):
                     return None
-                owned_ids = self.owned_servants_by_rarity.get(rarity)
                 if owned_ids is None:
                     owned_hits = self._scan_owned_servants(rarity, candidates)
                     if owned_hits is None:
                         return None
                     owned_ids = set(owned_hits)
                     self.owned_servants_by_rarity[rarity] = owned_ids
-                else:
-                    mfaalog.info(
-                        f"[羁绊补齐] 复用{rarity}星库存扫描结果：{len(owned_ids)}名"
-                    )
                 owned = [item for item in candidates if str(item["id"]) in owned_ids]
                 if not owned:
-                    mfaalog.info(f"[羁绊补齐] {rarity}星完整扫描无匹配，切换下一星级")
+                    source = "本地从者库" if self.local_servant_inventory_active else "完整扫描"
+                    mfaalog.info(f"[羁绊补齐] {source}{rarity}星无匹配，切换下一星级")
                     continue
                 for item in owned:
                     item["slot"] = slot
@@ -1015,10 +1152,7 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                         owned,
                         ranking_servants,
                         self.fixed_equips,
-                        [
-                            item for item in self.bond_equips
-                            if str(item["id"]) not in self.unavailable_equips
-                        ],
+                        self._candidate_bond_equips(),
                         future_equip_slots,
                         rank_budget,
                         self.bond_base,
@@ -1056,8 +1190,39 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                         if availability == "replan":
                             should_replan = True
                             break
-                        if self._select_scanned_servant(candidate, candidates):
+                        if self.local_servant_inventory_active:
+                            self._focus_user(f"正在定位本地库从者：{candidate['name']}")
+                        select_result = self._select_scanned_servant(candidate, candidates)
+                        if select_result == "selected":
                             chosen = dict(candidate)
+                            break
+                        if select_result == "failed":
+                            return None
+                        if self.local_servant_inventory_active:
+                            candidate_id = str(candidate["id"])
+                            visible_ids = (
+                                set(getattr(self, "last_servant_search_seen", set()))
+                                & set(owned_ids)
+                            )
+                            removed_ids = set(owned_ids) - visible_ids
+                            self.unavailable_servants.update(removed_ids)
+                            owned_ids.intersection_update(visible_ids)
+                            owned = [
+                                item for item in candidates
+                                if str(item["id"]) in owned_ids
+                            ]
+                            self._focus_user(
+                                f"本地库与当前仓库不一致，已刷新{rarity}星候选："
+                                f"{len(owned_ids)}名",
+                                "orange",
+                            )
+                            mfaalog.warning(
+                                f"[羁绊补齐] 本地从者目标未找到："
+                                f"{candidate['name']}({candidate_id})；"
+                                f"复用本次完整查找批量刷新{rarity}星候选，"
+                                f"当前可见={len(owned_ids)}，排除={len(removed_ids)}"
+                            )
+                            should_replan = True
                             break
                     if should_replan:
                         continue
@@ -1350,8 +1515,8 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             used_ids = {str(item.get("id")) for item in self.fixed_equips}
             used_ids.update(str(item.get("id")) for item in self.added_equips.values())
             candidates = [
-                item for item in self.bond_equips
-                if str(item["id"]) not in used_ids and str(item["id"]) not in self.unavailable_equips
+                item for item in self._candidate_bond_equips()
+                if str(item["id"]) not in used_ids
             ]
             plan = optimize_equips(
                 current_servants,
@@ -1373,8 +1538,23 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             if self.used_cost + int(equip["cost"]) > self.max_cost:
                 self.unavailable_equips.add(str(equip["id"]))
                 continue
+            if self.local_equip_inventory_active:
+                self._focus_user(f"正在定位本地库礼装：{equip['name']}")
             result = self._select_equip(slot, equip)
             if result == "not_found":
+                if self.local_equip_inventory_active:
+                    equip_id = str(equip["id"])
+                    self.available_equips.discard(equip_id)
+                    self.unavailable_equips.add(equip_id)
+                    self._focus_user(
+                        f"本地记录的礼装“{equip['name']}”当前不可用，正在重新规划",
+                        "orange",
+                    )
+                    mfaalog.warning(
+                        f"[羁绊补齐] 本地礼装记录未在当前筛选中找到："
+                        f"{equip['name']}({equip_id})；可能未满破或库存已变化"
+                    )
+                    continue
                 mfaalog.error(
                     f"[羁绊补齐] bond_completion_select_verify_failed: "
                     f"预检存在但装备阶段未找到 {equip['name']}({equip['id']})"
