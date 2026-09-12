@@ -1,0 +1,70 @@
+{
+  "manifest": "G:\\Workspace\\MaaFgo\\docs\\verification\\formation_negative_samples.json",
+  "calibration": {},
+  "timing_scope": "offline matcher only; excludes device/Agent/Pipeline latency",
+  "reader_init_ms": 1907.5317999995605,
+  "coverage": {
+    "catalog_count": 472,
+    "template_count": 2028,
+    "covered_ids": 470,
+    "missing_ids": [
+      "9935530",
+      "1700100"
+    ],
+    "unmapped_templates": [
+      "f_5057300.png"
+    ],
+    "conflicting_templates": [],
+    "unreadable_templates": []
+  },
+  "samples": [
+    {
+      "id": "existing-battle-screen",
+      "source": "existing_real_screenshot_manually_reviewed",
+      "expected_page": false,
+      "frames": [
+        {
+          "path": "G:\\Workspace\\MaaFgo\\logs\\maa_mcp_test_current.png",
+          "sha256": "89ab247f3a287c5a1396bc6ffa75ea47deddf6dbb261f4955d36f864ae193709",
+          "error": "not_on_formation_confirmation",
+          "matcher_ms": 194.82060000154888
+        }
+      ],
+      "elapsed_ms": 196.56880000184174
+    },
+    {
+      "id": "existing-quest-start-dialog",
+      "source": "existing_real_screenshot_manually_reviewed",
+      "expected_page": false,
+      "frames": [
+        {
+          "path": "G:\\Workspace\\MaaFgo\\debug\\on_error\\2026.09.05-01.53.45.136_进本流程.png",
+          "sha256": "57c9d1428396d6e9e1facc0e929c24e84432e9f19b16c02cc36faefaaf1162f5",
+          "error": "not_on_formation_confirmation",
+          "matcher_ms": 171.68670000319253
+        }
+      ],
+      "elapsed_ms": 174.23780000171973
+    }
+  ],
+  "metrics": {
+    "samples": 2,
+    "positive_samples": 0,
+    "negative_samples": 2,
+    "sample_errors": 0,
+    "page_false_accepts": 0,
+    "page_false_rejects": 0,
+    "annotated_occupied_slots": 0,
+    "correct_identities": 0,
+    "wrong_identities": 0,
+    "unknown_identities": 0,
+    "occupancy_errors": 0,
+    "support_errors": 0,
+    "class_errors": 0
+  },
+  "median_sample_ms": 185.40330000178074,
+  "max_sample_ms": 196.56880000184174,
+  "identity_unknown_rate": null,
+  "acceptance_complete": false,
+  "acceptance_note": "An offline report is evidence for its listed samples only; verify held-out coverage, calibration provenance and Agent/device timing before acceptance."
+}

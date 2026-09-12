@@ -18,6 +18,8 @@ if _AGENT_DIR not in sys.path:
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
+from maa.event_sink import NotificationType
+from maa.tasker import TaskerEventSink
 
 import mfaalog
 from battle.core.decider import RuleDecider
@@ -27,12 +29,53 @@ from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.runtime.runtime import AutoBattleRuntime
+from battle.runtime.formation_session import context_session, session_override, sessions
 from chaldea import fetch_share_data
+
+
+@AgentServer.tasker_sink()
+class FormationTaskLifecycle(TaskerEventSink):
+    """与 BBC 停止监听并列，只清理编队内存，不控制任何游戏/进程。"""
+
+    def on_tasker_task(self, tasker, noti_type, detail):
+        if detail.entry == "MaaTaskerPostStop":
+            sessions.stop_owner(detail.uuid)
+        elif noti_type == NotificationType.Starting:
+            sessions.task_started(detail.task_id, detail.uuid)
+        elif noti_type in (NotificationType.Succeeded, NotificationType.Failed):
+            sessions.finish(detail.task_id)
+
+
+@AgentServer.custom_action("begin_native_formation_session")
+class BeginNativeFormationSession(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg):
+        root, token = context_session(context)
+        # repeat(count=1) 也走单场调度，必须继续使用外层显式创建的会话。
+        if not sessions.valid(root, token, repeat=True):
+            token = sessions.begin(root)
+        try:
+            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+                raise ValueError("cannot install native formation session")
+            return CustomAction.RunResult(success=True)
+        except Exception as exc:
+            sessions.finish(root, token)
+            mfaalog.error(f"[初始编队] 会话初始化失败: {exc}")
+            return CustomAction.RunResult(success=False)
 
 
 @AgentServer.custom_action("auto_battle")
 class AutoBattleAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        root, token = context_session(context)
+        initial_formation, formation_battle = None, 1
+        if token:
+            try:
+                if context.tasker.stopping:
+                    raise ValueError("task stopping")
+                initial_formation, formation_battle = sessions.read(root, token)
+            except ValueError as exc:
+                mfaalog.error(f"[auto_battle] 初始编队会话无效: {exc}")
+                return CustomAction.RunResult(success=False)
         param = _load_action_param(argv.custom_action_param)
         profile = _parse_strategy_profile(param)
         battle_policy = _parse_battle_policy(param)
@@ -43,6 +86,8 @@ class AutoBattleAction(CustomAction):
         except TeamFetchError as e:
             # 队伍下载失败: 明确失败并提示, 由 pipeline on_error 走终止分支
             mfaalog.error(f"[auto_battle] {e}")
+            if token:
+                sessions.invalidate(root, token, "chaldea_plan_failed")
             return CustomAction.RunResult(success=False)
         decider = RuleDecider(battle_policy, plan=plan)
 
@@ -56,7 +101,17 @@ class AutoBattleAction(CustomAction):
             f"[auto_battle] start profile={profile.id} "
             f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
         )
-        result = AutoBattleRuntime(context, controller, decider, profile, battle_policy).run()
+        try:
+            result = AutoBattleRuntime(
+                context, controller, decider, profile, battle_policy,
+                initial_formation=initial_formation, formation_battle=formation_battle,
+            ).run()
+        except Exception:
+            if token and sessions.valid(root, token):
+                sessions.invalidate(root, token, "battle_runtime_exception")
+            raise
+        if not result.ok and token and sessions.valid(root, token):
+            sessions.invalidate(root, token, "battle_runtime_failed")
         mfaalog.info(f"[auto_battle] end ok={result.ok} reason={result.reason} turns={result.turns}")
 
         # TODO(save_evidence)：失败时保存截图/状态证据

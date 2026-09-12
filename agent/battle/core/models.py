@@ -30,6 +30,66 @@ class Confidence:
 
 
 @dataclass(frozen=True)
+class FormationSlot:
+    """编队确认页的成员；slot 为 1..6，不是战斗中动态的前排位置。
+
+    confidence 是匹配证据分，不是正确率。class_id 来自独立的职阶识别；
+    catalog_class 仅在身份确认后从本地目录解析，不能冒充视觉职阶证据。
+    """
+
+    slot: int
+    status: str                       # empty / identified / unknown
+    servant_id: str | None = None
+    class_id: str | None = None
+    is_support: bool | None = None
+    identity_confidence: Confidence = field(default_factory=lambda: Confidence(0.0))
+    class_confidence: Confidence = field(default_factory=lambda: Confidence(0.0))
+    catalog_class: str | None = None
+    best_candidate_id: str | None = None  # 诊断候选，绝不能作为已确认身份使用
+    best_score: float = 0.0
+    identity_margin: float = 0.0
+    matched_template: str = ""
+    consistent_frames: int = 0
+    reason: str = ""
+    search_scope: str = ""
+
+    def __post_init__(self):
+        if not is_slot(self.slot, 1, 6):
+            raise ValueError("formation slot must be 1..6")
+        if self.status not in {"empty", "identified", "unknown"}:
+            raise ValueError("invalid formation slot status")
+        if (self.status == "identified") != bool(self.servant_id):
+            raise ValueError("only identified slots may carry a servant_id")
+        if self.status == "empty" and self.is_support is not False:
+            raise ValueError("empty slot cannot be support")
+
+
+@dataclass(frozen=True)
+class InitialFormation:
+    """一次真实采集的不可变快照；复用时也不改写采集时间或初始位置。"""
+
+    slots: Tuple[FormationSlot, ...]
+    task_id: int
+    session_id: str
+    revision: int
+    captured_at: str
+    captured_battle: int
+    source: str = "formation_confirmation"
+    calibration_id: str = "unverified"
+
+    def __post_init__(self):
+        if tuple(s.slot for s in self.slots) != (1, 2, 3, 4, 5, 6):
+            raise ValueError("initial formation must contain six ordered slots")
+        if not self.session_id or self.task_id <= 0 or self.revision <= 0:
+            raise ValueError("initial formation requires task/session/revision")
+
+    def member_key(self, slot: int) -> tuple[str, int, int]:
+        if not is_slot(slot, 1, 6):
+            raise ValueError("formation slot must be 1..6")
+        return self.session_id, self.revision, slot
+
+
+@dataclass(frozen=True)
 class CommandCard:
     """下排面卡。"""
     ui_slot: int                     # 1..5

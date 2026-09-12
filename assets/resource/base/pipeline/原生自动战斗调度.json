@@ -49,6 +49,13 @@
         ]
     },
     "原生自动战斗调度": {
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "begin_native_formation_session"
+            }
+        },
+        "on_error": [],
         "doc": "单场调度: 点击关卡→进本(阶段机)→auto_battle→结算回主界面。进本阶段机(剧情→助战→编队→实际战斗)见 进本流程.json, 通用剧情跳过见 跳过剧情.json。MaaFW 同目录所有 pipeline JSON 合并为同一命名空间, 跨文件引用节点名不变",
         "next": [
             "[JumpBack]点击关卡",

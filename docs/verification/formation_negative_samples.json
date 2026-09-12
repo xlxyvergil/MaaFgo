@@ -1,0 +1,17 @@
+{
+  "description": "仅为人工查看确认的真实非编队页负样本；没有编队页正样本，不用于身份准确率验收。原始文件保留在本机既有 logs/debug 目录，不复制或修改。",
+  "samples": [
+    {
+      "id": "existing-battle-screen",
+      "source": "existing_real_screenshot_manually_reviewed",
+      "expected_page": false,
+      "frames": ["../../logs/maa_mcp_test_current.png"]
+    },
+    {
+      "id": "existing-quest-start-dialog",
+      "source": "existing_real_screenshot_manually_reviewed",
+      "expected_page": false,
+      "frames": ["../../debug/on_error/2026.09.05-01.53.45.136_进本流程.png"]
+    }
+  ]
+}

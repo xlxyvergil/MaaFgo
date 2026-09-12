@@ -15,6 +15,9 @@ import sys
 import time
 import traceback
 from collections import Counter
+from dataclasses import dataclass, replace
+from functools import lru_cache
+from pathlib import Path
 
 import cv2
 import numpy as np
@@ -22,6 +25,7 @@ import numpy as np
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
+from maa.custom_recognition import CustomRecognition
 
 _CUSTOM_DIR = os.path.dirname(os.path.abspath(__file__))
 _AGENT_DIR = os.path.dirname(_CUSTOM_DIR)
@@ -31,6 +35,8 @@ if _AGENT_DIR not in sys.path:
 
 from chaldea import fetch_share_data
 import mfaalog
+from battle.core.models import Confidence, FormationSlot
+from battle.runtime.formation_session import context_session, sessions
 
 
 BASE_W, BASE_H = 1280, 720
@@ -2045,3 +2051,352 @@ class ValidateFormationFromChaldea(AutoFormationFromChaldea):
     def _fail(self, message):
         mfaalog.error(f"[手动编队] {message}")
         return False
+
+
+# ---------- 原生战斗：只读取最终编队，不调用上方任何编成/点击方法 ----------
+
+IDENTITY_FRAME_NODES = ("编队身份-第1帧", "编队身份-第2帧", "编队身份-第3帧")
+
+
+@dataclass(frozen=True)
+class FormationCalibration:
+    """只接受有明确标定记录的阈值；缺少标定时保留诊断候选，身份为未知。
+
+    page/support 沿用原编队页面判断。通用头像阈值没有默认值，不能直接
+    使用 Chaldea 少候选时的 FACE_THRESHOLD。配置位于采集节点 attach，
+    不新增用户配置界面；离线评估工具也使用同一配置。
+    """
+
+    calibration_id: str = "unverified"
+    verified: bool = False
+    template_family: str = "NarrowFigures"
+    identity_threshold: float | None = None
+    identity_margin: float | None = None
+    class_threshold: float | None = None
+    class_margin: float | None = None
+    class_roi: tuple = ()          # 相对每个 SLOT_ROIS 左上角的区域
+    class_templates: tuple = ()    # (视觉职阶, (相对资源图片路径, ...))
+    class_groups: tuple = ()       # (视觉职阶, (目录职阶, ...))，不擅自合并特殊职阶
+
+    @classmethod
+    def parse(cls, data):
+        if not isinstance(data, dict):
+            raise ValueError("formation calibration must be an object")
+        fields = dict(data)
+        if fields.get("template_family", "NarrowFigures") not in {"NarrowFigures", "servant_face"}:
+            raise ValueError("unsupported formation template family")
+        for key in ("identity_threshold", "identity_margin", "class_threshold", "class_margin"):
+            value = fields.get(key)
+            if value is not None and (type(value) not in {int, float} or not 0 < value <= 1):
+                raise ValueError(f"invalid calibration {key}")
+        for key in ("class_templates", "class_groups"):
+            mapping = fields.get(key, {})
+            if not isinstance(mapping, dict):
+                raise ValueError(f"{key} must be an object")
+            pairs = []
+            for name, values in mapping.items():
+                if not isinstance(name, str) or not name or not isinstance(values, list):
+                    raise ValueError(f"invalid {key}")
+                if not values or not all(isinstance(v, str) and v for v in values):
+                    raise ValueError(f"invalid {key} values")
+                if key == "class_templates" and any(
+                    Path(v).is_absolute() or ".." in Path(v).parts for v in values
+                ):
+                    raise ValueError("class template must be a relative resource path")
+                pairs.append((name, tuple(values)))
+            fields[key] = tuple(pairs)
+        roi = fields.get("class_roi", ())
+        if roi and (len(roi) != 4 or any(type(v) is not int for v in roi)
+                    or roi[0] < 0 or roi[1] < 0 or roi[2] <= 0 or roi[3] <= 0
+                    or roi[0] + roi[2] > 187 or roi[1] + roi[3] > 276):
+            raise ValueError("class ROI must be inside each formation slot")
+        fields["class_roi"] = tuple(roi)
+        if type(fields.get("verified", False)) is not bool:
+            raise ValueError("verified must be boolean")
+        if fields.get("verified"):
+            if not fields.get("calibration_id") or fields["calibration_id"] == "unverified":
+                raise ValueError("verified calibration requires evidence id")
+            if fields.get("identity_threshold") is None or fields.get("identity_margin") is None:
+                raise ValueError("verified calibration requires identity thresholds")
+            if fields["class_templates"] and (not roi or fields.get("class_threshold") is None
+                                               or fields.get("class_margin") is None):
+                raise ValueError("class templates require calibrated ROI and thresholds")
+        return cls(**fields)
+
+
+def _identity_manifest(roots, family, catalog_path):
+    """一次目录扫描；层覆盖优先。mtime/size 变更会触发新索引，不缓存队伍。"""
+    paths = {}
+    for root in roots:
+        for path in sorted(Path(root, family).glob("f_*.png")):
+            paths.setdefault(path.name, path)
+    manifest = tuple((name, str(p), p.stat().st_mtime_ns, p.stat().st_size)
+                     for name, p in sorted(paths.items()))
+    catalog = Path(catalog_path)
+    return str(catalog), catalog.stat().st_mtime_ns, catalog.stat().st_size, manifest
+
+
+@lru_cache(maxsize=2)
+def _cached_identity_index(catalog_path, catalog_mtime, catalog_size, manifest):
+    catalog = json.loads(Path(catalog_path).read_text(encoding="utf-8"))["servants"]
+    records = {}
+    explicit = {}
+    prefixes = {}
+    for item in catalog:
+        sid = str(item["id"])
+        if sid in records or not sid.isdigit() or len(sid) <= 2:
+            raise ValueError(f"invalid/duplicate servant id: {sid}")
+        records[sid] = {"name": item["name"], "class": item["class"]}
+        prefixes.setdefault(sid[:-2], set()).add(sid)
+        for name in item.get("images") or []:
+            explicit.setdefault(name, set()).add(sid)
+    groups = {sid: [] for sid in records}
+    unmapped, conflicts, unreadable = [], [], []
+    for name, path, _mtime, _size in manifest:
+        owners = set(explicit.get(name, ()))
+        match = re.fullmatch(r"f_(\d+)\d{3}d?\.png", name, re.IGNORECASE)
+        if match:
+            owners.update(prefixes.get(match[1], ()))
+        if len(owners) > 1:
+            conflicts.append(name)
+            continue
+        if not owners:
+            unmapped.append(name)
+            continue
+        template = _read_image(path)
+        if template is None:
+            unreadable.append(name)
+            continue
+        template.setflags(write=False)
+        groups[next(iter(owners))].append((name, template))
+    by_class = {}
+    for sid, info in records.items():
+        by_class.setdefault(info["class"], []).append(sid)
+    report = {
+        "catalog_count": len(records), "template_count": len(manifest),
+        "covered_ids": sum(bool(v) for v in groups.values()),
+        "missing_ids": [sid for sid, values in groups.items() if not values],
+        "unmapped_templates": unmapped, "conflicting_templates": conflicts,
+        "unreadable_templates": unreadable,
+    }
+    return records, {sid: tuple(v) for sid, v in groups.items()}, by_class, report
+
+
+class FormationIdentityReader(AutoFormationFromChaldea):
+    """复用编队的 ROI、空位/助战、模板匹配；每次读取只接收显式图像。
+
+    不调用 _shot/_prepare_target_templates/run，因而不会使用缓存截图、
+    下载 Chaldea 数据、移动或更换成员。实例仅存活于单次采集回调。
+    """
+
+    def __init__(self, roots, calibration=None, catalog_path=None):
+        self.image_roots = list(roots)
+        self.sx = self.sy = 1.0
+        self.calibration = calibration or FormationCalibration()
+        self.records, self.templates, self.by_class, self.coverage = _cached_identity_index(
+            *_identity_manifest(self.image_roots, self.calibration.template_family,
+                                catalog_path or os.path.join(_CUSTOM_DIR, "servant_list.json"))
+        )
+        self.config_marker = self._load_named_template("battle/配置变更.png")
+        self.start_markers = [self._load_named_template(f"battle/{name}.png")
+                              for name in ("开始任务", "战斗开始")]
+        self.support_marker = self._load_named_template("battle/助战标记.png")
+        if self.config_marker is None or self.support_marker is None or not any(
+            x is not None for x in self.start_markers
+        ):
+            raise ValueError("formation_page_resource_missing")
+        self.class_templates = {}
+        for name, paths in self.calibration.class_templates:
+            values = [(p, self._load_named_template(p)) for p in paths]
+            if any(t is None for _, t in values):
+                raise ValueError(f"class_template_missing:{name}")
+            self.class_templates[name] = values
+
+    def _rank(self, image, roi, identities):
+        scores = []
+        for sid in identities:
+            match = self._match_servant(image, self.templates[sid], roi)
+            if match is not None and np.isfinite(match[0]):
+                scores.append((match[0], sid, match[2]))
+        return sorted(scores, key=lambda x: (-x[0], x[1]))
+
+    def _accepted(self, ranked):
+        c = self.calibration
+        return (c.verified and len(ranked) >= 2
+                and ranked[0][0] >= c.identity_threshold
+                and ranked[0][0] - ranked[1][0] >= c.identity_margin)
+
+    def _class(self, image, roi):
+        c = self.calibration
+        if not c.class_roi or not self.class_templates:
+            return None, Confidence(0.0, "class_templates_unavailable")
+        x, y, w, h = c.class_roi
+        ranked = []
+        for name, templates in self.class_templates.items():
+            match = self._match_servant(image, templates, (roi[0] + x, roi[1] + y, w, h))
+            if match is not None and np.isfinite(match[0]):
+                ranked.append((match[0], name))
+        ranked.sort(reverse=True)
+        if (c.verified and c.class_threshold is not None and c.class_margin is not None
+                and len(ranked) > 1 and ranked[0][0] >= c.class_threshold
+                and ranked[0][0] - ranked[1][0] >= c.class_margin):
+            return ranked[0][1], Confidence(ranked[0][0], "formation_class_template")
+        return None, Confidence(0.0, "class_uncertain")
+
+    def read_frame(self, image, *, full_audit=False, diagnostics=False):
+        image = _norm_img(image)
+        if image is None:
+            raise ValueError("screenshot_unavailable")
+        height, width = image.shape[:2]
+        self.sx, self.sy = width / BASE_W, height / BASE_H
+        if width < BASE_W // 2 or abs(self.sx / self.sy - 1) > 0.015:
+            raise ValueError("unsupported_formation_layout")
+        confirm = self._match_template(image, self.config_marker)
+        starts = [self._match_template(image, marker) for marker in self.start_markers]
+        if not confirm or confirm[0] < 0.8 or not any(s and s[0] >= 0.8 for s in starts):
+            raise ValueError("not_on_formation_confirmation")
+        slots = []
+        c = self.calibration
+        for index, roi in enumerate(SLOT_ROIS):
+            if self._is_empty_slot(image, roi):
+                slots.append(FormationSlot(index + 1, "empty", is_support=False,
+                                           reason="existing_empty_slot_heuristic"))
+                continue
+            support = self._match_template(image, self.support_marker, roi)
+            is_support = None if support is None else support[0] >= SUPPORT_THRESHOLD
+            class_id, class_conf = self._class(image, roi)
+            ranked, scope = [], "not_calibrated"
+            if c.verified or diagnostics:
+                class_names = dict(c.class_groups).get(class_id, (class_id,))
+                candidates = tuple(sid for name in class_names for sid in self.by_class.get(name, ()))
+                if class_id and candidates and not full_audit:
+                    ranked = self._rank(image, roi, candidates)
+                    scope = "class"
+                # 最后一帧始终全库复核，避免高置信度职阶误判排除真正身份。
+                # 其余帧只要职阶或该职阶身份不可靠，也立即回退全库。
+                if full_audit or not self._accepted(ranked):
+                    ranked = self._rank(image, roi, self.templates)
+                    scope = "all_audit" if full_audit else "all_fallback"
+            identified = self._accepted(ranked)
+            best = ranked[0] if ranked else (0.0, None, "")
+            margin = best[0] - ranked[1][0] if len(ranked) > 1 else 0.0
+            class_conflict = bool(identified and class_id and self.records[best[1]]["class"]
+                                  not in dict(c.class_groups).get(class_id, (class_id,)))
+            if class_conflict:
+                class_id, class_conf = None, Confidence(0.0, "class_identity_conflict")
+            slots.append(FormationSlot(
+                slot=index + 1, status="identified" if identified else "unknown",
+                servant_id=best[1] if identified else None, class_id=class_id,
+                is_support=is_support, class_confidence=class_conf,
+                identity_confidence=Confidence(best[0] if identified else 0.0,
+                                               "formation_template" if identified else "unconfirmed"),
+                catalog_class=self.records[best[1]]["class"] if identified else None,
+                best_candidate_id=best[1], best_score=best[0], identity_margin=margin,
+                matched_template=best[2], search_scope=scope,
+                reason=("class_identity_conflict" if class_conflict else "") if identified else ("calibration_required" if not c.verified
+                                               else "identity_score_or_margin_insufficient"),
+            ))
+        return tuple(slots)
+
+
+def merge_formation_frames(frames):
+    """三次独立截图全部同意才能确认；相同 ID 的灵衣变化不制造身份分差。"""
+    if len(frames) != len(IDENTITY_FRAME_NODES) or any(
+        tuple(s.slot for s in f) != (1, 2, 3, 4, 5, 6) for f in frames
+    ):
+        raise ValueError("incomplete_formation_frames")
+    merged = []
+    for observations in zip(*frames):
+        last = observations[-1]
+        same_identity = len({(s.status, s.servant_id) for s in observations}) == 1
+        same_class = len({s.class_id for s in observations}) == 1
+        same_support = len({s.is_support for s in observations}) == 1
+        identity_ok = same_identity and same_support
+        merged.append(replace(
+            last,
+            status=last.status if identity_ok else "unknown",
+            servant_id=last.servant_id if identity_ok else None,
+            catalog_class=last.catalog_class if identity_ok else None,
+            is_support=last.is_support if same_support else None,
+            class_id=last.class_id if same_class else None,
+            class_confidence=min((s.class_confidence for s in observations), key=lambda c: c.value)
+            if same_class else Confidence(0.0, "class_frame_disagreement"),
+            identity_confidence=min((s.identity_confidence for s in observations), key=lambda c: c.value)
+            if identity_ok else Confidence(0.0, "identity_frame_disagreement"),
+            consistent_frames=len(frames) if identity_ok else 0,
+            reason=last.reason if identity_ok else "formation_frame_disagreement",
+        ))
+    return tuple(merged)
+
+
+@AgentServer.custom_recognition("formation_identity_frame")
+class FormationIdentityFrame(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        param = json.loads(argv.custom_recognition_param)
+        root, token = context_session(context)
+        revision = param["revision"]
+        try:
+            if token != param["session_id"] or context.tasker.stopping:
+                raise ValueError("formation_session_stopped")
+            # 仅复用路径选择；不创建控制器、不请求/读取 cached_image。
+            helper = AutoFormationFromChaldea()
+            helper.context = context
+            helper._init_paths()
+            calibration = FormationCalibration.parse(param.get("calibration", {}))
+            reader = FormationIdentityReader(helper.image_roots, calibration)
+            slots = reader.read_frame(argv.image, full_audit=param.get("full_audit", False))
+            sessions.append_frame(root, token, revision, slots)
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"frame_ok": True})
+        except Exception as exc:
+            # 命中只代表本次采样已结束，不代表身份/页面识别成功。
+            # 外层采集动作检查 error，失败不得走开始任务。
+            try:
+                sessions.append_frame(root, token, revision, (), str(exc))
+            except ValueError:
+                pass
+            return CustomRecognition.AnalyzeResult(
+                box=(0, 0, 1, 1), detail={"frame_ok": False, "reason": str(exc)}
+            )
+
+
+@AgentServer.custom_action("capture_initial_formation")
+class CaptureInitialFormation(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg):
+        root, token = context_session(context)
+        try:
+            revision = sessions.begin_capture(root, token)
+            node = context.get_node_data(argv.node_name) or {}
+            config = (node.get("attach") or {}).get("calibration", {})
+            calibration = FormationCalibration.parse(config)
+            overrides = {
+                name: {"recognition": {"type": "Custom", "param": {
+                    "custom_recognition": "formation_identity_frame",
+                    "custom_recognition_param": {
+                        "session_id": token, "revision": revision,
+                        "calibration": config, "full_audit": i == len(IDENTITY_FRAME_NODES) - 1,
+                    },
+                }}}
+                for i, name in enumerate(IDENTITY_FRAME_NODES)
+            }
+            detail = context.run_task("编队身份-采样", pipeline_override=overrides)
+            if context.tasker.stopping or detail is None or not detail.status.succeeded:
+                raise ValueError("formation_capture_pipeline_failed")
+            slots = merge_formation_frames(sessions.frames(root, token, revision))
+            snapshot = sessions.publish(root, token, revision, slots, calibration.calibration_id)
+            names = json.loads(Path(_CUSTOM_DIR, "servant_list.json").read_text(encoding="utf-8"))
+            names = {str(x["id"]): x["name"] for x in names["servants"]}
+            summary = "; ".join(
+                f"{s.slot}:{s.status}:{names.get(s.servant_id, s.servant_id or '?')}"
+                f":support={s.is_support}:reason={s.reason}"
+                for s in slots
+            )
+            mfaalog.info(f"[初始编队] task={root} session={token} revision={snapshot.revision} "
+                         f"calibration={snapshot.calibration_id} {summary}")
+            return CustomAction.RunResult(success=True)
+        except Exception as exc:
+            try:
+                sessions.invalidate(root, token, str(exc))
+            except ValueError:
+                pass
+            mfaalog.error(f"[初始编队] 采集失败，旧快照已失效，不开始战斗: {exc}")
+            return CustomAction.RunResult(success=False)

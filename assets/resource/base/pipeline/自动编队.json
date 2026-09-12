@@ -1,4 +1,75 @@
 {
+    "编队身份-会话": {
+        "doc": "仅由原生入口在任务 Context 中写入会话令牌，不保存队伍结果。",
+        "attach": {
+            "session_id": ""
+        }
+    },
+    "编队身份-采集": {
+        "doc": "只读最终编队快照。个别身份未知可继续，页面/截图失败使旧结果失效并停止；不继承 Global_Null 错误恢复。标定记录不足时不接受确定身份。",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "capture_initial_formation"
+            }
+        },
+        "attach": {
+            "calibration": {
+                "calibration_id": "unverified",
+                "verified": false,
+                "template_family": "NarrowFigures"
+            }
+        },
+        "on_error": [],
+        "next": [
+            "进本-实际点击队伍确认"
+        ]
+    },
+    "编队身份-采样": {
+        "doc": "从 next 获取框架新截图；不把当前节点作为入口直接跳过 recognition。",
+        "next": [
+            "编队身份-第1帧"
+        ],
+        "timeout": 10000,
+        "on_error": []
+    },
+    "编队身份-第1帧": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "formation_identity_frame"
+            }
+        },
+        "post_delay": 400,
+        "timeout": 10000,
+        "on_error": [],
+        "next": [
+            "编队身份-第2帧"
+        ]
+    },
+    "编队身份-第2帧": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "formation_identity_frame"
+            }
+        },
+        "post_delay": 400,
+        "timeout": 10000,
+        "on_error": [],
+        "next": [
+            "编队身份-第3帧"
+        ]
+    },
+    "编队身份-第3帧": {
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "formation_identity_frame"
+            }
+        },
+        "on_error": []
+    },
     "执行自动编队": {
         "doc": "战斗流程的自动编队入口。显式使用空 on_error，确保自动编队失败时任务保持失败并停止，不被全局 Global_Null 恢复链改写为成功。",
         "action": {

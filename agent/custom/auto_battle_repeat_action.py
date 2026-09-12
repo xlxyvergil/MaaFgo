@@ -37,6 +37,7 @@ from maa.context import Context
 from maa.custom_action import CustomAction
 
 import mfaalog
+from battle.runtime.formation_session import session_override, sessions
 
 # pipeline 节点名
 _NODE_FIRST_BATTLE = "原生自动战斗_多次_第一场"
@@ -64,6 +65,19 @@ class AutoBattleRepeatAction(CustomAction):
     """多次原生自动战斗循环控制器（连续出击模式）。"""
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        root = context.get_task_job().job_id
+        token = sessions.begin(root, repeat=True)
+        try:
+            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+                raise ValueError("cannot install repeat formation session")
+            return self._run_session(context, argv, root, token)
+        except Exception as exc:
+            mfaalog.error(f"[auto_battle_repeat] 会话中断: {exc}")
+            return CustomAction.RunResult(success=False)
+        finally:
+            sessions.finish(root, token)
+
+    def _run_session(self, context, argv, root, token):
         param = _load_param(argv.custom_action_param)
 
         # "原生自动战斗次数" option 通过 attach 注入 battle_count（attach 与 action
@@ -98,6 +112,10 @@ class AutoBattleRepeatAction(CustomAction):
 
         for i in range(battle_count):
             current = i + 1
+            if context.tasker.stopping:
+                last_error = "任务已停止"
+                break
+            sessions.battle_started(root, token, current)
             is_first = (i == 0)
             is_last = (i == battle_count - 1)
             mfaalog.info(f"[auto_battle_repeat] === Battle {current}/{battle_count} ===")
