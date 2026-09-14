@@ -11,9 +11,9 @@
     ]
   },
   "原生自动战斗-队伍下载失败-提示": {
-    "doc": "auto_battle 动作失败(多为 Chaldea 队伍下载失败), 提示用户并终止整条任务链",
+    "doc": "保留既有错误出口名称。auto_battle 的队伍下载、初始编队会话或战斗执行失败时提示并终止整条任务链，具体原因由 Action 日志给出。",
     "focus": {
-      "Node.Action.Starting": "<span style=\"color: #FF0000;\">Chaldea 队伍下载/解码失败，任务终止！请检查分享链接/ID 或网络后重试</span>"
+      "Node.Action.Starting": "<span style=\"color: #FF0000;\">原生自动战斗失败或已中断，任务终止。请查看上方具体错误：队伍下载、初始编队或战斗执行。</span>"
     },
     "action": {
       "type": "StopTask"

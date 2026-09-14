@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Chaldea 自动编队与手动编队核对。
+"""Chaldea 自动编队、手动核对与原生战斗初始编队采集。
 
 该 Action 仅从编队界面开始工作：读取 Chaldea BattleShareData 后，先拖拽调整
-已有本地从者与助战的位置，再打开从者选择页替换不匹配的本地从者。原生自动
-战斗相关 Action 不依赖、也不修改本模块。手动核对 Action 仅在从者身份相同的
-情况下复用拖拽换位，不进入从者或礼装仓库。
+已有本地从者与助战的位置，再打开从者选择页替换不匹配的本地从者。手动核对
+仅在从者身份相同的情况下复用拖拽换位，不进入从者或礼装仓库。文件末尾的
+原生初始编队入口只复用识别方法，不调用上述编成操作。
 """
 
 import glob
@@ -2083,6 +2083,8 @@ class FormationCalibration:
         if not isinstance(data, dict):
             raise ValueError("formation calibration must be an object")
         fields = dict(data)
+        if not isinstance(fields.get("calibration_id", "unverified"), str):
+            raise ValueError("calibration_id must be a string")
         if fields.get("template_family", "NarrowFigures") not in {"NarrowFigures", "servant_face"}:
             raise ValueError("unsupported formation template family")
         for key in ("identity_threshold", "identity_margin", "class_threshold", "class_margin"):
@@ -2130,10 +2132,19 @@ def _identity_manifest(roots, family, catalog_path):
     for root in roots:
         for path in sorted(Path(root, family).glob("f_*.png")):
             paths.setdefault(path.name, path)
-    manifest = tuple((name, str(p), p.stat().st_mtime_ns, p.stat().st_size)
-                     for name, p in sorted(paths.items()))
+    manifest = [(name, str(p), p.stat().st_mtime_ns, p.stat().st_size)
+                for name, p in sorted(paths.items())]
+    if family == "NarrowFigures":
+        # 与现有 _prepare_target_templates 一致：某 ID 没有窄头像时回退完整头像。
+        # 这里只登记文件；索引构建时不会解码已有主模板的整个备用目录。
+        fallback = {}
+        for root in roots:
+            for path in sorted(Path(root, "servant_face").glob("f_*.png")):
+                fallback.setdefault(path.name, path)
+        manifest.extend((f"servant_face/{name}", str(p), p.stat().st_mtime_ns, p.stat().st_size)
+                        for name, p in sorted(fallback.items()))
     catalog = Path(catalog_path)
-    return str(catalog), catalog.stat().st_mtime_ns, catalog.stat().st_size, manifest
+    return str(catalog), catalog.stat().st_mtime_ns, catalog.stat().st_size, tuple(manifest)
 
 
 @lru_cache(maxsize=2)
@@ -2152,32 +2163,41 @@ def _cached_identity_index(catalog_path, catalog_mtime, catalog_size, manifest):
             explicit.setdefault(name, set()).add(sid)
     groups = {sid: [] for sid in records}
     unmapped, conflicts, unreadable = [], [], []
-    for name, path, _mtime, _size in manifest:
+    primary_ids, fallback_ids = set(), set()
+    for label, path, _mtime, _size in manifest:
+        name = Path(label).name
+        is_fallback = label.startswith("servant_face/")
         owners = set(explicit.get(name, ()))
         match = re.fullmatch(r"f_(\d+)\d{3}d?\.png", name, re.IGNORECASE)
         if match:
             owners.update(prefixes.get(match[1], ()))
         if len(owners) > 1:
-            conflicts.append(name)
+            conflicts.append(label)
             continue
         if not owners:
-            unmapped.append(name)
+            unmapped.append(label)
+            continue
+        sid = next(iter(owners))
+        if is_fallback and sid in primary_ids:
             continue
         template = _read_image(path)
         if template is None:
-            unreadable.append(name)
+            unreadable.append(label)
             continue
         template.setflags(write=False)
-        groups[next(iter(owners))].append((name, template))
+        groups[sid].append((label, template))
+        (fallback_ids if is_fallback else primary_ids).add(sid)
     by_class = {}
     for sid, info in records.items():
         by_class.setdefault(info["class"], []).append(sid)
     report = {
-        "catalog_count": len(records), "template_count": len(manifest),
+        "catalog_count": len(records), "indexed_file_count": len(manifest),
+        "loaded_template_count": sum(len(v) for v in groups.values()),
         "covered_ids": sum(bool(v) for v in groups.values()),
         "missing_ids": [sid for sid, values in groups.items() if not values],
         "unmapped_templates": unmapped, "conflicting_templates": conflicts,
         "unreadable_templates": unreadable,
+        "fallback_ids": sorted(fallback_ids),
     }
     return records, {sid: tuple(v) for sid, v in groups.items()}, by_class, report
 
@@ -2323,7 +2343,7 @@ def merge_formation_frames(frames):
             if same_class else Confidence(0.0, "class_frame_disagreement"),
             identity_confidence=min((s.identity_confidence for s in observations), key=lambda c: c.value)
             if identity_ok else Confidence(0.0, "identity_frame_disagreement"),
-            consistent_frames=len(frames) if identity_ok else 0,
+            consistent_frames=len(frames) if identity_ok and last.status != "unknown" else 0,
             reason=last.reason if identity_ok else "formation_frame_disagreement",
         ))
     return tuple(merged)

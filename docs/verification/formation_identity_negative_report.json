@@ -2,20 +2,45 @@
   "manifest": "G:\\Workspace\\MaaFgo\\docs\\verification\\formation_negative_samples.json",
   "calibration": {},
   "timing_scope": "offline matcher only; excludes device/Agent/Pipeline latency",
-  "reader_init_ms": 1907.5317999995605,
+  "reader_init_ms": 2370.9161000006134,
   "coverage": {
     "catalog_count": 472,
-    "template_count": 2028,
-    "covered_ids": 470,
-    "missing_ids": [
-      "9935530",
-      "1700100"
-    ],
+    "indexed_file_count": 4563,
+    "loaded_template_count": 2033,
+    "covered_ids": 472,
+    "missing_ids": [],
     "unmapped_templates": [
-      "f_5057300.png"
+      "f_5057300.png",
+      "servant_face/f_1000010.png",
+      "servant_face/f_1000011.png",
+      "servant_face/f_1000012.png",
+      "servant_face/f_5057300.png",
+      "servant_face/f_8002100.png",
+      "servant_face/f_99354000.png",
+      "servant_face/f_99354004.png",
+      "servant_face/f_99391300.png",
+      "servant_face/f_99391304.png",
+      "servant_face/f_99417300.png",
+      "servant_face/f_99417304.png",
+      "servant_face/f_99436100.png",
+      "servant_face/f_99436104.png",
+      "servant_face/f_99455900.png",
+      "servant_face/f_99455904.png",
+      "servant_face/f_99456000.png",
+      "servant_face/f_99456004.png",
+      "servant_face/f_99462800.png",
+      "servant_face/f_99462804.png",
+      "servant_face/f_99467600.png",
+      "servant_face/f_99467604.png",
+      "servant_face/f_99475300.png",
+      "servant_face/f_99475304.png"
     ],
     "conflicting_templates": [],
-    "unreadable_templates": []
+    "unreadable_templates": [],
+    "fallback_ids": [
+      "1700100",
+      "9935530"
+    ]
   },
   "samples": [
     {
@@ -27,10 +52,10 @@
           "path": "G:\\Workspace\\MaaFgo\\logs\\maa_mcp_test_current.png",
           "sha256": "89ab247f3a287c5a1396bc6ffa75ea47deddf6dbb261f4955d36f864ae193709",
           "error": "not_on_formation_confirmation",
-          "matcher_ms": 194.82060000154888
+          "matcher_ms": 178.7944999996398
         }
       ],
-      "elapsed_ms": 196.56880000184174
+      "elapsed_ms": 180.52560000069207
     },
     {
       "id": "existing-quest-start-dialog",
@@ -41,10 +66,10 @@
           "path": "G:\\Workspace\\MaaFgo\\debug\\on_error\\2026.09.05-01.53.45.136_进本流程.png",
           "sha256": "57c9d1428396d6e9e1facc0e929c24e84432e9f19b16c02cc36faefaaf1162f5",
           "error": "not_on_formation_confirmation",
-          "matcher_ms": 171.68670000319253
+          "matcher_ms": 185.81910000284552
         }
       ],
-      "elapsed_ms": 174.23780000171973
+      "elapsed_ms": 188.12919999982114
     }
   ],
   "metrics": {
@@ -62,8 +87,8 @@
     "support_errors": 0,
     "class_errors": 0
   },
-  "median_sample_ms": 185.40330000178074,
-  "max_sample_ms": 196.56880000184174,
+  "median_sample_ms": 184.3274000002566,
+  "max_sample_ms": 188.12919999982114,
   "identity_unknown_rate": null,
   "acceptance_complete": false,
   "acceptance_note": "An offline report is evidence for its listed samples only; verify held-out coverage, calibration provenance and Agent/device timing before acceptance."

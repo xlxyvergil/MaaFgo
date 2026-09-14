@@ -84,15 +84,45 @@ class IdentityTests(unittest.TestCase):
         self.assertIsNone(slots[0].servant_id)
         self.assertEqual(slots[0].reason, "calibration_required")
 
+    def test_missing_narrow_identity_uses_existing_face_fallback(self):
+        image_write(self.root / "servant_face/f_30000.png", self.other)
+        data = json.loads(self.catalog.read_text())
+        data["servants"].append({"id": "3000", "name": "备用", "class": "rider", "images": []})
+        self.catalog.write_text(json.dumps(data), encoding="utf-8")
+        reader = self.reader()
+        self.assertEqual(reader.coverage["fallback_ids"], ["3000"])
+        self.assertEqual(reader.templates["3000"][0][0], "servant_face/f_30000.png")
+
     def test_wrong_class_falls_back_and_final_frame_audits_all(self):
         reader = self.reader()
         with patch.object(reader, "_class", return_value=("caster", Confidence(.99))):
             slots = reader.read_frame(self.image)
             self.assertEqual(slots[0].servant_id, "1000")
             self.assertEqual(slots[0].search_scope, "all_fallback")
+            self.assertIsNone(slots[0].class_id)
+            self.assertEqual(slots[0].class_confidence.source, "class_identity_conflict")
         with patch.object(reader, "_class", return_value=("saber", Confidence(.99))):
             slots = reader.read_frame(self.image, full_audit=True)
             self.assertEqual(slots[0].search_scope, "all_audit")
+
+    def test_class_template_uses_slot_relative_roi_and_margin(self):
+        icons = {}
+        for name in ("saber", "caster"):
+            icons[name] = self.rng.integers(0, 255, (12, 12, 3), dtype=np.uint8)
+            image_write(self.root / f"classes/{name}.png", icons[name])
+        calibration = f.FormationCalibration.parse({
+            "verified": True, "calibration_id": "synthetic-test-only",
+            "identity_threshold": .95, "identity_margin": .25,
+            "class_threshold": .95, "class_margin": .25,
+            "class_roi": [0, 0, 20, 20],
+            "class_templates": {name: [f"classes/{name}.png"] for name in icons},
+        })
+        for x, y, _, _ in f.SLOT_ROIS:
+            self.image[y+2:y+14, x+2:x+14] = icons["saber"]
+        reader = self.reader(calibration)
+        result = reader.read_frame(self.image, full_audit=True)
+        self.assertTrue(all(s.class_id == "saber" for s in result))
+        self.assertTrue(all(s.class_confidence.value > .99 for s in result))
 
     def test_high_score_wrong_class_cannot_survive_global_audit(self):
         reader = self.reader()

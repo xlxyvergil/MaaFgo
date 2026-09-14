@@ -120,6 +120,8 @@ class FormationSessions:
             session = self._get(task_id, token)
             if not session.collecting or revision != session.revision or session.error:
                 raise ValueError("invalid formation capture cannot be published")
+            if len(session.frames) != 3:
+                raise ValueError("three independently sampled frames required")
             snapshot = InitialFormation(
                 slots=slots, task_id=task_id, session_id=token, revision=revision,
                 captured_at=datetime.now(timezone.utc).isoformat(),
@@ -159,7 +161,7 @@ sessions = FormationSessions()
 
 
 def context_session(context) -> tuple[int, str]:
-    """v5.12.3 Context 的根任务 ID 在 run_task 克隆间保留。"""
+    """v5.10.1/v5.12.3 Context 根任务 ID 在 run_task 克隆间保留。"""
     root = context.get_task_job().job_id
     node = context.get_node_data(SESSION_NODE) or {}
     token = (node.get("attach") or {}).get("session_id", "")

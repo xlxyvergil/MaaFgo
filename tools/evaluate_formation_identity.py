@@ -61,6 +61,8 @@ def evaluate(manifest_path: Path, calibration_data: dict, roots: list[Path]) -> 
             expected = sample.get("slots", [])
             if expected_page and [s.get("slot") for s in expected] != list(range(1, 7)):
                 raise ValueError("positive sample requires six ordered slot annotations")
+            if expected_page and any(s.get("status") != "empty" and not s.get("servant_id") for s in expected):
+                raise ValueError("occupied slot annotation requires servant_id")
             for index, path in enumerate(paths):
                 image_bytes = path.read_bytes()
                 frame_row = {"path": str(path), "sha256": hashlib.sha256(image_bytes).hexdigest()}

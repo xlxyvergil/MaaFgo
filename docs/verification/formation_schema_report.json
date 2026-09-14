@@ -1,0 +1,193 @@
+{
+  "files_checked": 66,
+  "existing_failures": [
+    {
+      "file": "assets/resource/BBchannel/master_info.json",
+      "errors": 24,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('SN', 'skill_name', 'skill_type' were unexpected)"
+    },
+    {
+      "file": "assets/resource/BBchannel/material_info.json",
+      "errors": 3,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('职阶技能石', '职阶棋子', '金素材', '铜素材', '银素材' were unexpected)"
+    },
+    {
+      "file": "assets/resource/BBchannel/material_quality.json",
+      "errors": 5,
+      "tracked": false,
+      "first_error": "['英雄之证', '凶骨', '龙之牙', '虚影之尘', '愚者之锁', '万死的毒针', '魔术髓液', '宵泣之铁桩', '振荡火药', '赦免的小钟', '黄昏的仪式剑', '不忘之灰'] is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/oldstrategys.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '', 'strategy': {'card1': {'type': 2, 'cards': [], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 2, 'cards': [], 'criticalStar': 0, 'more_or_less': True}, 'card3': {'type': 2, 'cards': [], 'critica"
+    },
+    {
+      "file": "assets/resource/BBchannel/scripts_settings.json",
+      "errors": 3,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('NPlevel', 'allowOtherApple', 'assistEquip', 'assistIdx', 'assistMode', 'clearAP', 'connectMode', 'dropImage', 'dropStopNum', 'firstBattleSet', 'fullEquip', 'fullFriendshipStop', '"
+    },
+    {
+      "file": "assets/resource/BBchannel/servant_info_CH.json",
+      "errors": 432,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('NPcolor', 'SN', 'class', 'command_card', 'command_card_types', 'graph', 'graph_types', 'other_name', 'servant_face', 'servant_face_types', 'skill_name', 'skill_type', 'star' were "
+    },
+    {
+      "file": "assets/resource/BBchannel/servant_info_CNTW.json",
+      "errors": 432,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('NPcolor', 'SN', 'class', 'command_card', 'command_card_types', 'graph', 'graph_types', 'other_name', 'servant_face', 'servant_face_types', 'skill_name', 'skill_type', 'star' were "
+    },
+    {
+      "file": "assets/resource/BBchannel/servant_info_JP.json",
+      "errors": 432,
+      "tracked": false,
+      "first_error": "Unevaluated properties are not allowed ('NPcolor', 'SN', 'class', 'command_card', 'command_card_types', 'graph', 'graph_types', 'other_name', 'servant_face', 'servant_face_types', 'skill_name', 'skill_type', 'star' were "
+    },
+    {
+      "file": "assets/resource/BBchannel/UIsettings.json",
+      "errors": 23,
+      "tracked": false,
+      "first_error": "0 is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/settings/chaldea_94061640_offline.json",
+      "errors": 29,
+      "tracked": false,
+      "first_error": "'chaldea' is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/settings/宇宙凛_Caber_Caber.json",
+      "errors": 49,
+      "tracked": false,
+      "first_error": "'太空伊什塔尔' is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/settings/摩根_光狐_光狐.json",
+      "errors": 57,
+      "tracked": false,
+      "first_error": "'摩根' is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/settings/爱尔奎特_光狐_光狐.json",
+      "errors": 50,
+      "tracked": false,
+      "first_error": "'ArchetypeEarth' is not of type 'object'"
+    },
+    {
+      "file": "assets/resource/BBchannel/strategy/_1宝具(1号位_主打手红卡)+2指令卡_补刀.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '_1宝具(1号位_主打手红卡)+2指令卡_补刀', 'strategy': {'card1': {'type': 0, 'cards': [1], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 1, 'cards': ['1B', '1A', '1Q', '2B', '3B', '2A', '3A', '2Q', '3Q'], 'critica"
+    },
+    {
+      "file": "assets/resource/BBchannel/strategy/_1宝具(1号位_主打手绿卡)+2指令卡_补刀.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '_1宝具(1号位_主打手绿卡)+2指令卡_补刀', 'strategy': {'card1': {'type': 0, 'cards': [1], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 1, 'cards': ['1Q', '1B', '1A', '2B', '3B', '2A', '3A', '2Q', '3Q'], 'critica"
+    },
+    {
+      "file": "assets/resource/BBchannel/strategy/_1宝具(1号位_主打手蓝卡)+2指令卡_补刀.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '_1宝具(1号位_主打手蓝卡)+2指令卡_补刀', 'strategy': {'card1': {'type': 0, 'cards': [1], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 1, 'cards': ['1A', '1B', '1Q', '2B', '3B', '2A', '3A', '2Q', '3Q'], 'critica"
+    },
+    {
+      "file": "assets/resource/BBchannel/strategy/_1宝具(1号位_可自行修改)+2指令卡_避免同从者连携.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '_1宝具(1号位_可自行修改)+2指令卡_避免同从者连携', 'strategy': {'card1': {'type': 0, 'cards': [1], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 2, 'cards': [], 'criticalStar': 0, 'more_or_less': True}, 'card3': {'ty"
+    },
+    {
+      "file": "assets/resource/BBchannel/strategy/_3狂冬木凶骨.json",
+      "errors": 1,
+      "tracked": false,
+      "first_error": "[{'tag': '_3狂冬木凶骨', 'strategy': {'card1': {'type': 1, 'cards': ['1B', '2B', '3B', '1A', '2A', '3A', '1Q', '2Q', '3Q'], 'criticalStar': 0, 'more_or_less': True}, 'card2': {'type': 1, 'cards': ['1B', '2B', '3B', '1A', '2A'"
+    },
+    {
+      "file": "assets/resource/BBchannel/assets/status/status_info.json",
+      "errors": 15,
+      "tracked": false,
+      "first_error": "['兰陵王_1.png', '兰陵王_2.png', '兰陵王_3.png', '兰陵王_4.png', '冲田总司_1.png', '冲田总司_2.png', '冲田总司_3.png', '冲田总司_4.png', '吉尔·德·雷_1.png', '吉尔·德·雷_2.png', '吉尔·德·雷_3.png', '巴御前(Saber)_1.png', '巴御前(Saber)_2.png', '巴御前(Saber)_3.png', '弗格"
+    }
+  ],
+  "modified_pipeline_comparison": [
+    {
+      "file": "assets/resource/base/pipeline/自动编队.json",
+      "baseline_errors": 0,
+      "current_errors": 0
+    },
+    {
+      "file": "assets/resource/base/pipeline/进本流程.json",
+      "baseline_errors": 0,
+      "current_errors": 0
+    },
+    {
+      "file": "assets/resource/base/pipeline/原生自动战斗调度.json",
+      "baseline_errors": 0,
+      "current_errors": 0
+    },
+    {
+      "file": "assets/resource/base/pipeline/原生自动战斗.json",
+      "baseline_errors": 0,
+      "current_errors": 0
+    }
+  ],
+  "missing_schema": "deps/tools/interface_import.schema.json",
+  "interface_fragments": [
+    {
+      "file": "assets/tasks/原生自动战斗.json",
+      "errors": 0,
+      "messages": [],
+      "modified": false,
+      "note": "Source fragments; repository configure/build representation differs from final interface schema."
+    },
+    {
+      "file": "assets/options/Chaldea导入手动输入.json",
+      "errors": 6,
+      "messages": [
+        "{'type': 'select', 'label': '是否用助战代替编队数据', 'description': '队伍未标记助战时，可用当前同名助战替代对应从者；无法识别或不匹配会停止任务。已标记助战时按数据校验。', 'default': '否', 'cases': [{'name': '否', 'label': '否', 'pipeline_over",
+        "{'type': 'select', 'label': '是否使用 Chaldea 队伍', 'description': '选择助战后按编队方式检查或还原导入队伍，再进入战斗。无法按等级或技能区分同名从者，请将不用的个体放入保管室。\\n >', 'default': '否', 'cases': [{'name': '否', 'label': '否'}, {",
+        "{'type': 'input', 'label': 'Chaldea 队伍导入', 'description': '必填。支持分享链接、队伍ID、关卡ID、本地 JSON，或 config/Battle 下的缓存文件名。', 'inputs': [{'name': 'chaldea_import_source', 'label': '分享链接 / 队伍ID",
+        "{'type': 'select', 'label': '编队方式', 'description': '手动仅核对从者；身份一致但位置不同会自动换位保存。自动会按导入数据完整编队。', 'default': '手动', 'cases': [{'name': '手动', 'label': '手动', 'pipeline_override': {'进本-编队处理",
+        "{'type': 'select', 'label': '满破礼装缺失时', 'description': '仅在指定的满破礼装未找到时生效。', 'default': '跳过礼装', 'cases': [{'name': '跳过礼装', 'label': '跳过该礼装', 'pipeline_override': {'执行自动编队': {'attach':",
+        "{'type': 'select', 'label': '自动编成礼装', 'description': '关闭后只编排从者和助战，不更换礼装。', 'default': '是', 'cases': [{'name': '是', 'label': '是', 'pipeline_override': {'执行自动编队': {'attach': {'auto_e"
+      ],
+      "baseline_errors": 6,
+      "modified": false,
+      "note": "Source fragments; repository configure/build representation differs from final interface schema."
+    },
+    {
+      "file": "assets/options/战斗方式.json",
+      "errors": 1,
+      "messages": [
+        "{'type': 'select', 'label': '战斗方式', 'description': '选择使用 BBC 战斗还是原生自动战斗。使用 BBC 前请单独启用“启动bbc”任务。', 'default': 'bbc', 'cases': [{'name': 'bbc', 'label': 'BBC战斗', 'option': ['team_con"
+      ],
+      "baseline_errors": 1,
+      "modified": false,
+      "note": "Source fragments; repository configure/build representation differs from final interface schema."
+    },
+    {
+      "file": "assets/options/原生自动战斗次数.json",
+      "errors": 0,
+      "messages": [],
+      "baseline_errors": 0,
+      "modified": false,
+      "note": "Source fragments; repository configure/build representation differs from final interface schema."
+    }
+  ],
+  "static_flow": {
+    "base_nodes": 940,
+    "duplicates": [],
+    "missing_refs": []
+  },
+  "python_ast": {
+    "files": 67,
+    "errors": []
+  }
+}
