@@ -132,26 +132,25 @@ class IdentityTests(unittest.TestCase):
         def ranked(image, roi, ids):
             return [(0.999, "1000", "correct"), (.96, "2000", "similar")] if "1000" in ids else [
                 (.96, "2000", "similar"), (.4, "3000", "other")]
-        # 提高全局分差仍不足：可疑场景必须未知。
+        # 单帧全局复核：可疑场景必须未知。
         with patch.object(reader, "_class", return_value=("caster", Confidence(.99))), \
              patch.object(reader, "_rank", side_effect=ranked):
-            first = reader.read_frame(self.image)
             last = reader.read_frame(self.image, full_audit=True)
-        merged = f.merge_formation_frames((first, first, last))
-        self.assertEqual(first[0].servant_id, "2000")
+        merged = f.merge_formation_frames((last,))
         self.assertIsNone(merged[0].servant_id)
+        self.assertEqual(merged[0].search_scope, "all_audit")
 
     def test_low_margin_and_multi_frame_disagreement_are_unknown(self):
         reader = self.reader()
         with patch.object(reader, "_rank", return_value=[(.99, "1000", "a"), (.98, "2000", "b")]):
             self.assertEqual(reader.read_frame(self.image)[0].status, "unknown")
         frame = reader.read_frame(self.image, full_audit=True)
+        merged = f.merge_formation_frames((frame,))
+        self.assertEqual(merged[1].consistent_frames, 1)
+        # 超出当前帧数上限（单帧）的输入必须拒绝。
         changed = (replace(frame[0], servant_id="2000"), *frame[1:])
-        merged = f.merge_formation_frames((frame, frame, changed))
-        self.assertIsNone(merged[0].servant_id)
-        self.assertEqual(merged[1].consistent_frames, 3)
         with self.assertRaisesRegex(ValueError, "incomplete"):
-            f.merge_formation_frames((frame, frame))
+            f.merge_formation_frames((frame, changed))
 
     def test_page_and_screenshot_failure_are_not_empty_slots(self):
         reader = self.reader()

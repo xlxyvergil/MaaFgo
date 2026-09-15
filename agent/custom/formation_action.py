@@ -2055,7 +2055,9 @@ class ValidateFormationFromChaldea(AutoFormationFromChaldea):
 
 # ---------- 原生战斗：只读取最终编队，不调用上方任何编成/点击方法 ----------
 
-IDENTITY_FRAME_NODES = ("编队身份-第1帧", "编队身份-第2帧", "编队身份-第3帧")
+# 单帧采集：确认页为静态界面，无转场残留/动画帧风险；单帧全库匹配
+# 即可直接给出结论，多帧投票只增加等待时间（每帧约 28s 全库耗时）。
+IDENTITY_FRAME_NODES = ("编队身份-第1帧",)
 
 
 @dataclass(frozen=True)
@@ -2320,8 +2322,10 @@ class FormationIdentityReader(AutoFormationFromChaldea):
 
 
 def merge_formation_frames(frames):
-    """三次独立截图全部同意才能确认；相同 ID 的灵衣变化不制造身份分差。"""
-    if len(frames) != len(IDENTITY_FRAME_NODES) or any(
+    """各帧独立截图全部同意才能确认；相同 ID 的灵衣变化不制造身份分差。
+
+    单帧时退化为直接采纳该帧结论（无跨帧投票，安全性由阈值余量保证）。"""
+    if not frames or len(frames) > len(IDENTITY_FRAME_NODES) or any(
         tuple(s.slot for s in f) != (1, 2, 3, 4, 5, 6) for f in frames
     ):
         raise ValueError("incomplete_formation_frames")

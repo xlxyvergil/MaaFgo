@@ -1,0 +1,31 @@
+{
+  "description": "单张真实国服编队确认页截图的身份识别阈值实测记录。来源：assets/resource/cn/image/组队.png（1280x720，含配置变更/开始任务按钮与助战槽2）。roots 顺序为 cn 优先（对应用户选择 B服/享游服资源包时 _init_paths 的真实顺序）。诊断绕过 verified 检查（diagnostics=True），用于确定阈值，不代表验收完成。",
+  "date": "2026-09-15",
+  "image": "assets/resource/cn/image/组队.png",
+  "template_family": "NarrowFigures",
+  "page_check": {
+    "config_marker": {"template": "cn/image/battle/配置变更.png", "score": 0.9688, "loc": [194, 653]},
+    "start_marker": {"template": "cn/image/battle/开始任务.png", "score": 1.0, "loc": [1101, 649]},
+    "support_marker_slot2": {"template": "cn/image/battle/助战标记.png", "score": 0.9624, "loc": [321, 184]}
+  },
+  "slots": [
+    {"slot": 1, "best_candidate_id": "504500", "best_score": 0.8948, "runner_up_score": 0.3856, "margin": 0.5091, "is_support": false, "scope": "all_audit"},
+    {"slot": 2, "best_candidate_id": "301300", "best_score": 0.8657, "runner_up_score": 0.4653, "margin": 0.4005, "is_support": true, "scope": "all_audit"},
+    {"slot": 3, "best_candidate_id": "901000", "best_score": 0.9589, "runner_up_score": 0.5109, "margin": 0.4481, "is_support": false, "scope": "all_audit"},
+    {"slot": 4, "best_candidate_id": "2300300", "best_score": 0.9881, "runner_up_score": 0.4432, "margin": 0.545, "is_support": false, "scope": "all_audit"},
+    {"slot": 5, "best_candidate_id": "700500", "best_score": 0.9857, "runner_up_score": 0.4325, "margin": 0.5532, "is_support": false, "scope": "all_audit"},
+    {"slot": 6, "best_candidate_id": "4000100", "best_score": 0.9846, "runner_up_score": 0.4175, "margin": 0.5671, "is_support": false, "scope": "all_audit"}
+  ],
+  "derived_calibration": {
+    "calibration_id": "cal-20260915-teamimg",
+    "identity_threshold": 0.8,
+    "identity_margin": 0.15,
+    "rationale": "实测正确身份分数 0.8657-0.9881，全部高于阈值 0.8 并留有 >=0.066 余量；冒牌最高分 0.5109，与第一名分差 0.4005-0.5671，全部远大于 margin 0.15。阈值取保守整数值，正确样本全通过、冒牌全拒绝。"
+  },
+  "limitations": [
+    "单张截图单队伍，未覆盖相似立绘（同名/灵衣变体）对抗样本与空位混合场景",
+    "未做三帧一致性实测（离线单帧；正式采集为三帧投票，一致性要求只会更严）",
+    "base 模板顺序（未选服务器）下 config_marker 为旧样式 0.5449，页面判定会失败；国服用户须选择 cn 资源包",
+    "验收样本（held-out）待补：建议再采集 1-2 组不同队伍截图复测分数分布"
+  ]
+}

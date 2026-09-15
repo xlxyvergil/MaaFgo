@@ -45,8 +45,7 @@ class FakeContext:
 
 def publish(store, root, token):
     rev = store.begin_capture(root, token)
-    for _ in range(3):
-        store.append_frame(root, token, rev, SLOTS)
+    store.append_frame(root, token, rev, SLOTS)
     return store.publish(root, token, rev, SLOTS, "test")
 
 
@@ -127,7 +126,7 @@ class EntryTests(unittest.TestCase):
             self.assertEqual(entry, "编队身份-采样")
             params = [pipeline_override[n]["recognition"]["param"]["custom_recognition_param"]
                       for n in f.IDENTITY_FRAME_NODES]
-            self.assertEqual([p["full_audit"] for p in params], [False, False, True])
+            self.assertEqual([p["full_audit"] for p in params], [True])
             for p in params:
                 sessions.append_frame(ctx.root, token, p["revision"], SLOTS)
             return NS(status=NS(succeeded=True))

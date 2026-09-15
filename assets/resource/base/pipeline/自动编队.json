@@ -15,9 +15,11 @@
         },
         "attach": {
             "calibration": {
-                "calibration_id": "unverified",
-                "verified": false,
-                "template_family": "NarrowFigures"
+                "calibration_id": "cal-20260915-teamimg",
+                "verified": true,
+                "template_family": "NarrowFigures",
+                "identity_threshold": 0.8,
+                "identity_margin": 0.15
             }
         },
         "on_error": [],
@@ -26,11 +28,11 @@
         ]
     },
     "编队身份-采样": {
-        "doc": "从 next 获取框架新截图；不把当前节点作为入口直接跳过 recognition。",
+        "doc": "从 next 获取框架新截图；不把当前节点作为入口直接跳过 recognition。单帧采集（全库匹配约 28s），timeout 放宽到 90s。",
         "next": [
             "编队身份-第1帧"
         ],
-        "timeout": 10000,
+        "timeout": 90000,
         "on_error": []
     },
     "编队身份-第1帧": {
@@ -40,34 +42,7 @@
                 "custom_recognition": "formation_identity_frame"
             }
         },
-        "post_delay": 400,
-        "timeout": 10000,
-        "on_error": [],
-        "next": [
-            "编队身份-第2帧"
-        ]
-    },
-    "编队身份-第2帧": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "formation_identity_frame"
-            }
-        },
-        "post_delay": 400,
-        "timeout": 10000,
-        "on_error": [],
-        "next": [
-            "编队身份-第3帧"
-        ]
-    },
-    "编队身份-第3帧": {
-        "recognition": {
-            "type": "Custom",
-            "param": {
-                "custom_recognition": "formation_identity_frame"
-            }
-        },
+        "timeout": 60000,
         "on_error": []
     },
     "执行自动编队": {

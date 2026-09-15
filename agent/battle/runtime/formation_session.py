@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from threading import RLock
 from uuid import uuid4
 
-from ..core.models import FormationSlot, InitialFormation
+from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT
 
 
 SESSION_NODE = "编队身份-会话"
@@ -120,8 +120,8 @@ class FormationSessions:
             session = self._get(task_id, token)
             if not session.collecting or revision != session.revision or session.error:
                 raise ValueError("invalid formation capture cannot be published")
-            if len(session.frames) != 3:
-                raise ValueError("three independently sampled frames required")
+            if len(session.frames) != REQUIRED_FRAME_COUNT:
+                raise ValueError("independently sampled frames required")
             snapshot = InitialFormation(
                 slots=slots, task_id=task_id, session_id=token, revision=revision,
                 captured_at=datetime.now(timezone.utc).isoformat(),

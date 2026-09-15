@@ -145,8 +145,7 @@ class FrameworkTests(unittest.TestCase):
             if fail_capture:
                 self.assertEqual(received_images, [])
             else:
-                self.assertEqual(len(received_images), 3)
-                self.assertEqual(len(set(received_images)), 3)
+                self.assertEqual(len(received_images), 1)
             self.assertEqual(len(observed), int(page_ok and not fail_capture))
             if page_ok and not fail_capture:
                 snapshot = observed[0]

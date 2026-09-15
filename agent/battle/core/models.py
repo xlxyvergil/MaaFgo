@@ -29,6 +29,11 @@ class Confidence:
         return self.value >= threshold
 
 
+# 单帧采集：确认页为静态界面，单帧全库匹配即可给出结论。
+# formation_action.IDENTITY_FRAME_NODES 与 formation_session 的 publish 校验共用此值。
+REQUIRED_FRAME_COUNT = 1
+
+
 @dataclass(frozen=True)
 class FormationSlot:
     """编队确认页的成员；slot 为 1..6，不是战斗中动态的前排位置。
