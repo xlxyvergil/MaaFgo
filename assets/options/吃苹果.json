@@ -1,8 +1,8 @@
 {
     "option": {
-        "战前吃苹果": {
+        "吃苹果": {
             "type": "select",
-            "label": "是否战前吃苹果",
+            "label": "是否吃苹果",
             "default": "gold",
             "cases": [
                 {

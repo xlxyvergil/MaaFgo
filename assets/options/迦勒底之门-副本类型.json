@@ -11,7 +11,7 @@
           "option": [
             "chaldea_gate_quest_subtype_ember",
             "team_index",
-            "战前吃苹果",
+            "吃苹果",
             "battle_mode"
           ]
         },
@@ -21,7 +21,7 @@
           "option": [
             "chaldea_gate_quest_subtype_training",
             "team_index",
-            "战前吃苹果",
+            "吃苹果",
             "battle_mode"
           ]
         },
@@ -31,7 +31,7 @@
           "option": [
             "chaldea_gate_quest_subtype_qp",
             "team_index",
-            "战前吃苹果",
+            "吃苹果",
             "battle_mode"
           ]
         }
