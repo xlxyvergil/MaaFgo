@@ -15,11 +15,50 @@
         },
         "attach": {
             "calibration": {
-                "calibration_id": "cal-20260915-teamimg",
+                "calibration_id": "cal-20260916-class",
                 "verified": true,
                 "template_family": "NarrowFigures",
                 "identity_threshold": 0.8,
-                "identity_margin": 0.15
+                "identity_margin": 0.15,
+                "class_roi": [0, 0, 72, 50],
+                "class_threshold": 0.8,
+                "class_margin": 0.3,
+                "class_templates": {
+                    "saber": ["battle/职阶/Saber_Golden.png", "battle/职阶/Saber_Silver.png", "battle/职阶/Saber_Bronze.png", "battle/职阶/Saber_Grand.png"],
+                    "archer": ["battle/职阶/Archer_Golden.png", "battle/职阶/Archer_Silver.png", "battle/职阶/Archer_Bronze.png"],
+                    "lancer": ["battle/职阶/Lancer_Golden.png", "battle/职阶/Lancer_Silver.png", "battle/职阶/Lancer_Bronze.png", "battle/职阶/Lancer_Grand.png"],
+                    "rider": ["battle/职阶/Rider_Golden.png", "battle/职阶/Rider_Silver.png", "battle/职阶/Rider_Bronze.png", "battle/职阶/Rider_Grand.png"],
+                    "caster": ["battle/职阶/Caster_Golden.png", "battle/职阶/Caster_Silver.png", "battle/职阶/Caster_Bronze.png"],
+                    "assassin": ["battle/职阶/Assassin_Golden.png", "battle/职阶/Assassin_Silver.png", "battle/职阶/Assassin_Bronze.png"],
+                    "berserker": ["battle/职阶/Berserker_Golden.png", "battle/职阶/Berserker_Silver.png", "battle/职阶/Berserker_Bronze.png", "battle/职阶/Berserker_Grand.png"],
+                    "shielder": ["battle/职阶/Shielder_Golden.png"],
+                    "ruler": ["battle/职阶/Ruler_Golden.png"],
+                    "avenger": ["battle/职阶/Avenger_Golden.png", "battle/职阶/Avenger_Silver.png", "battle/职阶/Avenger_Black.png", "battle/职阶/Avenger_Grand.png"],
+                    "alterEgo": ["battle/职阶/AlterEgo_Golden.png", "battle/职阶/AlterEgo_Silver.png"],
+                    "foreigner": ["battle/职阶/Foreigner_Golden.png"],
+                    "pretender": ["battle/职阶/Pretender_Golden.png", "battle/职阶/Pretender_Grand.png"],
+                    "moonCancer": ["battle/职阶/MoonCancer_Golden.png", "battle/职阶/MoonCancer_Grand.png"],
+                    "beast": ["battle/职阶/Beast_Golden.png"],
+                    "unBeast": ["battle/职阶/UnBeast_Golden.png", "battle/职阶/UnBeast_Grand.png"]
+                },
+                "class_groups": {
+                    "saber": ["saber"],
+                    "archer": ["archer"],
+                    "lancer": ["lancer"],
+                    "rider": ["rider"],
+                    "caster": ["caster"],
+                    "assassin": ["assassin"],
+                    "berserker": ["berserker"],
+                    "shielder": ["shielder"],
+                    "ruler": ["ruler"],
+                    "avenger": ["avenger"],
+                    "alterEgo": ["alterEgo"],
+                    "foreigner": ["foreigner"],
+                    "pretender": ["pretender"],
+                    "moonCancer": ["moonCancer"],
+                    "beast": ["beast"],
+                    "unBeast": ["unBeast"]
+                }
             }
         },
         "on_error": [],
