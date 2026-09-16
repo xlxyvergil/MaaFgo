@@ -590,25 +590,44 @@ class AutoFormationFromChaldea(CustomAction):
     def _match_template(self, image, template, roi=None, display_size=None):
         if image is None or template is None:
             return None
-        scaled = template
         if display_size is None:
             width = max(1, int(round(template.shape[1] * self.sx)))
             height = max(1, int(round(template.shape[0] * self.sy)))
         else:
             width = max(1, int(round(display_size[0] * self.sx)))
             height = max(1, int(round(display_size[1] * self.sy)))
-        if width != template.shape[1] or height != template.shape[0]:
-            scaled = cv2.resize(template, (width, height))
+        # 同一实例内模板缩放结果缓存：全库匹配时同一模板会按相同尺寸
+        # 被多个槽位反复使用，重复 cv2.resize 是主要耗时，缓存后只缩一次。
+        # 模板对象由实例（或模块级索引）持有，id 在实例存活期内稳定。
+        cache = self.__dict__.setdefault("_tpl_scale_cache", {})
+        cache_key = (id(template), width, height)
+        scaled = cache.get(cache_key)
+        if scaled is None:
+            scaled = template
+            if width != template.shape[1] or height != template.shape[0]:
+                scaled = cv2.resize(template, (width, height))
+            cache[cache_key] = scaled
         region, offset_x, offset_y = image, 0, 0
         if roi is not None:
-            x, y, roi_width, roi_height = self._scale_roi(roi)
-            x, y = max(0, x), max(0, y)
-            roi_width = min(roi_width, image.shape[1] - x)
-            roi_height = min(roi_height, image.shape[0] - y)
-            if roi_width <= 0 or roi_height <= 0:
+            # 同帧内同 ROI 的裁剪缓存：一个槽位要匹配几十张模板，
+            # 每次重复 scale_roi + 切片是纯浪费；帧内容不变时安全。
+            # 缓存键含 image 的 id，换帧后自动失效。
+            rcache = self.__dict__.setdefault("_roi_crop_cache", {})
+            rkey = (id(image), roi)
+            cropped = rcache.get(rkey)
+            if cropped is None:
+                x, y, roi_width, roi_height = self._scale_roi(roi)
+                x, y = max(0, x), max(0, y)
+                roi_width = min(roi_width, image.shape[1] - x)
+                roi_height = min(roi_height, image.shape[0] - y)
+                if roi_width <= 0 or roi_height <= 0:
+                    rcache[rkey] = False
+                else:
+                    cropped = (image[y:y + roi_height, x:x + roi_width], x, y)
+                    rcache[rkey] = cropped
+            if cropped is False:
                 return None
-            region = image[y:y + roi_height, x:x + roi_width]
-            offset_x, offset_y = x, y
+            region, offset_x, offset_y = cropped
         if region.shape[0] < scaled.shape[0] or region.shape[1] < scaled.shape[1]:
             return None
         _min_value, score, _min_loc, max_loc = cv2.minMaxLoc(
@@ -2055,8 +2074,9 @@ class ValidateFormationFromChaldea(AutoFormationFromChaldea):
 
 # ---------- 原生战斗：只读取最终编队，不调用上方任何编成/点击方法 ----------
 
-# 单帧采集：确认页为静态界面，无转场残留/动画帧风险；单帧全库匹配
-# 即可直接给出结论，多帧投票只增加等待时间（每帧约 28s 全库耗时）。
+# 单帧采集：确认页为静态界面，无转场残留/动画帧风险。
+# 已验证标定时优先职阶限定快速匹配（秒级）；职阶不可靠或匹配不被
+# 接受时由 read_frame 自动回退全库（约 28s），不再无条件全库复核。
 IDENTITY_FRAME_NODES = ("编队身份-第1帧",)
 
 
@@ -2210,6 +2230,22 @@ class FormationIdentityReader(AutoFormationFromChaldea):
     不调用 _shot/_prepare_target_templates/run，因而不会使用缓存截图、
     下载 Chaldea 数据、移动或更换成员。实例仅存活于单次采集回调。
     """
+
+    _instance_cache = {}
+
+    @classmethod
+    def acquire(cls, roots, calibration):
+        """按 (roots, calibration) 复用实例。
+
+        模板索引带 mtime/size 失效检测，但目录扫描与实例重建在
+        单次任务内是纯重复开销（几百次 stat + 重复读图）；任务级
+        复用可显著降低采样延迟。sx/sy 每帧重置，无跨帧状态残留。"""
+        key = (tuple(roots), calibration)
+        reader = cls._instance_cache.get(key)
+        if reader is None:
+            reader = cls(roots, calibration)
+            cls._instance_cache[key] = reader
+        return reader
 
     def __init__(self, roots, calibration=None, catalog_path=None):
         self.image_roots = list(roots)
@@ -2367,7 +2403,7 @@ class FormationIdentityFrame(CustomRecognition):
             helper.context = context
             helper._init_paths()
             calibration = FormationCalibration.parse(param.get("calibration", {}))
-            reader = FormationIdentityReader(helper.image_roots, calibration)
+            reader = FormationIdentityReader.acquire(helper.image_roots, calibration)
             slots = reader.read_frame(argv.image, full_audit=param.get("full_audit", False))
             sessions.append_frame(root, token, revision, slots)
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"frame_ok": True})
@@ -2397,7 +2433,11 @@ class CaptureInitialFormation(CustomAction):
                     "custom_recognition": "formation_identity_frame",
                     "custom_recognition_param": {
                         "session_id": token, "revision": revision,
-                        "calibration": config, "full_audit": i == len(IDENTITY_FRAME_NODES) - 1,
+                        # 仅多帧模式下对末帧强制全库复核；单帧依赖
+                        # read_frame 内部的职阶限定 + 不可靠时回退全库。
+                        "calibration": config,
+                        "full_audit": len(IDENTITY_FRAME_NODES) > 1
+                        and i == len(IDENTITY_FRAME_NODES) - 1,
                     },
                 }}}
                 for i, name in enumerate(IDENTITY_FRAME_NODES)
