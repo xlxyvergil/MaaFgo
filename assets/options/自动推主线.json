@@ -1,0 +1,64 @@
+{
+  "option": {
+    "主线-推进上限": {
+      "type": "input",
+      "label": "推进关卡上限",
+      "description": "战斗关和纯剧情关均计 1 关；到达上限后停在当前地图或副本列表。",
+      "inputs": [
+        {
+          "name": "count",
+          "label": "关卡数",
+          "default": "10",
+          "verify": "^[1-9][0-9]{0,2}$",
+          "pipeline_type": "int"
+        }
+      ],
+      "pipeline_override": {
+        "主线-配置": {
+          "attach": {
+            "quest_limit": "{count}"
+          }
+        }
+      }
+    },
+    "主线-战斗方式": {
+      "type": "select",
+      "label": "战斗方式",
+      "default": "native",
+      "cases": [
+        {
+          "name": "native",
+          "label": "原生自动战斗",
+          "option": [
+            "原生自动战斗使用Chaldea队伍",
+            "原生自动战斗助战方式"
+          ],
+          "pipeline_override": {
+            "主线-配置": {
+              "attach": {
+                "battle_mode": "native"
+              }
+            }
+          }
+        },
+        {
+          "name": "bbc",
+          "label": "BBC 单场战斗",
+          "option": [
+            "team_config",
+            "apple_type",
+            "support_order_mismatch",
+            "team_config_error"
+          ],
+          "pipeline_override": {
+            "主线-配置": {
+              "attach": {
+                "battle_mode": "bbc"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }
+}

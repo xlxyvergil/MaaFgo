@@ -1,0 +1,223 @@
+{
+  "自动推主线调度": {
+    "doc": "从主线地图或副本列表启动；外层独立循环，不进入通用战斗调度。",
+    "action": {
+      "type": "Custom",
+      "param": {
+        "custom_action": "auto_main_story"
+      }
+    }
+  },
+  "主线-配置": {
+    "attach": {
+      "server": "cn",
+      "quest_limit": 10,
+      "battle_mode": "native",
+      "transition_timeout": 120
+    }
+  },
+  "主线-结果提示": {},
+  "主线-副本列表信息": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "副本打开标记-感叹号.png",
+        "threshold": 0.8,
+        "green_mask": true,
+        "roi": [
+          1115,
+          70,
+          165,
+          550
+        ]
+      }
+    },
+    "doc": "通用列表信息 i 图标。2026-09-26 国服东之村主线列表没有该图标，不能仅依赖本节点；须结合 主线-列表后退、主线-列表NEXT，空列表再结合地图底栏。"
+  },
+  "主线-列表后退": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "后退按钮.png",
+        "threshold": 0.8,
+        "roi": [
+          0,
+          0,
+          230,
+          100
+        ]
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "doc": "限定左上角的关闭/后退按钮。国服东之村主线列表实测 0.9841；地图上的管理室不会命中。与 NEXT 或地图底栏组合判断列表，不能单用后退。"
+  },
+  "主线-地图菜单": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "菜单.png",
+          "菜单2.png"
+        ],
+        "threshold": 0.8,
+        "green_mask": true,
+        "roi": [
+          1080,
+          580,
+          200,
+          140
+        ]
+      }
+    },
+    "doc": "与 主线-地图控件 组合确认地图，不能单用菜单。2026-09-26 国服卡美洛东之村实测 菜单2.png 0.9988；参考 地图轮巡.json 的 巡-能看到菜单。"
+  },
+  "主线-地图控件": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "map/UI隐藏.png",
+        "threshold": 0.8,
+        "roi": [
+          1000,
+          600,
+          100,
+          100
+        ]
+      }
+    },
+    "doc": "复用 地图坐标导航.json 的 UI隐藏 模板，仅读取、不点击。2026-09-26 国服卡美洛东之村实测 0.9749；需先排除 主线-副本列表信息。"
+  },
+  "主线-助战界面": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "助战选择界面标记.png",
+          "support/助战编入确认.png",
+          "support/助战NPC.png"
+        ],
+        "threshold": 0.8,
+        "green_mask": true
+      }
+    }
+  },
+  "主线-结算界面": {
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/scene_postbattle.png",
+        "threshold": 0.8
+      }
+    },
+    "action": {
+      "type": "Click"
+    }
+  },
+  "主线-地图NEXT": {
+    "recognition": {
+      "type": "Custom",
+      "param": {
+        "custom_recognition": "main_story_next",
+        "custom_recognition_param": {
+          "panel": false
+        }
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "doc": "主线-地图菜单 与 主线-地图控件 确认后调用。2026-09-26 国服卡美洛东之村实测差异 0.0367（越低越好），scale=1；返回框是箭头下方点击点，不是标记本身。点击后由 open_panel 复核列表。"
+  },
+  "主线-列表NEXT": {
+    "recognition": {
+      "type": "Custom",
+      "param": {
+        "custom_recognition": "main_story_next",
+        "custom_recognition_param": {
+          "panel": true
+        }
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "doc": "先判列表再调用；国服东之村第6节实测差异 0.0317，点击点约(698,196)，成功到达助战。当前画面可能同时看见背景地图 NEXT，故必须限定右侧列表 ROI。"
+  },
+  "主线-列表向上查找": {
+    "action": {
+      "type": "Swipe",
+      "param": {
+        "begin": [
+          995,
+          190,
+          1,
+          1
+        ],
+        "end": [
+          995,
+          535,
+          1,
+          1
+        ],
+        "duration": 500
+      }
+    }
+  },
+  "主线-列表向下查找": {
+    "action": {
+      "type": "Swipe",
+      "param": {
+        "begin": [
+          995,
+          535,
+          1,
+          1
+        ],
+        "end": [
+          995,
+          190,
+          1,
+          1
+        ],
+        "duration": 500
+      }
+    }
+  },
+  "主线-地图任务图标": {
+    "doc": "复用 原生自动战斗调度.json 的 task.png 及左下 ROI；仅用于 后退+菜单+任务图标 且无地图控件 的空列表复核，不能单独判定列表。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "task.png",
+        "roi": [
+          4,
+          499,
+          620,
+          219
+        ],
+        "green_mask": true,
+        "threshold": 0.8
+      }
+    }
+  },
+  "主线-任务完成报酬": {
+    "doc": "2026-09-26 国服东之村第6节第二场胜利后停在整屏“任务完成／获得报酬”，没有 battle/下一步.png。复用 base/image/报酬界面.png 的蓝底识别作为跨服回退；国服由 cn/pipeline/自动推主线资源.json 覆盖为底部明确提示 OCR。仅命中后点击底部提示，随后重新确认地图或列表；参考 原生自动战斗调度.json 的 结算推进_点击右上角，但本流程不用盲点兜底。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "报酬界面.png",
+        "roi": [350, 280, 350, 220],
+        "threshold": 0.82
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [640, 648, 1, 1]
+      }
+    },
+    "post_delay": 800
+  }
+}

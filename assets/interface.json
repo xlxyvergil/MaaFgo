@@ -88,6 +88,8 @@
     "tasks/冠位戴冠战.json",
     "tasks/迦勒底之门.json",
     "tasks/直接战斗.json",
+    "tasks/自动推主线.json",
+    "options/自动推主线.json",
     "tasks/通用大活动.json",
     "tasks/通用小活动.json",
     "tasks/每日1石.json",

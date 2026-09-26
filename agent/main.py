@@ -35,6 +35,8 @@ import ocr_logger
 import support_action
 import auto_battle_action
 import auto_battle_repeat_action
+import main_story_recognition
+import main_story_action
 
 
 def main():

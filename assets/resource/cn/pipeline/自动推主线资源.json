@@ -1,0 +1,17 @@
+{
+  "主线-配置": {
+    "attach": {
+      "server": "cn"
+    }
+  },
+  "主线-任务完成报酬": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [485, 617, 310, 62],
+        "expected": ["请点击游戏界面"],
+        "threshold": 0.8
+      }
+    }
+  }
+}
