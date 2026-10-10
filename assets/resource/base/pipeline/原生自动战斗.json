@@ -35,7 +35,8 @@
     ]
   },
   "原生自动战斗_多次入口": {
-    "doc": "battle_count 不在此硬编码：默认值由 auto_battle_repeat 的 _parse_battle_count 提供（默认 1），用户配置通过「原生自动战斗次数」option 以节点 attach 注入，attach 优先级低于 custom_action_param，若此处写死会永久屏蔽用户设置。",
+    "doc": "同一顶层任务仅执行一次，JumpBack 返回通用战斗调度后应进入完成提示；不能在每场重置此入口的命中计数。battle_count 默认 1，由 option 的 attach 或 custom_action_param 注入。",
+    "max_hit": 1,
     "action": {
       "type": "Custom",
       "param": {
