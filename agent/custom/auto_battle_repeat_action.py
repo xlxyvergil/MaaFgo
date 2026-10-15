@@ -20,7 +20,7 @@
   battle_count (int): 战斗次数，默认 1，范围 1~999。可通过 custom_action_param
     或入口节点（原生自动战斗_多次入口）的 attach.battle_count 注入，前者优先。
   reset_hit_nodes (list[str], 可选): 每场战斗前需要重置命中计数的节点列表。
-    默认值为包含 max_hit=1 的关键节点，确保多场战斗时节点可重复触发。
+    默认值包含跨场复用的有界节点，确保每场战斗重新获得命中预算。
   其余参数（chaldea_import_source / max_turns / strategy_profile / card_policy / skill_policy）
   会透传给 auto_battle custom action。
 """
@@ -47,8 +47,8 @@ _NODE_LAST_BATTLE = "原生自动战斗_多次_最后一场"
 # 安全上限
 _MAX_BATTLE_COUNT = 999
 
-# 默认需要重置命中计数的节点（所有 max_hit=1 且跨场复用的节点）
-# 这些节点在第 1 场战斗后命中计数达到上限，第 2 场起会被跳过
+# 默认需要重置命中计数的节点（跨场复用的 max_hit 有界节点）
+# Context.run_task 共用命中计数，每场前重置，避免前一场消耗下一场预算
 _DEFAULT_RESET_HIT_NODES = [
     "执行原生自动战斗",
     "执行战斗结束_不回主界面",
@@ -59,7 +59,14 @@ _DEFAULT_RESET_HIT_NODES = [
     "跳过剧情-点击跳过",
     "结算推进_点击右上角",
     "结算推进_点击右上角_继续",
-    "点击关卡"
+    "点击关卡",
+    # These bounded entry nodes must get a fresh budget for each battle.
+    "特殊编队-编成条件未满足",
+    "特殊编队-打开自动编队",
+    "特殊编队-限制提示关闭",
+    "特殊编队-自动编成确认",
+    "特殊编队-队伍决定",
+    "剧情奖励-展示继续"
 ]
 
 

@@ -1,0 +1,53 @@
+{
+    "结算-已返回幕间列表": {
+        "enabled": true,
+        "doc": "幕间物语结束后的正向列表出口。只接受前景标题，拒绝奖励通知遮罩下的背景列表；只在结算阶段使用，奖励处理排在此节点前。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    1000,
+                                    0,
+                                    280,
+                                    90
+                                ],
+                                "expected": [
+                                    "幕间物语"
+                                ],
+                                "threshold": 0.8,
+                                "color_filter": "剧情奖励-前景白字过滤"
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    0,
+                                    0,
+                                    175,
+                                    90
+                                ],
+                                "expected": [
+                                    "^关闭$"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "pre_wait_freezes": {
+            "time": 1000,
+            "timeout": 5000
+        },
+        "on_error": []
+    }
+}

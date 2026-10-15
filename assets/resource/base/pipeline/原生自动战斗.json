@@ -11,13 +11,18 @@
     ]
   },
   "原生自动战斗-队伍下载失败-提示": {
-    "doc": "保留既有错误出口名称。auto_battle 的队伍下载、初始编队会话或战斗执行失败时提示并终止整条任务链，具体原因由 Action 日志给出。",
+    "doc": "auto_battle 失败时显示具体错误提示后走失败出口。StopTask 会将任务置为成功，不能用于此错误分支。",
     "focus": {
       "Node.Action.Starting": "<span style=\"color: #FF0000;\">原生自动战斗失败或已中断，任务终止。请查看上方具体错误：队伍下载、初始编队或战斗执行。</span>"
     },
     "action": {
-      "type": "StopTask"
-    }
+      "type": "DoNothing"
+    },
+    "next": [
+      "原生自动战斗-失败出口"
+    ],
+    "timeout": 1,
+    "on_error": []
   },
   "原生自动战斗_Chaldea入口": {
     "action": {
@@ -42,6 +47,12 @@
       "param": {
         "custom_action": "auto_battle_repeat"
       }
-    }
+    },
+    "on_error": []
+  },
+  "原生自动战斗-失败出口": {
+    "enabled": false,
+    "doc": "故意禁用的失败屏障；上游错误提示找不到可执行后继，向原生调度及次数循环传播 failed。",
+    "on_error": []
   }
 }
