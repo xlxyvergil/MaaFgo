@@ -75,16 +75,16 @@
             "type": "TemplateMatch",
             "param": {
                 "roi": [
-                    0,
-                    0,
-                    0,
-                    0
+                    48,
+                    315,
+                    116,
+                    100
                 ],
                 "template": [
-                    "grand/grand_ex1.png"
+                    "grand/grand_berserker.png"
                 ],
                 "threshold": [
-                    0.7
+                    0.95
                 ]
             }
         },
