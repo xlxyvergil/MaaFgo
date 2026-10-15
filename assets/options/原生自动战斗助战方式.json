@@ -14,7 +14,6 @@
                     "pipeline_override": {
                         "进本流程": {
                             "next": [
-                                "[JumpBack]进本-特殊编队处理",
                                 "[JumpBack]进本-关闭告知弹窗",
                                 "助战action",
                                 "[JumpBack]进本-自动编队确认",
@@ -31,7 +30,6 @@
                     "pipeline_override": {
                         "进本流程": {
                             "next": [
-                                "[JumpBack]进本-特殊编队处理",
                                 "[JumpBack]进本-关闭告知弹窗",
                                 "进本-选择助战",
                                 "[JumpBack]进本-自动编队确认",
@@ -48,7 +46,6 @@
                     "pipeline_override": {
                         "进本流程": {
                             "next": [
-                                "[JumpBack]进本-特殊编队处理",
                                 "[JumpBack]进本-关闭告知弹窗",
                                 "Chaldea助战action",
                                 "[JumpBack]进本-自动编队确认",
