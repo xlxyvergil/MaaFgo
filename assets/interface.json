@@ -23,16 +23,7 @@
   "resource": [
     {
       "name": "B服(小米/应用宝服)",
-      "path": [
-        "resource/base",
-        "resource/cn"
-      ],
-      "option": [
-        "资源包类型-cn"
-      ]
-    },
-    {
-      "name": "享游服",
+      "label": "B服(小米/应用宝/享游服)",
       "path": [
         "resource/base",
         "resource/cn"

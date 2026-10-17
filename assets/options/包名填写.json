@@ -156,36 +156,6 @@
                     }
                 },
                 {
-                    "name": "享游服",
-                    "label": "享游服",
-                    "pipeline_override": {
-                        "打开游戏": {
-                            "action": {
-                                "type": "StartApp",
-                                "param": {
-                                    "package": "com.bilibili.fatego.sharejoy/com.bilibili.fatego.UnityPlayerNativeActivity"
-                                }
-                            }
-                        },
-                        "关闭游戏": {
-                            "action": {
-                                "type": "StopApp",
-                                "param": {
-                                    "package": "com.bilibili.fatego.sharejoy"
-                                }
-                            }
-                        },
-                        "登录-关闭游戏": {
-                            "action": {
-                                "type": "StopApp",
-                                "param": {
-                                    "package": "com.bilibili.fatego.sharejoy"
-                                }
-                            }
-                        }
-                    }
-                },
-                {
                     "name": "应用宝服",
                     "label": "应用宝服",
                     "pipeline_override": {
