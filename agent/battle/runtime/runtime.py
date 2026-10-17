@@ -625,6 +625,14 @@ class AutoBattleRuntime:
                     map_since = None
                     time.sleep(0.5)
                     continue
+                reward = self.ctx.run_recognition("战斗-奖励界面", img)
+                if reward and reward.hit:
+                    mfaalog.info("[AutoBattle] 战斗奖励页，独立于剧情开关点击右上角继续")
+                    detail = self.ctx.run_task("剧情奖励-展示继续")
+                    if not detail or not detail.status.succeeded:
+                        mfaalog.error("[AutoBattle] 战斗奖励页推进失败")
+                        return False
+                    continue
             if handle_story and story_seen:
                 # 剧情后有些关卡直接返回地图。两种独立底栏特征均命中且
                 # 稳定 3 秒才交回调度；短暂露出地图不能算完成。
@@ -639,7 +647,7 @@ class AutoBattleRuntime:
                         return True
                 else:
                     map_since = None
-            # 关闭跳过时连同盲点也禁用，避免在按钮尚未识别到的切换帧误触。
+            # 未确认画面的盲点仍尊重剧情开关；已确认奖励页走上面的独立 pipeline。
             skip_enabled = (not handle_story or
                             (self.ctx.get_node_data("跳过剧情-点击跳过") or {}).get("enabled", True))
             if tap_close and skip_enabled and not story_seen:
