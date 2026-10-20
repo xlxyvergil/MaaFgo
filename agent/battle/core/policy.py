@@ -20,9 +20,6 @@ class CardPolicy:
     color_priority: Tuple[CardColor, ...] = (CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK)
     np_first: bool = True                 # 有宝具卡则优先出
     prefer_mighty_chain: bool = True      # 三色连锁（红蓝绿各一张）优先
-    prefer_brave_chain: bool = True       # 已知归属时优先同一从者三连
-    preferred_servant_id: str | None = None
-    preferred_initial_slot: int | None = 1  # 解析为英灵身份后，不随当前位置变化
 
 
 @dataclass(frozen=True)

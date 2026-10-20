@@ -9,7 +9,6 @@
 """
 import os
 import sys
-from dataclasses import replace
 
 # 让 agent/battle 可作为顶层包导入（main.py 只把 custom 目录加进了 path）
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,11 +24,10 @@ from maa.tasker import TaskerEventSink
 import mfaalog
 from battle.core.decider import RuleDecider
 from battle.core.models import BattlePlan
-from battle.core.plan_parser import (_load_action_param, _parse_battle_policy, _parse_enemy_target,
+from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
                                     _parse_plan, _parse_strategy_profile)
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
-from battle.data.servant_identity import resolve_servant_id, servant_name
 from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.formation_session import context_session, session_override, sessions
 from chaldea import fetch_share_data
@@ -78,21 +76,7 @@ class AutoBattleAction(CustomAction):
             except ValueError as exc:
                 mfaalog.error(f"[auto_battle] 初始编队会话无效: {exc}")
                 return CustomAction.RunResult(success=False)
-        param = dict(_load_action_param(argv.custom_action_param))
-        node_name = getattr(argv, "node_name", "")
-        node_data = (context.get_node_data(node_name) or {}) if node_name else {}
-        attach = node_data.get("attach") or {}
-        attached_cards = attach.get("card_policy") or {}
-        explicit_cards = param.get("card_policy") or {}
-        param["card_policy"] = {
-            **(attached_cards if isinstance(attached_cards, dict) else {}),
-            **(explicit_cards if isinstance(explicit_cards, dict) else {}),
-        }
-        # 选怪通过 attach 注入，避免 Chaldea 导入覆盖 action 时丢失配置。
-        # 显式 custom_action_param（包括 0=自动）优先于界面配置。
-        if "enemy_target" not in param:
-            param["enemy_target"] = attach.get("enemy_target", 0)
-        enemy_target = _parse_enemy_target(param)
+        param = _load_action_param(argv.custom_action_param)
         profile = _parse_strategy_profile(param)
         battle_policy = _parse_battle_policy(param)
         plan = _parse_plan(param)
@@ -107,19 +91,7 @@ class AutoBattleAction(CustomAction):
                 sessions.invalidate(root, token, "chaldea_plan_failed")
             return CustomAction.RunResult(success=False)
         roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
-        preferred = battle_policy.card.preferred_servant_id
-        initial_slot = battle_policy.card.preferred_initial_slot
-        preferred_id = (
-            resolve_servant_id(preferred) if preferred else
-            roster_servant_ids[initial_slot - 1] if initial_slot else None
-        )
-        battle_policy = replace(battle_policy, card=replace(
-            battle_policy.card, preferred_servant_id=preferred_id,
-        ))
-        mfaalog.info(f"[英灵选卡] 主输出={servant_name(preferred_id)}({preferred_id or '未指定'})")
-        if preferred_id and preferred_id not in roster_servant_ids:
-            mfaalog.info("[英灵选卡] 指定英灵未出现在编队识别结果中，未识别到其面卡时沿用通用选卡")
-        decider = RuleDecider(battle_policy, plan=plan, enemy_target=enemy_target)
+        decider = RuleDecider(battle_policy, plan=plan)
 
         # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
         # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
@@ -129,8 +101,7 @@ class AutoBattleAction(CustomAction):
         plan_turns = len(plan.turns) if plan is not None else 0
         mfaalog.info(
             f"[auto_battle] start profile={profile.id} "
-            f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns} "
-            f"enemy_target={enemy_target or 'auto'}"
+            f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
         )
         try:
             result = AutoBattleRuntime(
