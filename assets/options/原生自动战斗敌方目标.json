@@ -1,0 +1,44 @@
+{
+  "option": {
+    "原生自动战斗敌方目标": {
+      "type": "select",
+      "label": "敌方目标",
+      "description": "敌方血条从左到右为 1、2、3 号位。每回合优先攻击指定位置，优先于 Chaldea 计划中的目标；未识别到该位置的存活敌人时沿用原策略。自动模式遵循 Chaldea 计划或当前自动选怪策略。",
+      "default_case": "auto",
+      "cases": [
+        {
+          "name": "auto",
+          "label": "自动",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"enemy_target": 0}},
+            "原生自动战斗_Chaldea入口": {"attach": {"enemy_target": 0}}
+          }
+        },
+        {
+          "name": "1",
+          "label": "1 号位（左）",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"enemy_target": 1}},
+            "原生自动战斗_Chaldea入口": {"attach": {"enemy_target": 1}}
+          }
+        },
+        {
+          "name": "2",
+          "label": "2 号位（中）",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"enemy_target": 2}},
+            "原生自动战斗_Chaldea入口": {"attach": {"enemy_target": 2}}
+          }
+        },
+        {
+          "name": "3",
+          "label": "3 号位（右）",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"enemy_target": 3}},
+            "原生自动战斗_Chaldea入口": {"attach": {"enemy_target": 3}}
+          }
+        }
+      ]
+    }
+  }
+}

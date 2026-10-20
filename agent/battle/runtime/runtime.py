@@ -25,6 +25,7 @@ from ..core.validator import (
     validate_main_action,
 )
 from ..execution.executor import Executor
+from ..data.servant_identity import servant_name
 from ..perception import perception
 import mfaalog
 from platform_waits import platform_timeout
@@ -69,10 +70,16 @@ class BattleResult:
 
 
 class AutoBattleRuntime:
+    # 没有编队证据时保留通用选卡；每次更新都替换元组，不共享可变阵容。
+    roster_servant_ids: tuple[str | None, ...] = (None,) * 6
+    candidate_servant_ids: tuple[str | None, ...] = ()
+    servant_recognizer = None
+
     def __init__(self, context, controller, decider: Decider, profile: StrategyProfile,
                  battle_policy: BattlePolicy | None = None, *,
                  initial_formation: InitialFormation | None = None,
-                 formation_battle: int = 1) -> None:
+                 formation_battle: int = 1,
+                 roster_servant_ids: tuple[str | None, ...] | None = None) -> None:
         self.ctx = context
         self.controller = controller
         self.decider = decider
@@ -83,8 +90,19 @@ class AutoBattleRuntime:
         self.initial_formation_reused = (
             initial_formation is not None and initial_formation.captured_battle != formation_battle
         )
+        if roster_servant_ids is None and initial_formation is not None:
+            roster_servant_ids = tuple(
+                slot.servant_id if slot.status == "identified" else None
+                for slot in initial_formation.slots
+            )
+        if roster_servant_ids is None or len(roster_servant_ids) != 6:
+            roster_servant_ids = (None,) * 6
+        self.roster_servant_ids = tuple(roster_servant_ids)
+        self.candidate_servant_ids = self.roster_servant_ids
+        self.servant_recognizer = None
         self.executor = Executor(context, controller)
         self._turn_index = 0
+        self._selection_cards = ()
 
     def run(self) -> BattleResult:
         if self.initial_formation is not None:
@@ -96,6 +114,10 @@ class AutoBattleRuntime:
             )
         else:
             mfaalog.info("[AutoBattle] initial_formation=none; 使用通用策略")
+        mfaalog.info(
+            "[AutoBattle] roster_servant_ids="
+            f"{tuple(self.roster_servant_ids)}; 卡牌归属缺证据时保持 unknown"
+        )
         mfaalog.info(f"[AutoBattle] run() start, max_turns={self.profile.max_turns}")
         turns = 0
         while turns < self.profile.max_turns:
@@ -208,6 +230,20 @@ class AutoBattleRuntime:
 
             if scene is Scene.COMMAND_SELECTION:
                 mfaalog.info(f"[AutoBattle] ========== Turn {turns+1} ==========")
+                self._selection_cards = state.cards
+                cards_text = " | ".join(
+                    f"卡{card.ui_slot}:{servant_name(card.owner_servant_id)}/{card.color.value}"
+                    f"(前排{card.owner_slot or '?'},归属{card.owner_confidence.value:.3f},"
+                    f"分差{card.owner_margin:.3f},{'可攻击' if card.can_attack else '封印/无法行动'})"
+                    for card in state.cards
+                )
+                mfaalog.info(f"[英灵选卡] {cards_text}")
+                self._selection_np_cards = state.np_cards
+                mfaalog.info("[宝具选卡] " + " | ".join(
+                    f"宝具{card.servant_slot}:{servant_name(card.owner_servant_id)}"
+                    f"({'可用' if card.available else card.blocked_reason},卡面={card.confidence.value:.3f})"
+                    for card in state.np_cards
+                ))
                 mfaalog.info(f"[AutoBattle] State: {state}")
                 action = self.decider.decide(state, turn_index=turns)
                 mfaalog.info(f"[AutoBattle] Decided Action: {action}")
@@ -218,8 +254,7 @@ class AutoBattleRuntime:
                     return BattleResult.fail(
                         f"invalid_card_action:{verdict.reason}", turns
                     )
-                has_plan = hasattr(self.decider, 'plan') and self.decider.plan is not None
-                if not verdict.ok and verdict.reason == "np_not_present" and not has_plan:
+                if not verdict.ok and verdict.reason == "np_not_present":
                     action = self._replace_unavailable_np_picks(action, state)
                     verdict = validate_card_action(action, state, self.profile)
                     mfaalog.info(
@@ -269,14 +304,36 @@ class AutoBattleRuntime:
     def _observe(self, *, settle_main: bool = False):
         mfaalog.info("[AutoBattle] _observe() -> post_screencap")
         img = self.controller.post_screencap().wait().get()
-        if settle_main and perception.detect_scene(self.ctx, img) is Scene.MAIN_BATTLE:
+        scene = perception.detect_scene(self.ctx, img) if settle_main else None
+        if scene is Scene.MAIN_BATTLE:
             mfaalog.info(
                 f"[AutoBattle] MAIN_BATTLE detected; waiting {_MAIN_BATTLE_SETTLE_S}s "
                 "before skill CD recognition"
             )
             time.sleep(_MAIN_BATTLE_SETTLE_S)
             img = self.controller.post_screencap().wait().get()
-        result = perception.build(self.ctx, img)
+        elif scene is Scene.COMMAND_SELECTION:
+            # The upper NP cards finish appearing after the five face cards.
+            # Keep the timing in the native pipeline rather than using NP bars
+            # to predict cards that are not yet visible.
+            detail = self.ctx.run_task("战斗_选卡展开等待")
+            if not (detail and detail.status.succeeded):
+                raise RuntimeError("command_card_settle_failed")
+            img = self.controller.post_screencap().wait().get()
+        frontline = self.roster_servant_ids[:3]
+        candidates = self.candidate_servant_ids or self.roster_servant_ids
+        if any(candidates):
+            if self.servant_recognizer is None:
+                self.servant_recognizer = perception.FrontlineServantRecognizer.from_context(self.ctx)
+            result = perception.build(
+                self.ctx, img, frontline_servant_ids=frontline,
+                candidate_servant_ids=candidates,
+                servant_recognizer=self.servant_recognizer,
+            )
+        else:
+            result = perception.build(self.ctx, img)
+        if result.scene is Scene.MAIN_BATTLE and any(candidates):
+            self._update_frontline(result.servants)
 
         # 有 Chaldea 计划时：技能 CD 检测无意义（计划已精确指定何时放技能），
         # 且 ColorMatch ROI 可能因分辨率/缩放偏移导致误判为 CD。
@@ -284,13 +341,31 @@ class AutoBattleRuntime:
         has_plan = hasattr(self.decider, 'plan') and self.decider.plan is not None
         if has_plan:
             result = self._patch_skills_available(result)
-            mfaalog.info("[AutoBattle] _observe() -> plan active, all skills patched to available")
+            mfaalog.info("[AutoBattle] _observe() -> plan active, present servants' skills patched to available")
 
         mfaalog.info(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
         return result
 
+    def _update_frontline(self, servants) -> None:
+        identities = {servant.slot: servant.servant_id for servant in servants}
+        frontline = tuple(identities.get(slot) for slot in (1, 2, 3))
+        previous = self.roster_servant_ids[:3]
+        if frontline == previous:
+            return
+        reserves = list(self.roster_servant_ids[3:])
+        for before, after in zip(previous, frontline):
+            if after is not None and after != before and after in reserves:
+                reserves.remove(after)
+        self.roster_servant_ids = frontline + tuple(reserves) + (None,) * (3 - len(reserves))
+        mfaalog.info(
+            "[当前前排] " + " | ".join(
+                f"{slot}:{servant_name(sid) if sid else '未识别，跳过技能'}"
+                for slot, sid in enumerate(frontline, start=1)
+            )
+        )
+
     def _patch_skills_available(self, state: BattleState) -> BattleState:
-        """将所有从者技能和御主技能标记为可用。"""
+        """将已识别在场的从者技能和御主技能标记为可用，保留空位过滤。"""
         from dataclasses import replace as dc_replace
 
         # 从者技能
@@ -316,7 +391,22 @@ class AutoBattleRuntime:
         mfaalog.info(f"[AutoBattle] action: {action}")
 
     def _execute_selection(self, action) -> bool:
-        picks = self._normalize_picks_for_execution(action.picks)
+        picks = self._normalize_picks_for_execution(
+            action.picks,
+            blocked_face_slots={card.ui_slot for card in self._selection_cards if not card.can_attack},
+        )
+        cards = {card.ui_slot: card for card in self._selection_cards}
+        selected = []
+        for pick in picks:
+            if pick.kind is PrimitiveKind.SELECT_NP:
+                selected.append(f"宝具{pick.slot}")
+            else:
+                card = cards.get(pick.slot)
+                selected.append(
+                    f"卡{pick.slot}:{servant_name(card.owner_servant_id)}/{card.color.value}"
+                    if card else f"卡{pick.slot}"
+                )
+        mfaalog.info(f"[英灵选卡] 实际出卡={' → '.join(selected)}")
         mfaalog.info(f"[AutoBattle] _execute_selection() picks={picks}")
         for index, p in enumerate(picks):
             if p.kind is PrimitiveKind.SELECT_NP:
@@ -333,7 +423,7 @@ class AutoBattleRuntime:
                 time.sleep(_PICK_DELAY_S)
         return True
 
-    def _normalize_picks_for_execution(self, picks) -> tuple[CardPick, ...]:
+    def _normalize_picks_for_execution(self, picks, *, blocked_face_slots=()) -> tuple[CardPick, ...]:
         """Keep command-card execution moving when perception returns partial picks."""
         normalized: list[CardPick] = []
         selected_face_slots: set[int] = set()
@@ -361,7 +451,7 @@ class AutoBattleRuntime:
                 "[AutoBattle] command picks incomplete after validation warning; "
                 "padding with face cards"
             )
-        for slot in range(1, 6):
+        for slot in sorted(range(1, 6), key=lambda slot: slot in blocked_face_slots):
             if len(normalized) >= 3:
                 break
             if slot in selected_face_slots:
@@ -374,8 +464,8 @@ class AutoBattleRuntime:
     @staticmethod
     def _replace_unavailable_np_picks(action, state):
         """Replace NP picks missing from state with detected face cards."""
-        available_np_slots = {card.servant_slot for card in state.np_cards}
-        available_face_slots = {card.ui_slot for card in state.cards}
+        available_np_slots = {card.servant_slot for card in state.np_cards if card.available}
+        available_face_slots = sorted(state.cards, key=lambda card: not card.can_attack)
         picks = [
             pick
             for pick in action.picks
@@ -387,7 +477,8 @@ class AutoBattleRuntime:
             for pick in picks
             if pick.kind is PrimitiveKind.SELECT_CARD
         }
-        for slot in sorted(available_face_slots):
+        for card in available_face_slots:
+            slot = card.ui_slot
             if len(picks) >= 3:
                 break
             if slot in selected_face_slots:
@@ -499,6 +590,15 @@ class AutoBattleRuntime:
             # 等待回到主界面
             if not self._wait_until((Scene.MAIN_BATTLE,), _ORDER_CHANGE_RETURN_TIMEOUT_S):
                 return False
+            front = oc.starting_member_idx - 1
+            back = oc.sub_member_idx - 1
+            roster = list(self.roster_servant_ids)
+            roster[front], roster[back] = roster[back], roster[front]
+            self.roster_servant_ids = tuple(roster)
+            mfaalog.info(
+                "[AutoBattle] order change roster updated: "
+                f"{tuple(self.roster_servant_ids)}"
+            )
 
         return True
 

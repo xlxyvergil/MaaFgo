@@ -1,0 +1,713 @@
+{
+    "战斗_选卡展开等待": {
+        "doc": "普通面卡先出现，宝具卡稍后展开；等待后再采集完整两排卡面。",
+        "action": {
+            "type": "DoNothing"
+        },
+        "post_delay": 1800,
+        "next": []
+    },
+    "战斗_卡1_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_卡1_封印_识别1",
+                    "战斗_卡1_封印_识别2",
+                    "战斗_卡1_封印_识别3"
+                ]
+            }
+        }
+    },
+    "战斗_卡2_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_卡2_封印_识别1",
+                    "战斗_卡2_封印_识别2",
+                    "战斗_卡2_封印_识别3"
+                ]
+            }
+        }
+    },
+    "战斗_卡3_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_卡3_封印_识别1",
+                    "战斗_卡3_封印_识别2",
+                    "战斗_卡3_封印_识别3"
+                ]
+            }
+        }
+    },
+    "战斗_卡4_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_卡4_封印_识别1",
+                    "战斗_卡4_封印_识别2",
+                    "战斗_卡4_封印_识别3"
+                ]
+            }
+        }
+    },
+    "战斗_卡5_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_卡5_封印_识别1",
+                    "战斗_卡5_封印_识别2",
+                    "战斗_卡5_封印_识别3"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡1_卡面": {
+        "doc": "识别上排宝具卡名称区域，NP条数值不作为卡片存在或可用的依据。",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    300,
+                    175,
+                    220,
+                    145
+                ],
+                "expected": ".+",
+                "threshold": 0.65,
+                "order_by": "Length"
+            }
+        }
+    },
+    "战斗_宝具卡1_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡1_封印_识别1",
+                    "战斗_宝具卡1_封印_识别2"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡2_卡面": {
+        "doc": "识别上排宝具卡名称区域，NP条数值不作为卡片存在或可用的依据。",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    530,
+                    175,
+                    220,
+                    145
+                ],
+                "expected": ".+",
+                "threshold": 0.65,
+                "order_by": "Length"
+            }
+        }
+    },
+    "战斗_宝具卡2_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡2_封印_识别1",
+                    "战斗_宝具卡2_封印_识别2"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡3_卡面": {
+        "doc": "识别上排宝具卡名称区域，NP条数值不作为卡片存在或可用的依据。",
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    760,
+                    175,
+                    220,
+                    145
+                ],
+                "expected": ".+",
+                "threshold": 0.65,
+                "order_by": "Length"
+            }
+        }
+    },
+    "战斗_宝具卡3_封印": {
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡3_封印_识别1",
+                    "战斗_宝具卡3_封印_识别2"
+                ]
+            }
+        }
+    },
+    "战斗_卡1_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    30,
+                    460,
+                    55,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/card_sealed_arts.png",
+                    "battle/card_state/card_sealed_buster.png",
+                    "battle/card_state/card_sealed_quick.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡1_封印_识别2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    45,
+                    465,
+                    200,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡1_封印_识别3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    35,
+                    455,
+                    215,
+                    105
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_卡2_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    287,
+                    460,
+                    55,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/card_sealed_arts.png",
+                    "battle/card_state/card_sealed_buster.png",
+                    "battle/card_state/card_sealed_quick.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡2_封印_识别2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    302,
+                    465,
+                    200,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡2_封印_识别3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    292,
+                    455,
+                    215,
+                    105
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_卡3_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    544,
+                    460,
+                    55,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/card_sealed_arts.png",
+                    "battle/card_state/card_sealed_buster.png",
+                    "battle/card_state/card_sealed_quick.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡3_封印_识别2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    559,
+                    465,
+                    200,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡3_封印_识别3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    549,
+                    455,
+                    215,
+                    105
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_卡4_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    801,
+                    460,
+                    55,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/card_sealed_arts.png",
+                    "battle/card_state/card_sealed_buster.png",
+                    "battle/card_state/card_sealed_quick.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡4_封印_识别2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    816,
+                    465,
+                    200,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡4_封印_识别3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    806,
+                    455,
+                    215,
+                    105
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_卡5_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1058,
+                    460,
+                    55,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/card_sealed_arts.png",
+                    "battle/card_state/card_sealed_buster.png",
+                    "battle/card_state/card_sealed_quick.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡5_封印_识别2": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1073,
+                    465,
+                    200,
+                    90
+                ],
+                "template": [
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_卡5_封印_识别3": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    1063,
+                    455,
+                    215,
+                    105
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_宝具卡1_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    290,
+                    145,
+                    240,
+                    160
+                ],
+                "template": [
+                    "battle/card_state/np_sealed_cn.png",
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_宝具卡1_封印_识别2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    290,
+                    145,
+                    240,
+                    160
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized",
+                    "宝具封印",
+                    "寶具封印",
+                    "NP (Seal|Sealed)",
+                    "宝具使用不可"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_宝具卡2_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    520,
+                    145,
+                    240,
+                    160
+                ],
+                "template": [
+                    "battle/card_state/np_sealed_cn.png",
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_宝具卡2_封印_识别2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    520,
+                    145,
+                    240,
+                    160
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized",
+                    "宝具封印",
+                    "寶具封印",
+                    "NP (Seal|Sealed)",
+                    "宝具使用不可"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_宝具卡3_封印_识别1": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    750,
+                    145,
+                    240,
+                    160
+                ],
+                "template": [
+                    "battle/card_state/np_sealed_cn.png",
+                    "battle/card_state/unable_to_act_cn.png"
+                ],
+                "threshold": 0.8,
+                "green_mask": true
+            }
+        }
+    },
+    "战斗_宝具卡3_封印_识别2": {
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    750,
+                    145,
+                    240,
+                    160
+                ],
+                "expected": [
+                    "无法行动",
+                    "行动不能",
+                    "行動不能",
+                    "Cannot (Act|Move)",
+                    "Immobilized",
+                    "宝具封印",
+                    "寶具封印",
+                    "NP (Seal|Sealed)",
+                    "宝具使用不可"
+                ],
+                "threshold": 0.65
+            }
+        }
+    },
+    "战斗_宝具卡1_边框": {
+        "doc": "宝具卡公共发光边框；避免将场景中的文字识别为宝具名称。",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡1_边框_左",
+                    "战斗_宝具卡1_边框_右"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡1_边框_左": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_left.png",
+                "roi": [
+                    326,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    },
+    "战斗_宝具卡1_边框_右": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_right.png",
+                "roi": [
+                    474,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    },
+    "战斗_宝具卡2_边框": {
+        "doc": "宝具卡公共发光边框；避免将场景中的文字识别为宝具名称。",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡2_边框_左",
+                    "战斗_宝具卡2_边框_右"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡2_边框_左": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_left.png",
+                "roi": [
+                    556,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    },
+    "战斗_宝具卡2_边框_右": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_right.png",
+                "roi": [
+                    704,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    },
+    "战斗_宝具卡3_边框": {
+        "doc": "宝具卡公共发光边框；避免将场景中的文字识别为宝具名称。",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_宝具卡3_边框_左",
+                    "战斗_宝具卡3_边框_右"
+                ]
+            }
+        }
+    },
+    "战斗_宝具卡3_边框_左": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_left.png",
+                "roi": [
+                    786,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    },
+    "战斗_宝具卡3_边框_右": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/card_state/np_frame_right.png",
+                "roi": [
+                    934,
+                    145,
+                    35,
+                    75
+                ],
+                "threshold": 0.88,
+                "method": 5
+            }
+        }
+    }
+}

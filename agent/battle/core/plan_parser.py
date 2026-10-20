@@ -9,7 +9,7 @@ from typing import Tuple
 
 from battle.core.enums import CardColor
 from battle.core.models import (BattlePlan, MasterSkillAction, OrderChangeAction,
-                                ServantSkillAction, TurnPlan)
+                                ServantSkillAction, TurnPlan, is_slot)
 from battle.core.policy import (BattlePolicy, CardPolicy, Goal, SkillPolicy,
                                 StrategyProfile)
 
@@ -131,6 +131,12 @@ def _load_action_param(raw_param: object) -> dict:
         return {}
     return parsed if isinstance(parsed, dict) else {}
 
+def _parse_enemy_target(param: dict) -> int | None:
+    """0/缺省为自动选怪；仅接受 1..3 的整数槽位。"""
+    value = param.get("enemy_target")
+    return value if is_slot(value, 1, 3) else None
+
+
 def _parse_strategy_profile(param: dict) -> StrategyProfile:
     """解析运行参数；非法或越界值回退到安全默认值。"""
     profile_id = param.get("strategy_profile", "farm-safe-v1")
@@ -195,6 +201,12 @@ def _parse_battle_policy(param: dict) -> BattlePolicy:
         color_priority=color_priority,
         np_first=bool(card_param.get("np_first", True)),
         prefer_mighty_chain=bool(card_param.get("prefer_mighty_chain", True)),
+        prefer_brave_chain=bool(card_param.get("prefer_brave_chain", True)),
+        preferred_servant_id=str(card_param.get("preferred_servant_id") or "").strip() or None,
+        preferred_initial_slot=(
+            card_param.get("preferred_initial_slot", 1)
+            if is_slot(card_param.get("preferred_initial_slot", 1), 1, 3) else None
+        ),
     )
 
     skill_param = param.get("skill_policy", {})
@@ -222,4 +234,3 @@ def _parse_battle_policy(param: dict) -> BattlePolicy:
     )
 
     return BattlePolicy(card=card, skill=skill)
-

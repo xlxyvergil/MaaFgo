@@ -161,6 +161,7 @@ def apply_visual_patch(
         prefix = f"card[{card.ui_slot}]"
         color = card.color
         owner_slot = card.owner_slot
+        owner_confidence = card.owner_confidence
         confidence = card.confidence
         wants_color = _wants(requested, "cards.color", prefix, f"{prefix}.color")
         wants_owner = _wants(requested, "cards.owner_slot", f"{prefix}.owner_slot")
@@ -174,8 +175,16 @@ def apply_visual_patch(
             if card.owner_slot is not None and card.owner_slot != visual.owner_slot:
                 conflicts.append(f"{prefix}.owner_slot")
             owner_slot = visual.owner_slot
+            owner_confidence = Confidence(visual.confidence, "vision")
             resolved.add(f"{prefix}.owner_slot")
-        cards.append(replace(card, color=color, owner_slot=owner_slot, confidence=confidence))
+        cards.append(replace(
+            card,
+            color=color,
+            owner_slot=owner_slot,
+            confidence=confidence,
+            owner_confidence=owner_confidence,
+            owner_reason=("vision" if wants_owner and visual.owner_slot is not None else card.owner_reason),
+        ))
 
     visual_servants = {servant.slot: servant for servant in observation.servants}
     servants = tuple(

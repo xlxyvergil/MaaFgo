@@ -1,46 +1,4 @@
 {
-    "战斗_NP卡1": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    228,
-                    656,
-                    45,
-                    23
-                ],
-                "expected": "\\d+"
-            }
-        }
-    },
-    "战斗_NP卡2": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    546,
-                    656,
-                    45,
-                    23
-                ],
-                "expected": "\\d+"
-            }
-        }
-    },
-    "战斗_NP卡3": {
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    863,
-                    656,
-                    45,
-                    23
-                ],
-                "expected": "\\d+"
-            }
-        }
-    },
     "战斗_主界面": {
         "recognition": {
             "type": "TemplateMatch",
@@ -80,7 +38,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -108,7 +66,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -136,7 +94,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -164,7 +122,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -192,7 +150,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -220,7 +178,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -248,7 +206,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -276,7 +234,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },
@@ -304,7 +262,7 @@
                     "battle/digits/9.png"
                 ],
                 "green_mask": true,
-                "threshold": 0.82
+                "threshold": 0.80
             }
         }
     },

@@ -154,6 +154,10 @@ class AutoBattleRepeatAction(CustomAction):
                 mfaalog.error(f"[auto_battle_repeat] Battle {current} {last_error}")
                 break
 
+            if context.tasker.stopping:
+                last_error = "任务已停止"
+                break
+
             if detail is None:
                 last_error = "run_task 返回 None（入口节点不存在或启动失败）"
                 mfaalog.error(f"[auto_battle_repeat] Battle {current} {last_error}")

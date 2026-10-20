@@ -11,15 +11,27 @@
 """
 from __future__ import annotations
 
-from typing import List, Optional, Tuple
+from dataclasses import replace
+from typing import List, Optional, Sequence, Tuple
 
 from ..core.enums import CardColor, Scene
 from ..core.models import (BattleState, CommandCard, Confidence, EnemyState,
                            NpCard, ServantState, SkillState)
 from . import config
+from .card_owner import CommandCardOwnerRecognizer
+from .frontline import FrontlineServantRecognizer
 
 
-def build(context, img, screenshot_id: str = "") -> BattleState:
+def build(
+    context,
+    img,
+    screenshot_id: str = "",
+    *,
+    frontline_servant_ids: Sequence[str | int | None] | None = None,
+    owner_recognizer: CommandCardOwnerRecognizer | None = None,
+    candidate_servant_ids: Sequence[str | int | None] | None = None,
+    servant_recognizer: FrontlineServantRecognizer | None = None,
+) -> BattleState:
     scene, sconf = _detect_scene(context, img)
 
     # 只有选卡界面才需要解析卡牌；主界面/动画等无卡可读
@@ -29,15 +41,44 @@ def build(context, img, screenshot_id: str = "") -> BattleState:
     master_skills: Tuple[SkillState, ...] = ()
     unknown: List[str] = []
     if scene is Scene.COMMAND_SELECTION:
-        cards = tuple(_detect_card(context, img, i) for i in range(1, 6))
-        np_cards = tuple(c for c in (_detect_np(context, img, s) for s in config.FRONTLINE_SLOTS) if c)
+        card_states = []
+        for i in range(1, 6):
+            blocked = _reco(context, config.FACE_BLOCKED_NODE.format(ui_slot=i), img)
+            is_blocked = bool(blocked and blocked.hit)
+            card_states.append(replace(
+                _detect_card(context, img, i), can_attack=not is_blocked,
+                blocked_reason="sealed_or_cannot_act" if is_blocked else "",
+            ))
+        cards = tuple(card_states)
+        np_owners = {}
+        if frontline_servant_ids is not None:
+            recognizer = owner_recognizer or CommandCardOwnerRecognizer.default()
+            owners = {item.ui_slot: item for item in recognizer.detect(img, frontline_servant_ids)}
+            np_owners = {item.ui_slot: item for item in recognizer.detect_np(img, frontline_servant_ids)}
+            cards = tuple(
+                replace(
+                    card,
+                    owner_slot=owners[card.ui_slot].owner_slot,
+                    owner_confidence=owners[card.ui_slot].confidence,
+                    owner_servant_id=owners[card.ui_slot].servant_id,
+                    owner_margin=owners[card.ui_slot].margin,
+                    owner_template=owners[card.ui_slot].matched_template,
+                    owner_reason=owners[card.ui_slot].reason,
+                )
+                for card in cards
+            )
+        np_cards = tuple(c for c in (_detect_np(context, img, s, np_owners.get(s))
+                                    for s in config.FRONTLINE_SLOTS) if c)
         for c in cards:
             if not c.confidence.passes(config.MIN_CARD_CONFIDENCE):
                 unknown.append(f"card[{c.ui_slot}]")
             if c.owner_slot is None:
                 unknown.append(f"card[{c.ui_slot}].owner_slot")
     elif scene is Scene.MAIN_BATTLE:
-        servants = _detect_servants(context, img)
+        servants = _detect_servants(
+            context, img, candidate_servant_ids or frontline_servant_ids or (),
+            recognizer=servant_recognizer,
+        )
         for servant in servants:
             for index, skill in enumerate(servant.skills, start=1):
                 if skill.available is None:
@@ -110,57 +151,39 @@ def _detect_card(context, img, ui_slot: int) -> CommandCard:
     return CommandCard(ui_slot, color, owner_slot=None, confidence=Confidence(float(score), "ocr"))
 
 
-def _detect_np(context, img, servant_slot: int) -> Optional[NpCard]:
-    node = config.NP_CARD_NODE.format(servant_slot=servant_slot)
-    r = _reco(context, node, img)
-    if not (r and r.hit):
-        return None
+def _detect_np(context, img, servant_slot: int, owner=None) -> Optional[NpCard]:
+    visual = _reco(context, config.NP_VISUAL_NODE.format(servant_slot=servant_slot), img)
+    title = getattr(getattr(visual, "best_result", None), "text", "") or ""
+    title = title.strip()
+    title_present = bool(visual and visual.hit and len(title) >= 2
+                         and float(getattr(visual.best_result, "score", 0.0) or 0.0) >= config.MIN_NP_CONFIDENCE
+                         and title.casefold() not in {"目标", "目標", "target"})
+    owner_matches = bool(owner and owner.owner_slot == servant_slot
+                         and owner.best_score >= config.MIN_NP_CONFIDENCE)
+    blocked = _reco(context, config.NP_BLOCKED_NODE.format(servant_slot=servant_slot), img)
+    is_blocked = bool(blocked and blocked.hit)
+    if not (owner_matches or is_blocked):
+        # Scenery text is not a card. When identity evidence is unavailable,
+        # require the shared NP frame as well as its visible title.
+        frame = _reco(context, config.NP_FRAME_NODE.format(servant_slot=servant_slot), img) if title_present else None
+        if not (frame and frame.hit):
+            return None
 
-    best = getattr(r, "best_result", None)
-    text = getattr(best, "text", "") or ""
-    score = float(getattr(best, "score", 0.0) or 0.0)
-    percent = _parse_np_percent(text)
-
-    # 只有高置信度、明确读到 100%~300% 才认为宝具卡可用。
-    # 低于 100% 或超过游戏上限 300% 的结果都不应进入 np_cards；
-    # 低置信度命中也必须 fail-closed。
-    if percent is None or not (100 <= percent <= 300) or score < config.MIN_NP_CONFIDENCE:
-        return None
-
+    # Availability comes only from the visible card and its restriction overlay.
+    score = max(
+        float(getattr(getattr(visual, "best_result", None), "score", 0.0) or 0.0) if title_present else 0.0,
+        owner.best_score if owner_matches else 0.0,
+        1.0 if is_blocked else 0.0,
+    )
     return NpCard(
         servant_slot,
-        Confidence(score, "ocr"),
-        percent=percent,
+        Confidence(score, "np_card_visual"),
+        available=not is_blocked,
+        blocked_reason="sealed_or_cannot_act" if is_blocked else "",
+        owner_servant_id=owner.servant_id if owner and owner.owner_slot == servant_slot else None,
+        owner_confidence=owner.confidence if owner and owner.owner_slot == servant_slot else Confidence(0.0),
+        owner_template=owner.matched_template if owner and owner.owner_slot == servant_slot else "",
     )
-
-
-def _parse_np_percent(text: str) -> Optional[int]:
-    """把 OCR 文本解析成 0..300 的 NP 百分比。
-
-    OCR 可能把 ``100%`` 读成 ``1.0.0%``，因此允许数字之间出现分隔符，
-    但最终必须得到一个合法的 0..300 数值；异常值一律丢弃。
-    """
-    import re
-
-    normalized = (text or "").replace("％", "%")
-    match = re.search(r"([0-9][0-9.\s]{0,8}[0-9]|[0-9])\s*%?", normalized)
-    if not match:
-        return None
-
-    digits = re.sub(r"\D", "", match.group(1))
-    if not digits:
-        return None
-
-    value = int(digits)
-
-    # 如果值超过游戏上限 300，可能是 OCR 把 % 误读为数字（如 "100%" → "1009"），
-    # 尝试去掉最后一位再判断。
-    if value > 300 and len(digits) > 1:
-        trimmed = int(digits[:-1])
-        if 0 <= trimmed <= 300:
-            return trimmed
-
-    return value if 0 <= value <= 300 else None
 
 
 def _detect_enemies(context, img) -> Tuple[EnemyState, ...]:
@@ -184,17 +207,21 @@ def _count(reco) -> int:
     return int(getattr(best, "count", 0) or 0)
 
 
-def _detect_servants(context, img) -> Tuple[ServantState, ...]:
-    """检测前排从者的技能可用性。
+def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None) -> Tuple[ServantState, ...]:
+    """先识别各位置的战斗头像，再检测已确认从者的技能 CD。
 
-    识别逻辑：TemplateMatch 在技能按钮 ROI 内滑动窗口匹配 digits 目录的
-    0-9 数字模板（任一命中），命中数字（剩余回合数）则技能在冷却、不可用；
-    否则（没有 CD 数字）技能可用。FGO 里可用技能的按钮上没有 CD 数字，
-    所以"未命中 CD"就是可用的直接信号，不应再标记为未知而被
-    safety gate 跳过。
+    头像未匹配时按空位处理，不识别或使用该位置的技能。
+    存在从者时，技能按钮命中 CD 数字模板则不可用，否则可用。
+    搜索范围为已确认编队（含候补），身份与位置取自当前截图。
     """
     out: List[ServantState] = []
-    for slot in config.FRONTLINE_SLOTS:
+    if not any(candidate_servant_ids):
+        return ()
+    recognizer = recognizer or FrontlineServantRecognizer.from_context(context)
+    for identity in recognizer.detect(img, candidate_servant_ids):
+        if identity.servant_id is None:
+            continue
+        slot = identity.slot
         skills: List[SkillState] = []
         for idx in range(1, 4):
             cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
@@ -206,7 +233,7 @@ def _detect_servants(context, img) -> Tuple[ServantState, ...]:
                 continue
             # 未命中任何 CD 数字 → 技能可用。
             skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
-        out.append(ServantState(slot, tuple(skills), Confidence(1.0, "composite")))
+        out.append(ServantState(slot, tuple(skills), identity.confidence, identity.servant_id))
     return tuple(out)
 
 

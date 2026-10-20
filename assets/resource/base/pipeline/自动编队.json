@@ -15,11 +15,12 @@
         },
         "attach": {
             "calibration": {
-                "calibration_id": "cal-20260916-class",
+                "calibration_id": "cal-20261018-class-crop",
                 "verified": true,
                 "template_family": "NarrowFigures",
                 "identity_threshold": 0.8,
                 "identity_margin": 0.15,
+                "identity_crop": [0.08, 0.15, 0.92, 0.82],
                 "class_roi": [0, 0, 72, 50],
                 "class_threshold": 0.8,
                 "class_margin": 0.3,

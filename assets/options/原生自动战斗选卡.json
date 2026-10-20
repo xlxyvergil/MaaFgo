@@ -1,0 +1,93 @@
+{
+  "option": {
+    "原生自动战斗主输出": {
+      "type": "select",
+      "label": "主输出英灵",
+      "description": "识别指令卡归属后，优先选择这位英灵的面卡，再考虑三连与卡色。初始站位会解析为英灵身份；未识别到归属时沿用卡色策略。",
+      "default_case": "1",
+      "cases": [
+        {
+          "name": "1",
+          "label": "初始首位英灵",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"preferred_initial_slot": 1, "preferred_servant_id": ""}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_initial_slot": 1, "preferred_servant_id": ""}}}
+          }
+        },
+        {
+          "name": "2",
+          "label": "初始第二位英灵",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"preferred_initial_slot": 2, "preferred_servant_id": ""}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_initial_slot": 2, "preferred_servant_id": ""}}}
+          }
+        },
+        {
+          "name": "3",
+          "label": "初始第三位英灵",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"preferred_initial_slot": 3, "preferred_servant_id": ""}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_initial_slot": 3, "preferred_servant_id": ""}}}
+          }
+        },
+        {
+          "name": "servant",
+          "label": "指定英灵",
+          "option": ["原生自动战斗指定主输出"],
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"preferred_initial_slot": 0}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_initial_slot": 0}}}
+          }
+        },
+        {
+          "name": "none",
+          "label": "通用选卡",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"preferred_initial_slot": 0, "preferred_servant_id": ""}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_initial_slot": 0, "preferred_servant_id": ""}}}
+          }
+        }
+      ]
+    },
+    "原生自动战斗指定主输出": {
+      "type": "input",
+      "label": "指定主输出",
+      "description": "填写英灵名称或 ID，例如 C.I.E.L、梅林。名称有多个匹配时请使用完整名称或 ID。",
+      "inputs": [
+        {"name": "preferred_servant", "label": "英灵名称 / ID", "default": "", "verify": ".*"}
+      ],
+      "pipeline_override": {
+        "原生自动战斗入口": {"attach": {"card_policy": {"preferred_servant_id": "{preferred_servant}"}}},
+        "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"preferred_servant_id": "{preferred_servant}"}}}
+      }
+    },
+    "原生自动战斗选卡倾向": {
+      "type": "select",
+      "label": "选卡倾向",
+      "default_case": "finish_wave",
+      "cases": [
+        {
+          "name": "finish_wave", "label": "输出优先",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"goal": "finish_wave"}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"goal": "finish_wave"}}}
+          }
+        },
+        {
+          "name": "build_np", "label": "回收 NP 优先",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"goal": "build_np"}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"goal": "build_np"}}}
+          }
+        },
+        {
+          "name": "build_stars", "label": "打星优先",
+          "pipeline_override": {
+            "原生自动战斗入口": {"attach": {"card_policy": {"goal": "build_stars"}}},
+            "原生自动战斗_Chaldea入口": {"attach": {"card_policy": {"goal": "build_stars"}}}
+          }
+        }
+      ]
+    }
+  }
+}

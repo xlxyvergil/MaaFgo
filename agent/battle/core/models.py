@@ -3,7 +3,7 @@
 约定：
 - 坐标不出现在这里。PrimitiveAction 只携带槽位号，真实 720p 坐标只存在于 execution 层。
 - 视觉不确定必须能显式表达（Confidence、unknown_fields），不允许用假默认值掩盖识别失败。
-- V1b 只用 选目标 + 选 3 张卡；技能/NP 顺序字段暂不建模，等 V2 再加。
+- V2 支持技能、换人及按从者/卡色描述的面卡与宝具混合顺序。
 """
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from typing import Optional, Tuple
 
 from .enums import CardColor, PrimitiveKind, Scene
 
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
 
 
 def is_slot(value: object, low: int, high: int) -> bool:
@@ -99,16 +99,28 @@ class CommandCard:
     """下排面卡。"""
     ui_slot: int                     # 1..5
     color: CardColor
-    owner_slot: Optional[int]        # 1..3；V1 先为 None
-    confidence: Confidence
+    owner_slot: Optional[int]        # 当前前排槽位 1..3；不确定时为 None
+    confidence: Confidence           # 卡色识别置信度
+    owner_confidence: Confidence = field(default_factory=lambda: Confidence(0.0))
+    owner_servant_id: str | None = None
+    owner_margin: float = 0.0
+    owner_template: str = ""
+    owner_reason: str = ""
+    can_attack: bool = True          # 封印/无法行动的面卡仍可选作回合占位
+    blocked_reason: str = ""
 
 
 @dataclass(frozen=True)
 class NpCard:
-    """上排宝具卡（某从者 NP 满时出现）。"""
+    """上排实际可见的宝具卡；封印时仍记录卡面，但不允许选择。"""
     servant_slot: int                # 1..3，宝具卡的归属从者
     confidence: Confidence
-    percent: int | None = None       # OCR 读到的 NP 百分比；调试/审计用
+    percent: int | None = None       # 兼容历史快照；当前不再读取 NP 数值
+    available: bool = True
+    blocked_reason: str = ""
+    owner_servant_id: str | None = None
+    owner_confidence: Confidence = field(default_factory=lambda: Confidence(0.0))
+    owner_template: str = ""
 
 
 @dataclass(frozen=True)
@@ -123,6 +135,7 @@ class ServantState:
     slot: int
     skills: Tuple[SkillState, SkillState, SkillState]
     confidence: Confidence
+    servant_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -153,12 +166,26 @@ class BattleState:
     def cards_ready(self, threshold: float = 0.90) -> bool:
         return len(self.cards) == 5 and all(c.confidence.passes(threshold) for c in self.cards)
 
+    def card_owners_ready(self, threshold: float = 0.86) -> bool:
+        return len(self.cards) == 5 and all(
+            c.owner_slot is not None and c.owner_confidence.passes(threshold)
+            for c in self.cards
+        )
+
 
 @dataclass(frozen=True)
 class CardPick:
     """一次选卡：来自面卡或宝具卡。"""
     kind: PrimitiveKind              # SELECT_CARD | SELECT_NP
     slot: int                        # SELECT_CARD: ui_slot 1..5 ; SELECT_NP: servant_slot 1..3
+
+
+@dataclass(frozen=True)
+class PlannedCard:
+    """攻略中的出卡意图；面卡位置由当前截图的从者归属与卡色解析。"""
+    kind: PrimitiveKind
+    servant_slot: int
+    color: CardColor | None = None
 
 
 @dataclass(frozen=True)
@@ -189,6 +216,7 @@ class TurnPlan:
     np_order: Tuple[int, ...] = ()       # 希望释放的宝具（从者槽位，1..3）
     target_enemy: Optional[int] = None   # 需要选中的敌人目标
     skill_sequence: Tuple[ServantSkillAction | MasterSkillAction | OrderChangeAction, ...] = ()
+    card_sequence: Tuple[PlannedCard, ...] = ()
 
 
 @dataclass(frozen=True)

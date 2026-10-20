@@ -9,6 +9,7 @@
 """
 import os
 import sys
+from dataclasses import replace
 
 # 让 agent/battle 可作为顶层包导入（main.py 只把 custom 目录加进了 path）
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -24,10 +25,11 @@ from maa.tasker import TaskerEventSink
 import mfaalog
 from battle.core.decider import RuleDecider
 from battle.core.models import BattlePlan
-from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
+from battle.core.plan_parser import (_load_action_param, _parse_battle_policy, _parse_enemy_target,
                                     _parse_plan, _parse_strategy_profile)
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
+from battle.data.servant_identity import resolve_servant_id, servant_name
 from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.formation_session import context_session, session_override, sessions
 from chaldea import fetch_share_data
@@ -76,20 +78,48 @@ class AutoBattleAction(CustomAction):
             except ValueError as exc:
                 mfaalog.error(f"[auto_battle] 初始编队会话无效: {exc}")
                 return CustomAction.RunResult(success=False)
-        param = _load_action_param(argv.custom_action_param)
+        param = dict(_load_action_param(argv.custom_action_param))
+        node_name = getattr(argv, "node_name", "")
+        node_data = (context.get_node_data(node_name) or {}) if node_name else {}
+        attach = node_data.get("attach") or {}
+        attached_cards = attach.get("card_policy") or {}
+        explicit_cards = param.get("card_policy") or {}
+        param["card_policy"] = {
+            **(attached_cards if isinstance(attached_cards, dict) else {}),
+            **(explicit_cards if isinstance(explicit_cards, dict) else {}),
+        }
+        # 选怪通过 attach 注入，避免 Chaldea 导入覆盖 action 时丢失配置。
+        # 显式 custom_action_param（包括 0=自动）优先于界面配置。
+        if "enemy_target" not in param:
+            param["enemy_target"] = attach.get("enemy_target", 0)
+        enemy_target = _parse_enemy_target(param)
         profile = _parse_strategy_profile(param)
         battle_policy = _parse_battle_policy(param)
         plan = _parse_plan(param)
+        chaldea_roster = None
         try:
             if plan is None:
-                plan = _plan_from_chaldea_share(param)
+                plan, chaldea_roster = _battle_setup_from_chaldea_share(param)
         except TeamFetchError as e:
             # 队伍下载失败: 明确失败并提示, 由 pipeline on_error 走终止分支
             mfaalog.error(f"[auto_battle] {e}")
             if token:
                 sessions.invalidate(root, token, "chaldea_plan_failed")
             return CustomAction.RunResult(success=False)
-        decider = RuleDecider(battle_policy, plan=plan)
+        roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
+        preferred = battle_policy.card.preferred_servant_id
+        initial_slot = battle_policy.card.preferred_initial_slot
+        preferred_id = (
+            resolve_servant_id(preferred) if preferred else
+            roster_servant_ids[initial_slot - 1] if initial_slot else None
+        )
+        battle_policy = replace(battle_policy, card=replace(
+            battle_policy.card, preferred_servant_id=preferred_id,
+        ))
+        mfaalog.info(f"[英灵选卡] 主输出={servant_name(preferred_id)}({preferred_id or '未指定'})")
+        if preferred_id and preferred_id not in roster_servant_ids:
+            mfaalog.info("[英灵选卡] 指定英灵未出现在编队识别结果中，未识别到其面卡时沿用通用选卡")
+        decider = RuleDecider(battle_policy, plan=plan, enemy_target=enemy_target)
 
         # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
         # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
@@ -99,12 +129,14 @@ class AutoBattleAction(CustomAction):
         plan_turns = len(plan.turns) if plan is not None else 0
         mfaalog.info(
             f"[auto_battle] start profile={profile.id} "
-            f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
+            f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns} "
+            f"enemy_target={enemy_target or 'auto'}"
         )
         try:
             result = AutoBattleRuntime(
                 context, controller, decider, profile, battle_policy,
                 initial_formation=initial_formation, formation_battle=formation_battle,
+                roster_servant_ids=roster_servant_ids,
             ).run()
         except Exception:
             if token and sessions.valid(root, token):
@@ -119,6 +151,13 @@ class AutoBattleAction(CustomAction):
 
 
 def _plan_from_chaldea_share(param: dict) -> BattlePlan | None:
+    """Compatibility wrapper returning only the Chaldea battle plan."""
+    return _battle_setup_from_chaldea_share(param)[0]
+
+
+def _battle_setup_from_chaldea_share(
+    param: dict,
+) -> tuple[BattlePlan | None, tuple[str | None, ...] | None]:
     """从参数解析出 Chaldea 来源并转成 BattlePlan。
 
     支持两种形态（显式 ``plan`` 优先级更高，由调用方保证已在此前解析）：
@@ -130,7 +169,7 @@ def _plan_from_chaldea_share(param: dict) -> BattlePlan | None:
     share = param.get("chaldea_share")
     if isinstance(share, dict):
         mfaalog.info(f"[auto_battle] 使用离线注入的 chaldea_share")
-        return _build_plan_from_share(share)
+        return _build_plan_from_share(share), _roster_from_share(share)
 
     source = param.get("chaldea_import_source") or param.get("chaldea_import_source_file")
     if isinstance(source, str) and source.strip():
@@ -143,9 +182,9 @@ def _plan_from_chaldea_share(param: dict) -> BattlePlan | None:
                 f"[Chaldea] 队伍接口无匹配数据: team_id={team_id}, "
                 f"请检查链接/ID是否正确, 或稍后重试"
             )
-        return _build_plan_from_share(share_data)
+        return _build_plan_from_share(share_data), _roster_from_share(share_data)
 
-    return None
+    return None, None
 
 
 class TeamFetchError(RuntimeError):
@@ -169,3 +208,50 @@ def _build_plan_from_share(share: dict) -> BattlePlan:
     )
     mfaalog.info(f"[auto_battle] chaldea_share -> plan turns={len(plan.turns)}")
     return plan
+
+
+def _roster_from_share(share: dict) -> tuple[str | None, ...] | None:
+    """Extract six semantic formation slots from Chaldea BattleShareData."""
+    members = (share.get("team") or {}).get("onFieldSvts")
+    if not isinstance(members, list):
+        return None
+    roster: list[str | None] = []
+    for index in range(6):
+        member = members[index] if index < len(members) else None
+        servant_id = member.get("svtId") if isinstance(member, dict) else None
+        if isinstance(servant_id, int) and not isinstance(servant_id, bool) and servant_id > 0:
+            roster.append(str(servant_id))
+        elif isinstance(servant_id, str) and servant_id.strip().isdigit() and int(servant_id) > 0:
+            roster.append(str(int(servant_id)))
+        else:
+            roster.append(None)
+    return tuple(roster)
+
+
+def _merge_rosters(
+    initial_formation,
+    chaldea_roster: tuple[str | None, ...] | None,
+) -> tuple[str | None, ...]:
+    """Merge visual and Chaldea evidence without hiding identity conflicts."""
+    visual = None
+    if initial_formation is not None:
+        visual = tuple(
+            slot.servant_id if slot.status == "identified" else None
+            for slot in initial_formation.slots
+        )
+    if visual is None:
+        return chaldea_roster or (None,) * 6
+    if chaldea_roster is None:
+        return visual
+
+    merged: list[str | None] = []
+    for index, (seen, planned) in enumerate(zip(visual, chaldea_roster), start=1):
+        if seen is not None and planned is not None and seen != planned:
+            mfaalog.warning(
+                f"[auto_battle] roster conflict at slot {index}: "
+                f"formation={seen} chaldea={planned}; owner mapping disabled for this slot"
+            )
+            merged.append(None)
+        else:
+            merged.append(seen or planned)
+    return tuple(merged)

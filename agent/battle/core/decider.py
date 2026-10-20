@@ -2,11 +2,11 @@
 
 纯逻辑，无设备/无网络/无 maa 依赖，可离线单测。
 V1b 策略：宝具卡优先出，剩余槽位用面卡按卡色枚举打分补齐，共 3 张。
-owner_slot 在 V1 为 None，故暂不计 Brave / 从者优先级。
+owner_slot 可用时，普通策略与 Chaldea 的面卡补齐共同考虑 Brave Chain。
 
 V2：支持 BattlePlan（固定回合计划）。有计划时：
   - MAIN_BATTLE：按 turn_index 取 TurnPlan，输出技能序列 + 换人
-  - COMMAND_SELECTION：优先按 TurnPlan.np_order 选宝具，再按卡色补面卡
+  - COMMAND_SELECTION：按攻略的面卡/宝具顺序匹配当前卡面，未指定部分按策略补齐
 无计划时退回 V1b 行为。
 """
 from __future__ import annotations
@@ -34,7 +34,8 @@ class Decider(Protocol):
 
 class RuleDecider:
     def __init__(self, policy: BattlePolicy | CardPolicy | None = None,
-                 plan: BattlePlan | None = None) -> None:
+                 plan: BattlePlan | None = None, *,
+                 enemy_target: int | None = None) -> None:
         if isinstance(policy, BattlePolicy):
             self.policy = policy
         elif isinstance(policy, CardPolicy):
@@ -42,6 +43,7 @@ class RuleDecider:
         else:
             self.policy = BattlePolicy()
         self.plan = plan
+        self.enemy_target = enemy_target if is_slot(enemy_target, 1, 3) else None
 
     @property
     def card_policy(self) -> CardPolicy:
@@ -52,13 +54,27 @@ class RuleDecider:
         return self.policy.skill
 
     def decide(self, state: BattleState, turn_index: int = 0) -> BattleAction:
-        target = _pick_target(state)
+        target = self._pick_enemy_target(state, turn_index)
 
         if state.scene is Scene.MAIN_BATTLE:
             return self._decide_main_battle(state, turn_index, target)
 
         # 选卡阶段
         return self._decide_command_selection(state, turn_index, target)
+
+    def _pick_enemy_target(self, state: BattleState, turn_index: int) -> int | None:
+        # 手动配置优先；目标槽位未识别到存活敌人时沿用计划/自动策略。
+        if self.enemy_target is not None and any(
+            enemy.slot == self.enemy_target and enemy.alive for enemy in state.enemies
+        ):
+            return self.enemy_target
+        if self.plan is not None:
+            planned = self.plan.turn(turn_index).target_enemy
+            if planned is not None and any(
+                enemy.slot == planned and enemy.alive for enemy in state.enemies
+            ):
+                return planned
+        return _pick_target(state)
 
     def _decide_main_battle(self, state: BattleState, turn_index: int,
                             target) -> BattleAction:
@@ -75,15 +91,13 @@ class RuleDecider:
             )
 
         tp = self.plan.turn(turn_index)
-        # 计划中指定的敌人目标优先。技能状态过滤由 Runtime 的统一安全门处理，
+        # 敌人目标已按手动配置/计划/自动策略确定。技能状态过滤由 Runtime 的统一安全门处理，
         # 保证 RuleDecider 与未来其他 Decider 使用同一套跳过策略。
-        enemy = tp.target_enemy if tp.target_enemy is not None else target
-
         # 日志：输出 Chaldea 计划的本回合技能队列
         _log_plan_turn(turn_index, tp)
 
         return BattleAction(
-            target_enemy=enemy,
+            target_enemy=target,
             picks=(),
             servant_skills=tp.servant_skills,
             master_skills=tp.master_skills,
@@ -96,8 +110,14 @@ class RuleDecider:
     def _decide_command_selection(self, state: BattleState, turn_index: int,
                                   target) -> BattleAction:
         tp: Optional[TurnPlan] = None
-        if self.plan is not None:
+        if self.plan is not None and 0 <= turn_index < len(self.plan.turns):
             tp = self.plan.turn(turn_index)
+
+        if tp is not None and tp.card_sequence:
+            picks = _resolve_planned_cards(tp, state, self.card_policy)
+            mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 攻略出卡={tp.card_sequence} 实际={picks}")
+            return BattleAction(target_enemy=target, picks=picks,
+                                rationale_tag=f"v2:turn{turn_index}_cards")
 
         # ---- 宝具卡选择 ----
         np_picks: List[CardPick] = []
@@ -105,32 +125,72 @@ class RuleDecider:
         if tp is not None and tp.np_order:
             # 固定计划优先按配置点击宝具，不依赖 NP OCR 是否识别成功。
             for slot in tp.np_order:
+                if not any(card.servant_slot == slot and card.available for card in state.np_cards):
+                    continue
                 if slot not in {pick.slot for pick in np_picks} and len(np_picks) < 3:
                     np_picks.append(CardPick(PrimitiveKind.SELECT_NP, slot))
             mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 计划宝具顺序={tp.np_order} 实际np_picks={[p.slot for p in np_picks]}")
         elif tp is None and self.card_policy.np_first:
             # 无计划：有宝具就优先出
             np_picks = [CardPick(PrimitiveKind.SELECT_NP, c.servant_slot)
-                        for c in state.np_cards][:3]
+                        for c in state.np_cards if c.available][:3]
 
         # ---- 面卡补齐 ----
         need = 3 - len(np_picks)
         face_picks: List[CardPick] = []
         if need > 0 and state.cards:
-            slots = _best_face_order(state.cards, min(need, len(state.cards)), self.card_policy)
+            chain_owner = np_picks[0].slot if len(np_picks) == 1 else None
+            slots = _best_face_order(
+                state.cards,
+                min(need, len(state.cards)),
+                self.card_policy,
+                chain_owner_slot=chain_owner,
+            )
             face_picks = [CardPick(PrimitiveKind.SELECT_CARD, s) for s in slots]
 
         picks = tuple((np_picks + face_picks)[:3])
 
-        # 计划中指定的敌人目标优先
-        enemy = tp.target_enemy if (tp is not None and tp.target_enemy is not None) else target
-
         tag = f"v2:turn{turn_index}" if tp is not None else f"v2:{self.card_policy.goal.value}"
         return BattleAction(
-            target_enemy=enemy,
+            target_enemy=target,
             picks=picks,
             rationale_tag=tag
         )
+
+
+def _resolve_planned_cards(tp: TurnPlan, state: BattleState, policy: CardPolicy) -> Tuple[CardPick, ...]:
+    """将攻略的从者/卡色映射到此回合位置，保留宝具穿插在面卡间的顺序。"""
+    picks: list[CardPick | None] = []
+    used_faces: set[int] = set()
+    used_np: set[int] = set()
+    for request in tp.card_sequence[:3]:
+        pick = None
+        if request.kind is PrimitiveKind.SELECT_NP:
+            if request.servant_slot not in used_np and any(
+                card.servant_slot == request.servant_slot and card.available
+                for card in state.np_cards
+            ):
+                pick = CardPick(PrimitiveKind.SELECT_NP, request.servant_slot)
+                used_np.add(request.servant_slot)
+        else:
+            card = next((card for card in state.cards
+                         if card.ui_slot not in used_faces and card.can_attack
+                         and card.owner_slot == request.servant_slot
+                         and card.color is request.color), None)
+            if card is not None:
+                pick = CardPick(PrimitiveKind.SELECT_CARD, card.ui_slot)
+                used_faces.add(card.ui_slot)
+        picks.append(pick)
+
+    remaining = tuple(card for card in state.cards if card.ui_slot not in used_faces)
+    need = min(3 - len(used_faces) - len(used_np), len(remaining))
+    fallback = iter(CardPick(PrimitiveKind.SELECT_CARD, slot) for slot in (_best_face_order(
+        remaining, need, policy,
+        chain_owner_slot=next(iter(used_np)) if len(used_np) == 1 else None,
+    ) if need else ()))
+    picks = [pick if pick is not None else next(fallback, None) for pick in picks]
+    picks.extend(fallback)
+    return tuple(pick for pick in picks if pick is not None)[:3]
 
 
 def _pick_target(state: BattleState):
@@ -176,16 +236,39 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     return tuple(skills[:skill_policy.max_skills_per_turn] if skill_policy.max_skills_per_turn > 0 else skills)
 
 
-def _best_face_order(cards: Tuple[CommandCard, ...], need: int, policy: CardPolicy) -> List[int]:
+def _best_face_order(
+    cards: Tuple[CommandCard, ...],
+    need: int,
+    policy: CardPolicy,
+    *,
+    chain_owner_slot: int | None = None,
+) -> List[int]:
     weights = {c: len(policy.color_priority) - i for i, c in enumerate(policy.color_priority)}
     goal_color = _GOAL_COLOR.get(policy.goal)
 
-    def score(seq: Tuple[CommandCard, ...]) -> float:
+    def score(seq: Tuple[CommandCard, ...]) -> tuple[int, int, float]:
         s = 0.0
         n = len(seq)
         for pos, card in enumerate(seq):
             s += weights.get(card.color, 0) * (n - pos)      # 靠前的卡权重更高
         colors = {c.color for c in seq}
+        owners = tuple(card.owner_slot for card in seq)
+        if policy.prefer_brave_chain:
+            if (
+                chain_owner_slot is None
+                and len(seq) == 3
+                and owners[0] is not None
+                and len(set(owners)) == 1
+            ):
+                s += 14.0
+            elif (
+                chain_owner_slot is not None
+                and len(seq) == 2
+                and all(owner == chain_owner_slot for owner in owners)
+            ):
+                # One NP from this servant plus two face cards completes the
+                # same-servant chain and grants the Extra attack.
+                s += 14.0
         if len(colors) == 1:                                 # 同色链
             s += 5.0
         elif len(colors) == 3 and policy.prefer_mighty_chain:
@@ -218,7 +301,12 @@ def _best_face_order(cards: Tuple[CommandCard, ...], need: int, policy: CardPoli
                 s += 3.0
             if seq[-1].color is goal_color:
                 s += 2.0
-        return s
+        preferred = sum(
+            card.owner_servant_id == policy.preferred_servant_id
+            and card.owner_confidence.passes(0.86)
+            for card in seq
+        ) if policy.preferred_servant_id else 0
+        return sum(card.can_attack for card in seq), preferred, s
 
     best = max(permutations(cards, need), key=score)
     return [c.ui_slot for c in best]

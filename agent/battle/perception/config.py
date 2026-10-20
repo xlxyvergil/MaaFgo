@@ -8,8 +8,9 @@
   - 战斗_主界面          TemplateMatch（主界面攻击钮）
   - 战斗_胜利 / 战斗_失败   OCR / TemplateMatch
   - 战斗_卡{1..5}        OCR（识别「力击/迅击/技击」）
-  - 战斗_NP卡{1..3}      OCR（识别 NP 数值，≥100% 可用）
+  - 战斗_宝具卡{1..3}_卡面 / _封印  实际卡面与限制状态
   - 战斗_敌人{1..3} / 战斗_敌人{1..3}_选中
+战斗 HUD 头像参数定义在 自动战斗_前排身份.json 的 attach 中。
 """
 from __future__ import annotations
 
@@ -28,7 +29,10 @@ SCENE_NODES = {
 
 # 参数化节点名模板
 CARD_NODE = "战斗_卡{ui_slot}"               # OCR，识别 "力击"/"迅击"/"技击"
-NP_CARD_NODE = "战斗_NP卡{servant_slot}"          # TemplateMatch
+NP_VISUAL_NODE = "战斗_宝具卡{servant_slot}_卡面" # 上排宝具名称，仅作辅助证据
+NP_FRAME_NODE = "战斗_宝具卡{servant_slot}_边框" # 未知编队时的通用卡片证据
+NP_BLOCKED_NODE = "战斗_宝具卡{servant_slot}_封印"
+FACE_BLOCKED_NODE = "战斗_卡{ui_slot}_封印"
 ENEMY_NODE = "战斗_敌人{slot}"                     # 存活/位置
 ENEMY_TARGET_NODE = "战斗_敌人{slot}_选中"         # 当前目标
 

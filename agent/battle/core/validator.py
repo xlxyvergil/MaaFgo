@@ -268,7 +268,7 @@ def validate_card_action(
         return Verdict(False, "duplicate_picks")
 
     face_slots = {card.ui_slot for card in state.cards}
-    np_slots = {card.servant_slot for card in state.np_cards}
+    np_slots = {card.servant_slot for card in state.np_cards if card.available}
     for pick in action.picks:
         if pick.kind not in _ALLOWED_PICK_KINDS:
             return Verdict(False, f"forbidden_pick_kind:{pick.kind.value}")

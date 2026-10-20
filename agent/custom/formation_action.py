@@ -2283,6 +2283,7 @@ class FormationCalibration:
     template_family: str = "NarrowFigures"
     identity_threshold: float | None = None
     identity_margin: float | None = None
+    identity_crop: tuple = ()       # 可选模板局部 [left, top, right, bottom]，归一化到 0..1
     class_threshold: float | None = None
     class_margin: float | None = None
     class_roi: tuple = ()          # 相对每个 SLOT_ROIS 左上角的区域
@@ -2302,6 +2303,12 @@ class FormationCalibration:
             value = fields.get(key)
             if value is not None and (type(value) not in {int, float} or not 0 < value <= 1):
                 raise ValueError(f"invalid calibration {key}")
+        crop = fields.get("identity_crop", ())
+        if crop and (len(crop) != 4
+                     or any(type(v) not in {int, float} for v in crop)
+                     or not (0 <= crop[0] < crop[2] <= 1 and 0 <= crop[1] < crop[3] <= 1)):
+            raise ValueError("identity crop must be normalized template bounds")
+        fields["identity_crop"] = tuple(crop)
         for key in ("class_templates", "class_groups"):
             mapping = fields.get(key, {})
             if not isinstance(mapping, dict):
@@ -2445,6 +2452,19 @@ class FormationIdentityReader(AutoFormationFromChaldea):
             *_identity_manifest(self.image_roots, self.calibration.template_family,
                                 catalog_path or os.path.join(_CUSTOM_DIR, "servant_list.json"))
         )
+        self.identity_templates = {}
+        if self.calibration.identity_crop:
+            left, top, right, bottom = self.calibration.identity_crop
+
+            def crop(template):
+                height, width = template.shape[:2]
+                return template[round(top * height):round(bottom * height),
+                                round(left * width):round(right * width)]
+
+            self.identity_templates = {
+                sid: tuple((name, crop(template)) for name, template in variants)
+                for sid, variants in self.templates.items()
+            }
         self.config_marker = self._load_named_template("battle/配置变更.png")
         self.start_markers = [self._load_named_template(f"battle/{name}.png")
                               for name in ("开始任务", "战斗开始")]
@@ -2460,10 +2480,11 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 raise ValueError(f"class_template_missing:{name}")
             self.class_templates[name] = values
 
-    def _rank(self, image, roi, identities):
+    def _rank(self, image, roi, identities, *, cropped=False):
         scores = []
+        templates = self.identity_templates if cropped else self.templates
         for sid in identities:
-            match = self._match_servant(image, self.templates[sid], roi)
+            match = self._match_servant(image, templates[sid], roi)
             if match is not None and np.isfinite(match[0]):
                 scores.append((match[0], sid, match[2]))
         return sorted(scores, key=lambda x: (-x[0], x[1]))
@@ -2525,6 +2546,16 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 if full_audit or not self._accepted(ranked):
                     ranked = self._rank(image, roi, self.templates)
                     scope = "all_audit" if full_audit else "all_fallback"
+                # 保留原整幅匹配的成功结果，只有原流程无法确认时才比较局部头像。
+                if not self._accepted(ranked) and c.identity_crop:
+                    if class_id and candidates and not full_audit:
+                        local = self._rank(image, roi, candidates, cropped=True)
+                        if self._accepted(local):
+                            ranked, scope = local, "class_crop"
+                    if not self._accepted(ranked):
+                        local = self._rank(image, roi, self.templates, cropped=True)
+                        if self._accepted(local):
+                            ranked, scope = local, "all_crop"
             identified = self._accepted(ranked)
             best = ranked[0] if ranked else (0.0, None, "")
             margin = best[0] - ranked[1][0] if len(ranked) > 1 else 0.0
@@ -2537,7 +2568,8 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 servant_id=best[1] if identified else None, class_id=class_id,
                 is_support=is_support, class_confidence=class_conf,
                 identity_confidence=Confidence(best[0] if identified else 0.0,
-                                               "formation_template" if identified else "unconfirmed"),
+                                               ("formation_template_crop" if scope.endswith("_crop")
+                                                else "formation_template") if identified else "unconfirmed"),
                 catalog_class=self.records[best[1]]["class"] if identified else None,
                 best_candidate_id=best[1], best_score=best[0], identity_margin=margin,
                 matched_template=best[2], search_scope=scope,

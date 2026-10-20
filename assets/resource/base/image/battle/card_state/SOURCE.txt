@@ -1,0 +1,8 @@
+Game UI recognition templates adapted from hgjazhgj/FGO-py.
+Source commit: 7b0cb32ff8ee8207715f4ea1084c1a86b5412d1f
+https://github.com/hgjazhgj/FGO-py/tree/7b0cb32ff8ee8207715f4ea1084c1a86b5412d1f/FGO-py/fgoImage
+Copyright (C) 2019-2026 hgjazhgj. AGPL-3.0, see repository LICENSE.
+Underlying Fate/Grand Order images belong to their respective owners.
+Modification: transparent pixels converted to the MaaFramework green mask.
+
+np_frame_left.png / np_frame_right.png: cropped from a local FGO CN screenshot captured on 2026-10-17; shared NP card border, independent of servant identity or quest. Original screenshot is kept only in local debug records.
