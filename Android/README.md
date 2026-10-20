@@ -15,7 +15,7 @@
 
 文件名中的 `<版本号>` 对应所选版本。正式版和 beta 均使用同一证书签名的 Release APK；旧版调试包可能带有 `-debug` 后缀。安卓暂未接入 Mirror酱更新源，更新时请下载新版 APK。
 
-需要开发版时，可从 [GitHub Actions](https://github.com/xlxyvergil/MaaFgo/actions/workflows/android.yml) 下载：登录 GitHub，选择 `main` 分支最近一次成功的构建，在 **Artifacts** 中下载 `MaaFGO-android-<架构>-debug` 附件，解压后安装其中的 APK。
+需要开发版时，可从 [GitHub Actions](https://github.com/xlxyvergil/MaaFgo/actions/workflows/android.yml) 下载：登录 GitHub，选择一次成功的 PR 或手动构建，在 **Artifacts** 中下载 `MaaFGO-android-<架构>-debug` 附件，解压后安装其中的 APK。维护者可通过“Run workflow”选择分支手动构建；普通分支 push 不再自动生成 APK。
 
 外壳安装下限为 Android 9 / API 28，后台模式要求 Android 10 / API 29 以上；当前支持和测试目标为 Android 10+，能安装不代表所有功能已验收。MuMu 对普通 ARM 应用的兼容不能代替原生库兼容：本机 ARM64 包在 x86_64 MuMu 上虽能安装和打开界面，特权服务及部分推理未通过，请使用 x86_64 包。
 
@@ -31,7 +31,7 @@
 | 模式 | 游戏画面 | 启动入口 | 分辨率 |
 | --- | --- | --- | --- |
 | 后台模式 | 游戏运行在独立虚拟屏，在 MaaFGO 上方预览 | 任务页“开始任务” | 固定 `1280×720 / DPI 240`，主屏可保持原比例 |
-| 前台模式 | 游戏显示在手机主屏，由悬浮面板操作 | 游戏横屏稳定后，从悬浮面板“开始任务” | 主屏游戏画面须为横屏 16:9 |
+| 前台模式 | 游戏显示在手机主屏，由悬浮面板操作 | 游戏横屏稳定后，从悬浮面板“开始任务” | 主屏游戏画面须为横屏 16:9，推荐 1280 × 720 |
 
 **超宽屏优先使用后台模式。** `2160×720` 等主屏不需要修改，后台仍以独立的 1280×720 游戏画面识别和点击。设备或系统限制虚拟屏时，再尝试前台模式。后台模式中的部分游戏 SDK 登录或授权窗口仍可能短暂出现在主屏；不能保证所有窗口都留在预览中。
 
@@ -137,7 +137,7 @@ python tools/build_android.py --abi x86_64 --skip-runtime
 
 安卓下载文件为 `MaaFGO-android-arm64-v8a-<tag>.apk` 和 `MaaFGO-android-x86_64-<tag>.apk`，手机选 ARM64，MuMu 等 x86_64 模拟器选 x86_64。正式版和 beta tag 均使用正式签名的 Release APK，并验证签名、非调试标志、架构及版本。
 
-原有分支和 PR 继续构建 debug APK。手动安卓构建默认 debug，维护者可启用 `release` 输入验证正式签名构建，产物保存在 Actions 附件。已发布的旧 tag 不会自动补上 APK；该流程在修改合入后推送的新 tag 上生效，也可在包含修改的 tag 上手动运行统一发布流程。
+与 MXU 一致，普通分支 push 不打包，相关 PR 保留 debug APK 构建；`v*` tag 通过统一发布流程构建正式签名包。手动安卓构建默认 debug，维护者可启用 `release` 输入验证正式签名构建，产物保存在 Actions 附件。已发布的旧 tag 不会自动补上 APK；该流程在修改合入后推送的新 tag 上生效，也可在包含修改的 tag 上手动运行统一发布流程。
 
 ## 从 MXU 移植时的维护要点
 

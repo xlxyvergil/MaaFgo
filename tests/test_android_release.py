@@ -1,6 +1,7 @@
 """Release 发布边界：签名身份、调试标志、ABI 和版本不得混淆。"""
 import importlib.util
 from pathlib import Path
+import re
 import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,6 +67,32 @@ class ReleaseVerificationTests(unittest.TestCase):
         for badging in ("", "native-code: 'arm64-v8a'\n", self.badging.replace("versionCode='1200'", "versionCode='0'")):
             with self.subTest(badging=badging), self.assertRaises(ValueError):
                 self.validate(badging=badging)
+
+
+class AndroidWorkflowTriggerTests(unittest.TestCase):
+    @staticmethod
+    def trigger_block(path):
+        workflow = path.read_text(encoding="utf-8")
+        # 仅提取已有工作流的顶层 on 区块，不解析脚本或 GitHub 表达式。
+        match = re.search(r"^on:\n(?P<triggers>(?:[ \t].*\n|\n)*)", workflow, re.MULTILINE)
+        if match is None:
+            raise AssertionError(f"Missing workflow trigger block: {path}")
+        return match.group("triggers")
+
+    def test_apk_retains_pr_manual_and_reusable_triggers_without_branch_push(self):
+        block = self.trigger_block(ROOT / ".github/workflows/android.yml")
+        events = set(re.findall(r"^  ([a-z_]+):", block, re.MULTILINE))
+        self.assertEqual(events, {"pull_request", "workflow_dispatch", "workflow_call"})
+
+    def test_unified_release_still_builds_android_only_for_v_tags(self):
+        workflow = (ROOT / ".github/workflows/install.yml").read_text(encoding="utf-8")
+        block = self.trigger_block(ROOT / ".github/workflows/install.yml")
+        self.assertRegex(block, r'push:\n    tags:\n      - "v\*"')
+        self.assertNotIn("    branches:", block.split("  pull_request:", 1)[0])
+        job = workflow.split("  build-android:\n", 1)[1].split("\n  changelog:", 1)[0]
+        self.assertIn("if: startsWith(github.ref, 'refs/tags/v')", job)
+        self.assertIn("uses: ./.github/workflows/android.yml", job)
+        self.assertIn("release: true", job)
 
 
 if __name__ == "__main__":

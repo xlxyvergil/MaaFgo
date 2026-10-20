@@ -1,7 +1,7 @@
 {
   "interface_version": 2,
   "name": "MaaFgo",
-  "description": "FGO自动战斗工具,模拟器需要强制为1280*720模式",
+  "description": "FGO自动战斗工具，要求游戏画面为横屏16:9，推荐分辨率1280 × 720",
   "contact": "QQ群: 1102496882",
   "license": "AGPL-3.0",
   "welcome": "Announcement.md",

@@ -30,16 +30,7 @@ on:
       - "tests/test_android*.py"
       - "tests/android/**"
       - ".github/workflows/android.yml"
-  push:
-    branches: ["main", "codex/android-app"]
-    paths:
-      - "Android/**"
-      - "agent/**"
-      - "assets/**"
-      - "tools/*android*.py"
-      - "tests/test_android*.py"
-      - "tests/android/**"
-      - ".github/workflows/android.yml"
+  # 与 MXU 一致：普通分支 push 不打包；v* tag 由 install.yml 调用本流程发布。
 
 permissions:
   contents: read
