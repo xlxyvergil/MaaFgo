@@ -122,6 +122,15 @@
                                     "package": "com.bilibili.fgo.m4399"
                                 }
                             }
+                        },
+                        "4399-关闭弹窗-前往游戏盒领取-小": {
+                            "enabled": true
+                        },
+                        "4399-关闭弹窗-前往游戏盒领取-大": {
+                            "enabled": true
+                        },
+                        "4399-关闭弹窗-我知道了前往查看": {
+                            "enabled": true
                         }
                     }
                 },
