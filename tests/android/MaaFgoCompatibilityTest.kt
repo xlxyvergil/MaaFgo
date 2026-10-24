@@ -16,7 +16,7 @@ import java.io.File
 /** 使用真正的安卓 PI 解析器和执行计划编译器检查生成资源。 */
 class MaaFgoCompatibilityTest {
     @Test fun apkConfiguresMirrorChyanIndependentlyOfDesktopPi() {
-        assertEquals("MaaFgo", BuildConfig.MAFW_MIRRORCHYAN_RID)
+        assertEquals("MaaFgo_exec", BuildConfig.MAFW_MIRRORCHYAN_RID)
     }
 
     private fun definition(): ProjectDefinition {

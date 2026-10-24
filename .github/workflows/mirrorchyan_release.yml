@@ -6,6 +6,11 @@ on:
       tag:
         default: ''
         required: false
+      platform:
+        description: Platforms to upload (choose android when backfilling APKs)
+        type: choice
+        default: all
+        options: [all, android, win]
   release:
     types: [released]
 
@@ -20,14 +25,18 @@ jobs:
           - os: win
             arch: x86_64
             filename: MaaFgo-win-x86_64-*-MXU.zip
+            rid: MaaFgo
           - os: android
             arch: arm64
             filename: MaaFGO-android-arm64-v8a-v*.apk
+            rid: MaaFgo_exec
           - os: android
             arch: amd64
             filename: MaaFGO-android-x86_64-v*.apk
+            rid: MaaFgo_exec
     steps:
       - name: Resolve release tag and Android channel
+        if: ${{ inputs.platform == '' || inputs.platform == 'all' || inputs.platform == matrix.os }}
         id: release
         shell: bash
         env:
@@ -48,10 +57,11 @@ jobs:
           fi
           echo "android_channel=$channel" >> "$GITHUB_OUTPUT"
       - uses: MirrorChyan/uploading-action@v1
+        if: ${{ inputs.platform == '' || inputs.platform == 'all' || inputs.platform == matrix.os }}
         with:
           filetype: latest-release
           filename: ${{ matrix.filename }}
-          mirrorchyan_rid: MaaFgo
+          mirrorchyan_rid: ${{ matrix.rid }}
           tag: ${{ steps.release.outputs.tag }}
           # APK 直接分发，不套 ZIP；Windows 仍沿用上传 action 的渠道判定。
           extra_zip: "false"
@@ -63,4 +73,5 @@ jobs:
           owner: xlxyvergil
           repo: MaaFgo
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          # 原 token 获得新资源授权后可复用，也可为 APK 单独配置 token。
+          upload_token: ${{ matrix.os == 'android' && (secrets.MirrorChyanExecUploadToken || secrets.MirrorChyanUploadToken) || secrets.MirrorChyanUploadToken }}

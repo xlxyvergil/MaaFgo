@@ -91,7 +91,7 @@ Android 对 `Android/data` 的访问限制因系统而异；这些是手机数�
 | 前台有点击但位置不对，或任务因尺寸变化停止 | 先停止任务，确认游戏处于横屏 16:9，重新从悬浮面板开始；超宽屏可改用后台 |
 | 任务失败需要反馈 | 从“设置 → 日志 → 导出日志”保存或分享日志，附手机型号、安卓版本、APK 架构、Shizuku/Root 和前台/后台模式 |
 
-安卓版资源和 Agent 随 APK 更新。安卓与桌面共用 Mirror酱项目 `MaaFgo`，但按系统和架构分别发布；安卓更新只查询 Android APK，不会下载 Windows 包。升级保留规则不包含卸载后重装，也不会自动导入桌面的个人配置。
+安卓版资源和 Agent 随 APK 更新。安卓使用 Mirror酱整包项目 `MaaFgo_exec`，桌面继续使用增量项目 `MaaFgo`；安卓按安装包架构查询 Android APK。升级保留规则不包含卸载后重装，也不会自动导入桌面的个人配置。
 
 ## 已验收范围
 
@@ -132,11 +132,17 @@ python tools/build_android.py --skip-runtime
 python tools/build_android.py --abi x86_64 --skip-runtime
 ```
 
-正式签名包使用 `python tools/build_android.py --release`，需设置 `KEYSTORE_PATH`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`。tag 构建通过 GitHub Secrets 使用固定正式密钥，签名及验证说明见 [signing/README.md](signing/README.md)。`profile.yaml` 中的 `update.mirrorchyanRid` 固定安卓更新项目；上传流程在正式仓库使用现有 `MirrorChyanUploadToken`，同步 Windows、Android ARM64 和 Android x86_64 三份附件。安卓稳定版上传到 stable，alpha / beta / rc / dev / ci 预发布上传到 beta。
+正式签名包使用 `python tools/build_android.py --release`，需设置 `KEYSTORE_PATH`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`。tag 构建通过 GitHub Secrets 使用固定正式密钥，签名及验证说明见 [signing/README.md](signing/README.md)。`profile.yaml` 中的 `update.mirrorchyanRid` 固定为 `MaaFgo_exec`，APK 原样上传，不套 ZIP。Windows 上传到 `MaaFgo`，Android ARM64 / x86_64 上传到 `MaaFgo_exec`；更新日志也分别同步两个项目。安卓稳定版上传到 stable，alpha / beta / rc / dev / ci 预发布上传到 beta。
 
-上传工作流合入正式仓库后，可手动运行 `mirrorchyan_release.yml`，输入已有 Release 的 tag（如 `v2.0.11`），补同步该版本 APK，无需重新打 tag。省略 tag 时选择最新稳定版。网页能否选择 Android，以该工作流实际上传成功及 Mirror酱接口返回为准；只提交代码不会补齐远端安装包。
+资源开通且上传工作流合入正式仓库后，可手动运行 `mirrorchyan_release.yml`，输入已有 Release 的 tag（如 `v2.0.11`），选择 `platform=android` 补同步 APK，无需重新打 tag，也不会重复上传已发布的 Windows 包。省略 tag 时选择最新稳定版；默认 `platform=all` 同步全部平台。网页能否下载 Android，以该工作流实际上传成功及 Mirror酱接口返回为准；旧版 APK 的更新配置不会随补上传自动改变。
 
-接入前置条件：2026-10-24 补同步 `v2.0.11` 时，Mirror酱将 `MaaFgo` 识别为增量资源，拒收 `.apk`，报错 `incremental resource ... file ext not supported`。该服务端限制尚未解除，安卓分发不可用；需先由 Mirror酱管理员开通 APK 全量资源或支持对应平台策略。若使用独立资源 ID，应同时调整本文件所述上传项目与 `profile.yaml`，并配置有该资源上传权限的 token，再验证真实上传。不要直接变更桌面项目的增量更新方式。已同步的 Windows 版本再次上传会返回 8006 版本已存在，补同步时也应跳过已发布平台。
+接入前置条件：2026-10-24 的首次补传确认 `MaaFgo` 为增量资源，拒收 `.apk`。现按 MaaEnd 的分流方式准备 `MaaFgo_exec`，由 Mirror酱管理员开通后再做线上验收；代码不会自动创建服务端资源。请管理员配置：
+
+- 资源 ID：`MaaFgo_exec`，类型为原始 APK 的全量/整包分发。
+- 平台与架构：`android/arm64`、`android/amd64`，渠道 `stable`、`beta`。
+- 上传权限：若原 `MirrorChyanUploadToken` 获得该资源权限，可直接复用；若需要单独 token，在正式仓库新增 Secret `MirrorChyanExecUploadToken`，安卓包和其更新日志会优先使用它。
+
+保留桌面 `MaaFgo` 的增量更新类型及 token。资源开通前，PR 保持草稿，不触发补传，也不将安卓 Mirror酱分发视为已可用。
 
 ## Tag 构建与发布
 

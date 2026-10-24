@@ -17,13 +17,13 @@ class MirrorChyanPublicationTests(unittest.TestCase):
         self.workflow = WORKFLOW.read_text(encoding="utf8")
         # 读取显式矩阵行；不把 YAML 的 on 按布尔值解析，也不引入测试专用依赖。
         self.rows = re.findall(
-            r"^          - os: (\S+)\n            arch: (\S+)\n            filename: (\S+)$",
+            r"^          - os: (\S+)\n            arch: (\S+)\n            filename: (\S+)\n            rid: (\S+)$",
             self.workflow, re.MULTILINE,
         )
 
     def test_each_platform_selects_only_its_own_release_attachment(self):
         expected = {("win", "x86_64"), ("android", "arm64"), ("android", "amd64")}
-        self.assertEqual({(os_, arch) for os_, arch, _ in self.rows}, expected)
+        self.assertEqual({(os_, arch) for os_, arch, _, _ in self.rows}, expected)
         for tag in ("v2.0.11", "v2.0.12-beta.1"):
             assets = {
                 ("win", "x86_64"): f"MaaFgo-win-x86_64-{tag}-MXU.zip",
@@ -31,21 +31,41 @@ class MirrorChyanPublicationTests(unittest.TestCase):
                 ("android", "amd64"): f"MaaFGO-android-x86_64-{tag}.apk",
             }
             files = list(assets.values()) + ["MaaFGO-android-arm64-v8a-debug.apk", "release-verification.json"]
-            for os_, arch, pattern in self.rows:
+            for os_, arch, pattern, _ in self.rows:
                 with self.subTest(tag=tag, os=os_, arch=arch):
                     self.assertEqual([name for name in files if fnmatch.fnmatchcase(name, pattern)],
                                      [assets[(os_, arch)]])
 
-    def test_publication_and_client_share_the_project_but_not_desktop_update_fields(self):
+    def test_apk_uses_the_full_package_project_and_desktop_keeps_incremental_project(self):
         profile = (ROOT / "Android/profile.yaml").read_text(encoding="utf8")
-        self.assertRegex(profile, r"(?m)^update:\n  mirrorchyanRid: MaaFgo$")
-        self.assertIn("mirrorchyan_rid: MaaFgo", self.workflow)
+        self.assertRegex(profile, r"(?m)^update:\n  mirrorchyanRid: MaaFgo_exec$")
+        for os_, _, _, rid in self.rows:
+            self.assertEqual(rid, "MaaFgo_exec" if os_ == "android" else "MaaFgo")
+        self.assertIn("mirrorchyan_rid: ${{ matrix.rid }}", self.workflow)
         self.assertIn("${{ matrix.os }}", self.workflow)
         self.assertIn("${{ matrix.arch }}", self.workflow)
         self.assertIn('extra_zip: "false"', self.workflow)
         self.assertIn("github.repository_owner == 'xlxyvergil'", self.workflow)
         self.assertIn("${{ steps.release.outputs.tag }}", self.workflow)
         self.assertIn("${{ inputs.tag || github.event.release.tag_name }}", self.workflow)
+        self.assertIn("secrets.MirrorChyanExecUploadToken || secrets.MirrorChyanUploadToken", self.workflow)
+
+    def test_apk_backfill_can_skip_published_windows_package(self):
+        self.assertIn("options: [all, android, win]", self.workflow)
+        condition = "${{ inputs.platform == '' || inputs.platform == 'all' || inputs.platform == matrix.os }}"
+        self.assertEqual(self.workflow.count("if: " + condition), 2)
+        # Same predicate on metadata and upload; release events without inputs still upload all.
+        for requested, platforms in [("android", {"android"}), ("win", {"win"}),
+                                     ("all", {"android", "win"}), ("", {"android", "win"})]:
+            selected = {os_ for os_, _, _, _ in self.rows if requested in ("", "all", os_)}
+            self.assertEqual(selected, platforms)
+
+    def test_release_notes_update_both_resource_ids_for_the_selected_tag(self):
+        notes = (ROOT / ".github/workflows/mirrorchyan_release_note.yml").read_text(encoding="utf8")
+        self.assertIn("rid: [MaaFgo, MaaFgo_exec]", notes)
+        self.assertIn("mirrorchyan_rid: ${{ matrix.rid }}", notes)
+        self.assertIn("version_name: ${{ inputs.tag || github.event.release.tag_name }}", notes)
+        self.assertIn("secrets.MirrorChyanExecUploadToken || secrets.MirrorChyanUploadToken", notes)
 
     def test_release_resolution_and_android_channel_execute_correctly(self):
         bash = (Path("C:/Program Files/Git/bin/bash.exe") if os.name == "nt"
