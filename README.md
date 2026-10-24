@@ -30,7 +30,7 @@
 | Windows / MXU | 在电脑上通过 ADB 操作模拟器；可选 BBC 或原生自动战斗 | [桌面版 Releases](https://github.com/xlxyvergil/MaaFgo/releases)，下载 `*-MXU.zip` |
 | Android / APK（测试版） | 直接在手机或模拟器内运行；使用 Shizuku / Root，支持前台与后台模式 | [安卓版 Releases](https://github.com/xlxyvergil/MaaFgo/releases)，下载对应架构的 `.apk`；详见 [安卓使用说明](./Android/README.md) |
 
-安卓包与 Windows 包在同一个 Release 中提供。安卓手机通常选择 **`arm64-v8a`**，MuMu 12 选择 **`x86_64`**。APK 已包含 Python、识别模型和原生战斗运行环境，无需另装 BBC 或电脑端 Python；安卓更新请从 Releases 下载新版 APK，暂未接入 Mirror酱。
+安卓包与 Windows 包在同一个 Release 中提供。安卓手机通常选择 **`arm64-v8a`**，MuMu 12 选择 **`x86_64`**。APK 已包含 Python、识别模型和原生战斗运行环境，无需另装 BBC 或电脑端 Python；可从 Releases 下载新版 APK，已同步的版本也可通过 Mirror酱下载和更新。
 
 ---
 
@@ -186,7 +186,7 @@
 
 使用**相同签名**的 APK 覆盖安装时会保留配置、库存、队伍缓存和羁绊进度。同一 Git 提交反复构建的 APK 版本码相同，覆盖后需到“设置 → 项目资源 → 重新解压资源”刷新任务与图片；该操作保留 `pi/config/`。
 
-**卸载应用或清除数据会删除这些文件。** 本地与 CI 调试包可能签名不同，无法覆盖安装时请先备份数据或使用相同签名的构建。“导出配置”不包含库存、队伍缓存与羁绊进度，这些文件需另行备份 `pi/config/`。安卓包的更新来源与桌面版独立，桌面 Mirror酱 配置不用于 APK 更新。
+**卸载应用或清除数据会删除这些文件。** 本地与 CI 调试包可能签名不同，无法覆盖安装时请先备份数据或使用相同签名的构建。“导出配置”不包含库存、队伍缓存与羁绊进度，这些文件需另行备份 `pi/config/`。安卓更新可选 GitHub 或 Mirror酱；Mirror酱下载需要有效 CDK，安卓与桌面安装包按系统和架构分别提供。
 
 完整安装指引、兼容差异与已知问题见 [Android/README.md](./Android/README.md)。
 

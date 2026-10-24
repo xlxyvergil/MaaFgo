@@ -29,6 +29,8 @@ display:
       width: 1280
       height: 720
       dpi: 240
+update:
+  mirrorchyanRid: MaaFgo_exec
 app:
   id: maafgo
   label: MaaFGO

@@ -12,15 +12,20 @@ on:
 jobs:
   mirrorchyan:
     runs-on: macos-latest
+    if: ${{ github.repository_owner == 'xlxyvergil' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        rid: [MaaFgo, MaaFgo_exec]
 
     steps:
       - id: uploading
         uses: MirrorChyan/release-note-action@v1
         with:
-          mirrorchyan_rid: MaaFgo
-          version_name: ${{ inputs.tag }}
+          mirrorchyan_rid: ${{ matrix.rid }}
+          version_name: ${{ inputs.tag || github.event.release.tag_name }}
 
           owner: xlxyvergil
           repo: MaaFgo
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          upload_token: ${{ secrets.MirrorChyanUploadToken }}
+          upload_token: ${{ matrix.rid == 'MaaFgo_exec' && (secrets.MirrorChyanExecUploadToken || secrets.MirrorChyanUploadToken) || secrets.MirrorChyanUploadToken }}

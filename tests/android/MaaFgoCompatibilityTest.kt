@@ -1,5 +1,6 @@
 package com.aliothmoon.maafw.project
 
+import com.aliothmoon.maafw.BuildConfig
 import com.aliothmoon.maafw.domain.*
 import com.aliothmoon.maafw.runner.RunPlanBuilder
 import com.aliothmoon.maafw.runner.RunPlanResult
@@ -14,6 +15,10 @@ import java.io.File
 
 /** 使用真正的安卓 PI 解析器和执行计划编译器检查生成资源。 */
 class MaaFgoCompatibilityTest {
+    @Test fun apkConfiguresMirrorChyanIndependentlyOfDesktopPi() {
+        assertEquals("MaaFgo_exec", BuildConfig.MAFW_MIRRORCHYAN_RID)
+    }
+
     private fun definition(): ProjectDefinition {
         val root = File(requireNotNull(System.getenv("MAAFGO_COMPAT_ASSETS")))
         val loaded = ProjectLoader(DirectoryProjectSource(root)).load()
