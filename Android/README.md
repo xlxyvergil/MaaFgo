@@ -136,6 +136,8 @@ python tools/build_android.py --abi x86_64 --skip-runtime
 
 上传工作流合入正式仓库后，可手动运行 `mirrorchyan_release.yml`，输入已有 Release 的 tag（如 `v2.0.11`），补同步该版本 APK，无需重新打 tag。省略 tag 时选择最新稳定版。网页能否选择 Android，以该工作流实际上传成功及 Mirror酱接口返回为准；只提交代码不会补齐远端安装包。
 
+接入前置条件：2026-10-24 补同步 `v2.0.11` 时，Mirror酱将 `MaaFgo` 识别为增量资源，拒收 `.apk`，报错 `incremental resource ... file ext not supported`。该服务端限制尚未解除，安卓分发不可用；需先由 Mirror酱管理员开通 APK 全量资源或支持对应平台策略。若使用独立资源 ID，应同时调整本文件所述上传项目与 `profile.yaml`，并配置有该资源上传权限的 token，再验证真实上传。不要直接变更桌面项目的增量更新方式。已同步的 Windows 版本再次上传会返回 8006 版本已存在，补同步时也应跳过已发布平台。
+
 ## Tag 构建与发布
 
 推送 `v*` tag 会由统一发布流程同时构建 Windows / MXU、ARM64 安卓和 x86_64 安卓。三个构建均通过后，Windows ZIP 和两个 APK 一起上传到同一个 GitHub Release；`beta` 等预发布标记与 Windows 包一致。任一架构构建或回归失败时，本次 Release 不会发布。
