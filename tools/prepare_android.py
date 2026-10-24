@@ -248,7 +248,7 @@ def compatibility_report(source: dict, converted: dict) -> dict:
 def adapt_interface(data: dict, assets: Path) -> dict:
     data = copy.deepcopy(data)
     data["description"] = "FGO 安卓自动化助手；使用 Shizuku 或 Root，后台画面固定为 1280×720。"
-    # 安卓 APK 随资源更新。桌面 Mirror酱 RID 未配置 APK，不能用于手机更新。
+    # APK 的更新来源由 profile.yaml 显式配置，不继承桌面更新字段。
     data.pop("mirrorchyan_rid", None)
     data.pop("mirrorchyan_multiplatform", None)
     data["agent"] = {"child_exec": "python3", "child_args": ["-u", "agent/main.py"]}

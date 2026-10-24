@@ -6,14 +6,14 @@
 
 ## 下载与设备要求
 
-前往 [GitHub Releases](https://github.com/xlxyvergil/MaaFgo/releases)，在对应版本的 **Assets** 中下载适合设备的 APK，直接安装。安卓包与 Windows 包在同一个版本中提供；部分旧版本没有 APK，请选择包含 APK 附件的版本。
+前往 [GitHub Releases](https://github.com/xlxyvergil/MaaFgo/releases)，在对应版本的 **Assets** 中下载适合设备的 APK，直接安装；已完成同步的版本也可从 [Mirror酱](https://mirrorchyan.com/zh/projects) 选择 Android 和对应架构下载。安卓包与 Windows 包在同一个版本中提供；部分旧版本没有 APK，请选择包含 APK 附件的版本。
 
 | 设备 | Releases 下载文件 | 使用要求 |
 | --- | --- | --- |
 | 常见 ARM64 安卓手机 | `MaaFGO-android-arm64-v8a-<版本号>.apk` | 目标系统 Android 10+；Shizuku 或已具备 Root 的设备 |
 | MuMu 12 等 x86_64 模拟器 | `MaaFGO-android-x86_64-<版本号>.apk` | 选择模拟器实际架构，并启用 Shizuku 或 Root |
 
-文件名中的 `<版本号>` 对应所选版本。正式版和 beta 均使用同一证书签名的 Release APK；旧版调试包可能带有 `-debug` 后缀。安卓暂未接入 Mirror酱更新源，更新时请下载新版 APK。
+文件名中的 `<版本号>` 对应所选版本。正式版和 beta 均使用同一证书签名的 Release APK；旧版调试包可能带有 `-debug` 后缀。新版 APK 的更新来源可选 Mirror酱或 GitHub：Mirror酱下载需要有效 CDK；GitHub 下载不需要。旧包若提示更新源未配置，请先手动安装已接入更新配置的新版 APK。
 
 需要开发版时，可从 [GitHub Actions](https://github.com/xlxyvergil/MaaFgo/actions/workflows/android.yml) 下载：登录 GitHub，选择一次成功的 PR 或手动构建，在 **Artifacts** 中下载 `MaaFGO-android-<架构>-debug` 附件，解压后安装其中的 APK。维护者可通过“Run workflow”选择分支手动构建；普通分支 push 不再自动生成 APK。
 
@@ -91,7 +91,7 @@ Android 对 `Android/data` 的访问限制因系统而异；这些是手机数�
 | 前台有点击但位置不对，或任务因尺寸变化停止 | 先停止任务，确认游戏处于横屏 16:9，重新从悬浮面板开始；超宽屏可改用后台 |
 | 任务失败需要反馈 | 从“设置 → 日志 → 导出日志”保存或分享日志，附手机型号、安卓版本、APK 架构、Shizuku/Root 和前台/后台模式 |
 
-安卓版资源和 Agent 随 APK 更新，桌面 Mirror酱 项目 ID 不用于安卓更新。升级保留规则不包含卸载后重装，也不会自动导入桌面的个人配置。
+安卓版资源和 Agent 随 APK 更新。安卓与桌面共用 Mirror酱项目 `MaaFgo`，但按系统和架构分别发布；安卓更新只查询 Android APK，不会下载 Windows 包。升级保留规则不包含卸载后重装，也不会自动导入桌面的个人配置。
 
 ## 已验收范围
 
@@ -132,7 +132,9 @@ python tools/build_android.py --skip-runtime
 python tools/build_android.py --abi x86_64 --skip-runtime
 ```
 
-正式签名包使用 `python tools/build_android.py --release`，需设置 `KEYSTORE_PATH`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`。tag 构建通过 GitHub Secrets 使用固定正式密钥，签名及验证说明见 [signing/README.md](signing/README.md)。安卓应用内更新源和 Mirror酱发布仍需另行配置。
+正式签名包使用 `python tools/build_android.py --release`，需设置 `KEYSTORE_PATH`、`KEYSTORE_PASSWORD`、`KEY_ALIAS`、`KEY_PASSWORD`。tag 构建通过 GitHub Secrets 使用固定正式密钥，签名及验证说明见 [signing/README.md](signing/README.md)。`profile.yaml` 中的 `update.mirrorchyanRid` 固定安卓更新项目；上传流程在正式仓库使用现有 `MirrorChyanUploadToken`，同步 Windows、Android ARM64 和 Android x86_64 三份附件。安卓稳定版上传到 stable，alpha / beta / rc / dev / ci 预发布上传到 beta。
+
+上传工作流合入正式仓库后，可手动运行 `mirrorchyan_release.yml`，输入已有 Release 的 tag（如 `v2.0.11`），补同步该版本 APK，无需重新打 tag。省略 tag 时选择最新稳定版。网页能否选择 Android，以该工作流实际上传成功及 Mirror酱接口返回为准；只提交代码不会补齐远端安装包。
 
 ## Tag 构建与发布
 

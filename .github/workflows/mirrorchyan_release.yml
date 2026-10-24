@@ -16,15 +16,46 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [win]
-        arch: [x86_64]
+        include:
+          - os: win
+            arch: x86_64
+            filename: MaaFgo-win-x86_64-*-MXU.zip
+          - os: android
+            arch: arm64
+            filename: MaaFGO-android-arm64-v8a-v*.apk
+          - os: android
+            arch: amd64
+            filename: MaaFGO-android-x86_64-v*.apk
     steps:
+      - name: Resolve release tag and Android channel
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: |
+          if [[ -n "$RELEASE_TAG" ]]; then
+            release_tag=$(gh release view "$RELEASE_TAG" --repo xlxyvergil/MaaFgo --json tagName --jq .tagName)
+          else
+            release_tag=$(gh release view --repo xlxyvergil/MaaFgo --json tagName --jq .tagName)
+          fi
+          test -n "$release_tag"
+          echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
+          # 安卓只有 stable / beta 两档，alpha、rc 等预发布也归入 beta。
+          channel=stable
+          if [[ "$release_tag" =~ -(alpha|beta|rc|dev|ci)([.-]|$) ]]; then
+            channel=beta
+          fi
+          echo "android_channel=$channel" >> "$GITHUB_OUTPUT"
       - uses: MirrorChyan/uploading-action@v1
         with:
           filetype: latest-release
-          filename: ${{ format('MaaFgo-{0}-{1}-*-MXU*', matrix.os, matrix.arch) }}
+          filename: ${{ matrix.filename }}
           mirrorchyan_rid: MaaFgo
-          tag: ${{ inputs.tag }}
+          tag: ${{ steps.release.outputs.tag }}
+          # APK 直接分发，不套 ZIP；Windows 仍沿用上传 action 的渠道判定。
+          extra_zip: "false"
+          channel: ${{ matrix.os == 'android' && steps.release.outputs.android_channel || '' }}
 
           os: ${{ matrix.os }}
           arch: ${{ matrix.arch }}
