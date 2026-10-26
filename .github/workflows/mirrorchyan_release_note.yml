@@ -12,6 +12,9 @@ on:
 jobs:
   mirrorchyan:
     runs-on: macos-latest
+    permissions:
+      contents: read
+      issues: write
     if: ${{ github.repository_owner == 'xlxyvergil' }}
     strategy:
       fail-fast: false
@@ -19,11 +22,32 @@ jobs:
         rid: [MaaFgo, MaaFgo_exec]
 
     steps:
+      - name: Resolve release tag and Android channel
+        id: release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ inputs.tag || github.event.release.tag_name }}
+        run: |
+          if [[ -n "$RELEASE_TAG" ]]; then
+            release_tag=$(gh release view "$RELEASE_TAG" --repo xlxyvergil/MaaFgo --json tagName --jq .tagName)
+          else
+            release_tag=$(gh release view --repo xlxyvergil/MaaFgo --json tagName --jq .tagName)
+          fi
+          test -n "$release_tag"
+          echo "tag=$release_tag" >> "$GITHUB_OUTPUT"
+          # 安卓只有 stable / beta 两档，预发布版本统一归入 beta。
+          channel=stable
+          if [[ "$release_tag" =~ -(alpha|beta|rc|dev|ci)([.-]|$) ]]; then
+            channel=beta
+          fi
+          echo "android_channel=$channel" >> "$GITHUB_OUTPUT"
       - id: uploading
         uses: MirrorChyan/release-note-action@v1
         with:
           mirrorchyan_rid: ${{ matrix.rid }}
           version_name: ${{ inputs.tag || github.event.release.tag_name }}
+          channel: ${{ matrix.rid == 'MaaFgo_exec' && steps.release.outputs.android_channel || '' }}
 
           owner: xlxyvergil
           repo: MaaFgo

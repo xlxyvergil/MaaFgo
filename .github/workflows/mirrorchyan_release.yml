@@ -17,6 +17,9 @@ on:
 jobs:
   mirrorchyan:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
     if: ${{ github.repository_owner == 'xlxyvergil' }}
     strategy:
       fail-fast: false
