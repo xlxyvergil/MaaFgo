@@ -46,7 +46,7 @@ jobs:
         uses: MirrorChyan/release-note-action@v1
         with:
           mirrorchyan_rid: ${{ matrix.rid }}
-          version_name: ${{ inputs.tag || github.event.release.tag_name }}
+          version_name: ${{ steps.release.outputs.tag }}
           channel: ${{ matrix.rid == 'MaaFgo_exec' && steps.release.outputs.android_channel || '' }}
 
           owner: xlxyvergil
