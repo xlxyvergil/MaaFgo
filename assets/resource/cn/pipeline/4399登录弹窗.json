@@ -1,0 +1,126 @@
+{
+    "4399-关闭弹窗-前往游戏盒领取-小": {
+        "doc": "小尺寸“前往游戏盒领取”弹窗：识别特征按钮后点击固定关闭位置；点击后回到登录主循环复查，直到特征消失。默认禁用，仅由 4399 服包名选项启用。",
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "4399/4399-前往游戏盒领取-小.png",
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    770,
+                    219,
+                    12,
+                    14
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "rate_limit": 200,
+        "max_hit": 5,
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "4399-关闭弹窗-前往游戏盒领取-大": {
+        "doc": "大尺寸“前往游戏盒领取”弹窗：识别特征按钮后点击固定关闭位置；点击后回到登录主循环复查，直到特征消失。默认禁用，仅由 4399 服包名选项启用。",
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "4399/4399-前往游戏盒领取-大.png",
+                "threshold": 0.9
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    815,
+                    170,
+                    16,
+                    20
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "rate_limit": 200,
+        "max_hit": 5,
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "4399-关闭弹窗-我知道了前往查看": {
+        "doc": "“我知道了，前往查看”弹窗：识别特征按钮后点击固定关闭位置；点击后回到登录主循环复查，直到特征消失。默认禁用，仅由 4399 服包名选项启用。",
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    500,
+                    440,
+                    300,
+                    80
+                ],
+                "template": "4399/4399-我知道了前往查看.png",
+                "threshold": 0.78
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    769,
+                    252,
+                    15,
+                    11
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "rate_limit": 200,
+        "max_hit": 5,
+        "next": [
+            "阶段判断循环"
+        ]
+    },
+    "4399-关闭弹窗-我知道了前往查看-资料更新": {
+        "doc": "资料更新页上的“我知道了，前往查看”弹窗：特征与普通弹窗相同，但整体位置更高，使用独立 ROI 区分并点击该布局的固定关闭位置。默认禁用，仅由 4399 服包名选项启用。",
+        "enabled": false,
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    500,
+                    380,
+                    300,
+                    60
+                ],
+                "template": "4399/4399-我知道了前往查看.png",
+                "threshold": 0.78
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    768,
+                    236,
+                    16,
+                    16
+                ]
+            }
+        },
+        "post_wait_freezes": 1000,
+        "rate_limit": 200,
+        "max_hit": 5,
+        "next": [
+            "阶段判断循环"
+        ]
+    }
+}

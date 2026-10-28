@@ -1,5 +1,6 @@
 # WorkBuddy 工作区数据（memory/skills，不纳入版本控制）
 .workbuddy/
+/temp/
 
 # 更新日志
 UPDATE_*.md
