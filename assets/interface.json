@@ -82,6 +82,8 @@
     "tasks/直接战斗.json",
     "tasks/自动推主线.json",
     "options/自动推主线.json",
+    "tasks/自动清free本.json",
+    "options/自动清free本.json",
     "tasks/通用大活动.json",
     "tasks/通用小活动.json",
     "tasks/每日1石.json",

@@ -42,6 +42,8 @@ import auto_battle_action
 import auto_battle_repeat_action
 import main_story_recognition
 import main_story_action
+import free_quest_recognition
+import free_quest_action
 
 
 def main():
