@@ -31,6 +31,7 @@ if not IS_ANDROID:
 import box_action
 import expball_action
 import formation_action
+import teapot_action
 import bond_completion_action
 import current_bond_completion_action
 import inventory_scan_action

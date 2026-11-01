@@ -59,7 +59,8 @@ class FallbackFrameworkTests(unittest.TestCase):
                         "type": "Custom", "param": {"custom_action": "record"}}
                     nodes["助战兜底-选择首个助战"]["repeat_delay"] = 0
                     for name in (formation, "执行羁绊补齐自动编队", "进本-实际点击队伍确认",
-                                 "不应进入首个助战原有后续", "进本-点击队伍确认", "编队身份-采集"):
+                                 "不应进入首个助战原有后续", "进本-点击队伍确认", "编队身份-采集",
+                                 "原生战斗-校验茶壶", "原生战斗-兜底校验茶壶"):
                         nodes[name] = {"action": {"type": "Custom", "param": {"custom_action": "record"}}}
                     if case["name"] == "自动":
                         nodes[formation]["next"] = ["执行羁绊补齐自动编队"]
@@ -129,7 +130,7 @@ class FallbackFrameworkTests(unittest.TestCase):
                             else:
                                 fetch.assert_not_called()
                         self.assertEqual(controller.inputs, 0)
-                    expected = (["助战兜底-选择首个助战"] * 3 + ["进本-选择助战", "进本-实际点击队伍确认"]
+                    expected = (["助战兜底-选择首个助战"] * 3 + ["进本-选择助战", "原生战斗-兜底校验茶壶", "进本-实际点击队伍确认"]
                                 if active else [formation] + (["执行羁绊补齐自动编队"] if case["name"] == "自动" else []))
                     self.assertEqual(seen, expected)
         sessions.stop_owner("")

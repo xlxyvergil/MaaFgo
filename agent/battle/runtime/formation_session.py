@@ -18,6 +18,10 @@ from .bond_stop_state import bond_stops
 SESSION_NODE = "编队身份-会话"
 GATE_NODE = "进本-点击队伍确认"
 CAPTURE_NODE = "编队身份-采集"
+TEAPOT_NODE = "原生战斗-校验茶壶"
+FALLBACK_GATE_NODE = "进本-助战兜底跳过编队"
+FALLBACK_TEAPOT_NODE = "原生战斗-兜底校验茶壶"
+START_NODE = "进本-实际点击队伍确认"
 
 
 @dataclass
@@ -259,5 +263,10 @@ def session_override(token: str) -> dict:
     # 只传递令牌，不将可变快照放入会被复制/字典合并的 pipeline attach。
     return {
         SESSION_NODE: {"attach": {"session_id": token}},
-        GATE_NODE: {"next": [CAPTURE_NODE]},
+        # 仅原生会话在编队汇合后检查茶壶；BBC 和独立 Chaldea 编队保留原路径。
+        # 助战兜底不采集身份，但茶壶仍须按用户设置核对后才允许实际开始。
+        GATE_NODE: {"next": [TEAPOT_NODE]},
+        TEAPOT_NODE: {"next": [CAPTURE_NODE]},
+        FALLBACK_GATE_NODE: {"next": [FALLBACK_TEAPOT_NODE]},
+        FALLBACK_TEAPOT_NODE: {"next": [START_NODE]},
     }

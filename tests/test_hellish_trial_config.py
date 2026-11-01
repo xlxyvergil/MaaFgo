@@ -19,7 +19,7 @@ CONFIG_NODE = "原生自动战斗-高级策略配置"
 class HellishTrialConfigTests(unittest.TestCase):
     def test_trial_retains_source_and_formation_options_then_shared_strategy(self):
         self.assertEqual(TASK["option"], [
-            "地狱的试炼-队伍方案", "Chaldea编队方式", "原生自动战斗助战方式",
+            "地狱的试炼-队伍方案", "Chaldea编队方式", "原生自动战斗是否使用茶壶", "原生自动战斗助战方式",
             "原生自动战斗羁绊满停止", "原生自动战斗高级策略",
         ])
         self.assertEqual(TASK["resource"], ["日服"])

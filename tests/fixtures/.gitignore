@@ -5,3 +5,5 @@
 !mystic_code/*.png
 # Minimal real-image regression for the Free Quest digit badge.
 !free_quest_badge_1.png
+# Minimal tea/storm popup, bar and page-guard UI crops.
+!teapot/*.png
