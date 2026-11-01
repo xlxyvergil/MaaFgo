@@ -784,11 +784,18 @@ class SupportAction(CustomAction):
             skip_servant = False
             if source_mode == "chaldea":
                 if attach.get("chaldea_enabled") is not True:
-                    mfaalog.error("[SupportAction] 使用 Chaldea 配置需要先开启‘是否使用 Chaldea 队伍’")
+                    mfaalog.error(
+                        "[SupportAction] 助战方式已选择使用编辑器/Chaldea 配置，但尚未开启方案导入。"
+                        "请开启战斗选项中的“使用编辑器/chaldea配置”，并填写“编辑器/chaldea方案导入”；"
+                        "如需在 MAA 中直接设置助战，请将助战方式改为“自定义助战”。"
+                    )
                     return CustomAction.RunResult(success=False)
                 source = str(attach.get("chaldea_import_source") or "").strip()
                 if not source:
-                    mfaalog.error("[SupportAction] 使用 Chaldea 配置但未填写 Chaldea 队伍导入")
+                    mfaalog.error(
+                        "[SupportAction] 已开启使用编辑器/Chaldea 配置，但没有填写队伍方案。"
+                        "请在“编辑器/chaldea方案导入”中填写分享链接、队伍 ID、关卡 ID 或选择本地队伍文件。"
+                    )
                     return CustomAction.RunResult(success=False)
                 share_data, _, _ = fetch_share_data(source)
                 try:

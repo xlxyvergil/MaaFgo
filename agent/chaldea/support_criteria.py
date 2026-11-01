@@ -135,8 +135,17 @@ def build_support_criteria(share_data, servant_map, resolve_name=get_equip_name)
     members = (front[:3] + backup[:3])
     supports = [item for item in members if isinstance(item, dict)
                 and str(item.get("supportType") or "").lower() in _SUPPORT_TYPES]
-    if len(supports) != 1:
-        raise ValueError(f"Chaldea 队伍必须恰有一个标记助战，实际为 {len(supports)} 个")
+    if not supports:
+        raise ValueError(
+            "导入的队伍没有标记助战，无法确定要借用哪位从者。"
+            "请在 Chaldea 或编队编辑器中，将准备借用的一位从者标记为助战，重新导出并导入；"
+            "也可将助战方式改为“自定义助战”，在 MAA 中设置要借用的从者。"
+        )
+    if len(supports) > 1:
+        raise ValueError(
+            f"导入的队伍标记了 {len(supports)} 位助战，但每支队伍只能借用一位。"
+            "请在 Chaldea 或编队编辑器中，只保留一位从者的助战标记，重新导出并导入。"
+        )
     for member in members:
         if not isinstance(member, dict):
             continue
