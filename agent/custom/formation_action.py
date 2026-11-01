@@ -38,6 +38,7 @@ if _AGENT_DIR not in sys.path:
 from chaldea import fetch_share_data
 from mystic_code import extract_mystic_code_id, ensure_mystic_code
 from platform_waits import platform_timeout
+from resource_package import resolve_resource_package
 from chaldea.servant_aliases import build_servant_lookup, canonical_servants, servant_aliases
 import mfaalog
 from battle.core.models import Confidence, FormationSlot
@@ -609,9 +610,7 @@ class AutoFormationFromChaldea(CustomAction):
     # ---------- 路径、截图与模板 ----------
 
     def _init_paths(self):
-        config = self.context.get_node_data("资源包配置") or {}
-        package = str((config.get("attach") or {}).get("resource_package") or "base").strip()
-        layer = "cn" if package == "cn" else "base"
+        layer = resolve_resource_package(self.context, caller="编队")
         roots = []
         for root in (_PROJECT_DIR, os.path.dirname(_PROJECT_DIR)):
             for current_layer in (layer, "base"):
@@ -622,6 +621,7 @@ class AutoFormationFromChaldea(CustomAction):
                 if os.path.isdir(packaged_root) and packaged_root not in roots:
                     roots.append(packaged_root)
         self.image_roots = roots
+        mfaalog.info(f"[编队资源] 素材层={layer}，搜索目录={roots}")
         self.narrow_dirs = [os.path.join(root, "NarrowFigures") for root in roots]
         self.face_dirs = [os.path.join(root, "servant_face") for root in roots]
         self.equip_list_dirs = [os.path.join(root, "EquipFaces", "list") for root in roots]
@@ -2635,6 +2635,11 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 sid: tuple((name, crop(template)) for name, template in variants)
                 for sid, variants in self.templates.items()
             }
+        self.page_marker_paths = {
+            name: self._template_path(f"battle/{name}.png")
+            for name in ("配置变更", "开始任务", "战斗开始")
+        }
+        mfaalog.info(f"[初始编队] 页面模板路径={self.page_marker_paths}")
         self.config_marker = self._load_named_template("battle/配置变更.png")
         self.start_markers = [self._load_named_template(f"battle/{name}.png")
                               for name in ("开始任务", "战斗开始")]
@@ -2722,6 +2727,12 @@ class FormationIdentityReader(AutoFormationFromChaldea):
         confirm = self._match_template(image, self.config_marker)
         starts = [self._match_template(image, marker) for marker in self.start_markers]
         if not confirm or confirm[0] < 0.8 or not any(s and s[0] >= 0.8 for s in starts):
+            for name, match in zip(("配置变更", "开始任务", "战斗开始"), (confirm, *starts)):
+                score = f"{match[0]:.4f}" if match else "未取得匹配结果"
+                mfaalog.warning(
+                    f"[初始编队] 页面校验 {name}: score={score}/0.8，"
+                    f"template={self.page_marker_paths[name]}"
+                )
             raise ValueError("not_on_formation_confirmation")
         slots = []
         c = self.calibration

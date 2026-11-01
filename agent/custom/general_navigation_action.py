@@ -140,6 +140,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 from maa.context import Context
 import mfaalog
+from resource_package import resolve_resource_package
 
 # 方案B常量
 SCALE = 2.0              # 恒定缩放比: 全部地图进图缩放统一 2.0(coords 已归一化)
@@ -543,15 +544,14 @@ class GeneralNavigationAction(CustomAction):
             ROOT_DIR = os.path.dirname(AGENT_DIR)
 
             # 步骤1: 参数(全部实时读 pipeline 节点——玩家选择经 options 覆盖
-            # attach.quests / 关卡选择.template / 资源包配置.attach.resource_package, 读到的即运行时最终值)
+            # attach.quests / 关卡选择.template；素材层以资源包声明的实际加载层为准)
             node = context.get_node_data(_argv.node_name) or {}
             target_quest = str((node.get("attach") or {}).get("quests") or "").strip()
             sel = context.get_node_data("关卡选择") or {}
             # MaaFramework 5.x 官方 dump: recognition.param.template 为数组, 取第 0 个
             tpl_val = ((sel.get("recognition") or {}).get("param") or {}).get("template")
             template = tpl_val[0] if isinstance(tpl_val, list) and tpl_val else ""
-            cfg = context.get_node_data("资源包配置") or {}
-            resource_package = str((cfg.get("attach") or {}).get("resource_package") or "").strip()
+            resource_package = resolve_resource_package(context, caller="导航")
             mfaalog.info(f"[导航] 导航参数: quest={target_quest} template={template} pkg={resource_package}")
 
             # 步骤2: 素材目录 + 归一化坐标表

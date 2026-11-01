@@ -52,6 +52,7 @@ if _custom_dir not in sys.path:
     sys.path.insert(0, _custom_dir)
 
 import mfaalog
+from resource_package import resolve_resource_package
 from chaldea import fetch_share_data
 from chaldea.servant_aliases import build_servant_lookup
 from chaldea.support_criteria import build_support_criteria
@@ -129,21 +130,7 @@ def _image_dir(package, *parts):
 
 def _resolve_resource_package(context):
     """Use the loaded image layer, not a possibly stale per-task option."""
-    config = context.get_node_data("资源包配置") or {}
-    attach = config.get("attach") or {}
-    configured = "cn" if str(attach.get("resource_package") or "base").strip() == "cn" else "base"
-    loaded = attach.get("loaded_resource_package")
-    if loaded is None:
-        # Compatible with existing custom bundles and older packaged resources.
-        return configured
-    if loaded not in ("base", "cn"):
-        raise ValueError(f"助战实际资源包标记无效：{loaded!r}")
-    if loaded != configured:
-        mfaalog.warning(
-            f"[SupportAction] 任务资源包标识={configured} 与实际加载素材={loaded} 不一致；"
-            f"助战按实际加载的{'国服' if loaded == 'cn' else '默认/日服'}素材识别"
-        )
-    return loaded
+    return resolve_resource_package(context, caller="助战")
 
 # ---------------- ROI 尺寸 ----------------
 CE_ROI = (166, 53)        # 礼装匹配窗口(w,h): 左上角锚点, 与礼装模板(约153x40)同量级(左右各+3, 向下+3)
