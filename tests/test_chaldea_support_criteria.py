@@ -97,11 +97,11 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
     def test_missing_or_multiple_support_fails(self):
         data = self._sample("雨暗阿_21086_94061640.json")
         data["team"]["onFieldSvts"][0]["supportType"] = "none"
-        with self.assertRaisesRegex(ValueError, "恰有一个"):
+        with self.assertRaisesRegex(ValueError, "没有标记助战.*重新导出并导入.*自定义助战"):
             build_support_criteria(data, self.servant_map)
         data["team"]["onFieldSvts"][0]["supportType"] = "friend"
         data["team"]["onFieldSvts"][1]["supportType"] = "friend"
-        with self.assertRaisesRegex(ValueError, "恰有一个"):
+        with self.assertRaisesRegex(ValueError, "标记了 2 位助战.*只保留一位"):
             build_support_criteria(data, self.servant_map)
 
     def test_missing_optional_fields_do_not_add_conditions(self):
@@ -119,10 +119,16 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
         argv = SimpleNamespace(node_name="Chaldea助战action",
                                custom_action_param='{"source_mode":"chaldea"}')
         context = SimpleNamespace(get_node_data=lambda name: {"attach": {"chaldea_enabled": False}})
-        self.assertFalse(action.run(context, argv).success)
+        with patch("support_action.mfaalog.error") as log_error:
+            self.assertFalse(action.run(context, argv).success)
+            message = log_error.call_args[0][0]
+            self.assertIn("使用编辑器/chaldea配置", message)
+            self.assertIn("自定义助战", message)
         context = SimpleNamespace(get_node_data=lambda name: {"attach": {"chaldea_enabled": True,
                                                                             "chaldea_import_source": ""}})
-        self.assertFalse(action.run(context, argv).success)
+        with patch("support_action.mfaalog.error") as log_error:
+            self.assertFalse(action.run(context, argv).success)
+            self.assertIn("分享链接、队伍 ID、关卡 ID", log_error.call_args[0][0])
 
     def test_invalid_source_or_missing_ce_template_fails_before_search(self):
         action = SupportAction()

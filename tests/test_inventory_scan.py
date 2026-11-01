@@ -88,7 +88,7 @@ class InventoryScanTests(unittest.TestCase):
         return matrix, variants, stars
 
     def test_single_row_bond_equips_recognizes_sparse_and_full_rows(self):
-        for count in (1, 3, 8, 12, 16, 19, 24):
+        for count in (1, 3, 8, 12, 16, 17, 19, 24):
             with self.subTest(count=count):
                 self.frame.fill(0)
                 matrix, variants, _ = self.make_single_row_equips(count)
@@ -102,8 +102,13 @@ class InventoryScanTests(unittest.TestCase):
                 self.assertEqual(metrics["bottom_detection"], "short_bond_list")
                 self.assertTrue(metrics["recognition_valid"])
                 self.assertEqual(metrics["swipes"], 3)
-                self.assertEqual(self.scan.last_rarity_grid["card_origins"],
-                                 [190 + i * 149 for i in range((count + 7) // 8)])
+                origins = self.scan.last_rarity_grid["card_origins"]
+                expected_origins = [190 + i * 149 for i in range((count + 7) // 8)]
+                self.assertEqual(len(origins), len(expected_origins))
+                # 不同平台的 OpenCV 匹配峰值可能相差 1px；2px 容差仍小于
+                # 完整礼装模板复核的 ±5px 搜索范围，且继续检查行数和身份。
+                for actual, expected in zip(origins, expected_origins):
+                    self.assertLessEqual(abs(actual - expected), 2)
 
     def test_single_row_bond_equips_requires_no_lower_star_rows(self):
         _, _, stars = self.make_single_row_equips(1)
