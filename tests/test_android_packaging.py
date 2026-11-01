@@ -211,6 +211,27 @@ class AndroidInterfaceTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "native_setting"):
             android.adapt_interface(source, ROOT / "assets")
 
+    def test_new_backend_selector_prunes_bbc_before_scanning_files(self):
+        # 新任务不能依赖转换脚本维护选项名白名单；干净 checkout 没有 BBC 配置目录。
+        for name in ("Free-战斗方式", "新增任务-战斗方式"):
+            with self.subTest(selector=name), tempfile.TemporaryDirectory() as tmp:
+                source = self.fixture()
+                source["task"][-1]["option"].append(name)
+                native = {"name": "native", "option": ["native_setting"],
+                          "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "native"}}}}
+                source["option"][name] = {"type": "select", "default": "bbc", "default_case": "bbc",
+                                          "cases": [{"name": "bbc", "option": ["bbc_files"]}, native]}
+                source["option"]["bbc_files"] = {
+                    "type": "scan_select", "scan_dir": "BBchannel/settings", "scan_filter": "*.json"}
+                original = copy.deepcopy(source)
+                converted = android.adapt_interface(source, Path(tmp))
+                option = converted["option"][name]
+                self.assertEqual(option["cases"], [native])
+                self.assertEqual(option["default_case"], "native")
+                self.assertNotIn("default", option)
+                self.assertNotIn("bbc_files", converted["option"])
+                self.assertEqual(source, original)
+
     def test_scan_select_becomes_standard_pi_with_real_filenames(self):
         with tempfile.TemporaryDirectory() as tmp:
             assets = Path(tmp)
@@ -280,6 +301,11 @@ class AndroidInterfaceTests(unittest.TestCase):
     def test_project_extensions_are_all_converted(self):
         source = android.load_interface(ROOT / "assets")
         converted = android.adapt_interface(source, ROOT / "assets")
+        free = converted["option"]["Free-战斗方式"]
+        self.assertEqual(free["default_case"], "native")
+        self.assertEqual([case["name"] for case in free["cases"]], ["native"])
+        self.assertNotIn("bbc_team_config", converted["option"])
+        self.assertIn("自动清free本", {task["name"] for task in converted["task"]})
         report = android.compatibility_report(source, converted)
         self.assertEqual(len(report["file_lists"]), 6)
         self.assertEqual(

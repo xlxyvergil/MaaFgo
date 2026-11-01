@@ -59,14 +59,23 @@ function drawMatrix(ctx:CanvasRenderingContext2D,value:ShareImageMatrix,x:number
  ctx.imageSmoothingEnabled=true;
 }
 
-function equipImageHeight(equip:ShareEquip):number{return (equip.candidateCount??1)>1?52:72;}
+const EQUIP_GAP=8;
+function equipRow(ctx:CanvasRenderingContext2D,equip:ShareEquip,width:number){
+ const inner=width-16,labelHeight=linesHeight(ctx,equip.label,inner,11,16,true);
+ if(equip.kind==='bond-effect')return {height:16+labelHeight+6+linesHeight(ctx,equip.details,inner,16,22,true),labelHeight,nameHeight:0,detailsHeight:0,textWidth:inner};
+ const textWidth=inner-52,nameHeight=linesHeight(ctx,equip.name,textWidth,15,21,true),detailsHeight=linesHeight(ctx,equip.details,textWidth,11,16);
+ return {height:16+labelHeight+6+Math.max(38,nameHeight+4+detailsHeight),labelHeight,nameHeight,detailsHeight,textWidth};
+}
 function memberHeight(ctx:CanvasRenderingContext2D,member:ShareMember,w:number):number{
- let h=196+linesHeight(ctx,member.name,w-24,19,26,true)+20+24;
- if(member.skills.length)h+=62;
- if(member.append)h+=linesHeight(ctx,member.append,w-24,13,18)+6;
- if(member.equips.length)for(const equip of member.equips)h+=linesHeight(ctx,equip.label,w-24,12,18)+2+equipImageHeight(equip)+8+linesHeight(ctx,equip.name,w-24,17,23)+linesHeight(ctx,equip.details,w-24,12,17)+14;
- else h+=76;
- return h+14;
+ const width=w-24;
+ let h=40+120+10+22+linesHeight(ctx,member.name,width,19,26,true)+4;
+ if(member.className)h+=linesHeight(ctx,member.className,width,12,17)+3;
+ if(member.details)h+=linesHeight(ctx,member.details,width,13,19)+6;
+ if(member.skills.length)h+=54;
+ if(member.append)h+=linesHeight(ctx,member.append,width,12,17)+7;
+ if(member.equips.length)for(const equip of member.equips)h+=equipRow(ctx,equip,width).height+EQUIP_GAP;
+ else h+=58;
+ return h+12;
 }
 function subjectHeight(ctx:CanvasRenderingContext2D,person:SharePerson,width:number):number{return Math.max(58,20+linesHeight(ctx,person.name,width-65,19,25,true));}
 function subject(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,person:SharePerson,x:number,y:number,width:number){
@@ -84,28 +93,34 @@ function skillHeight(ctx:CanvasRenderingContext2D,action:ShareSkill):number{
  if(action.enemy)h+=24;if(action.choice)h+=linesHeight(ctx,`效果：${action.choice}`,CONTENT-100,16,23)+5;if(action.detail)h+=linesHeight(ctx,action.detail,CONTENT-100,15,21);
  return Math.ceil(h+28);
 }
+function attackCardHeight(ctx:CanvasRenderingContext2D,card:ShareAttack['cards'][number],width:number):number{
+ if(card.automatic)return 166;
+ const textWidth=width-142;
+ let h=linesHeight(ctx,card.label,textWidth,18,25,true)+6;
+ if(card.person)h+=linesHeight(ctx,card.person.position,textWidth,12,18)+3+linesHeight(ctx,card.person.name,textWidth,18,24,true)+4;
+ if(card.label==='宝具 NP')h+=linesHeight(ctx,card.name,textWidth,15,21);
+ if(card.deckLabel)h+=linesHeight(ctx,card.deckLabel,textWidth,12,18)+4;
+ return Math.max(166,18+h+12);
+}
 function attackHeight(ctx:CanvasRenderingContext2D,action:ShareAttack):number{
- const col=(CONTENT-48-32)/3;
- let h=50;
- for(let i=0;i<action.cards.length;i+=3){
-  h+=Math.max(178,...action.cards.slice(i,i+3).map(card=>card.automatic?178:66+linesHeight(ctx,card.person?.name??'',col-152,18,24,true)+linesHeight(ctx,card.name,col-152,15,21)+24))+12;
- }
+ const col=(CONTENT-48-32)/3;let h=50;
+ for(let i=0;i<action.cards.length;i+=3)h+=Math.max(...action.cards.slice(i,i+3).map(card=>attackCardHeight(ctx,card,col)))+12;
  return h+10;
 }
 function actionHeight(ctx:CanvasRenderingContext2D,action:ShareAction){return action.kind==='attack'?attackHeight(ctx,action):skillHeight(ctx,action);}
 
-interface Layout {height:number;header:number;formation:number;mystic:number;turns:number[];footer:number;qrColumns:number;qrTile:number;qrSize:number}
-function layout(ctx:CanvasRenderingContext2D,model:ShareImageModel,encoded:EncodedShareImage):Layout{
+export interface ShareImageLayout {height:number;header:number;formation:number;mystic:number;turns:number[];footer:number;qrColumns:number;qrTile:number;qrSize:number}
+export function measureShareImageLayout(ctx:CanvasRenderingContext2D,model:ShareImageModel,encoded:EncodedShareImage):ShareImageLayout{
  if(encoded?.format!=='maafgo-share-image'||encoded.schema!==1||!Array.isArray(encoded.markers)||!encoded.markers.length)throw new Error('缺少图片回导标记，请重新生成。');
  if(encoded.markers.length>24)throw new Error('方案内容过多，一张分享图片无法容纳完整回导标记，请拆分方案。');
  const anchorSize=matrixSize(encoded.anchor);
  if(anchorSize>210)throw new Error('图片定位标记过大，请重新生成。');
- const header=Math.max(238,anchorSize+78,76+linesHeight(ctx,model.title,CONTENT-260,38,52,true)+108);
+ const header=Math.max(212,anchorSize+72,70+linesHeight(ctx,model.title,CONTENT-280,36,48,true)+94);
  const col=(CONTENT-5*12)/6;
  const formation=60+Math.max(...model.members.map(member=>memberHeight(ctx,member,col)));
  const mystic=Math.max(138,84+linesHeight(ctx,model.mystic.name,470,25,34,true),...model.mystic.skills.slice(0,3).map(skill=>84+linesHeight(ctx,skill.name,140,14,20)));
  const turns=model.turns.map(turn=>74+turn.actions.reduce((total,action)=>total+actionHeight(ctx,action),0)+(turn.implicitEnd?44:0)+14);
- const qrSize=Math.max(...encoded.markers.map(matrixSize)),qrColumns=qrSize+40<=(CONTENT-16)/2?2:1;
+ const qrSize=Math.max(...encoded.markers.map(matrixSize)),qrColumns=qrSize+40<=(CONTENT-48-16)/2?2:1;
  if(qrSize+40>CONTENT)throw new Error('回导标记超出图片宽度，请拆分方案。');
  const qrTile=qrSize+70;
  const noticeHeight=model.notices.reduce((h,notice)=>h+linesHeight(ctx,notice,CONTENT-48,15,22)+6,0);
@@ -115,34 +130,39 @@ function layout(ctx:CanvasRenderingContext2D,model:ShareImageModel,encoded:Encod
  return {height:Math.ceil(height),header,formation,mystic,turns,footer,qrColumns,qrTile,qrSize};
 }
 
+function renderEquip(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,equip:ShareEquip,x:number,y:number,w:number):number{
+ const row=equipRow(ctx,equip,w),bond=equip.kind==='bond-effect';
+ box(ctx,x,y,w,row.height,bond?'#fff8e9':COLOR.faint,bond?COLOR.gold:COLOR.line,5);
+ text(ctx,equip.label,x+8,y+8,w-16,11,bond?COLOR.amber:equip.candidateIndex?COLOR.blue:COLOR.muted,16,true);
+ const top=y+8+row.labelHeight+6;
+ if(bond)text(ctx,equip.details,x+8,top,w-16,16,COLOR.amber,22,true);
+ else{
+  image(ctx,assets,equip.image,x+8,top,44,38,'礼','contain');
+  text(ctx,equip.name,x+60,top,row.textWidth,15,COLOR.ink,21,true);
+  text(ctx,equip.details,x+60,top+row.nameHeight+4,row.textWidth,11,COLOR.muted,16);
+ }
+ return row.height;
+}
 function renderMember(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,member:ShareMember,x:number,y:number,w:number,h:number){
  box(ctx,x,y,w,h,member.support?'#fffcf3':COLOR.paper,member.support?COLOR.gold:COLOR.line,7);
  text(ctx,`${member.slot!+1} · ${member.slot!<3?'前排':'候补'}`,x+12,y+12,w-24,14,COLOR.blue,20,true);
- if(member.support){text(ctx,member.support,x+w-82,y+13,70,12,COLOR.amber,18,true);}
- let top=y+42;
- image(ctx,assets,member.image,x+12,top,w-24,130,member.support?'助战':member.identified?'?':'空');
- if(member.classIcon)image(ctx,assets,member.classIcon,x+15,top+96,30,30,'', 'contain');
- if(member.grand){box(ctx,x+w-76,top+108,62,18,COLOR.deep,'',2);text(ctx,'GRAND',x+w-73,top+110,57,11,'#ffffff',14,true);}
- top+=140;text(ctx,member.rarity,x+12,top,w-24,15,COLOR.gold,21,true);top+=24;
- top+=text(ctx,member.name,x+12,top,w-24,19,COLOR.ink,26,true);
- text(ctx,member.className,x+12,top+1,w-24,12,COLOR.muted,18);top+=20;
- text(ctx,member.details,x+12,top,w-24,13,COLOR.muted,20);top+=24;
- if(member.skills.length){
-  const step=(w-24)/3;
-  member.skills.forEach((skill,i)=>{image(ctx,assets,skill.icon,x+12+i*step,top,30,30,String(i+1),'contain');text(ctx,skill.level,x+12+i*step,top+35,step,13,COLOR.ink,18,true);});top+=62;
- }
- if(member.append){top+=text(ctx,member.append,x+12,top,w-24,13,COLOR.muted,18)+6;}
- if(!member.equips.length){box(ctx,x+12,top+4,w-24,52,COLOR.faint,COLOR.line,4);text(ctx,'不要求礼装',x+20,top+21,w-40,15,COLOR.muted,21);return;}
- for(const equip of member.equips){
-  top+=text(ctx,equip.label,x+12,top,w-24,12,equip.candidateIndex?COLOR.blue:COLOR.muted,18)+2;
-  const imageHeight=equipImageHeight(equip);image(ctx,assets,equip.image,x+12,top,w-24,imageHeight,'礼装','contain');top+=imageHeight+8;
-  top+=text(ctx,equip.name,x+12,top,w-24,17,COLOR.ink,23,true);
-  top+=text(ctx,equip.details,x+12,top,w-24,12,COLOR.muted,17)+14;
- }
+ if(member.support)text(ctx,member.support,x+w-82,y+13,70,12,COLOR.amber,18,true);
+ let top=y+40;const width=w-24;
+ image(ctx,assets,member.image,x+12,top,width,120,member.support?'助战':member.identified?'?':'空');
+ if(member.classIcon)image(ctx,assets,member.classIcon,x+15,top+86,30,30,'','contain');
+ if(member.grand){box(ctx,x+w-76,top+98,62,18,COLOR.deep,'',2);text(ctx,'GRAND',x+w-73,top+100,57,11,'#ffffff',14,true);}
+ top+=130;text(ctx,member.rarity,x+12,top,width,15,COLOR.gold,21,true);top+=22;
+ top+=text(ctx,member.name,x+12,top,width,19,COLOR.ink,26,true)+4;
+ if(member.className)top+=text(ctx,member.className,x+12,top,width,12,COLOR.muted,17)+3;
+ if(member.details)top+=text(ctx,member.details,x+12,top,width,13,COLOR.muted,19)+6;
+ if(member.skills.length){const step=width/3;member.skills.forEach((skill,i)=>{image(ctx,assets,skill.icon,x+12+i*step,top,30,30,String(i+1),'contain');text(ctx,skill.level,x+12+i*step,top+34,step,13,COLOR.ink,18,true);});top+=54;}
+ if(member.append)top+=text(ctx,member.append,x+12,top,width,12,COLOR.muted,17)+7;
+ if(!member.equips.length){box(ctx,x+12,top+4,width,46,COLOR.faint,COLOR.line,4);text(ctx,'不要求礼装',x+20,top+16,w-40,15,COLOR.muted,21);return;}
+ for(const equip of member.equips)top+=renderEquip(ctx,assets,equip,x+12,top,width)+EQUIP_GAP;
 }
 function drawSkill(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,action:ShareSkill,x:number,y:number,w:number,height:number,ordinal:number){
  if(ordinal%2===0){ctx.fillStyle=COLOR.faint;ctx.fillRect(x+12,y,w-24,height);}
- text(ctx,String(ordinal+1).padStart(2,'0'),x+22,y+20,36,14,COLOR.muted,20);
+ box(ctx,x+19,y+17,32,30,action.kind==='retire'?COLOR.error:COLOR.deep,'',5);text(ctx,String(ordinal+1).padStart(2,'0'),x+25,y+23,25,14,'#ffffff',20,true);
  const sy=y+14;
  if(action.kind==='swap'){
   subject(ctx,assets,action.actor,x+64,sy,245);
@@ -166,23 +186,30 @@ function drawSkill(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,action:
  if(action.detail)text(ctx,action.detail,x+64,extra,w-100,15,COLOR.error,21);
 }
 function drawAttack(ctx:CanvasRenderingContext2D,assets:Map<string,Asset>,action:ShareAttack,x:number,y:number,w:number){
- text(ctx,'攻击 · 回合结束',x+24,y+10,400,20,COLOR.blue,28,true);
+ text(ctx,'攻击 · 按从左到右顺序出卡',x+24,y+10,600,20,COLOR.blue,28,true);
  if(action.enemy)text(ctx,action.enemy,x+w-300,y+13,270,15,COLOR.error,21,true);
  const col=(w-48-32)/3;let top=y+50;
  for(let start=0;start<action.cards.length;start+=3){
-  const cards=action.cards.slice(start,start+3);
-  const h=Math.max(178,...cards.map(card=>card.automatic?178:66+linesHeight(ctx,card.person?.name??'',col-152,18,24,true)+linesHeight(ctx,card.name,col-152,15,21)+24));
+  const cards=action.cards.slice(start,start+3),h=Math.max(...cards.map(card=>attackCardHeight(ctx,card,col)));
   cards.forEach((card,index)=>{
    const left=x+24+index*(col+16),tone=card.color==='buster'?'#ad484a':card.color==='arts'?'#3479b4':card.color==='quick'?'#42875b':COLOR.muted;
    box(ctx,left,top,col,h,card.automatic?COLOR.faint:COLOR.paper,card.automatic?COLOR.line:tone,6);
-   text(ctx,String(start+index+1),left+10,top+9,25,13,tone,18,true);
-   if(card.automatic){text(ctx,'AUTO',left+70,top+47,col-90,25,COLOR.muted,34,true);text(ctx,'默认普通卡补齐',left+54,top+100,col-70,18,COLOR.muted,26);return;}
-   image(ctx,assets,card.image??card.person?.image,left+12,top+25,116,136,card.label==='宝具 NP'?'NP':'卡','contain');
-   let ty=top+18;ty+=text(ctx,card.label,left+144,ty,col-155,18,tone,25,true)+6;
-   if(card.person){text(ctx,card.person.position,left+144,ty,col-155,12,COLOR.muted,18);ty+=19;ty+=text(ctx,card.person.name,left+144,ty,col-155,18,COLOR.ink,24,true)+4;}
-   if(card.label==='宝具 NP')ty+=text(ctx,card.name,left+144,ty,col-155,15,COLOR.muted,21);
-   if(card.deckLabel)text(ctx,card.deckLabel,left+144,ty+4,col-155,12,COLOR.muted,18);
-  });top+=h+12;
+   box(ctx,left+8,top+8,24,24,card.automatic?COLOR.muted:tone,'',4);text(ctx,String(start+index+1),left+15,top+11,16,14,'#ffffff',20,true);
+   if(card.automatic){text(ctx,'普通卡补齐',left+45,top+44,col-62,23,COLOR.muted,32,true);text(ctx,'按当前策略选择',left+45,top+91,col-62,16,COLOR.muted,23);}
+   else{
+    image(ctx,assets,card.image??card.person?.image,left+12,top+36,104,118,card.label==='宝具 NP'?'NP':'卡','contain');
+    const tx=left+130,tw=col-142;let ty=top+18;
+    ty+=text(ctx,card.label,tx,ty,tw,18,tone,25,true)+6;
+    if(card.person){ty+=text(ctx,card.person.position,tx,ty,tw,12,COLOR.muted,18)+3;ty+=text(ctx,card.person.name,tx,ty,tw,18,COLOR.ink,24,true)+4;}
+    if(card.label==='宝具 NP')ty+=text(ctx,card.name,tx,ty,tw,15,COLOR.muted,21);
+    if(card.deckLabel)text(ctx,card.deckLabel,tx,ty+4,tw,12,COLOR.muted,18);
+   }
+  });
+  for(let index=0;index<cards.length-1;index++){
+   const ax=x+24+index*(col+16)+col+8,ay=top+Math.floor(h/2);
+   ctx.save();ctx.strokeStyle=COLOR.blue;ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(ax-5,ay);ctx.lineTo(ax+5,ay);ctx.moveTo(ax+1,ay-4);ctx.lineTo(ax+5,ay);ctx.lineTo(ax+1,ay+4);ctx.stroke();ctx.restore();
+  }
+  top+=h+12;
  }
 }
 
@@ -217,17 +244,17 @@ export async function renderShareImage(options:ShareImageOptions):Promise<Render
  const model=shareImageModel(options.data,options.catalog,options);
  const canvas=document.createElement('canvas');canvas.width=W;canvas.height=1;
  const ctx=canvas.getContext('2d');if(!ctx)throw new Error('浏览器无法生成图片，请使用支持 Canvas 的桌面浏览器。');
- const geometry=layout(ctx,model,options.encoded);
+ const geometry=measureShareImageLayout(ctx,model,options.encoded);
  const {assets,failures}=await loadAssets(imageSources(model),options.signal);
  try{
   abort(options.signal);canvas.height=geometry.height;ctx.fillStyle=COLOR.background;ctx.fillRect(0,0,W,canvas.height);
   let top=PAD;
   box(ctx,PAD,top,CONTENT,geometry.header,COLOR.paper,COLOR.line,12);
   ctx.fillStyle=COLOR.deep;ctx.fillRect(PAD,top,6,geometry.header);
-  text(ctx,'MAAFGO  ·  PARTY & BATTLE PLAN',PAD+26,top+23,CONTENT-280,15,COLOR.blue,22,true);
-  const titleH=text(ctx,model.title,PAD+26,top+58,CONTENT-280,38,COLOR.ink,52,true);
-  text(ctx,`${model.turns.length} 回合  ·  ${model.actions} 条动作  ·  COST ${model.cost}`,PAD+26,top+70+titleH,CONTENT-280,17,COLOR.muted,24);
-  text(ctx,`${model.state}${model.warnings?` · ${model.warnings} 项提醒`:''}`,PAD+26,top+104+titleH,CONTENT-280,17,model.blocking?COLOR.error:options.validation?.valid?COLOR.blue:COLOR.amber,24,true);
+  text(ctx,'MAAFGO  ·  PARTY & BATTLE PLAN',PAD+26,top+20,CONTENT-280,14,COLOR.blue,20,true);
+  const titleH=text(ctx,model.title,PAD+26,top+52,CONTENT-280,36,COLOR.ink,48,true);
+  text(ctx,`${model.turns.length} 回合  ·  ${model.actions} 条动作  ·  COST ${model.cost}`,PAD+26,top+62+titleH,CONTENT-280,17,COLOR.muted,24);
+  text(ctx,`${model.state}${model.warnings?` · ${model.warnings} 项提醒`:''}`,PAD+26,top+94+titleH,CONTENT-280,17,model.blocking?COLOR.error:options.validation?.valid?COLOR.blue:COLOR.amber,24,true);
   const anchorSize=matrixSize(options.encoded.anchor);drawMatrix(ctx,options.encoded.anchor,W-PAD-230+Math.floor((204-anchorSize)/2),top+16);
   text(ctx,'MaaFGO 分享图 v1',W-PAD-230,top+20+anchorSize,204,13,COLOR.muted,20,true);
   text(ctx,'保留定位标记及底部数据码',W-PAD-230,top+44+anchorSize,210,11,COLOR.muted,16);

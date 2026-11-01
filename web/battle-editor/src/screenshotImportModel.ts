@@ -49,6 +49,7 @@ export function shareImagePreview(data:Json,catalog:Catalog) {
   const supportType=member?.supportType;
   const supportLabel=supportType==='friend'?'好友助战':supportType==='npc'?'NPC 助战':supportType==='fixed'?'固定助战':'';
   const equips=['equip1','equip2','equip3'].flatMap((key,equipIndex)=>{
+   if(member?.grandSvt===true&&key==='equip2')return [];
    const candidates=equipCandidatesForDisplay(member,key),label=member?.grandSvt?['普通礼装','羁绊礼装','报酬礼装'][equipIndex]:`礼装 ${equipIndex+1}`;
    return candidates.map((requirement,candidateIndex)=>{
     const equip=catalog.equips.find(item=>item.id===requirement.id),baseName=equip?.name??(requirement.id?`礼装 #${requirement.id}`:'未指定候选');

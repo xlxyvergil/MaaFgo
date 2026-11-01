@@ -301,7 +301,7 @@ def validate_battle(data: Any, catalog: dict | None = None) -> dict:
                             error(item_path + ".id", "duplicate_equip_candidate", "同一格的候选礼装 ID 不能重复；同一礼装的任意满破状态请使用未指定", **loc)
                         seen_ids.add(candidate_id)
             if member.get("grandSvt"):
-                warning(path, "grand_equip_boundary", "冠位三礼装会保存；当前自动编队跳过冠位从者礼装修改，助战礼装显示也受现有羁绊效果逻辑限制", **loc)
+                warning(path, "grand_equip_boundary", "冠位羁绊礼装按效果筛选，无需指定卡面；当前自动编队仍跳过冠位从者的礼装修改", **loc)
             if member.get("classBoardData") is not None and not isinstance(member["classBoardData"], dict):
                 error(path + ".classBoardData", "invalid_object", "classBoardData 必须是对象或 null", **loc)
             unknown(member, servant_keys, path, **loc)

@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import type {Catalog,Json} from './model';
-import {restoreNamingSource,suggestBattleFileName} from './battleFileName';
+import {restoreNamingSource,suggestBattleFileName,importedBattleFileName,canonicalBattleFileName,sameBattleFileName,availableBattleFileName} from './battleFileName';
 
 const catalog:Catalog={servants:[{id:1,name:'阿尔托莉雅·卡斯特'},{id:2,name:'奥伯龙',aliases:[2002]},{id:3,name:'玛修'},{id:4,name:'候补从者'}],equips:[],mysticCodes:[]};
 const formation=(slots:any[]):Json=>({team:{name:'标题不会参与命名',onFieldSvts:slots,backupSvts:[{svtId:4},null,null]},actions:[]});
@@ -77,4 +77,77 @@ test('name suggestions preserve imported JSON, catalog metadata and the existing
  const dataBefore=structuredClone(data),catalogBefore=structuredClone(catalog),names=Object.freeze(['unrelated.json']);
  suggestBattleFileName(data,catalog,'chaldea',names,neverRandom);
  assert.deepEqual(data,dataBefore);assert.deepEqual(catalog,catalogBefore);assert.deepEqual(names,['unrelated.json']);
+});
+
+test('imported filenames take precedence over team titles and keep Chinese, spaces and extension case',()=>{
+ const data=formation([{svtId:1}]);data.team.name='标题与文件名不同';const before=structuredClone(data);
+ assert.equal(importedBattleFileName(data,' 我的 原方案.JSON '),'我的 原方案.JSON');
+ assert.equal(importedBattleFileName(data,'我的 原方案'),'我的 原方案.json');
+ assert.equal(importedBattleFileName(data),'标题与文件名不同.json');
+ assert.equal(importedBattleFileName({team:{name:'命名方案.json'}}),'命名方案.json');
+ assert.deepEqual(data,before);
+});
+
+test('unnamed or unsafe imported metadata falls back without selecting any path basename',()=>{
+ const named={team:{name:'可信队名'}};
+ for(const value of [undefined,null,{},'', '  ','.json','../原文件.json','C:\\目录\\原文件.json','C:原文件.json','/tmp/原文件.json']){
+  assert.equal(importedBattleFileName(named,value),'可信队名.json');
+ }
+ for(const title of [undefined,null,{},'', ' ... ','未命名方案','未命名方案.json'])assert.equal(importedBattleFileName({team:{name:title}}),null);
+ assert.equal(importedBattleFileName({team:{name:'未命名方案'}},'已有名字.json'),'已有名字.json');
+});
+
+test('a real uploaded filename is retained even when it matches the default unnamed team title',()=>{
+ assert.equal(importedBattleFileName({team:{name:'原有队名'}},'未命名方案.json'),'未命名方案.json');
+ assert.equal(importedBattleFileName({team:{name:'未命名方案'}},'未命名方案'),'未命名方案.json');
+ assert.equal(importedBattleFileName({team:{name:'未命名方案'}}),null);
+});
+
+test('inherited names clean illegal characters and reserved device names without losing their useful title',()=>{
+ assert.equal(importedBattleFileName({team:{name:' . 甲/乙\\丙:丁*戊?己"庚<辛>壬|癸\u0000 . '}}),'甲-乙-丙-丁-戊-己-庚-辛-壬-癸-.json');
+ assert.equal(importedBattleFileName({},'活动:周回?.json'),'活动-周回-.json');
+ for(const name of ['CON','prn.json','COM0.json','LPT¹.JSON']){
+  const inherited=importedBattleFileName({},name)!;
+  assert.ok(inherited.startsWith('方案_'));assert.doesNotThrow(()=>canonicalBattleFileName(inherited));
+ }
+});
+
+test('canonical names normalize whitespace and missing extensions but reject unsafe and overlong names',()=>{
+ assert.equal(canonicalBattleFileName('  中文 方案  '),'中文 方案.json');
+ assert.equal(canonicalBattleFileName('MiXeD.JsOn'),'MiXeD.JsOn');
+ for(const name of ['', ' ', '.', '..', '.hidden.json','foo.','../foo.json','C:\\foo.json','a/b','foo:bar','foo\u0000bar','CON.json','NUL.anything.json','LPT².json','a'.repeat(156)])assert.throws(()=>canonicalBattleFileName(name),name);
+ assert.equal(canonicalBattleFileName('a'.repeat(155)), 'a'.repeat(155)+'.json');
+ assert.equal(canonicalBattleFileName('a'.repeat(155)+'.json').length,160);
+});
+
+test('same-name comparison includes implicit JSON and Unicode case without conflating invalid paths',()=>{
+ assert.equal(sameBattleFileName(' Foo.JSON ','foo'),true);
+ assert.equal(sameBattleFileName('Ä方案.json','ä方案.JSON'),true);
+ assert.equal(sameBattleFileName('原名.json','另一份.json'),false);
+ assert.equal(sameBattleFileName('../foo.json','foo.json'),false);
+ assert.equal(sameBattleFileName('CON.json','con'),false);
+});
+
+test('inherited names truncate complete Unicode points and reserve room for the extension',()=>{
+ const inherited=importedBattleFileName({team:{name:'😀'.repeat(100)}})!;
+ assert.equal(inherited,'😀'.repeat(77)+'.json');assert.ok(inherited.length<=160);
+ assert.equal(new TextDecoder().decode(new TextEncoder().encode(inherited)),inherited);
+ const fromFile=importedBattleFileName({},'甲'.repeat(154)+'😀.JSON')!;
+ assert.equal(fromFile,'甲'.repeat(154)+'.JSON');assert.ok(fromFile.length<=160);
+});
+
+test('explicit Save As keeps a free inherited name and resolves case-insensitive suffix collisions once',()=>{
+ assert.equal(availableBattleFileName('原方案.JSON',[],neverRandom),'原方案.JSON');
+ const existing=Object.freeze(['原方案.json','原方案_abcdef.json','原方案_abcdef_2.JSON']);let calls=0;
+ assert.equal(availableBattleFileName('原方案.JSON',existing,()=>{calls++;return 'ABCDEF';}),'原方案_abcdef_3.JSON');
+ assert.equal(calls,1);assert.deepEqual(existing,['原方案.json','原方案_abcdef.json','原方案_abcdef_2.JSON']);
+ assert.equal(availableBattleFileName('原方案',['原方案'],()=>'/../A-B-C-!'),'原方案_abc000.json');
+});
+
+test('Save As collision names retain their extension and Unicode integrity at the length limit',()=>{
+ const base=importedBattleFileName({},'😀'.repeat(100)+'.JSON')!;
+ const name=availableBattleFileName(base,[base.toLowerCase()],()=> '012345');
+ assert.ok(name.endsWith('_012345.JSON'));assert.ok(name.length<=160);
+ assert.equal(new TextDecoder().decode(new TextEncoder().encode(name)),name);
+ assert.throws(()=>availableBattleFileName('../unsafe.json',[],neverRandom));
 });

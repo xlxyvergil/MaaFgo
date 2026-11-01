@@ -43,13 +43,14 @@ def _extract_ce_id(svt_info: dict) -> Optional[int]:
 
 
 def _candidate_assist_settings(team_data: dict) -> Optional[dict]:
-    """Export the Maa CE-candidate extension only when BBC can express it.
+    """Export explicit Grand support and Maa CE candidates BBC can express.
 
     Ordinary BBC assistEquip's outer groups are OR choices; nested candidates
     inside a normal group are not executed by BBC. Grand support instead uses
     three actual slots, each with its own list. BBC's fullEquip flag applies to
     every option, so mixed/non-MLB constraints must not be silently weakened.
-    Existing single-CE exports retain their prior output shape.
+    Ordinary single-CE exports retain their prior output shape. Grand support
+    always needs its mode and bond-effect filter, even without named CE slots.
     """
     front = list(team_data.get("onFieldSvts") or [])[:3]
     backup = list(team_data.get("backupSvts") or [])[:3]
@@ -63,24 +64,34 @@ def _candidate_assist_settings(team_data: dict) -> Optional[dict]:
                     and requirement["candidates"] is not None
                     and not isinstance(requirement["candidates"], list)):
                 raise ValueError(f"BBC 导出的 {key}.candidates 必须是候选数组")
+            if (member.get("grandSvt") is True and key == "equip2"
+                    and isinstance(requirement, dict) and requirement.get("candidates")):
+                raise ValueError("冠位羁绊礼装仅支持效果筛选，不能导出 equip2 礼装候选；请先修正候选要求。")
     has_extension = any(isinstance(member, dict) and any(
         isinstance(member.get(key), dict) and bool(member[key].get("candidates"))
         for key in ("equip1", "equip2", "equip3")) for member in members)
-    if not has_extension:
-        return None
     supports = [(index, member) for index, member in enumerate(members)
                 if isinstance(member, dict) and member.get("supportType") in ("friend", "fixed", "npc")]
+    has_grand_support = any(member.get("grandSvt") is True for _, member in supports)
+    if not has_extension and not has_grand_support:
+        return None
     if len(supports) != 1:
-        raise ValueError("BBC 多候选礼装导出必须恰有一个助战位置")
+        raise ValueError("BBC 冠位或多候选礼装导出必须恰有一个助战位置")
     index, support = supports[0]
     if support.get("supportType") == "npc":
-        raise ValueError("BBC 多候选礼装无法保留仅 NPC 助战限制，请使用原始 Chaldea JSON")
+        raise ValueError("BBC 无法保留仅 NPC 助战限制，请使用原始 Chaldea JSON")
     if any(isinstance(member, dict) and member is not support and any(
             isinstance(member.get(key), dict) and member[key].get("candidates")
             for key in ("equip1", "equip2", "equip3")) for member in members):
         raise ValueError("BBC 不支持自有从者的多候选礼装要求，请使用原始 Chaldea JSON")
+    grand = support.get("grandSvt") is True
     groups, statuses = [], []
     for number in range(1, 4):
+        # The unique bond CE is not a card-face filter and does not share the
+        # visible CEs' global MLB constraint. Old imported metadata stays intact.
+        if grand and number == 2:
+            groups.append([])
+            continue
         key = f"equip{number}"
         raw = support.get(key)
         if raw is None and number == 1 and support.get("ceId") is not None:
@@ -124,7 +135,6 @@ def _candidate_assist_settings(team_data: dict) -> Optional[dict]:
         groups.append(names)
     if len(set(statuses)) > 1:
         raise ValueError("BBC 的 fullEquip 是全局设置，无法表达各候选不同的满破要求；请使用原始 Chaldea JSON")
-    grand = support.get("grandSvt") is True
     ce_only = support.get("svtId") in (None, 0)
     if not grand and (groups[1] or groups[2]):
         raise ValueError("普通助战只有一个礼装位，不能将额外礼装槽自动当作同槽候选")
@@ -139,6 +149,8 @@ def _candidate_assist_settings(team_data: dict) -> Optional[dict]:
     if grand:
         board = support.get("classBoardData") or {}
         changed = board.get("grandBondEquipSkillChange") if isinstance(board, dict) else None
+        if ce_only and not any(groups) and type(changed) is not bool:
+            raise ValueError("BBC 仅礼装冠位助战至少需要一个礼装或明确的羁绊效果要求；不能导出完全不限制的空要求。")
         settings["jbType"] = "NP50" if changed is True else "初始" if changed is False else "任意"
     return settings
 

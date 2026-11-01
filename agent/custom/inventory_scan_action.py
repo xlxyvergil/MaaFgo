@@ -53,8 +53,8 @@ CONTENT_STABLE_ROUNDS = 3
 CONTENT_DIFF_THRESHOLD = 0.012
 SCROLL_THUMB_WIDTH_RANGE = (18, 30)
 # 1280x720 小图标列表中的滑块高度随列表长度变化；实机从者列表曾达到
-# 117px。高度上限过小会令滑块始终返回 None，无法确认到达底部。
-SCROLL_THUMB_HEIGHT_RANGE = (30, 160)
+# 117px，短列表则可能接近整条轨道。高度上限过小会误判没有滚动条。
+SCROLL_THUMB_HEIGHT_RANGE = (30, 550)
 SCROLL_BOTTOM_CENTER_Y = 650
 SCROLL_STABLE_DELTA = 1
 INVENTORY_ICON_LAYOUT_NODES = {
@@ -712,18 +712,16 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
             EQUIP_THRESHOLD, EQUIP_MARGIN,
             match_image=match_image,
         )
-        self.stable_single_row_equips = bool(hits) and len(grids) == 2 and all(
-            grid.get("single_row_bond_equips", False) for grid in grids
+        self.stable_equip_layout = len(grids) == 2 and all(
+            grid.get("card_origins") for grid in grids
+        ) and grids[0]["card_origins"] == grids[1]["card_origins"]
+        self.stable_short_bond_equips = self.stable_equip_layout and all(
+            grid.get("short_bond_equips", False) for grid in grids
         )
         return hits, image
 
-    def _single_row_bond_equip_candidate(self, image):
-        """仅羁绊筛选：用完整四星条确认顶部单行，支持不足四张的列表。
-
-        单星在卡面上容易误命中，不能直接把通用网格的两行要求降为一行。
-        此处要求四星条在复位后的首行位置命中，且下方没有其他四星条；
-        身份仍须通过完整礼装模板复核及双帧稳定校验。
-        """
+    def _short_bond_equip_candidate(self, image):
+        """用完整四星条确认顶部一至三行羁绊礼装，不向空白外推行。"""
         if not getattr(self, "bond_equips_only", False):
             return None
         base = self._to_base(image)
@@ -749,47 +747,58 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
                 result, nan=-1.0, posinf=-1.0, neginf=-1.0
             ).max(axis=1))
         curves = np.stack(curves)
-        lower_start = BOND_EQUIP_FIRST_STAR_Y + INVENTORY_ROW_PITCH // 2
-        if np.any(curves[:, lower_start - RARITY_SEARCH_TOP:] >= RARITY_THRESHOLD):
+        rows = []
+        for row_index in range(3):
+            expected = BOND_EQUIP_FIRST_STAR_Y + row_index * INVENTORY_ROW_PITCH
+            first = expected - BOND_EQUIP_ROW_TOLERANCE
+            last = expected + BOND_EQUIP_ROW_TOLERANCE
+            scores = curves[:, first - RARITY_SEARCH_TOP:last - RARITY_SEARCH_TOP + 1]
+            supports = (scores >= RARITY_THRESHOLD).sum(axis=0)
+            best = max(range(scores.shape[1]), key=lambda i: (supports[i], scores[:, i].sum()))
+            support = int(supports[best])
+            if support == 0:
+                break
+            # 出现下一行时，上一行须有足够列支持；允许个别星级被标记遮挡。
+            if rows and rows[-1][1] < RARITY_MIN_COLUMNS:
+                return None
+            rows.append((first + best, support, float(scores[:, best].mean())))
+        if not rows:
             return None
-        first = BOND_EQUIP_FIRST_STAR_Y - BOND_EQUIP_ROW_TOLERANCE
-        last = BOND_EQUIP_FIRST_STAR_Y + BOND_EQUIP_ROW_TOLERANCE
-        scores = curves[:, first - RARITY_SEARCH_TOP:last - RARITY_SEARCH_TOP + 1]
-        supports = (scores >= RARITY_THRESHOLD).sum(axis=0)
-        best = max(range(scores.shape[1]), key=lambda i: (supports[i], scores[:, i].sum()))
-        support = int(supports[best])
-        if support == 0:
+        # 卡片上的“装备中”等标记可能在星级条附近形成假峰，只检查末行
+        # 半个行距之外是否仍有下一行，避免把这些同一卡片内的峰当作新行。
+        lower_start = rows[-1][0] + INVENTORY_ROW_PITCH // 2 - RARITY_SEARCH_TOP
+        if np.any(curves[:, lower_start:] >= RARITY_THRESHOLD):
             return None
-        star_y = first + best
-        origin = star_y - RARITY_TO_CARD_TOP
-        mean = float(scores[:, best].mean())
+        origins = [row[0] - RARITY_TO_CARD_TOP for row in rows]
         return {
-            "phase": origin % INVENTORY_ROW_PITCH,
-            "rows": [(star_y, support, mean)],
-            "support": support,
-            "score_sum": mean,
-            # 单行模式不向空白区域外推其他卡位。
-            "origins": [origin],
+            "phase": origins[0] % INVENTORY_ROW_PITCH,
+            "rows": rows,
+            "support": sum(row[1] for row in rows),
+            "score_sum": sum(row[2] for row in rows),
+            "origins": origins,
             "diagnostic": {
-                "detected_rows": [star_y], "supports": [support],
-                "means": [round(mean, 4)], "card_origins": [origin],
-                "single_row_bond_equips": True,
+                "detected_rows": [row[0] for row in rows],
+                "supports": [row[1] for row in rows],
+                "means": [round(row[2], 4) for row in rows],
+                "card_origins": origins,
+                "short_bond_equips": True,
             },
         }
 
     def _match_equip_image(self, image, matrix, variants):
         self.last_rarity_grid = None
         candidates = self._small_icon_row_candidates(image)
-        single_row = self._single_row_bond_equip_candidate(image)
-        if single_row is not None:
-            candidates.append(single_row)
+        short_list = self._short_bond_equip_candidate(image)
+        if short_list is not None:
+            candidates.append(short_list)
         if not candidates:
-            mfaalog.warning("[个人库存] 礼装页未形成稳定多行网格或羁绊单行")
+            mfaalog.warning("[个人库存] 礼装页未形成稳定多行网格或羁绊短列表")
             return {}
 
         ranked = sorted(
             candidates,
             key=lambda candidate: (
+                candidate["diagnostic"].get("short_bond_equips", False),
                 candidate["support"],
                 candidate["score_sum"] / len(candidate["rows"]),
                 len(candidate["rows"]),
@@ -968,7 +977,8 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
         content_unchanged = 0
         unmatched_cells = 0
         swipes = 0
-        single_row_scan = label == "礼装" and getattr(self, "bond_equips_only", False)
+        short_list_scan = label == "礼装" and getattr(self, "bond_equips_only", False)
+        zero_hit_pages = 0
         self.current_scan_recoveries = 0
         for page_index in range(max_swipes + 1):
             if self.context.tasker.stopping:
@@ -982,17 +992,27 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
             if image is None:
                 return None, None
             if not hits:
-                # 任何一屏零命中都先原位重试，不能跳过未识别页后覆盖旧库。
+                # 先排除截图延迟；礼装身份缺图不应阻断有独立证据的到底检查。
                 time.sleep(0.8)
                 hits, image = matcher(catalog, matrix, variants)
                 if image is None:
                     return None, None
                 if not hits:
-                    mfaalog.error(
-                        f"[个人库存] {label}第{page_index + 1}屏重复零命中，"
-                        "无法区分空列表和识别失败，保留旧库存"
+                    thumb = self._scroll_thumb_center(image)
+                    if label != "礼装" or not (
+                        getattr(self, "stable_equip_layout", False) or
+                        self._scroll_at_bottom(image, thumb)
+                    ):
+                        mfaalog.error(
+                            f"[个人库存] {label}第{page_index + 1}屏重复零命中，"
+                            "缺少可靠的识别或列表完成证据，保留旧库存"
+                        )
+                        return None, None
+                    zero_hit_pages += 1
+                    mfaalog.warning(
+                        f"[个人库存] 礼装第{page_index + 1}屏重试后仍零命中，"
+                        "继续检查列表底部；未知礼装不会入库"
                     )
-                    return None, None
             for item_id, hit in hits.items():
                 old = observed.get(item_id)
                 if old is None or hit[0] > old[0]:
@@ -1019,9 +1039,9 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
             self._focus(f"正在扫描{label}：已识别 {len(observed)}")
 
             current_thumb = self._scroll_thumb_center(image)
-            single_row_scan = (
-                single_row_scan and current_thumb is None and
-                getattr(self, "stable_single_row_equips", False)
+            short_list_scan = (
+                short_list_scan and current_thumb is None and
+                getattr(self, "stable_short_bond_equips", False)
             )
             current_content = self._content_signature(image)
             content_diff = self._content_difference(previous_content, current_content)
@@ -1030,17 +1050,21 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
             stable_page = (
                 current_thumb is not None and previous_thumb is not None and
                 abs(current_thumb - previous_thumb) <= SCROLL_STABLE_DELTA and
-                current_thumb >= SCROLL_BOTTOM_CENTER_Y and stable_content
+                self._scroll_at_bottom(image, current_thumb) and stable_content
             )
             unchanged = unchanged + 1 if stable_page else 0
             scrollbar_bottom = unchanged >= BOTTOM_STABLE_ROUNDS
-            single_row_bottom = single_row_scan and content_unchanged >= CONTENT_STABLE_ROUNDS
-            if scrollbar_bottom or single_row_bottom:
-                bottom_detection = "scrollbar" if scrollbar_bottom else "single_row"
+            short_list_bottom = short_list_scan and content_unchanged >= CONTENT_STABLE_ROUNDS
+            if scrollbar_bottom or short_list_bottom:
+                if not observed:
+                    mfaalog.error(f"[个人库存] {label}已到底，但全程无可靠身份命中，保留旧库存")
+                    return None, None
+                bottom_detection = "scrollbar" if scrollbar_bottom else "short_bond_list"
                 metrics = {
                     "pages_scanned": page_index + 1,
                     "swipes": swipes,
                     "unmatched_candidate_cells": unmatched_cells,
+                    "zero_hit_pages": zero_hit_pages,
                     "detail_recoveries": self.current_scan_recoveries,
                     "bottom_confirmed": True,
                     "bottom_detection": bottom_detection,
@@ -1052,6 +1076,11 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
                     f"滚动条稳定={unchanged}，画面稳定={content_unchanged}，"
                     f"画面差异={content_diff}"
                 )
+                if zero_hit_pages:
+                    mfaalog.warning(
+                        f"[个人库存] 礼装已到底，保存 {len(observed)} 种已识别礼装；"
+                        f"{zero_hit_pages} 屏零命中，未识别礼装不代表未持有，请补齐模板后重新构建"
+                    )
                 if not self._leave_current_list():
                     mfaalog.error(f"[个人库存] {label}扫描完成，但仓库页状态异常")
                     return None, None
@@ -1200,8 +1229,8 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
         gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
         return cv2.resize(gray, (232, 106))
 
-    def _scroll_thumb_center(self, image):
-        """返回右侧滚动条白色滑块的纵向中心（基准分辨率坐标）。"""
+    def _scroll_thumb_bounds(self, image):
+        """返回右侧白色滑块的上下边；短列表的滑块也可能接近整条轨道。"""
         base = self._to_base(image)
         if base is None:
             return None
@@ -1218,8 +1247,19 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
                 min_height <= height <= max_height and
                 area >= 300
             ):
-                candidates.append((int(area), int(round(roi_y + y + height / 2))))
-        return max(candidates)[1] if candidates else None
+                candidates.append((int(area), roi_y + int(y), roi_y + int(y + height)))
+        return max(candidates)[1:] if candidates else None
+
+    def _scroll_thumb_center(self, image):
+        bounds = self._scroll_thumb_bounds(image)
+        return int(round(sum(bounds) / 2)) if bounds else None
+
+    def _scroll_at_bottom(self, image, center):
+        if center is None:
+            return False
+        bounds = self._scroll_thumb_bounds(image)
+        # 长滑块到底时中心可能低于 650，改看其下沿；短滑块兼容原判定。
+        return bounds[1] >= 705 if bounds else center >= SCROLL_BOTTOM_CENTER_Y
 
     def _leave_current_list(self):
         if self.current_list is None:

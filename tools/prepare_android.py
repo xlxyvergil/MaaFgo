@@ -299,10 +299,14 @@ def adapt_interface(data: dict, assets: Path) -> dict:
         preset["task"] = [t for t in preset["task"] if t["name"] not in REMOVED_TASKS]
 
     options = data["option"]
-    for name in ("battle_mode", "主线-战斗方式"):
-        option = options[name]
-        option["cases"] = [case for case in option["cases"] if case["name"] == "native"]
-        option["default"] = "native"
+    # 按后端分支识别，避免新增独立任务后遗漏 BBC 依赖，扫描未打包的桌面配置。
+    for option in options.values():
+        cases = option.get("cases", [])
+        if not {"bbc", "native"} <= {case["name"] for case in cases}:
+            continue
+        option["cases"] = [case for case in cases if case["name"] == "native"]
+        option.pop("default", None)
+        option["default_case"] = "native"
         option["description"] = "安卓版使用原生自动战斗，可导入 Chaldea 队伍。"
 
     # 只保留可从任务、资源和全局选项到达的选项，去掉 BBC / 模拟器路径配置。

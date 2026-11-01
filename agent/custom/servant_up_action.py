@@ -26,6 +26,7 @@ from maa.context import Context
 from maa.pipeline import JOCR
 
 import mfaalog
+from resource_package import resolve_resource_package
 from box_action import ExecuteBoxTask
 
 BASE_W, BASE_H = 1280, 720
@@ -239,9 +240,7 @@ class ExecuteServantUp(CustomAction):
     # ---------- 初始化 ----------
 
     def _init_dirs(self):
-        cfg = self._context.get_node_data("资源包配置") or {}
-        pkg = str((cfg.get("attach") or {}).get("resource_package") or "base").strip()
-        layer = "cn" if pkg == "cn" else "base"
+        layer = resolve_resource_package(self._context, caller="强化从者")
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
         def _resolve(l, sub):

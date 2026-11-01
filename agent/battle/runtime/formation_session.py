@@ -12,11 +12,16 @@ from threading import RLock
 from uuid import uuid4
 
 from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT, VERIFIED_FORMATION_SOURCE
+from .bond_stop_state import bond_stops
 
 
 SESSION_NODE = "编队身份-会话"
 GATE_NODE = "进本-点击队伍确认"
 CAPTURE_NODE = "编队身份-采集"
+TEAPOT_NODE = "原生战斗-校验茶壶"
+FALLBACK_GATE_NODE = "进本-助战兜底跳过编队"
+FALLBACK_TEAPOT_NODE = "原生战斗-兜底校验茶壶"
+START_NODE = "进本-实际点击队伍确认"
 
 
 @dataclass
@@ -50,6 +55,7 @@ class FormationSessions:
         with self._lock:
             token = uuid4().hex
             self._sessions[task_id] = _Session(token, repeat)
+            bond_stops.clear_formation(task_id)
             return token
 
     def _get(self, task_id: int, token: str) -> _Session:
@@ -92,12 +98,14 @@ class FormationSessions:
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, reason)
+            bond_stops.clear_formation(task_id)
 
     def skip_capture(self, task_id: int, token: str) -> None:
         """丢弃本次采集并允许战斗在无初始快照时继续。"""
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
 
     def set_support_fallback(self, task_id: int, token: str, active: bool) -> None:
         """兜底状态随当前助战保留；重新选到目标助战或结束会话后恢复。"""
@@ -107,6 +115,7 @@ class FormationSessions:
             # 重新选到的助战和锁定编队也不应沿用旧身份。
             self._invalidate(session, "")
             session.support_fallback = active
+            bond_stops.clear_formation(task_id)
 
     def support_fallback(self, task_id: int, token: str) -> bool:
         with self._lock:
@@ -117,6 +126,7 @@ class FormationSessions:
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, "formation_update_pending")
+            bond_stops.clear_formation(task_id)
             return session.revision
 
     def abandon_update(self, task_id: int, token: str, revision: int) -> None:
@@ -139,6 +149,7 @@ class FormationSessions:
             )
             session.snapshot = snapshot
             session.error = ""
+            bond_stops.set_formation(task_id, snapshot.slots)
             return snapshot
 
     def verified_snapshot(self, task_id: int, token: str) -> InitialFormation | None:
@@ -156,6 +167,7 @@ class FormationSessions:
             session = self._get(task_id, token)
             previous = self.verified_snapshot(task_id, token) if reuse_verified else None
             self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
             session.capture_seed = previous.slots if previous is not None else ()
             session.collecting = True
             return session.revision
@@ -208,6 +220,7 @@ class FormationSessions:
             session.collecting = False
             session.frames.clear()
             session.capture_seed = ()
+            bond_stops.set_formation(task_id, snapshot.slots)
             return snapshot
 
     def read(self, task_id: int, token: str) -> tuple[InitialFormation | None, int]:
@@ -250,5 +263,10 @@ def session_override(token: str) -> dict:
     # 只传递令牌，不将可变快照放入会被复制/字典合并的 pipeline attach。
     return {
         SESSION_NODE: {"attach": {"session_id": token}},
-        GATE_NODE: {"next": [CAPTURE_NODE]},
+        # 仅原生会话在编队汇合后检查茶壶；BBC 和独立 Chaldea 编队保留原路径。
+        # 助战兜底不采集身份，但茶壶仍须按用户设置核对后才允许实际开始。
+        GATE_NODE: {"next": [TEAPOT_NODE]},
+        TEAPOT_NODE: {"next": [CAPTURE_NODE]},
+        FALLBACK_GATE_NODE: {"next": [FALLBACK_TEAPOT_NODE]},
+        FALLBACK_TEAPOT_NODE: {"next": [START_NODE]},
     }

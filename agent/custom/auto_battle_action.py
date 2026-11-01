@@ -39,6 +39,8 @@ from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.data.servant_identity import canonical_servant_id
 from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.formation_session import context_session, session_override, sessions
+from battle.runtime.bond_stop_state import bond_stops
+from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
 
 
@@ -135,6 +137,7 @@ class AutoBattleAction(CustomAction):
         # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
         # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
         controller = context.tasker.controller
+        bond_stops.set_controller(root, controller)
 
         plan_status = "loaded" if plan is not None else "none"
         plan_turns = len(plan.turns) if plan is not None else 0
@@ -155,6 +158,10 @@ class AutoBattleAction(CustomAction):
         if not result.ok and token and sessions.valid(root, token):
             sessions.invalidate(root, token, "battle_runtime_failed")
         mfaalog.info(f"[auto_battle] end ok={result.ok} reason={result.reason} turns={result.turns}")
+
+        # 已确认胜利后立即交接结算，避免Pipeline默认延迟错过短暂羁绊页。
+        if result.ok and result.reason == "victory":
+            inspect_victory_settlement(context, result, controller)
 
         # TODO(save_evidence)：失败时保存截图/状态证据
         return CustomAction.RunResult(success=result.ok)

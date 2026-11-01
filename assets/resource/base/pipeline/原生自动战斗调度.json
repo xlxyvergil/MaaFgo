@@ -1,4 +1,75 @@
 {
+    "结算-羁绊满停止": {
+        "doc": "默认关闭。开启时先确认羁绊结算页并按本节点配置有界等待动画，MAX或无法确认时保存证据停止。指定号位仅在明确识别羁绊升级展示、映射可信且外层已声明还有既定战斗次数时保存待复核证据并不命中，由原结算继续，下一场重新检查，不额外加场。所有模式不按升级等级推断MAX，遮挡未确认仍停止。此节点不用JumpBack；外层循环须区分真正停止与本场延后。",
+        "enabled": false,
+        "recognition": {
+            "type": "Custom",
+            "param": {
+                "custom_recognition": "native_bond_max"
+            }
+        },
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "save_native_bond_stop"
+            }
+        },
+        "attach": {
+            "check_attempts": 3,
+            "check_wait_node": "结算-羁绊停止等待动画",
+            "page_wait_node": "结算-等待羁绊出现",
+            "page_wait_attempts": 80,
+            "page_wait_timeout_ms": 5000,
+            "positive_wait_node": "结算-羁绊快速复核",
+            "positive_attempts": 20,
+            "positive_timeout_ms": 2000
+        },
+        "next": ["结算-羁绊停止出口"],
+        "on_error": ["结算-羁绊停止异常出口"]
+    },
+    "结算-等待羁绊出现": {
+        "doc": "仅在已有战后RESULT识别成立后快速等待羁绊页或明确羁绊升级展示；总次数与截止时间读取结算-羁绊满停止.attach。升级遮挡按指定号位剩余预算规则处理，其他未确认页面保留现场停止。",
+        "pre_delay": 50,
+        "post_delay": 0,
+        "action": {"type": "DoNothing"},
+        "next": [],
+        "on_error": []
+    },
+    "结算-羁绊快速复核": {
+        "doc": "羁绊页初帧尚未MAX时先短间隔观察；阳性立即锁存。明确升级展示遮挡时，仅指定号位且仍有既定次数可保存证据延后到下一场；其他未知遮挡仍停止。无MAX结论须严格冻结确认。",
+        "pre_delay": 100,
+        "post_delay": 0,
+        "action": {"type": "DoNothing"},
+        "next": [],
+        "on_error": []
+    },
+    "结算-羁绊停止等待动画": {
+        "doc": "羁绊页检查间隔与冻结参数由Pipeline维护。自定义识别先等待600ms，再读取本节点post_wait_freezes调用Context.wait_freezes并严格检查布尔结果；节点本身的冻结超时不会使run_task失败，不能只依赖其任务状态。冻结确认后取新帧，有限轮次内至少两帧一致才允许未满放行。",
+        "pre_delay": 600,
+        "action": {"type": "DoNothing"},
+        "post_wait_freezes": {
+            "time": 1000,
+            "target": [80, 450, 1120, 100],
+            "threshold": 0.95,
+            "method": 5,
+            "rate_limit": 200,
+            "timeout": 8000
+        },
+        "next": [],
+        "on_error": []
+    },
+    "结算-羁绊停止出口": {
+        "doc": "终止当前Pipeline，保留羁绊结算现场。StopTask可能报告succeeded，repeat、主线和Free必须同时检查根任务业务停止状态，不能据此开始下一场。截图保存失败也到此停止。",
+        "action": {"type": "StopTask"},
+        "next": [],
+        "on_error": []
+    },
+    "结算-羁绊停止异常出口": {
+        "doc": "羁绊守卫动作异常时同样终止Pipeline，外层仍消费根任务停止原因。独立节点避免next与on_error指向同名出口，触发maa-checker重复路由错误；不得在异常路径继续结算或开始下一场。",
+        "action": {"type": "StopTask"},
+        "next": [],
+        "on_error": []
+    },
     "作战成功_结束战斗": {
         "recognition": {
             "type": "TemplateMatch",
@@ -15,6 +86,7 @@
             "rate_limit": 500
         },
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -46,6 +118,7 @@
             "rate_limit": 500
         },
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -161,6 +234,7 @@
             "type": "Click"
         },
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -192,6 +266,7 @@
             "type": "Click"
         },
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -263,6 +338,7 @@
     },
     "结束战斗_不回主界面": {
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -281,6 +357,7 @@
     },
     "结束战斗_连续出击继续": {
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -327,6 +404,7 @@
         },
         "post_delay": 800,
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",
@@ -371,6 +449,7 @@
         },
         "post_delay": 800,
         "next": [
+            "结算-羁绊满停止",
             "[JumpBack]剧情奖励-展示继续",
             "[JumpBack]剧情奖励-从者加入详情关闭",
             "[JumpBack]剧情奖励-礼装详情关闭",

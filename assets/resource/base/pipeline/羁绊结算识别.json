@@ -1,0 +1,109 @@
+{
+    "羁绊结算-页面": {
+        "doc": "日服模板已换为2026-11-01冬木XA实机羁绊页裁图，保留BBC 720p参考ROI；国服cn同名覆盖仍为BBC临时素材。页面与第5栏MAX已由MaaMCP确认（替换前0.9728/0.9732），可参考tests/fixtures/bond_stop/jp_bond_slot5_max.png与docs/verification/bond_stop_templates.json。固定左上ROI用于排除升级展示右侧同样出现的文字，不能扩大到全屏；升级弹窗负样本见jp_bond_level_up_overlay.png。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊结算页.png",
+                "roi": [67, 150, 93, 83],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-升级展示": {
+        "doc": "升级标题与右侧羁绊说明必须同时命中，只证明羁绊升级展示正在遮挡结算。不能证明当前上限已满，不能替代MAX判定；禁止采用BBC数字1或羁绊>=10逻辑。日服两张模板来自2026-11-01本项目12到13级升级实拍；国服同名覆盖采用BBC临时模板，待实机校准。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "羁绊结算-升级标题",
+                    "羁绊结算-升级说明"
+                ]
+            }
+        }
+    },
+    "羁绊结算-升级标题": {
+        "doc": "BBC jbup1顶部升级字区的720p参考ROI，日服改为本项目实拍裁图；仅与升级说明组合识别展示，不读羁绊等级。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/升级标题.png",
+                "roi": [1100, 67, 157, 167],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-升级说明": {
+        "doc": "BBC jbup右侧羁绊说明字区的720p参考ROI，日服改为本项目实拍裁图。该文字片段也见于正常结果页，必须限定右侧并同时确认顶部升级标题。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/升级说明.png",
+                "roi": [653, 267, 87, 133],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-任意MAX": {
+        "doc": "所有从者模式仅判断专属羁绊横行任一MAX，不归属编队位置。横向覆盖1280完整画面，避免把无助战六名自有布局误作五栏并漏末列；纵向已由2026-11-01日服实机五栏截图确认，自有模板MaaMCP复核为1.0，其他布局及国服仍待实机校准。必须先确认羁绊结算页，不识别其他页面的MAX。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [0, 487, 1280, 37],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-第1栏MAX": {
+        "doc": "去掉助战后的结算第1栏，不能直接作为编队1号位。五栏ROI已由2026-11-01日服实机截图确认；本场编队6号位在助战4号位排除后对应结算第5栏。指定模式仅放行已校准的五名自有从者布局，MAX匹配必须由羁绊页门控。日服MAX使用自截图，国服仍为BBC临时素材。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [118, 487, 162, 37],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-第2栏MAX": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [341, 487, 162, 37],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-第3栏MAX": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [563, 487, 162, 37],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-第4栏MAX": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [786, 487, 162, 37],
+                "threshold": 0.8
+            }
+        }
+    },
+    "羁绊结算-第5栏MAX": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/bond/羁绊MAX.png",
+                "roi": [1009, 487, 162, 37],
+                "threshold": 0.8
+            }
+        }
+    }
+}

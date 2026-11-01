@@ -31,6 +31,7 @@ if not IS_ANDROID:
 import box_action
 import expball_action
 import formation_action
+import teapot_action
 import bond_completion_action
 import current_bond_completion_action
 import inventory_scan_action
@@ -40,8 +41,11 @@ import ocr_logger
 import support_action
 import auto_battle_action
 import auto_battle_repeat_action
+import bond_stop_action
 import main_story_recognition
 import main_story_action
+import free_quest_recognition
+import free_quest_action
 
 
 def main():

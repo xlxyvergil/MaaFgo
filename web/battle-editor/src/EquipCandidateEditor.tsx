@@ -2,6 +2,8 @@ import {useEffect,useState} from 'react';
 import {Plus,X} from 'lucide-react';
 import type {Catalog,Json} from './model';
 import {equipCandidatesForDisplay,hasStoredEquipRequirement,supportsEquipCandidates} from './equipRequirements';
+import {GrandBondEffectControl} from './GrandBondEffectControl';
+import type {GrandBondEffect} from './grandBondEffect';
 import './equipCandidateEditor.css';
 
 function CandidateAvatar({src,name}:{src?:string|null;name:string}) {
@@ -10,15 +12,17 @@ function CandidateAvatar({src,name}:{src?:string|null;name:string}) {
  return <div className="equip-candidate-avatar">{src&&!failed?<img src={src} alt={name} onError={()=>setFailed(true)}/>:<Plus size={24}/>}</div>;
 }
 
-export function EquipCandidateEditor({member,catalog,onChoose,onRemove,onClear,onUpdate,onError}:{
+export function EquipCandidateEditor({member,catalog,onChoose,onRemove,onClear,onUpdate,onBondEffectChange,onError}:{
  member:Json;catalog:Catalog;onChoose:(key:string,index:number)=>void;onRemove:(key:string,index:number)=>void;onClear:(key:string)=>void;
  onUpdate:(key:string,index:number,changes:Json)=>void;onError:(message:string)=>void;
+ onBondEffectChange:(value:GrandBondEffect)=>void;
 }) {
  const keys=member.grandSvt||member.equip2||member.equip3?['equip1','equip2','equip3']:['equip1'];
  const safely=(fn:()=>void)=>{try{fn();}catch(error){onError((error as Error).message);}};
  return <section className="equip-candidates-editor" aria-label="概念礼装候选设置">
   <div className="subsection-title">概念礼装 <small>{member.grandSvt?'冠位三礼装':'普通礼装'}</small></div>
   {keys.map((key,slotIndex)=>{
+   if(key==='equip2'&&member.grandSvt===true)return <div className="equip-candidate-slot" key={key}><div className="equip-candidate-slot-heading"><strong>礼装 2 · 羁绊礼装</strong></div><GrandBondEffectControl member={member} onChange={value=>safely(()=>onBondEffectChange(value))}/></div>;
    const choices=equipCandidatesForDisplay(member,key),allowed=supportsEquipCandidates(member,key);
    const rawCount=Array.isArray(member[key]?.candidates)?member[key].candidates.length:0;
    return <div className="equip-candidate-slot" key={key}>

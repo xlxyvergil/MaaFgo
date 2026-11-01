@@ -81,7 +81,7 @@ export function LocalBattleImport({battleDirectory,busy=false,onBack,onClose,onI
 
  return <Modal title="从 config/Battle 导入" wide onClose={onClose} closeDisabled={committing}>
   <section className="local-battle-import" aria-label="从当前 Battle 目录导入" aria-busy={loading||!!importing||committing}>
-   <div className="local-battle-directory"><FolderOpen size={20} aria-hidden="true"/><div><strong>当前战斗方案目录</strong><code>{path}</code><p>选择一个文件，导入为独立草稿；原文件不会被覆盖。</p></div></div>
+   <div className="local-battle-directory"><FolderOpen size={20} aria-hidden="true"/><div><strong>当前战斗方案目录</strong><code>{path}</code><p>选择一个文件导入独立草稿；保存沿用原名，替换前会再次确认。</p></div></div>
    <div className="local-battle-toolbar"><label className="search-field"><Search size={17} aria-hidden="true"/><input autoFocus aria-label="搜索本地战斗方案" placeholder="搜索文件名或队名" value={query} onChange={event=>setQuery(event.target.value)}/></label><button type="button" className="button" disabled={blocked} onClick={()=>void refresh()}><RefreshCw size={16} className={loading?'local-import-spinner':''}/>刷新</button></div>
    {error&&<div className="local-battle-error" role="alert"><AlertTriangle size={17} aria-hidden="true"/><span>{error}</span></div>}
    <div className="local-battle-status" role="status" aria-live="polite">{committing?<><LoaderCircle size={15} className="local-import-spinner"/>正在提交草稿并切换，请稍候…</>:importing?<><LoaderCircle size={15} className="local-import-spinner"/>正在读取 {importing}…</>:loading?<><LoaderCircle size={15} className="local-import-spinner"/>正在读取本地文件列表…</>:loaded?`共 ${items.length} 个文件 · ${available} 个可导入${query.trim()?` · 匹配 ${filtered.length} 个`:''}`:'读取失败，可点击刷新重试。'}</div>

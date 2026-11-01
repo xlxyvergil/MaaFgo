@@ -5,6 +5,8 @@ import {skillAt,hasServantIdentity,isUnspecifiedSupport,memberLabel} from './mod
 import type {Catalog,Json,Servant} from './model';
 import {equipCandidatesForDisplay,equipForDisplay,hasStoredEquipRequirement,supportsEquipCandidates} from './equipRequirements';
 import type {EquipDragPosition} from './equipDrag';
+import {GrandBondEffectControl} from './GrandBondEffectControl';
+import type {GrandBondEffect} from './grandBondEffect';
 import './candidateCarousel.css';
 
 export function SkillIcon({skill,index,append=false}:{skill?:Json;index:number;append?:boolean}) {
@@ -52,9 +54,10 @@ export interface PartyCardDragBindings {
  onPointerDownCapture?:(event:ReactPointerEvent<HTMLElement>)=>void;onLostPointerCapture?:(event:ReactPointerEvent<HTMLElement>)=>void;
 }
 
-export function PartyCard({member,servant,catalog,index,defaultSupport=false,selected,dragging,dropTarget,onSelect,onChoose,onEquip,onClearEquip,onClearMember,equipDrag,onDragStart,onDragEnd,onDragOver,onDrop,onPointerStart,onPointerMove,onPointerEnd,onPointerCancel,onClickCapture,onPointerDownCapture,onLostPointerCapture}:{
+export function PartyCard({member,servant,catalog,index,defaultSupport=false,selected,dragging,dropTarget,onSelect,onChoose,onEquip,onClearEquip,onClearMember,onBondEffectChange,equipDrag,onDragStart,onDragEnd,onDragOver,onDrop,onPointerStart,onPointerMove,onPointerEnd,onPointerCancel,onClickCapture,onPointerDownCapture,onLostPointerCapture}:{
  member:Json|null;servant?:Servant;catalog:Catalog;index:number;defaultSupport?:boolean;selected:boolean;dragging:boolean;dropTarget:boolean;
  onSelect:()=>void;onChoose:()=>void;onEquip:(key:string)=>void;onClearEquip:(key:string)=>void;onClearMember:()=>void;
+ onBondEffectChange:(value:GrandBondEffect)=>void;
  equipDrag:{dragged:EquipDragPosition|null;target:EquipDragPosition|null;bindEquip:(position:EquipDragPosition)=>PartyCardDragBindings};
 }&PartyCardDragBindings) {
  const support=member?.supportType&&member.supportType!=='none',identified=hasServantIdentity(member),unspecified=isUnspecifiedSupport(member);
@@ -71,7 +74,7 @@ export function PartyCard({member,servant,catalog,index,defaultSupport=false,sel
    <span className="fgo-card-skills">{[0,1,2].map(i=><span key={i}><SkillIcon skill={skillAt(member??undefined,servant,i)} index={i}/><b>{member?.skillLvs?.[i]??'—'}</b></span>)}</span></>:unspecified?<span className="fgo-member-stats">只按礼装要求选择助战</span>:null}
   </button>
   <div className={`fgo-card-equips ${member?.grandSvt?'grand-equips':''}`} aria-label={`槽位 ${index+1} 概念礼装`}>
-   {ceKeys.map((key,i)=>{const ce=equipForDisplay(member,key),item=catalog.equips.find(e=>e.id===ce?.id),stored=hasStoredEquipRequirement(member,key),drag=equipDrag.bindEquip({slot:index,key}),isSource=equipDrag.dragged?.slot===index&&equipDrag.dragged.key===key,isTarget=equipDrag.target?.slot===index&&equipDrag.target.key===key&&!isSource;return <div className={`fgo-equip-slot ${stored?'has-clear':''} ${isSource?'equip-drag-placeholder':''} ${isTarget?'equip-drop-target':''}`} key={key} data-equip-key={key} onPointerDownCapture={drag.onPointerDownCapture} onPointerMove={drag.onPointerMove} onPointerUp={drag.onPointerEnd} onPointerCancel={drag.onPointerCancel} onLostPointerCapture={drag.onLostPointerCapture} onClickCapture={drag.onClickCapture} onDragStart={drag.onDragStart} onDragEnd={drag.onDragEnd} onDragOver={drag.onDragOver} onDrop={drag.onDrop}><button className={`fgo-equip-button ${!ce?'empty':''}`} disabled={!member&&!defaultSupport} draggable={!!ce} onPointerDown={drag.onPointerStart} onClick={()=>onEquip(key)} title={ce?'拖动调整整组候选；点击更换首选，其余候选在详细设置中选择':undefined} aria-label={`选择槽位 ${index+1} 礼装 ${i+1}${item?`：${item.name}`:''}`}>
+   {ceKeys.map((key,i)=>{if(key==='equip2'&&member?.grandSvt===true)return <div className="fgo-equip-slot" key={key}><GrandBondEffectControl compact member={member} onChange={onBondEffectChange} label={`槽位 ${index+1} 礼装 2 羁绊礼装效果`}/></div>;const ce=equipForDisplay(member,key),item=catalog.equips.find(e=>e.id===ce?.id),stored=hasStoredEquipRequirement(member,key),drag=equipDrag.bindEquip({slot:index,key}),isSource=equipDrag.dragged?.slot===index&&equipDrag.dragged.key===key,isTarget=equipDrag.target?.slot===index&&equipDrag.target.key===key&&!isSource;return <div className={`fgo-equip-slot ${stored?'has-clear':''} ${isSource?'equip-drag-placeholder':''} ${isTarget?'equip-drop-target':''}`} key={key} data-equip-key={key} onPointerDownCapture={drag.onPointerDownCapture} onPointerMove={drag.onPointerMove} onPointerUp={drag.onPointerEnd} onPointerCancel={drag.onPointerCancel} onLostPointerCapture={drag.onLostPointerCapture} onClickCapture={drag.onClickCapture} onDragStart={drag.onDragStart} onDragEnd={drag.onDragEnd} onDragOver={drag.onDragOver} onDrop={drag.onDrop}><button className={`fgo-equip-button ${!ce?'empty':''}`} disabled={!member&&!defaultSupport} draggable={!!ce} onPointerDown={drag.onPointerStart} onClick={()=>onEquip(key)} title={ce?'拖动调整整组候选；点击更换首选，其余候选在详细设置中选择':undefined} aria-label={`选择槽位 ${index+1} 礼装 ${i+1}${item?`：${item.name}`:''}`}>
     <CandidateArtwork member={member} equipKey={key} catalog={catalog} paused={isSource||dragging}/>
    </button>{stored&&<button type="button" className="fgo-equip-clear" data-no-drag="" draggable={false} aria-label={`清除槽位 ${index+1} 礼装 ${i+1} 要求`} title={`清除礼装 ${i+1} 要求（不要求礼装）`} onPointerDown={event=>event.stopPropagation()} onDragStart={event=>{event.preventDefault();event.stopPropagation();}} onClick={event=>{event.stopPropagation();onClearEquip(key);}}><X size={14} aria-hidden="true"/></button>}</div>;})}
   </div>

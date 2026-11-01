@@ -131,10 +131,16 @@ test('Chaldea image previews reject malformed fetched data, warnings and validat
 test('full-plan image preview labels each candidate as OR without flattening the three grand slots',()=>{
  const data=shareData();data.team.onFieldSvts[2]={supportType:'friend',grandSvt:true,equip1:{id:2,limitBreak:true,candidates:[{id:999,limitBreak:false},{id:3}]},equip2:{id:999},equip3:{id:3,candidates:[{id:2}]}} as any;
  const before=structuredClone(data),member=shareImagePreview(data,catalog).roster[2];
- assert.deepEqual(member.equips.map(e=>[e.sourceKey,e.candidateIndex]),[['equip1',0],['equip1',1],['equip1',2],['equip2',0],['equip3',0],['equip3',1]]);
- assert.deepEqual(member.equips.map(e=>e.id),[2,999,3,999,3,2]);
+ assert.deepEqual(member.equips.map(e=>[e.sourceKey,e.candidateIndex]),[['equip1',0],['equip1',1],['equip1',2],['equip3',0],['equip3',1]]);
+ assert.deepEqual(member.equips.map(e=>e.id),[2,999,3,3,2]);
  assert.match(member.equips[0].name,/普通礼装 · 候选 1\/3.*乙.*满破/);
  assert.match(member.equips[1].name,/普通礼装 · 或 2\/3.*非满破/);
- assert.match(member.equips[5].name,/报酬礼装 · 或 2\/2/);
+ assert.match(member.equips[4].name,/报酬礼装 · 或 2\/2/);
  assert.deepEqual(data,before);
+});
+
+test('restored image previews leave grand bond artwork to the shared effect preview without changing the saved CE',()=>{
+ const data=shareData();data.team.onFieldSvts[2]={supportType:'friend',grandSvt:true,equip2:{id:2,lv:100,limitBreak:true,future:{preserved:null}},classBoardData:{grandBondEquipSkillChange:true}} as any;
+ const before=structuredClone(data),member=shareImagePreview(data,catalog).roster[2];
+ assert.deepEqual(member.equips,[]);assert.deepEqual(data,before);
 });
