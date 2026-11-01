@@ -20,7 +20,7 @@ class HellishTrialConfigTests(unittest.TestCase):
     def test_trial_retains_source_and_formation_options_then_shared_strategy(self):
         self.assertEqual(TASK["option"], [
             "地狱的试炼-队伍方案", "Chaldea编队方式", "原生自动战斗助战方式",
-            "原生自动战斗高级策略",
+            "原生自动战斗羁绊满停止", "原生自动战斗高级策略",
         ])
         self.assertEqual(TASK["resource"], ["日服"])
         self.assertIn(TASK["entry"], PIPELINE)

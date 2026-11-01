@@ -10,6 +10,8 @@ from maa.custom_action import CustomAction
 
 import mfaalog
 from battle.runtime.formation_session import session_override, sessions
+from battle.runtime.bond_stop_state import bond_stops
+from bond_stop_action import BondStopReached
 from main_story_action import StoryRunner, StoryStopped, _BATTLE_RESET, map_swipes, next_names
 
 
@@ -268,6 +270,8 @@ class FreeQuestRunner:
                 return f"地图遍历完成，未找到未完成数字标记；本次确认 CLEAR {self.completed} 个 Free 本，完成战斗 {self.battles} 场"
             if target is not None:
                 self.enter(target)
+            bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
+                                      another_battle_planned=self.battles + 1 < self.limit)
             self.fight()
             self.settle()
             self.battles += 1
@@ -287,9 +291,23 @@ class FreeQuestRunner:
 class FreeQuestAction(CustomAction):
     def run(self, context, argv):
         runner = None
+        bond_stops.begin(context.get_task_job().job_id)
         try:
             runner = FreeQuestRunner(context.clone())
             message, ok = runner.run(), True
+            deferred = bond_stops.deferred(context.get_task_job().job_id)
+            if deferred:
+                message += "；羁绊目标尚未复核；任务按原条件结束，未追加战斗"
+                if deferred.screenshot_path:
+                    message += f"；截图：{deferred.screenshot_path}"
+                if deferred.latest_screenshot_path:
+                    message += f"；最新现场截图：{deferred.latest_screenshot_path}"
+                if deferred.screenshot_error:
+                    message += f"；截图保存失败：{deferred.screenshot_error}"
+        except BondStopReached as exc:
+            prefix = "条件达成停止" if exc.result.reason == "bond_max" else "羁绊检查停止"
+            message, ok = f"{prefix}：{exc.result.display()}", exc.result.reason == "bond_max"
+            mfaalog.info(f"[自动清free本] {message}")
         except Exception as exc:
             message = f"自动清free本中断：{exc}"
             if runner:

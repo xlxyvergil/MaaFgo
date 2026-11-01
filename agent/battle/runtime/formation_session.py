@@ -12,6 +12,7 @@ from threading import RLock
 from uuid import uuid4
 
 from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT, VERIFIED_FORMATION_SOURCE
+from .bond_stop_state import bond_stops
 
 
 SESSION_NODE = "编队身份-会话"
@@ -50,6 +51,7 @@ class FormationSessions:
         with self._lock:
             token = uuid4().hex
             self._sessions[task_id] = _Session(token, repeat)
+            bond_stops.clear_formation(task_id)
             return token
 
     def _get(self, task_id: int, token: str) -> _Session:
@@ -92,12 +94,14 @@ class FormationSessions:
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, reason)
+            bond_stops.clear_formation(task_id)
 
     def skip_capture(self, task_id: int, token: str) -> None:
         """丢弃本次采集并允许战斗在无初始快照时继续。"""
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
 
     def set_support_fallback(self, task_id: int, token: str, active: bool) -> None:
         """兜底状态随当前助战保留；重新选到目标助战或结束会话后恢复。"""
@@ -107,6 +111,7 @@ class FormationSessions:
             # 重新选到的助战和锁定编队也不应沿用旧身份。
             self._invalidate(session, "")
             session.support_fallback = active
+            bond_stops.clear_formation(task_id)
 
     def support_fallback(self, task_id: int, token: str) -> bool:
         with self._lock:
@@ -117,6 +122,7 @@ class FormationSessions:
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, "formation_update_pending")
+            bond_stops.clear_formation(task_id)
             return session.revision
 
     def abandon_update(self, task_id: int, token: str, revision: int) -> None:
@@ -139,6 +145,7 @@ class FormationSessions:
             )
             session.snapshot = snapshot
             session.error = ""
+            bond_stops.set_formation(task_id, snapshot.slots)
             return snapshot
 
     def verified_snapshot(self, task_id: int, token: str) -> InitialFormation | None:
@@ -156,6 +163,7 @@ class FormationSessions:
             session = self._get(task_id, token)
             previous = self.verified_snapshot(task_id, token) if reuse_verified else None
             self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
             session.capture_seed = previous.slots if previous is not None else ()
             session.collecting = True
             return session.revision
@@ -208,6 +216,7 @@ class FormationSessions:
             session.collecting = False
             session.frames.clear()
             session.capture_seed = ()
+            bond_stops.set_formation(task_id, snapshot.slots)
             return snapshot
 
     def read(self, task_id: int, token: str) -> tuple[InitialFormation | None, int]:

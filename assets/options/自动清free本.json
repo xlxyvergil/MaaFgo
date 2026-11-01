@@ -12,7 +12,7 @@
       "label": "战斗方式",
       "default": "native",
       "cases": [
-        {"name": "native", "label": "原生自动战斗（推荐）", "option": ["原生自动战斗使用Chaldea队伍", "原生自动战斗助战方式", "原生自动战斗高级策略"], "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "native"}}}},
+        {"name": "native", "label": "原生自动战斗（推荐）", "option": ["原生自动战斗使用Chaldea队伍", "原生自动战斗助战方式", "原生自动战斗羁绊满停止", "原生自动战斗高级策略"], "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "native"}}}},
         {"name": "bbc", "label": "BBC 单场战斗", "option": ["team_config", "apple_type", "support_order_mismatch", "team_config_error"], "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "bbc"}}}}
       ]
     }

@@ -7,6 +7,8 @@ from maa.custom_action import CustomAction
 
 import mfaalog
 from battle.runtime.formation_session import session_override, sessions
+from battle.runtime.bond_stop_state import bond_stops
+from bond_stop_action import BondStopReached, check_settlement_bond_stop
 
 
 # Context 克隆隔离节点配置，但框架命中计数属于任务状态，跨关仍需重置。
@@ -159,6 +161,9 @@ class StoryRunner:
     def check_stop(self):
         if self.tasker.stopping:
             raise StoryStopped("用户已停止")
+        result = bond_stops.get(self.ctx.get_task_job().job_id)
+        if result:
+            raise BondStopReached(result)
 
     def pause(self, seconds=0.5):
         until = self.clock() + seconds
@@ -567,6 +572,8 @@ class StoryRunner:
         stable_return = 0
         while self.clock() < deadline:
             image = self.frame()
+            if self.mode == "native":
+                check_settlement_bond_stop(self.ctx, image, controller=self.controller)
             self.failure(image)
             # 弹窗先处理，避免误认弹窗后透出的地图。
             handled = False
@@ -609,6 +616,7 @@ class StoryRunner:
             target = self.locate()
             kind = "battle" if target is None else self.enter(target)
             if kind == "battle":
+                bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1)
                 self.fight()
                 self.settle()
                 self.battles += 1
@@ -621,10 +629,15 @@ class StoryRunner:
 class MainStoryAction(CustomAction):
     def run(self, context, argv):
         runner = None
+        bond_stops.begin(context.get_task_job().job_id)
         try:
             runner = StoryRunner(context.clone())
             message = runner.run()
             ok = True
+        except BondStopReached as exc:
+            prefix = "条件达成停止" if exc.result.reason == "bond_max" else "羁绊检查停止"
+            message, ok = f"{prefix}：{exc.result.display()}", exc.result.reason == "bond_max"
+            mfaalog.info(f"[自动推主线] {message}")
         except Exception as exc:
             message = f"主线中断：{exc}"
             if runner:

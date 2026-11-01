@@ -2896,6 +2896,8 @@ class CaptureInitialFormation(CustomAction):
                 raise ValueError("formation_session_stopped")
             verified = sessions.verified_snapshot(root, token)
             if verified is not None and all(slot.status != "unknown" for slot in verified.slots):
+                from battle.runtime.bond_stop_state import bond_stops
+                bond_stops.set_formation(root, verified.slots)
                 mfaalog.info("[初始编队] 已复用 Chaldea 最终编队结果（6/6槽），跳过重复身份识别")
                 return CustomAction.RunResult(success=True)
             revision = sessions.begin_capture(root, token, reuse_verified=True)
