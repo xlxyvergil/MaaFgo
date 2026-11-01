@@ -76,8 +76,12 @@ class NativeBondOptionTests(unittest.TestCase):
         self.assertEqual(trial["地狱的试炼-结算调度"]["next"][0], GUARD)
         guard = nodes[GUARD]
         self.assertEqual(guard["next"], ["结算-羁绊停止出口"])
-        self.assertEqual(guard["on_error"], ["结算-羁绊停止出口"])
-        self.assertEqual(nodes["结算-羁绊停止出口"]["action"]["type"], "StopTask")
+        self.assertEqual(guard["on_error"], ["结算-羁绊停止异常出口"])
+        self.assertTrue(set(guard["next"]).isdisjoint(guard["on_error"]))
+        for exit_name in (*guard["next"], *guard["on_error"]):
+            self.assertEqual(nodes[exit_name]["action"]["type"], "StopTask")
+            self.assertEqual(nodes[exit_name]["next"], [])
+            self.assertEqual(nodes[exit_name]["on_error"], [])
         self.assertGreaterEqual(guard["attach"]["check_attempts"], 2)
         wait = nodes[guard["attach"]["check_wait_node"]]
         self.assertGreater(wait["pre_delay"], 0)

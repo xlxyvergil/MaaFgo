@@ -38,7 +38,7 @@ class BondDeferredFrameworkTests(unittest.TestCase):
     def scenario(self, *, mode="slot", planned=True, bad_mapping=False, recognition_error=False):
         source = json.loads((ROOT / "assets/resource/base/pipeline/原生自动战斗调度.json").read_text("utf-8"))
         nodes = {name: copy.deepcopy(source[name]) for name in (
-            action.GUARD_NODE, "结算-羁绊停止出口",
+            action.GUARD_NODE, "结算-羁绊停止出口", "结算-羁绊停止异常出口",
         )}
         nodes[action.GUARD_NODE]["enabled"] = True
         nodes[action.CONFIG_NODE] = {"attach": {

@@ -36,6 +36,7 @@ class BondStopFrameworkTests(unittest.TestCase):
             with self.subTest(is_max=is_max), tempfile.TemporaryDirectory() as temp:
                 nodes = {name: copy.deepcopy(source[name]) for name in (
                     action.GUARD_NODE, "结算-羁绊停止等待动画", "结算-羁绊停止出口",
+                    "结算-羁绊停止异常出口",
                     "结算-等待羁绊出现", "结算-羁绊快速复核")}
                 nodes[action.GUARD_NODE]["enabled"] = True
                 nodes[action.GUARD_NODE]["attach"].update(positive_attempts=2, positive_timeout_ms=1000)
