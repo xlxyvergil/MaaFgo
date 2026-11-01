@@ -136,10 +136,20 @@ test('grand bond effects render without choosing a CE and never expose imported 
   for(const legacyEquip of [undefined,{id:1,lv:100,limitBreak:true,future:{keep:['原卡面']}}]){
    const data=team();data.team.onFieldSvts[0]={supportType:'friend',grandSvt:true,classBoardData:{future:null,...(effect===undefined?{}:{grandBondEquipSkillChange:effect})},...(legacyEquip?{equip2:legacyEquip}:{})};
    const before=structuredClone(data),equips=shareImageModel(data,catalog).members[0].equips;
-   assert.deepEqual(equips,[{label:'羁绊礼装',name:'羁绊礼装',details:label}]);
+   assert.deepEqual(equips,[{kind:'bond-effect',label:'羁绊礼装',name:'羁绊礼装',details:label}]);
+   assert.equal(Object.hasOwn(equips[0],'image'),false);assert.equal(Object.hasOwn(equips[0],'id'),false);
    assert.deepEqual(data,before);
   }
  }
+});
+
+test('ordinary missing artwork and imported effect-like fields never become bond-effect display rows',()=>{
+ const data=team();data.team.onFieldSvts[0]={svtId:100,equip1:{id:2,kind:'bond-effect',future:{keep:true}},equip2:{id:3},classBoardData:{grandBondEquipSkillChange:true}};
+ const before=structuredClone(data),equips=shareImageModel(data,catalog).members[0].equips;
+ assert.equal(equips.length,2);assert.ok(equips.every(equip=>!Object.hasOwn(equip,'kind')));
+ assert.equal(equips[0].name,'羁绊礼装');assert.equal(equips[0].image,undefined);
+ assert.equal(equips[1].name,'报酬礼装');assert.equal(equips[1].image,undefined);
+ assert.deepEqual(data,before);
 });
 
 test('share alternatives resolve missing metadata with text and retain the legacy primary requirements',()=>{

@@ -162,7 +162,9 @@ def decode_share_image(image) -> dict | None:
         gray = cv2.resize(gray, (max(1, round(width * scale)), max(1, round(height * scale))), interpolation=cv2.INTER_CUBIC)
     height = gray.shape[0]
     found: set[str] = set()
-    regions = [(0, min(height, 650)), (max(0, height - 1200), height)]
+    # Include a usual two-row footer and the branding panel in one scan. Dense
+    # packets can decode together while the same codes split across tiles fail.
+    regions = [(0, min(height, 650)), (max(0, height - 1600), height)]
     scanned = set()
     for top, bottom in regions:
         if (top, bottom) not in scanned:
