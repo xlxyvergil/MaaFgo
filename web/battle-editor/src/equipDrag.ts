@@ -16,11 +16,11 @@ function memberAt(data:Json,slot:number):Json|undefined {
  return record(member)?member:undefined;
 }
 
-/** Only the CE cells currently visible on a real member are valid addresses. */
+/** Bond slot two is a servant-specific effect setting, never a movable CE. */
 export function equipDragPosition(data:Json,value:unknown):EquipDragPosition|null {
  if(!record(value)||!Number.isInteger(value.slot)||value.slot<0||value.slot>=6||!equipKeys.includes(value.key))return null;
  const member=memberAt(data,value.slot);
- if(!member||(value.key!=='equip1'&&!member.grandSvt))return null;
+ if(!member||value.key==='equip2'||(value.key==='equip3'&&member.grandSvt!==true))return null;
  return {slot:value.slot,key:value.key};
 }
 

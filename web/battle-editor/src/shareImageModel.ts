@@ -2,6 +2,7 @@ import {actionMemberAt,assertEditable,hasServantIdentity,isSwap,memberLabel,memb
 import {actionRosterAt,isRetire,resolveActionActor} from './actionRoster';
 import type {Catalog,Json} from './model';
 import {equipCandidatesForDisplay} from './equipRequirements';
+import {grandBondEffectLabel} from './grandBondEffect';
 import {isAutoAttackCard} from './attackCards';
 import {npAt} from './battlePreview';
 import {artworkColor,cardArtworkRequest,cardPreviewRegion} from './npCardRequest';
@@ -112,7 +113,8 @@ export function shareImageModel(data:Json,catalog:Catalog,options:{region?:strin
   members:initial.map((member,slot)=>{
    const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
    const grand=member?.grandSvt===true;
-   const equips=['equip1','equip2','equip3'].flatMap((key,index)=>{
+   const equips=['equip1','equip2','equip3'].flatMap<ShareEquip>((key,index)=>{
+    if(grand&&key==='equip2')return [{label:'羁绊礼装',name:'羁绊礼装',details:grandBondEffectLabel(member)}];
     const candidates=equipCandidatesForDisplay(member,key),label=grand?['普通礼装','羁绊礼装','报酬礼装'][index]:`礼装 ${index+1}`;
     return candidates.map((requirement,candidateIndex)=>{
      const item=catalog.equips.find(equip=>equip.id===requirement.id);

@@ -47,20 +47,29 @@ test('moving into an existing member with no CE leaves the source unrestricted',
  assert.equal(equipForDisplay(data.team.onFieldSvts[0],'equip1'),undefined);
 });
 
-test('grand secondary slots exchange within one member without changing its main CE or board',()=>{
- const data=fixture(),before=structuredClone(data),grand=data.team.onFieldSvts[2];
- assert.equal(swapEquipRequirements(data,at(2,'equip2'),at(2,'equip3')),true);
- const expected=structuredClone(before);[expected.team.onFieldSvts[2].equip2,expected.team.onFieldSvts[2].equip3]=[expected.team.onFieldSvts[2].equip3,expected.team.onFieldSvts[2].equip2];
- assert.deepEqual(data,expected);assert.equal(grand.classBoardData,data.team.onFieldSvts[2].classBoardData);
+test('grand bond slot rejects every drag direction without changing legacy CE data or effect settings',()=>{
+ for(const effect of [undefined,false,true]){
+  const data=fixture(),grand=data.team.onFieldSvts[2];
+  if(effect!==undefined)grand.classBoardData.grandBondEquipSkillChange=effect;
+  const before=structuredClone(data),bond=grand.equip2,board=grand.classBoardData;
+  assert.equal(equipDragPosition(data,at(2,'equip2')),null);
+  assert.equal(canStartEquipDrag(data,at(2,'equip2')),false);
+  for(const other of [at(0),at(1),at(2),at(2,'equip3'),at(3)]){
+   assert.equal(canDropEquipDrag(data,at(2,'equip2'),other),false);
+   assert.equal(canDropEquipDrag(data,other,at(2,'equip2')),false);
+   assert.equal(swapEquipRequirements(data,at(2,'equip2'),other),false);
+   assert.equal(swapEquipRequirements(data,other,at(2,'equip2')),false);
+   assert.deepEqual(data,before);
+  }
+  assert.equal(grand.equip2,bond);assert.equal(grand.classBoardData,board);
+ }
 });
 
-test('main and secondary exchange within one grand member supports all three cells',()=>{
- for(const secondary of ['equip2','equip3']){
-  const data=fixture(),before=structuredClone(data);
-  assert.equal(swapEquipRequirements(data,at(2),at(2,secondary)),true);
-  const expected=structuredClone(before);[expected.team.onFieldSvts[2].equip1,expected.team.onFieldSvts[2][secondary]]=[expected.team.onFieldSvts[2][secondary],expected.team.onFieldSvts[2].equip1];
-  assert.deepEqual(data,expected);
- }
+test('main and additional grand CE exchange while the bond record and effect stay on their servant',()=>{
+ const data=fixture(),before=structuredClone(data);
+ assert.equal(swapEquipRequirements(data,at(2),at(2,'equip3')),true);
+ const expected=structuredClone(before);[expected.team.onFieldSvts[2].equip1,expected.team.onFieldSvts[2].equip3]=[expected.team.onFieldSvts[2].equip3,expected.team.onFieldSvts[2].equip1];
+ assert.deepEqual(data,expected);
 });
 
 test('main slots carry their complete original legacy packages rather than reviving old aliases',()=>{
@@ -83,14 +92,14 @@ test('moving legacy-only main to an empty main removes aliases from the original
  assert.equal(equipForDisplay(a,'equip1'),undefined);
 });
 
-test('legacy main moved to a grand secondary becomes a standalone effective CE with unknown fields intact',()=>{
+test('legacy main moved to the grand additional slot keeps unknown fields and preserves the bond record',()=>{
  const data=fixture(),a=data.team.onFieldSvts[0],grand=data.team.onFieldSvts[2];
  a.equip1={id:null,future:{unknown:[{keep:'deep'}]}};Object.assign(a,{ceId:707,ceLv:80,ceLimitBreak:true});
- const previousSecondary=structuredClone(grand.equip2),grandMain=structuredClone(grand.equip1),grandThird=structuredClone(grand.equip3);
- assert.equal(swapEquipRequirements(data,at(0),at(2,'equip2')),true);
- assert.deepEqual(grand.equip2,{id:707,lv:80,limitBreak:true,future:{unknown:[{keep:'deep'}]}});
+ const previousSecondary=structuredClone(grand.equip3),grandMain=structuredClone(grand.equip1),grandBond=structuredClone(grand.equip2);
+ assert.equal(swapEquipRequirements(data,at(0),at(2,'equip3')),true);
+ assert.deepEqual(grand.equip3,{id:707,lv:80,limitBreak:true,future:{unknown:[{keep:'deep'}]}});
  assert.deepEqual(a.equip1,previousSecondary);for(const key of ['ceId','ceLv','ceLimitBreak'])assert.equal(Object.hasOwn(a,key),false);
- assert.deepEqual(grand.equip1,grandMain);assert.deepEqual(grand.equip3,grandThird);
+ assert.deepEqual(grand.equip1,grandMain);assert.deepEqual(grand.equip2,grandBond);
 });
 
 test('a legacy target main is normalized when its CE exchanges with a secondary source',()=>{
@@ -113,12 +122,15 @@ test('current main values override legacy values during only the participating m
 
 test('an empty explicit-zero target retains its unknown object and never borrows a stale ID',()=>{
  const data=fixture(),target=data.team.backupSvts[0];
+ data.team.onFieldSvts[2].equip3={id:303,lv:100,future:{grand:['third']}};
+ const bondBefore=structuredClone(data.team.onFieldSvts[2].equip2);
  Object.assign(target,{equip1:{id:0,future:{placeholder:true}},ceId:999,ceLv:12,ceLimitBreak:false});
  assert.equal(canStartEquipDrag(data,at(3)),false);
- assert.equal(swapEquipRequirements(data,at(2,'equip2'),at(3)),true);
- assert.deepEqual(data.team.onFieldSvts[2].equip2,{id:0,lv:12,limitBreak:false,future:{placeholder:true}});
- assert.equal(equipForDisplay(data.team.onFieldSvts[2],'equip2'),undefined);
- assert.deepEqual(target.equip1,{id:302,lv:100,future:{grand:['second']}});
+ assert.equal(swapEquipRequirements(data,at(2,'equip3'),at(3)),true);
+ assert.deepEqual(data.team.onFieldSvts[2].equip3,{id:0,lv:12,limitBreak:false,future:{placeholder:true}});
+ assert.equal(equipForDisplay(data.team.onFieldSvts[2],'equip3'),undefined);
+ assert.deepEqual(target.equip1,{id:303,lv:100,future:{grand:['third']}});
+ assert.deepEqual(data.team.onFieldSvts[2].equip2,bondBefore);
  for(const key of ['ceId','ceLv','ceLimitBreak'])assert.equal(Object.hasOwn(target,key),false);
 });
 
@@ -135,7 +147,7 @@ test('empty null requirements and absent secondary cells move independently with
 });
 
 test('invalid addresses, empty members, hidden secondary cells, and the same cell reject atomically',()=>{
- const invalid=[null,undefined,{},[],at(-1),at(6),at(1.5),at(NaN),at(Infinity),at(0,'equip0'),at(0,'ceId'),at(0,'__proto__'),at(0,'equip2'),at(1,'equip3'),at(4),at(5)];
+ const invalid=[null,undefined,{},[],at(-1),at(6),at(1.5),at(NaN),at(Infinity),at(0,'equip0'),at(0,'ceId'),at(0,'__proto__'),at(0,'equip2'),at(2,'equip2'),at(1,'equip3'),at(4),at(5)];
  for(const position of invalid){
   const data=fixture(),before=structuredClone(data);
   assert.equal(equipDragPosition(data,position),null);assert.equal(canStartEquipDrag(data,position),false);
@@ -157,7 +169,7 @@ test('empty or malformed source records cannot drag and malformed targets never 
   assert.equal(canDropEquipDrag(data,at(0),at(1)),false);assert.equal(swapEquipRequirements(data,at(0),at(1)),false);assert.deepEqual(data,before);
  }
  const data=fixture();data.team.backupSvts[0].ceId='999';const before=structuredClone(data);
- assert.equal(swapEquipRequirements(data,at(2,'equip2'),at(3)),false);assert.deepEqual(data,before);
+ assert.equal(swapEquipRequirements(data,at(2,'equip3'),at(3)),false);assert.deepEqual(data,before);
 });
 
 test('all dragged CE fields are detached before either side changes',()=>{

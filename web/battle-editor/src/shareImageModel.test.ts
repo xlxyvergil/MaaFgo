@@ -70,7 +70,7 @@ test('unspecified support and legacy CE restrictions are readable without invent
  const view=shareImageModel(data,catalog),member=view.members[0];
  assert.equal(member.name,'助战（仅要求礼装）');assert.equal(member.support,'好友助战');assert.equal(member.image,undefined);assert.deepEqual(member.skills,[]);
  assert.deepEqual(member.equips.map(e=>[e.label,e.name]),[['普通礼装','万华镜'],['羁绊礼装','羁绊礼装'],['报酬礼装','报酬礼装']]);
- assert.match(member.equips[0].details,/非满破/);assert.match(member.equips[1].details,/不要求满破/);assert.match(member.equips[2].details,/ · 满破/);
+ assert.match(member.equips[0].details,/非满破/);assert.equal(member.equips[1].details,'不限制');assert.equal(member.equips[1].image,undefined);assert.match(member.equips[2].details,/ · 满破/);
  assert.equal(view.members[1].name,'不要求此位置');assert.equal(member.details,'Lv.— · 宝具 —');
 });
 
@@ -129,6 +129,17 @@ test('share formation presents same-slot alternatives as OR while keeping grand 
  assert.match(equips[0].details,/Lv.100 · 满破/);assert.match(equips[1].details,/非满破/);assert.match(equips[4].details,/Lv.50 · 不要求满破/);
  assert.deepEqual(equips.map(e=>e.candidateCount),[2,2,undefined,2,2]);
  assert.deepEqual(data,before);
+});
+
+test('grand bond effects render without choosing a CE and never expose imported bond CE artwork',()=>{
+ for(const [effect,label] of [[true,'NP 50% 替换效果'],[false,'原始效果'],[undefined,'不限制']] as const){
+  for(const legacyEquip of [undefined,{id:1,lv:100,limitBreak:true,future:{keep:['原卡面']}}]){
+   const data=team();data.team.onFieldSvts[0]={supportType:'friend',grandSvt:true,classBoardData:{future:null,...(effect===undefined?{}:{grandBondEquipSkillChange:effect})},...(legacyEquip?{equip2:legacyEquip}:{})};
+   const before=structuredClone(data),equips=shareImageModel(data,catalog).members[0].equips;
+   assert.deepEqual(equips,[{label:'羁绊礼装',name:'羁绊礼装',details:label}]);
+   assert.deepEqual(data,before);
+  }
+ }
 });
 
 test('share alternatives resolve missing metadata with text and retain the legacy primary requirements',()=>{

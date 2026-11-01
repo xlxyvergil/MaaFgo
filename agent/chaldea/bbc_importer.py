@@ -419,7 +419,12 @@ def convert_bbc_config(config: dict, catalog: dict, equips: dict, *, root: Path 
                     if len(choices) > 1:
                         equipment["candidates"] = choices[1:]
                     slots[assist][f"equip{index}"] = equipment
-            if not any(slots[assist].get(f"equip{i}") for i in range(1, 4)) and ce_only:
+            board = slots[assist].get("classBoardData")
+            has_bond_effect = (grand_support and isinstance(board, dict)
+                               and type(board.get("grandBondEquipSkillChange")) is bool)
+            card_slots = (1, 3) if grand_support else (1,)
+            has_ce_filter = any(slots[assist].get(f"equip{i}") for i in card_slots)
+            if ce_only and not has_ce_filter and not has_bond_effect:
                 raise BbcImportError("仅礼装助战没有能够导入的礼装筛选，无法生成可执行编队")
     elif assist is not None:
         warnings.append(f"助战索引 {assist!r} 没有对应从者，未标记助战")

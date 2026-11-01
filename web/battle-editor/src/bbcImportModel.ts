@@ -1,6 +1,7 @@
 import {assertEditable,members,memberLabel,servantFor} from './model';
 import type {Catalog,Json} from './model';
 import {equipCandidatesForDisplay} from './equipRequirements';
+import {grandBondEffectLabel} from './grandBondEffect';
 
 export const BBC_FILE_ACCEPT='.json,application/json';
 export const MAX_BBC_BYTES=3*1024*1024;
@@ -9,7 +10,7 @@ export interface BBCImportResult {data:Json;warnings:string[];validation:Json|nu
 /** A Grand bond effect is a filter, not a named CE or an ordinary image slot. */
 export function grandRequirementPreview(member:Json|null) {
  const grand=member?.grandSvt===true,effect=member?.classBoardData?.grandBondEquipSkillChange;
- const bondEffect=grand?(effect===true?'羁绊礼装效果：NP50%替换':effect===false?'羁绊礼装效果：初始效果':effect==null?'羁绊礼装效果：未指定':'羁绊礼装效果：未知，请核对'):null;
+ const bondEffect=grand?`羁绊礼装效果：${typeof effect==='boolean'||effect==null?grandBondEffectLabel(member):'未知，请核对'}`:null;
  return {grand,bondEffect,emptyEquipLabel:grand?'未指定礼装卡面':'不要求礼装'};
 }
 
@@ -32,6 +33,7 @@ export function bbcPreview(data:Json,catalog:Catalog) {
  const roster=members(data).map((member,index)=>{
   const servant=member?.svtId?servantFor(catalog,member.svtId):undefined;
   const equips=['equip1','equip2','equip3'].flatMap((key,equipIndex)=>{
+   if(member?.grandSvt===true&&key==='equip2')return [];
    const candidates=equipCandidatesForDisplay(member,key),label=member?.grandSvt?['普通礼装','羁绊礼装','报酬礼装'][equipIndex]:`礼装 ${equipIndex+1}`;
    return candidates.map((requirement,candidateIndex)=>{
     const item=catalog.equips.find(e=>e.id===requirement.id),baseName=item?.name??(requirement.id?`礼装 #${requirement.id}`:'未指定候选');
