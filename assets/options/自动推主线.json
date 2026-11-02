@@ -13,7 +13,7 @@
     "主线-自动处理编队限制": {
       "type": "switch",
       "label": "自动处理编队限制情况",
-      "description": "限制关按游戏要求编队，本关忽略 Chaldea 编队与战斗配置，使用默认战斗逻辑；下一关恢复。关闭后遇到限制将停止。",
+      "description": "限制关（含编队中有多个助战）按游戏要求编队，本关忽略 Chaldea 编队与战斗配置，使用默认战斗逻辑；下一关恢复。关闭后遇到限制将停止。",
       "default_case": "Yes",
       "cases": [
         {"name": "Yes", "label": "开启", "pipeline_override": {"主线-配置": {"attach": {"auto_handle_restrictions": true}}}},
