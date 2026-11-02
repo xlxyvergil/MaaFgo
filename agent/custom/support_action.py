@@ -82,6 +82,7 @@ CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口
 CE_ANCHOR_GRAND = [(179, 35), (179, 129)]   # 冠位助战 礼装1/礼装2 左上角(166x53 窗口)
 BOND_ROI = (180, 84, 29, 29)          # 冠位助战 羁绊区域: 中心(194,99) 29x29 (相对框, 实测图案中心对齐)
 BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> 模板(带绿幕), 纯图案多服通用, 固定取 base 包 skill 目录
+TH_BOND = 0.40                     # 较高分须严格超过此值，才确认羁绊效果图标
 SKILL_ACTIVE = [(791, 154, 27, 22), (836, 154, 29, 22), (881, 154, 28, 22)]   # 主动技能 1-3 数字方框 (x,y,w,h)
 SKILL_PASSIVE = [(791, 156, 25, 20), (828, 156, 29, 20), (866, 156, 26, 20),
                  (903, 156, 24, 20), (941, 156, 25, 20)]        # 被动技能 1-5 数字方框 (x,y,w,h)
@@ -465,8 +466,8 @@ class SupportAction(CustomAction):
         """羁绊区域(中心(194,99) 29x29)与 base/image/skill/{50np,羁绊}.png 匹配
         模板带绿幕, 先抠掉绿幕背景再与截图区域灰度滑动匹配
         模板是纯图案(不含文字), 多服通用, 故固定取 base 包而非当前 pkg
-        两张模板本身形似、绝对分数偏低且受卡面立绘干扰, 故不设绝对阈值:
-        对两张模板分别打分, 取分高者作为识别结果"""
+        两张模板分别打分，较高分须严格大于 0.40 且两者不相等，才确认效果；
+        低分或同分视为未识别到，跳过当前条目。不限效果时保持跳过检查。"""
         import cv2
         if bond_opt not in BOND_TEMPLATES:
             return True
@@ -488,6 +489,15 @@ class SupportAction(CustomAction):
             t[green] = 255
             scores[opt] = float(cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED).max())
         best = max(scores, key=scores.get)
+        if (not all(np.isfinite(score) for score in scores.values())
+                or scores[best] <= TH_BOND
+                or scores["50np"] == scores["original"]):
+            mfaalog.info(
+                "[SupportAction] 未能确认羁绊礼装效果图标：" +
+                " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
+                f"，需较高分大于 {TH_BOND:.2f} 且两者分数不同，跳过当前助战条目"
+            )
+            return False
         mfaalog.info(f"[SupportAction] 羁绊: " +
                      " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
                      f" -> {best} (期望 {bond_opt})")

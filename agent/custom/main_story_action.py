@@ -143,6 +143,10 @@ class StoryRunner:
                 self._restriction_needs_auto = True
             elif self.reco("主线限制-固定成员", image):
                 self._mark_restricted("固定成员标记")
+            elif self.mode == "native" and self.reco("主线限制-多个助战", image):
+                # 剧情可能固定多名助战，却没有既有的“编队限制”标签。
+                # 必须在进入 Chaldea 单助战校验前接管，不能仅放宽数量后继续换人。
+                self._mark_restricted("多个助战标记")
             if self._restriction_needs_decide:
                 # 部分自动编成直接回确认页，不显示决定；仍须检查空槽再放行。
                 self._restriction_needs_decide = False

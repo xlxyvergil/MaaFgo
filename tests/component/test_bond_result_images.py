@@ -44,7 +44,7 @@ class BondResultImageTests(unittest.TestCase):
         pipeline = json.loads((ROOT / "assets/resource/base/pipeline/羁绊结算识别.json").read_text(encoding="utf-8"))
         options = json.loads((ROOT / "assets/options/原生自动战斗羁绊满停止.json").read_text(encoding="utf-8"))
         enabled = next(case for case in options["option"]["原生自动战斗羁绊满停止"]["cases"]
-                       if case["name"] == "all")
+                       if case["name"] == "Yes")
         pipeline["战斗_胜利"] = enabled["pipeline_override"]["战斗_胜利"]
         pipeline["probe"] = {"action": {"type": "Custom", "param": {"custom_action": "probe"}}}
         observed = {}

@@ -111,6 +111,40 @@ class FrameworkTests(FrameworkResources, unittest.TestCase):
                         self.assertEqual(controller.clicks, [])
                         self.assertEqual(controller.swipes, [])
 
+    def test_multiple_support_markers_require_two_in_formation_cards(self):
+        for server in ("cn", "jp"):
+            resource = self.resource(server)
+            folder = "cn" if server == "cn" else "base"
+            path = ROOT / "assets/resource" / folder / "image/battle/助战标记.png"
+            marker = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)
+            h, w = marker.shape[:2]
+            for count, y in ((0, 190), (1, 190), (2, 190), (3, 190), (6, 190), (2, 80)):
+                with self.subTest(server=server, count=count, y=y):
+                    image = np.zeros((720, 1280, 3), np.uint8)
+                    for x in (60, 260, 460, 675, 875, 1075)[:count]:
+                        image[y:y+h, x:x+w] = marker
+                    controller = ScreenController(image)
+                    self.assertTrue(controller.post_connection().wait().succeeded)
+                    hits = []
+
+                    class Probe(CustomAction):
+                        def run(self, ctx, argv):
+                            hits.append(bool(StoryRunner(ctx.clone()).reco("主线限制-多个助战", image)))
+                            return True
+
+                    resource.register_custom_action("multiple_support_probe", Probe())
+                    tasker = Tasker()
+                    self.assertTrue(tasker.bind(resource, controller))
+                    status = tasker.post_task("multiple_support_probe", {
+                        "multiple_support_probe": {"action": {"type": "Custom", "param": {
+                            "custom_action": "multiple_support_probe"
+                        }}}
+                    }).wait()
+                    self.assertTrue(status.succeeded)
+                    self.assertEqual(hits, [count >= 2 and y == 190])
+                    self.assertEqual(controller.clicks, [])
+                    self.assertEqual(controller.swipes, [])
+
     def test_close_fallback_recognizes_only_button_in_bottom_region(self):
         node_name = "主线-编队弹窗关闭保底"
         for server in ("cn", "jp"):

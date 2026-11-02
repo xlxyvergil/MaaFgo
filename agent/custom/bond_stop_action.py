@@ -46,7 +46,7 @@ def _digest(image) -> str:
     return hashlib.sha256(image.tobytes()).hexdigest()
 
 
-def _settings(context) -> tuple[str, int]:
+def _settings(context) -> tuple[str, int | tuple[int, ...]]:
     getter = getattr(context, "get_node_data", None)
     if getter is None:
         # 旧外部调用可只提供战斗参数；未提供此独立配置的调用默认关闭。
@@ -54,8 +54,16 @@ def _settings(context) -> tuple[str, int]:
     attach = (getter(CONFIG_NODE) or {}).get("attach") or {}
     mode = attach.get("native_bond_stop_mode", "off")
     slot = attach.get("native_bond_stop_slot", 1)
-    if mode not in {"off", "all", "slot"}:
-        raise ValueError("羁绊停止模式无效")
+    if mode not in {"off", "all", "slot", "slots"}:
+        raise ValueError("无法读取羁绊停止设置。请重新选择“羁绊满时停止”开关后重试。")
+    if mode == "slots":
+        flags = tuple(attach.get(f"native_bond_stop_slot_{i}", False) for i in range(1, 7))
+        if any(type(value) is not bool for value in flags):
+            raise ValueError("无法读取检查号位。请在“羁绊满时停止”的“检查号位”中重新勾选从者后重试。")
+        targets = tuple(i for i, selected in enumerate(flags, 1) if selected)
+        if not targets:
+            raise ValueError("尚未选择检查号位，无法判断应在哪位从者满羁绊时停止。请在“检查号位”中至少勾选一个号位，或关闭“羁绊满时停止”。")
+        return ("all", 0) if len(targets) == 6 else ("slots", targets)
     if mode == "slot" and (type(slot) is not int or not 1 <= slot <= 6):
         raise ValueError("羁绊停止目标号位无效")
     return mode, slot
@@ -73,7 +81,8 @@ def _read_maxima(context, image, mode):
 
 
 def _positive(context, token, image, mode, maxima, order, target_column):
-    selected = tuple(c for c in maxima if c == target_column) if mode == "slot" else ()
+    columns = (target_column,) if type(target_column) is int else target_column
+    selected = tuple(c for c in maxima if c in columns) if mode in {"slot", "slots"} else ()
     if not ((mode == "all" and maxima) or selected):
         return None
     positions = tuple(order[column - 1] for column in selected)
@@ -88,7 +97,12 @@ def _slot_mapping(context, target):
     formation = bond_stops.formation(_root(context))
     order = result_formation_order(formation)
     if len(order) != 5:
-        raise ValueError("指定号位的结算布局尚未校准（当前仅支持五名自有从者）")
+        raise ValueError("本场结算人数尚未适配，无法可靠判断所选号位。当前仅支持五名自有从者的号位识别；请保留截图反馈，或将“检查号位”改为全选后重试。")
+    if isinstance(target, tuple):
+        columns = tuple(i for i, slot in enumerate(order, 1) if slot in target)
+        if not columns:
+            raise ValueError("所选号位本场均为助战或空位，没有可检查的自有从者。请在“检查号位”中勾选本场自有从者所在号位后重试。")
+        return order, columns
     return order, result_slot_for_formation(formation, target)
 
 
@@ -102,12 +116,12 @@ def _inspect_upgrade(context, token, image, mode, target, *, evidence_image=None
         return False, None
     root = _root(context)
     evidence = image if evidence_image is None else evidence_image
-    if mode == "slot":
+    if mode in {"slot", "slots"}:
         _slot_mapping(context, target)
         if bond_stops.can_defer(root):
             deferred = bond_stops.defer(root, token,
                 message=(f"第{bond_stops.battle_number(root)}场羁绊升级展示遮挡，"
-                         f"{target}号位是否MAX尚未确认；按原剩余次数在下一场结算复核"),
+                         "所选号位是否MAX尚未确认；按原剩余次数在下一场结算复核"),
                 image=evidence, latest_image=image if evidence_image is not None else None)
             if deferred:
                 _save_evidence(context, deferred)
@@ -163,7 +177,7 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         original_digest = _digest(image)
         if bond_stops.checked(root, original_digest):
             return None
-        order, target_column = _slot_mapping(context, target) if mode == "slot" else ((), None)
+        order, target_column = _slot_mapping(context, target) if mode in {"slot", "slots"} else ((), None)
         maxima = _read_maxima(context, evidence_image, mode)
         stopped = _positive(context, token, evidence_image, mode, maxima, order, target_column)
         if stopped:

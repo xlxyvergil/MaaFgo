@@ -127,6 +127,57 @@ class GuardTests(unittest.TestCase):
         action.read_bond_page.assert_not_called()
         ctx.run_task.assert_not_called()
 
+    def multiselect(self, targets, *, support=4, frames=None):
+        ctx = Context(mode="slots", frames=frames)
+        ctx.nodes[action.CONFIG_NODE]["attach"].update({
+            f"native_bond_stop_slot_{i}": i in targets for i in range(1, 7)})
+        bond_stops.set_formation(ctx.root, slots(support=support))
+        return ctx
+
+    def test_multiple_selected_maxima_report_actual_formation_slots(self):
+        ctx = self.multiselect((1, 4, 6))  # Support4 is ignored; slot6 -> column5.
+        with patch.object(action, "read_bond_max", return_value=(1, 3, 5)):
+            result = action.inspect_bond_stop(ctx, frame())
+        self.assertEqual(result.formation_slots, (1, 6))
+        self.assertEqual(result.result_columns, (1, 5))
+
+    def test_unselected_max_does_not_stop_selected_members(self):
+        ctx = self.multiselect((1, 6))
+        with patch.object(action, "read_bond_max", return_value=(3,)):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame()))
+
+    def test_default_all_uses_whole_row_without_mapping_and_does_not_defer(self):
+        ctx = self.multiselect(range(1, 7))
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        self.assertEqual(action._settings(ctx), ("all", 0))
+        with patch.object(action, "read_any_bond_max", return_value=True):
+            self.assertEqual(action.inspect_bond_stop(ctx, frame()).reason, "bond_max")
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_empty_or_only_support_selection_has_actionable_error(self):
+        for targets, expected in (((), "至少勾选一个"), ((4,), "助战或空位")):
+            with self.subTest(targets=targets):
+                bond_stops.begin(8001)
+                ctx = self.multiselect(targets)
+                result = action.inspect_bond_stop(ctx, frame())
+                self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertIn(expected, result.message)
+                self.assertIn("检查号位", result.message)
+
+    def test_partial_selection_upgrade_defers_then_checks_next_battle(self):
+        ctx = self.multiselect((1, 6))
+        bond_stops.battle_started(ctx.root, 1, keep_formation=True, another_battle_planned=True)
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True), patch.object(action, "_save_evidence"):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+        self.assertIsNotNone(bond_stops.deferred(ctx.root))
+        bond_stops.battle_started(ctx.root, 2, keep_formation=True)
+        action.read_bond_page.return_value = True
+        with patch.object(action, "read_bond_max", return_value=(5,)):
+            result = action.inspect_bond_stop(ctx, frame())
+        self.assertEqual(result.battle, 2)
+        self.assertEqual(result.formation_slots, (6,))
+
     def test_all_mode_needs_no_formation_and_retains_actual_hit_frame(self):
         ctx = Context()
         with patch.object(action, "read_any_bond_max", return_value=True):

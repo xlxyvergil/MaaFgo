@@ -17,7 +17,9 @@ from maa.resource import Resource
 from maa.tasker import Tasker
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "agent/custom"))
 from test_formation_framework import MemoryController
+from bond_stop_action import _settings, CONFIG_NODE
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -36,6 +38,9 @@ class BondResultEntryTests(unittest.TestCase):
     def test_enabled_header_and_switch_off_keep_one_existing_matcher(self):
         cases = read("assets/options/原生自动战斗羁绊满停止.json")["option"]["原生自动战斗羁绊满停止"]["cases"]
         overrides = {case["name"]: case["pipeline_override"]["战斗_胜利"] for case in cases}
+        definitions = read("assets/options/原生自动战斗羁绊满停止.json")["option"]
+        choices = definitions["原生自动战斗羁绊检查号位"]["cases"]
+        master = {case["name"]: case["pipeline_override"] for case in cases}
         original = read("assets/resource/base/pipeline/自动战斗_感知.json")["战斗_胜利"]
         source = ROOT / "assets/resource/base/image"
         # Put the old next-step button below the new header ROI. Turning the
@@ -48,13 +53,26 @@ class BondResultEntryTests(unittest.TestCase):
 
         class Probe(CustomAction):
             def run(self, context, argv):
-                for mode, expected in (("all", False), ("off", True), ("slot6", False), ("off", True)):
+                for mode, expected in (("Yes", False), ("No", True), ("Yes", False), ("No", True)):
                     self_outer.assertTrue(context.override_pipeline({"战斗_胜利": overrides[mode]}))
                     node = context.get_node_data("战斗_胜利")
                     self_outer.assertEqual(node["recognition"]["type"], "TemplateMatch")
                     result = context.run_recognition("战斗_胜利", old_frame)
                     report.setdefault("switches", []).append((mode, bool(result and result.hit)))
                     self_outer.assertEqual(bool(result and result.hit), expected)
+                # Apply actual parent/checkbox overrides to one real Context.
+                # Changing all -> two -> one must clear unchecked old slots.
+                for targets, expected in (
+                    (tuple(range(1, 7)), ("all", 0)),
+                    ((1, 6), ("slots", (1, 6))),
+                    ((2,), ("slots", (2,))),
+                ):
+                    self_outer.assertTrue(context.override_pipeline(master["Yes"]))
+                    for i in targets:
+                        self_outer.assertTrue(context.override_pipeline(choices[i - 1]["pipeline_override"]))
+                    self_outer.assertEqual(_settings(context), expected)
+                self_outer.assertTrue(context.override_pipeline(master["No"]))
+                self_outer.assertEqual(_settings(context)[0], "off")
                 return True
 
         self_outer = self
@@ -65,7 +83,8 @@ class BondResultEntryTests(unittest.TestCase):
                 target = temp / "image" / relative
                 target.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(source / relative, target)
-            nodes = {"战斗_胜利": original, "probe": {"action": {
+            nodes = {CONFIG_NODE: read("assets/resource/base/pipeline/原生自动战斗.json")[CONFIG_NODE],
+                     "结算-羁绊满停止": {}, "战斗_胜利": original, "probe": {"action": {
                 "type": "Custom", "param": {"custom_action": "probe"}}}}
             (temp / "pipeline/test.json").write_text(json.dumps(nodes, ensure_ascii=False), encoding="utf-8")
             resource = Resource()
@@ -78,7 +97,7 @@ class BondResultEntryTests(unittest.TestCase):
             self.assertTrue(tasker.bind(resource, controller))
             try:
                 self.assertTrue(tasker.post_task("probe").wait().succeeded, report)
-                self.assertEqual(report["switches"], [("all", False), ("off", True), ("slot6", False), ("off", True)])
+                self.assertEqual(report["switches"], [("Yes", False), ("No", True), ("Yes", False), ("No", True)])
                 self.assertEqual(controller.inputs, 0)
             finally:
                 tasker.post_stop().wait()
