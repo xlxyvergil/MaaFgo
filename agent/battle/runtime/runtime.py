@@ -643,11 +643,20 @@ class AutoBattleRuntime:
         return False
 
     def _ensure_enemy_target(self, slot: int, *, label: str = "select_skill_enemy",
-                             required: bool = True,
                              timeout_s: float = _ENEMY_TARGET_READY_TIMEOUT_S) -> bool:
-        """等待动画收尾再选敌；技能严格确认，普攻恢复保持既有尽力选怪行为。"""
+        """等待动画收尾再尽力选敌；选不到时警告并继续，仅非法目标或停止返回失败。"""
         if not is_slot(slot, 1, 3) or self.ctx.tasker.stopping:
             return False
+
+        def skip_target(reason: str) -> bool:
+            if self.ctx.tasker.stopping:
+                return False
+            phase = "恢复攻击目标" if label == "restore_attack_enemy" else "技能选敌"
+            mfaalog.warning(
+                f"[AutoBattle] {phase}：{reason}；跳过本次选敌，沿用游戏当前目标继续执行。"
+            )
+            return True
+
         deadline = time.monotonic() + timeout_s
         while time.monotonic() < deadline:
             if self.ctx.tasker.stopping:
@@ -664,18 +673,19 @@ class AutoBattleRuntime:
                         return True
                     self._mark_action(label)
                     if not self.executor.select_enemy(slot):
-                        return not required and not self.ctx.tasker.stopping
+                        return skip_target(f"点击敌人{slot}未成功")
                     confirmed = self._wait_until_enemy_targeted(slot)
-                    return not self.ctx.tasker.stopping and (confirmed or not required)
-                if not required:
-                    # 伤害/即死技能可能已经击倒原攻击目标。普攻沿用游戏当前
-                    # 的存活目标，不因无法恢复已消失的敌人中止整场战斗。
-                    mfaalog.info(f"[AutoBattle] {label}: enemy {slot} unavailable; keep current attack target")
-                    return True
+                    if confirmed:
+                        return not self.ctx.tasker.stopping
+                    return skip_target(f"未能确认敌人{slot}已选中")
+                # 前一个伤害/即死技能可能已经击倒目标。主界面已稳定时，
+                # 不再等待该位置重新出现，也不因此跳过后续技能或攻击。
+                if enemy is None:
+                    return skip_target(f"未识别到敌人{slot}，可能已被击倒或尚未识别到")
+                return skip_target(f"敌人{slot}的识别结果可信度不足，无法确认目标")
             # 主界面模板在技能动画收尾可能仅弱命中（如0.82）；有界等强帧。
             time.sleep(0.5)
-        mfaalog.info(f"[AutoBattle] {label}: enemy {slot} readiness timed out")
-        return not required and not self.ctx.tasker.stopping
+        return skip_target(f"等待战斗主界面超时，未能选择敌人{slot}")
 
     def _execute_skills(self, action) -> bool:
         plan = getattr(self.decider, "plan", None)
@@ -818,7 +828,7 @@ class AutoBattleRuntime:
             isinstance(step, (ServantSkillAction, MasterSkillAction))
             and step.target_enemy is not None for step in sequence
         ):
-            return self._ensure_enemy_target(action.target_enemy, label="restore_attack_enemy", required=False)
+            return self._ensure_enemy_target(action.target_enemy, label="restore_attack_enemy")
         return True
 
     def _ensure_member_tracking(self):

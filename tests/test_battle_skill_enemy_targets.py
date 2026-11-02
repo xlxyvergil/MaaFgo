@@ -1,4 +1,4 @@
-"""Per-skill enemy targets keep Chaldea order and require actual confirmation."""
+"""Per-skill enemy targets keep Chaldea order and fall back when unavailable."""
 import sys
 import unittest
 from contextlib import contextmanager
@@ -203,15 +203,21 @@ class SkillEnemyTargetTests(unittest.TestCase):
         runtime.executor.select_enemy.assert_not_called()
         self.assertEqual(runtime.events, [("servant", 1, 1), ("master", 1)])
 
-    def test_missing_dead_low_confidence_or_wrong_scene_target_stops_before_cast(self):
+    def test_unavailable_target_warns_and_continues_servant_and_master_skills(self):
         scenarios = [state(enemies=()), state(enemies=(EnemyState(2, False, False, Confidence(1)),)),
                      state(enemies=(EnemyState(2, True, False, Confidence(0.1)),)),
                      state(scene=Scene.COMMAND_SELECTION), state(scene_confidence=0.1)]
         for observed in scenarios:
-            runtime = self.runtime();runtime._observe = Mock(return_value=observed)
-            with fast_clock():
-                self.assertFalse(runtime._execute_skills(action_for([ServantSkillAction(1, 1, target_enemy=2)])))
-            runtime.executor.select_enemy.assert_not_called();runtime._execute_skill_cast.assert_not_called()
+            for skill in (ServantSkillAction(1, 1, target_enemy=2), MasterSkillAction(1, target_enemy=2)):
+                with self.subTest(scene=observed.scene, enemies=observed.enemies, skill=skill):
+                    runtime = self.runtime();runtime._observe = Mock(return_value=observed)
+                    with fast_clock(), patch("battle.runtime.runtime.mfaalog.warning") as warning:
+                        self.assertTrue(runtime._execute_skills(action_for([skill])))
+                    runtime.executor.select_enemy.assert_not_called()
+                    runtime._execute_skill_cast.assert_called_once()
+                    warning.assert_called_once()
+                    self.assertIn("敌人2", warning.call_args.args[0])
+                    self.assertIn("沿用游戏当前目标继续执行", warning.call_args.args[0])
 
     def test_invalid_target_rejected_without_observe_or_cast(self):
         for target in (True, False, 0, 4, -1, "1", 1.0):
@@ -219,13 +225,17 @@ class SkillEnemyTargetTests(unittest.TestCase):
             self.assertFalse(runtime._execute_skills(action_for([MasterSkillAction(1, target_enemy=target)])))
             runtime._observe.assert_not_called();runtime._execute_skill_cast.assert_not_called()
 
-    def test_click_or_confirmation_failure_stops_without_cast(self):
+    def test_click_or_confirmation_failure_warns_and_continues_cast(self):
         for click_ok in (True, False):
-            runtime = self.runtime();runtime.executor.select_enemy = Mock(return_value=click_ok)
-            runtime._wait_until_enemy_targeted = Mock(return_value=False)
-            self.assertFalse(runtime._execute_skills(action_for([ServantSkillAction(1, 1, target_enemy=2)])))
-            runtime._execute_skill_cast.assert_not_called()
-            self.assertEqual(runtime._wait_until_enemy_targeted.call_count, 1 if click_ok else 0)
+            for skill in (ServantSkillAction(1, 1, target_enemy=2), MasterSkillAction(1, target_enemy=2)):
+                runtime = self.runtime();runtime.executor.select_enemy = Mock(return_value=click_ok)
+                runtime._wait_until_enemy_targeted = Mock(return_value=False)
+                with patch("battle.runtime.runtime.mfaalog.warning") as warning:
+                    self.assertTrue(runtime._execute_skills(action_for([skill])))
+                runtime._execute_skill_cast.assert_called_once()
+                self.assertEqual(runtime._wait_until_enemy_targeted.call_count, 1 if click_ok else 0)
+                warning.assert_called_once()
+                self.assertIn("未能确认" if click_ok else "点击", warning.call_args.args[0])
 
     def test_cancellation_before_or_during_target_observation_never_casts(self):
         runtime = self.runtime();runtime.ctx.tasker.stopping = True
@@ -238,6 +248,23 @@ class SkillEnemyTargetTests(unittest.TestCase):
         runtime._observe = Mock(side_effect=observe)
         self.assertFalse(runtime._execute_skills(action_for([MasterSkillAction(1, target_enemy=2)])))
         runtime._execute_skill_cast.assert_not_called()
+
+    def test_cancellation_during_click_or_confirmation_never_casts(self):
+        for stage in ("click", "confirmation"):
+            runtime = self.runtime()
+
+            def stop(*_args):
+                runtime.ctx.tasker.stopping = True
+                return False
+
+            if stage == "click":
+                runtime.executor.select_enemy = Mock(side_effect=stop)
+            else:
+                runtime._wait_until_enemy_targeted = Mock(side_effect=stop)
+            with patch("battle.runtime.runtime.mfaalog.warning") as warning:
+                self.assertFalse(runtime._execute_skills(action_for([ServantSkillAction(1, 1, target_enemy=2)])))
+            runtime._execute_skill_cast.assert_not_called()
+            warning.assert_not_called()
 
     def test_confirmation_requires_confident_main_battle_enemy_and_honors_timeout(self):
         runtime = self.runtime()
@@ -264,36 +291,38 @@ class SkillEnemyTargetTests(unittest.TestCase):
         self.assertEqual(runtime._observe.call_count, 3)
         self.assertEqual(runtime.events, [("servant", 1, 1)])
 
-    def test_skill_waits_for_missing_or_uncertain_enemy_then_confirms_before_cast(self):
-        runtime = self.runtime()
-        frames = iter([state(enemies=()), state(enemies=(EnemyState(2, True, False, Confidence(0.2)),))])
-        runtime._observe = Mock(side_effect=lambda **_kwargs: next(frames, state(selected=runtime.selected)))
-        with fast_clock():
-            self.assertTrue(runtime._execute_skills(action_for([MasterSkillAction(1, target_enemy=2)])))
-        self.assertEqual(runtime.events, [("enemy", 2), ("master", 1)])
-
-    def test_readiness_timeout_is_bounded_and_never_casts_skill(self):
-        runtime = self.runtime();runtime._observe = Mock(return_value=state(scene_confidence=0.82))
+    def test_missing_enemy_on_stable_main_battle_skips_selection_without_waiting(self):
+        runtime = self.runtime();runtime._observe = Mock(return_value=state(enemies=()))
         with fast_clock() as clock:
-            self.assertFalse(runtime._ensure_enemy_target(2, timeout_s=1))
+            self.assertTrue(runtime._execute_skills(action_for([MasterSkillAction(1, target_enemy=2)])))
+        self.assertEqual(clock[0], 0)
+        runtime._observe.assert_called_once()
+        self.assertEqual(runtime.events, [("master", 1)])
+
+    def test_readiness_timeout_is_bounded_and_allows_continuation(self):
+        runtime = self.runtime();runtime._observe = Mock(return_value=state(scene_confidence=0.82))
+        with fast_clock() as clock, patch("battle.runtime.runtime.mfaalog.warning") as warning:
+            self.assertTrue(runtime._ensure_enemy_target(2, timeout_s=1))
         self.assertEqual(clock[0], 1)
         self.assertEqual(runtime._observe.call_count, 2)
         runtime.executor.select_enemy.assert_not_called();runtime._execute_skill_cast.assert_not_called()
+        warning.assert_called_once()
+        self.assertIn("等待战斗主界面超时", warning.call_args.args[0])
 
     def test_best_effort_restore_timeout_or_click_failure_does_not_stop_attack(self):
         runtime = self.runtime();runtime._observe = Mock(return_value=state(scene_confidence=0.82))
         with fast_clock() as clock:
-            self.assertTrue(runtime._ensure_enemy_target(2, required=False, timeout_s=1))
+            self.assertTrue(runtime._ensure_enemy_target(2, label="restore_attack_enemy", timeout_s=1))
         self.assertEqual(clock[0], 1)
         for clicked in (False, True):
             runtime = self.runtime();runtime.executor.select_enemy = Mock(return_value=clicked)
             runtime._wait_until_enemy_targeted = Mock(return_value=False)
-            self.assertTrue(runtime._ensure_enemy_target(2, required=False))
+            self.assertTrue(runtime._ensure_enemy_target(2, label="restore_attack_enemy"))
             runtime._execute_skill_cast.assert_not_called()
 
     def test_best_effort_restore_still_honors_cancellation(self):
         runtime = self.runtime();runtime.ctx.tasker.stopping = True
-        self.assertFalse(runtime._ensure_enemy_target(2, required=False))
+        self.assertFalse(runtime._ensure_enemy_target(2, label="restore_attack_enemy"))
         runtime._observe.assert_not_called();runtime.executor.select_enemy.assert_not_called()
 
     def test_run_retains_old_initial_target_choice_then_restores_after_skills_before_attack(self):
@@ -314,6 +343,36 @@ class SkillEnemyTargetTests(unittest.TestCase):
         self.assertTrue(runtime.run().ok)
         self.assertEqual(runtime.events, [("enemy", 1), ("enemy", 2), ("servant", 1, 1),
                                           ("enemy", 3), ("master", 1), ("enemy", 1), ("attack",)])
+
+    def test_enemy_defeated_by_first_skill_does_not_stop_remaining_skills_or_attack(self):
+        runtime = self.runtime(selected=2)
+        action = action_for([
+            ServantSkillAction(1, 1), ServantSkillAction(1, 3, target_enemy=1),
+            MasterSkillAction(1),
+        ], target=2)
+        runtime.initial_formation = None
+        runtime.initial_formation_reused = False
+        runtime.candidate_servant_ids = ()
+        runtime.decider = NS(plan=BattlePlan(turns=(TurnPlan(),)), decide=lambda *_args, **_kw: action)
+        opened = [False]
+
+        def observe(**_kw):
+            enemies = tuple(EnemyState(i, True, i == 2, Confidence(1))
+                            for i in ((2,) if runtime.events else (1, 2)))
+            return state(enemies=enemies, scene=Scene.VICTORY if opened[0] else Scene.MAIN_BATTLE)
+
+        def open_cards():
+            runtime.events.append(("attack",));opened[0] = True;return True
+
+        runtime._observe = Mock(side_effect=observe)
+        runtime.executor.open_command_cards = Mock(side_effect=open_cards)
+        with patch("battle.runtime.runtime.mfaalog.warning") as warning:
+            self.assertTrue(runtime.run().ok)
+        self.assertEqual(runtime.events, [("servant", 1, 1), ("servant", 1, 3),
+                                          ("master", 1), ("attack",)])
+        runtime.executor.select_enemy.assert_not_called()
+        warning.assert_called_once()
+        self.assertIn("未识别到敌人1", warning.call_args.args[0])
 
     def test_unspecified_attack_target_restores_the_existing_decider_fallback(self):
         plan = convert_chaldea_actions_to_battle_plan([
