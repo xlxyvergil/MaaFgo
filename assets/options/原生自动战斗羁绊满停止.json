@@ -1,19 +1,25 @@
 {
   "option": {
     "原生自动战斗羁绊满停止": {
-      "type": "select",
+      "type": "switch",
       "label": "羁绊满时停止",
-      "description": "结算时发现羁绊 MAX 后截图停止。“所有从者”指任意自有从者；号位按出战编队计算，不含助战。指定号位被升级展示遮挡时，有剩余次数则在下一场复核，不额外加场。",
-      "default": "off",
+      "description": "所选号位中任意自有从者羁绊 MAX 时，截图并停止。",
+      "default_case": "No",
       "cases": [
         {
-          "name": "off",
+          "name": "No",
           "label": "关闭",
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
                 "native_bond_stop_mode": "off",
-                "native_bond_stop_slot": 0
+                "native_bond_stop_slot": 0,
+                "native_bond_stop_slot_1": false,
+                "native_bond_stop_slot_2": false,
+                "native_bond_stop_slot_3": false,
+                "native_bond_stop_slot_4": false,
+                "native_bond_stop_slot_5": false,
+                "native_bond_stop_slot_6": false
               }
             },
             "结算-羁绊满停止": {
@@ -37,13 +43,22 @@
           }
         },
         {
-          "name": "all",
-          "label": "所有从者",
+          "name": "Yes",
+          "label": "开启",
+          "option": [
+            "原生自动战斗羁绊检查号位"
+          ],
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "all",
-                "native_bond_stop_slot": 0
+                "native_bond_stop_mode": "slots",
+                "native_bond_stop_slot": 0,
+                "native_bond_stop_slot_1": false,
+                "native_bond_stop_slot_2": false,
+                "native_bond_stop_slot_3": false,
+                "native_bond_stop_slot_4": false,
+                "native_bond_stop_slot_5": false,
+                "native_bond_stop_slot_6": false
               }
             },
             "结算-羁绊满停止": {
@@ -65,33 +80,29 @@
               }
             }
           }
-        },
+        }
+      ]
+    },
+    "原生自动战斗羁绊检查号位": {
+      "type": "checkbox",
+      "label": "检查号位",
+      "description": "至少勾选一个号位，自动排除助战和空位。",
+      "default_case": [
+        "slot1",
+        "slot2",
+        "slot3",
+        "slot4",
+        "slot5",
+        "slot6"
+      ],
+      "cases": [
         {
           "name": "slot1",
           "label": "1号位从者",
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 1
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_1": true
               }
             }
           }
@@ -102,26 +113,7 @@
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 2
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_2": true
               }
             }
           }
@@ -132,26 +124,7 @@
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 3
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_3": true
               }
             }
           }
@@ -162,26 +135,7 @@
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 4
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_4": true
               }
             }
           }
@@ -192,26 +146,7 @@
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 5
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_5": true
               }
             }
           }
@@ -222,26 +157,7 @@
           "pipeline_override": {
             "原生自动战斗-羁绊停止配置": {
               "attach": {
-                "native_bond_stop_mode": "slot",
-                "native_bond_stop_slot": 6
-              }
-            },
-            "结算-羁绊满停止": {
-              "enabled": true
-            },
-            "战斗_胜利": {
-              "recognition": {
-                "type": "TemplateMatch",
-                "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
-                }
+                "native_bond_stop_slot_6": true
               }
             }
           }

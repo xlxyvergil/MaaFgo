@@ -61,10 +61,16 @@
     "on_error": []
   },
   "原生自动战斗-羁绊停止配置": {
-    "doc": "独立于高级策略与队伍方案的羁绊停止设置。slot为实际出战编队1～6号位；运行时按可信的本场编队映射到不含助战的羁绊结算栏。",
+    "doc": "羁绊停止独立配置。多选号位使用slot_1至slot_6布尔标记；全选按任意自有从者检测，部分选择按可信编队排除助战和空位后映射。旧all/slot参数保留兼容。",
     "attach": {
       "native_bond_stop_mode": "off",
-      "native_bond_stop_slot": 0
+      "native_bond_stop_slot": 0,
+      "native_bond_stop_slot_1": false,
+      "native_bond_stop_slot_2": false,
+      "native_bond_stop_slot_3": false,
+      "native_bond_stop_slot_4": false,
+      "native_bond_stop_slot_5": false,
+      "native_bond_stop_slot_6": false
     }
   },
   "原生自动战斗-高级策略配置": {

@@ -15,38 +15,35 @@ def read(relative):
 
 
 class NativeBondOptionTests(unittest.TestCase):
-    def test_independent_option_and_disabled_default(self):
+    def test_master_switch_and_default_all_multiselect(self):
         interface = read("assets/interface.json")
         self.assertIn("options/原生自动战斗羁绊满停止.json", interface["import"])
-        option = read("assets/options/原生自动战斗羁绊满停止.json")["option"][OPTION]
-        self.assertEqual(option["default"], "off")
-        self.assertEqual([x["name"] for x in option["cases"]],
-                         ["off", "all", *[f"slot{i}" for i in range(1, 7)]])
+        options = read("assets/options/原生自动战斗羁绊满停止.json")["option"]
+        option = options[OPTION]
+        self.assertEqual(option["type"], "switch")
+        self.assertEqual(option["default_case"], "No")
+        self.assertEqual([x["name"] for x in option["cases"]], ["No", "Yes"])
+        selection = options["原生自动战斗羁绊检查号位"]
+        self.assertEqual(selection["type"], "checkbox")
+        self.assertEqual(selection["default_case"], [f"slot{i}" for i in range(1, 7)])
+        self.assertEqual(option["cases"][1]["option"], ["原生自动战斗羁绊检查号位"])
+        for enabled, case in enumerate(option["cases"]):
+            overrides = case["pipeline_override"]
+            self.assertEqual(overrides[CONFIG]["attach"]["native_bond_stop_mode"], "slots" if enabled else "off")
+            self.assertEqual(overrides[GUARD]["enabled"], bool(enabled))
+            for i in range(1, 7):
+                self.assertIs(overrides[CONFIG]["attach"][f"native_bond_stop_slot_{i}"], False)
+            victory = overrides["战斗_胜利"]["recognition"]
+            self.assertEqual(victory["type"], "TemplateMatch")
+            self.assertEqual(victory["param"]["template"],
+                             "battle/bond/战后结果标题.png" if enabled else "battle/下一步.png")
+            self.assertEqual(victory["param"]["roi"], [450, 0, 400, 120] if enabled else [0, 0, 0, 0])
+        for i, case in enumerate(selection["cases"], 1):
+            self.assertEqual(case["pipeline_override"], {CONFIG: {"attach": {f"native_bond_stop_slot_{i}": True}}})
         native = read("assets/resource/base/pipeline/原生自动战斗.json")
         self.assertEqual(native[CONFIG]["attach"]["native_bond_stop_mode"], "off")
         nodes = read("assets/resource/base/pipeline/原生自动战斗调度.json")
         self.assertFalse(nodes[GUARD]["enabled"])
-        for case in option["cases"]:
-            overrides = case["pipeline_override"]
-            self.assertEqual(set(overrides), {CONFIG, GUARD, "战斗_胜利"})
-            mode = "slot" if case["name"].startswith("slot") else case["name"]
-            slot = int(case["name"][4:]) if mode == "slot" else 0
-            self.assertEqual(overrides[CONFIG]["attach"], {
-                "native_bond_stop_mode": mode, "native_bond_stop_slot": slot,
-            })
-            self.assertEqual(overrides[GUARD]["enabled"], mode != "off")
-            # Keep the existing scene recognition as one TemplateMatch; do not
-            # add another per-frame recognition, OCR, or nested And/Or branch.
-            victory = overrides["战斗_胜利"]["recognition"]
-            self.assertEqual(victory["type"], "TemplateMatch")
-            self.assertEqual(victory["param"]["template"],
-                             "battle/下一步.png" if mode == "off" else "battle/bond/战后结果标题.png")
-            self.assertEqual(victory["param"]["roi"],
-                             [0, 0, 0, 0] if mode == "off" else [450, 0, 400, 120])
-            self.assertEqual(victory["param"]["threshold"], 0.8)
-        original = read("assets/resource/base/pipeline/自动战斗_感知.json")["战斗_胜利"]["recognition"]
-        self.assertEqual(original["type"], "TemplateMatch")
-        self.assertEqual(original["param"]["template"], "battle/下一步.png")
 
     def test_all_five_native_entry_points_expose_bond_before_advanced(self):
         entries = [

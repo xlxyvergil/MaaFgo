@@ -35,7 +35,7 @@ class BondDeferredFrameworkTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def scenario(self, *, mode="slot", planned=True, bad_mapping=False, recognition_error=False):
+    def scenario(self, *, mode="slot", planned=True, bad_mapping=False, recognition_error=False, targets=()):
         source = json.loads((ROOT / "assets/resource/base/pipeline/原生自动战斗调度.json").read_text("utf-8"))
         nodes = {name: copy.deepcopy(source[name]) for name in (
             action.GUARD_NODE, "结算-羁绊停止出口", "结算-羁绊停止异常出口",
@@ -43,6 +43,7 @@ class BondDeferredFrameworkTests(unittest.TestCase):
         nodes[action.GUARD_NODE]["enabled"] = True
         nodes[action.CONFIG_NODE] = {"attach": {
             "native_bond_stop_mode": mode, "native_bond_stop_slot": 6,
+            **{f"native_bond_stop_slot_{i}": i in targets for i in range(1, 7)},
         }}
         nodes["root"] = {
             "action": {"type": "Custom", "param": {"custom_action": "setup"}},
@@ -106,7 +107,7 @@ class BondDeferredFrameworkTests(unittest.TestCase):
                     self.assertEqual(observed["root"], job.job_id)
                     stopped = bond_stops.get(job.job_id)
                     deferred = bond_stops.deferred(job.job_id)
-                    allowed = mode == "slot" and planned and not bad_mapping and not recognition_error
+                    allowed = mode in {"slot", "slots"} and planned and not bad_mapping and not recognition_error
                     self.assertEqual(bool(stopped), not allowed)
                     self.assertEqual(bool(deferred), allowed)
                     self.assertEqual(observed["seen"], ["settled", "parent_tail"] if allowed else [])
@@ -129,6 +130,12 @@ class BondDeferredFrameworkTests(unittest.TestCase):
 
     def test_selected_slot_on_last_battle_stops_without_parent_tail(self):
         self.scenario(mode="slot", planned=False)
+
+    def test_multiple_slots_with_remaining_battle_defer(self):
+        self.scenario(mode="slots", targets=(1, 6), planned=True)
+
+    def test_multiple_slots_on_last_battle_stop(self):
+        self.scenario(mode="slots", targets=(1, 6), planned=False)
 
     def test_all_mode_stays_unconfirmed_even_with_another_battle_planned(self):
         self.scenario(mode="all", planned=True)
