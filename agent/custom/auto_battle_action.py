@@ -39,7 +39,6 @@ from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.data.servant_identity import canonical_servant_id
 from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.formation_session import context_session, session_override, sessions
-from battle.runtime.bond_stop_state import bond_stops
 from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
 
@@ -134,10 +133,9 @@ class AutoBattleAction(CustomAction):
         roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
         decider = RuleDecider(battle_policy, plan=plan)
 
-        # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
-        # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
+        # Agent 控制器代理仅在当前回调内复用；重复获取会使旧代理失效，
+        # 回调结束后也不能交给后续结算回调，因此只获取一次并显式传递。
         controller = context.tasker.controller
-        bond_stops.set_controller(root, controller)
 
         plan_status = "loaded" if plan is not None else "none"
         plan_turns = len(plan.turns) if plan is not None else 0
