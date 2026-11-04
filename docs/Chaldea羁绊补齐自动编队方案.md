@@ -136,7 +136,7 @@ Chaldea 自动编队。一次完整羁绊补齐只有在最终从者、礼装与
 | --- | --- |
 | `agent/custom/bond_completion_action.py` | 新 Custom Action，负责识别、规划、选择与复核。 |
 | `agent/custom/bond_matcher.py` | 无 UI 依赖的纯函数：从者特性归一化、礼装目标匹配、羁绊评分、候选排序。 |
-| `agent/custom/bond_completion_costs.json` | 由 Atlas 离线生成的 `servant_id/equip_id -> cost` 索引；运行时绝不联网。 |
+| `agent/custom/bond_completion_costs.json` | `servant_id/equip_id -> cost` 离线索引；当前从者值已按本地游戏master与缓存日服Atlas导出核验，运行时绝不联网。 |
 | `agent/custom/bond_completion_memory.py` | 自动记忆的稳定键、编队签名、原子读写与损坏降级。 |
 | `tools/update_bond_completion_costs.py` | 增量更新上述 COST 索引的维护工具。 |
 | `assets/resource/base/pipeline/羁绊补齐自动编队.json` | 新 Action 专用 pipeline：进入/退出选择页、筛选、复位顶部、单次下滑、等待、筛选确认与最终决定。 |

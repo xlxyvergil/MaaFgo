@@ -1,0 +1,139 @@
+{
+  "minBuild": 933,
+  "appBuild": 1000,
+  "options": {
+    "mightyChain": true,
+    "disableEvent": null,
+    "pointBuffs": null,
+    "simulateAi": null,
+    "enemyRateUp": null
+  },
+  "team": {
+    "name": "匿名官方结构核验样例",
+    "mysticCode": {
+      "mysticCodeId": 20,
+      "level": 0
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 100100,
+        "limitCount": 4,
+        "skillIds": [null, null, null],
+        "skillLvs": [1, 1, 1],
+        "appendLvs": [0, 1, 0, 0, 0],
+        "tdId": 0,
+        "tdLv": 1,
+        "lv": 1,
+        "atkFou": 0,
+        "hpFou": 0,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {"id": null, "limitBreak": false, "lv": 0},
+        "supportType": "none"
+      },
+      {
+        "svtId": 505300,
+        "limitCount": 4,
+        "skillIds": [null, null, null],
+        "skillLvs": [1, 1, 1],
+        "appendLvs": [0, 1, 0, 0, 0],
+        "tdId": 0,
+        "tdLv": 1,
+        "lv": 1,
+        "atkFou": 0,
+        "hpFou": 0,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {"id": null, "limitBreak": false, "lv": 0},
+        "supportType": "friend"
+      },
+      {
+        "svtId": 402700,
+        "limitCount": 4,
+        "skillIds": [null, null, null],
+        "skillLvs": [1, 1, 1],
+        "appendLvs": [0, 1, 0, 0, 0],
+        "tdId": 0,
+        "tdLv": 1,
+        "lv": 1,
+        "atkFou": 0,
+        "hpFou": 0,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {"id": null, "limitBreak": false, "lv": 0},
+        "supportType": "none"
+      }
+    ],
+    "backupSvts": [
+      {
+        "svtId": 401300,
+        "limitCount": 4,
+        "skillIds": [null, null, null],
+        "skillLvs": [1, 1, 1],
+        "appendLvs": [0, 1, 0, 0, 0],
+        "tdId": 0,
+        "tdLv": 1,
+        "lv": 1,
+        "atkFou": 0,
+        "hpFou": 0,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {"id": null, "limitBreak": false, "lv": 0},
+        "supportType": "none"
+      },
+      null,
+      null
+    ]
+  },
+  "delegate": {
+    "replaceMemberIndexes": [[0, 0]]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "options": {"playerTarget": 0, "enemyTarget": 0, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "skill",
+      "skill": 0,
+      "options": {"playerTarget": 1, "enemyTarget": 0, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {"svt": 0, "card": 1, "isTD": false, "critical": false, "cardType": 1},
+        {"svt": 1, "card": -1, "isTD": true, "critical": false, "cardType": 2},
+        {"svt": 0, "card": 3, "isTD": false, "critical": false, "cardType": 2}
+      ],
+      "options": {"playerTarget": 0, "enemyTarget": 2, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "skill",
+      "skill": 2,
+      "options": {"playerTarget": 0, "enemyTarget": 0, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "options": {"playerTarget": 2, "enemyTarget": 0, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {"svt": 0, "card": -1, "isTD": true, "critical": false, "cardType": 2},
+        {"svt": 2, "card": 0, "isTD": false, "critical": false, "cardType": 3},
+        {"svt": 0, "card": 2, "isTD": false, "critical": false, "cardType": 1}
+      ],
+      "options": {"playerTarget": 0, "enemyTarget": 1, "random": 900, "threshold": 1000}
+    },
+    {
+      "type": "attack",
+      "attacks": [],
+      "options": {"playerTarget": 0, "enemyTarget": 0, "random": 900, "threshold": 1000}
+    }
+  ],
+  "isCritTeam": false
+}

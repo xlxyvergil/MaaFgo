@@ -80,7 +80,7 @@ class BbcToChaldeaTest(unittest.TestCase):
         share, warnings = convert_bbc_config(
             self._config("爱尔奎特_光狐_光狐.json"), self.catalog, self.equips,
         )
-        self.assertFalse(warnings)
+        self.assertTrue(any("固定回合" in warning for warning in warnings))
         self.assertEqual(share["team"]["onFieldSvts"][0]["svtId"], 2300500)
         plan = convert_chaldea_actions_to_battle_plan(
             share["actions"], share["delegate"],
@@ -109,10 +109,12 @@ class BbcToChaldeaTest(unittest.TestCase):
 
         runtime = AutoBattleRuntime.__new__(AutoBattleRuntime)
         runtime.decider = SimpleNamespace(plan=plan)
+        runtime._turn_index = 0
         runtime.battle_policy = SimpleNamespace(skill=SimpleNamespace(use_master_skills=True))
         calls = []
         runtime._execute_skill_cast = lambda label, *_args, **_kwargs: calls.append(label) or True
         runtime._wait_until = lambda *_args: True
+        runtime._wait_order_change_settled = lambda: True
         runtime._mark_action = lambda label: calls.append(label)
         runtime.executor = SimpleNamespace(order_change=lambda *_args: True)
         turn = plan.turns[0]
@@ -190,12 +192,11 @@ class BbcToChaldeaTest(unittest.TestCase):
                 self.catalog, self.equips,
             )
 
-    def test_card_strategy_is_recorded_and_skipped(self):
+    def test_card_strategy_is_not_silently_skipped_when_malformed(self):
         config = self._config("爱尔奎特_光狐_光狐.json")
         config["round1_turn0_strategy"] = [{"card1": {"cards": ["1B"]}}]
-        share, warnings = convert_bbc_config(config, self.catalog, self.equips)
-        self.assertEqual(len(warnings), 1)
-        self.assertTrue(share["actions"])
+        with self.assertRaisesRegex(BbcImportError, "选卡类型"):
+            convert_bbc_config(config, self.catalog, self.equips)
 
     def test_servant_only_support_does_not_require_default_equip(self):
         config = self._config("爱尔奎特_光狐_光狐.json")
@@ -224,7 +225,7 @@ class BbcToChaldeaTest(unittest.TestCase):
             data_dir.mkdir(parents=True)
             shutil.copy2(ROOT / "agent" / "utils" / "Chaldea" / "equip_names_CN.json", data_dir)
             path, warnings = import_bbc_file("爱尔奎特_光狐_光狐.json", root=root)
-            self.assertFalse(warnings)
+            self.assertTrue(any("固定回合" in warning for warning in warnings))
             self.assertEqual(path.parent, root / "config" / "Battle")
             self.assertIsInstance(json.loads(path.read_text(encoding="utf-8"))["team"], dict)
             with patch.object(chaldea, "CACHE_DIR", str(path.parent)):

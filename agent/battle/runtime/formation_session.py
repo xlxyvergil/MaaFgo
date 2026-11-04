@@ -11,12 +11,17 @@ from datetime import datetime, timezone
 from threading import RLock
 from uuid import uuid4
 
-from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT
+from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT, VERIFIED_FORMATION_SOURCE
+from .bond_stop_state import bond_stops
 
 
 SESSION_NODE = "编队身份-会话"
 GATE_NODE = "进本-点击队伍确认"
 CAPTURE_NODE = "编队身份-采集"
+TEAPOT_NODE = "原生战斗-校验茶壶"
+FALLBACK_GATE_NODE = "进本-助战兜底跳过编队"
+FALLBACK_TEAPOT_NODE = "原生战斗-兜底校验茶壶"
+START_NODE = "进本-实际点击队伍确认"
 
 
 @dataclass
@@ -29,6 +34,8 @@ class _Session:
     collecting: bool = False
     frames: list[tuple[FormationSlot, ...]] = field(default_factory=list)
     error: str = ""
+    support_fallback: bool = False
+    capture_seed: tuple[FormationSlot, ...] = ()
 
 
 class FormationSessions:
@@ -48,6 +55,7 @@ class FormationSessions:
         with self._lock:
             token = uuid4().hex
             self._sessions[task_id] = _Session(token, repeat)
+            bond_stops.clear_formation(task_id)
             return token
 
     def _get(self, task_id: int, token: str) -> _Session:
@@ -73,6 +81,8 @@ class FormationSessions:
                 raise ValueError("single battle session cannot be reused")
             if session.collecting:
                 self._invalidate(session, "unfinished_capture")
+            elif battle != session.battle and session.error == "formation_update_pending":
+                self._invalidate(session, "unfinished_formation_update")
             session.battle = battle
 
     @staticmethod
@@ -81,25 +91,93 @@ class FormationSessions:
         session.snapshot = None
         session.collecting = False
         session.frames.clear()
+        session.capture_seed = ()
         session.error = reason
 
     def invalidate(self, task_id: int, token: str, reason: str) -> None:
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, reason)
+            bond_stops.clear_formation(task_id)
 
     def skip_capture(self, task_id: int, token: str) -> None:
         """丢弃本次采集并允许战斗在无初始快照时继续。"""
         with self._lock:
             session = self._get(task_id, token)
             self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
 
-    def begin_capture(self, task_id: int, token: str) -> int:
+    def set_support_fallback(self, task_id: int, token: str, active: bool) -> None:
+        """兜底状态随当前助战保留；重新选到目标助战或结束会话后恢复。"""
         with self._lock:
             session = self._get(task_id, token)
+            # 调用方只在实际选中助战/兜底成功后通知。即使类型没变，
+            # 重新选到的助战和锁定编队也不应沿用旧身份。
             self._invalidate(session, "")
+            session.support_fallback = active
+            bond_stops.clear_formation(task_id)
+
+    def support_fallback(self, task_id: int, token: str) -> bool:
+        with self._lock:
+            return self._get(task_id, token).support_fallback
+
+    def begin_update(self, task_id: int, token: str) -> int:
+        """编队修改前撤销旧结果，返回只允许本次成功结果发布的代次。"""
+        with self._lock:
+            session = self._get(task_id, token)
+            self._invalidate(session, "formation_update_pending")
+            bond_stops.clear_formation(task_id)
+            return session.revision
+
+    def abandon_update(self, task_id: int, token: str, revision: int) -> None:
+        with self._lock:
+            session = self._get(task_id, token)
+            if session.revision == revision and session.error == "formation_update_pending":
+                self._invalidate(session, "")
+
+    def publish_verified(self, task_id: int, token: str, revision: int,
+                         slots: tuple[FormationSlot, ...]) -> InitialFormation:
+        with self._lock:
+            session = self._get(task_id, token)
+            if (session.revision != revision or session.error != "formation_update_pending"
+                    or session.collecting or session.support_fallback):
+                raise ValueError("expired or invalid formation update")
+            snapshot = InitialFormation(
+                slots=tuple(slots), task_id=task_id, session_id=token, revision=revision,
+                captured_at=datetime.now(timezone.utc).isoformat(), captured_battle=session.battle,
+                source=VERIFIED_FORMATION_SOURCE, calibration_id="chaldea-final-check-v1",
+            )
+            session.snapshot = snapshot
+            session.error = ""
+            bond_stops.set_formation(task_id, snapshot.slots)
+            return snapshot
+
+    def verified_snapshot(self, task_id: int, token: str) -> InitialFormation | None:
+        with self._lock:
+            session = self._get(task_id, token)
+            snapshot = session.snapshot
+            if (session.error or session.collecting or session.support_fallback or snapshot is None
+                    or snapshot.source != VERIFIED_FORMATION_SOURCE
+                    or snapshot.captured_battle != session.battle):
+                return None
+            return snapshot
+
+    def begin_capture(self, task_id: int, token: str, *, reuse_verified=False) -> int:
+        with self._lock:
+            session = self._get(task_id, token)
+            previous = self.verified_snapshot(task_id, token) if reuse_verified else None
+            self._invalidate(session, "")
+            bond_stops.clear_formation(task_id)
+            session.capture_seed = previous.slots if previous is not None else ()
             session.collecting = True
             return session.revision
+
+    def capture_seed(self, task_id: int, token: str, revision: int) -> tuple[FormationSlot, ...]:
+        with self._lock:
+            session = self._get(task_id, token)
+            if not session.collecting or session.revision != revision:
+                raise ValueError("expired formation capture")
+            return session.capture_seed
 
     def append_frame(self, task_id: int, token: str, revision: int,
                      slots: tuple[FormationSlot, ...], error: str = "") -> None:
@@ -128,14 +206,21 @@ class FormationSessions:
                 raise ValueError("invalid formation capture cannot be published")
             if len(session.frames) != REQUIRED_FRAME_COUNT:
                 raise ValueError("independently sampled frames required")
+            if session.capture_seed:
+                # 已复核槽位不是新截图证据，不伪造独立采样帧数或视觉分数。
+                slots = tuple(known if known.status != "unknown" else sampled
+                              for known, sampled in zip(session.capture_seed, slots))
             snapshot = InitialFormation(
                 slots=slots, task_id=task_id, session_id=token, revision=revision,
                 captured_at=datetime.now(timezone.utc).isoformat(),
                 captured_battle=session.battle, calibration_id=calibration_id,
+                source=VERIFIED_FORMATION_SOURCE if session.capture_seed else "formation_confirmation",
             )
             session.snapshot = snapshot
             session.collecting = False
             session.frames.clear()
+            session.capture_seed = ()
+            bond_stops.set_formation(task_id, snapshot.slots)
             return snapshot
 
     def read(self, task_id: int, token: str) -> tuple[InitialFormation | None, int]:
@@ -178,5 +263,10 @@ def session_override(token: str) -> dict:
     # 只传递令牌，不将可变快照放入会被复制/字典合并的 pipeline attach。
     return {
         SESSION_NODE: {"attach": {"session_id": token}},
-        GATE_NODE: {"next": [CAPTURE_NODE]},
+        # 仅原生会话在编队汇合后检查茶壶；BBC 和独立 Chaldea 编队保留原路径。
+        # 助战兜底不采集身份，但茶壶仍须按用户设置核对后才允许实际开始。
+        GATE_NODE: {"next": [TEAPOT_NODE]},
+        TEAPOT_NODE: {"next": [CAPTURE_NODE]},
+        FALLBACK_GATE_NODE: {"next": [FALLBACK_TEAPOT_NODE]},
+        FALLBACK_TEAPOT_NODE: {"next": [START_NODE]},
     }

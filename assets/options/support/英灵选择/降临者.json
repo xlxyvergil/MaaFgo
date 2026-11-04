@@ -6,56 +6,8 @@
             "default": "2501200",
             "cases": [
                 {
-                    "name": "2501200",
-                    "label": "诺克娜蕾·雅兰杜",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2501200"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25012000.png",
-                    "option": [
-                        "助战信息-2501200",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500800",
-                    "label": "谜之偶像X〔Alter〕",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500800"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25008000.png",
-                    "option": [
-                        "助战信息-2500800",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500300",
-                    "label": "谜之女主角XX",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500300"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25003000.png",
-                    "option": [
-                        "助战信息-2500300",
-                        "宝具等级"
-                    ]
-                },
-                {
                     "name": "2501600",
-                    "label": "谜之女主角XX〔Alter〕",
+                    "label": "423. 谜之女主角XX〔Alter〕",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -70,104 +22,8 @@
                     ]
                 },
                 {
-                    "name": "2501100",
-                    "label": "库库尔坎",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2501100"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25011000.png",
-                    "option": [
-                        "助战信息-2501100",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500500",
-                    "label": "旅行者",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500500"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25005000.png",
-                    "option": [
-                        "助战信息-2500500",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2501300",
-                    "label": "旺吉娜",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2501300"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25013000.png",
-                    "option": [
-                        "助战信息-2501300",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500900",
-                    "label": "暗之高扬斯卡娅",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500900"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25009000.png",
-                    "option": [
-                        "助战信息-2500900",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500600",
-                    "label": "梵高",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500600"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25006000.png",
-                    "option": [
-                        "助战信息-2500600",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500400",
-                    "label": "琰女",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500400"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25004000.png",
-                    "option": [
-                        "助战信息-2500400",
-                        "宝具等级"
-                    ]
-                },
-                {
                     "name": "2501400",
-                    "label": "苍崎青子",
+                    "label": "413. 苍崎青子",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -182,8 +38,184 @@
                     ]
                 },
                 {
+                    "name": "2501300",
+                    "label": "393. 旺吉娜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501300"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25013000.png",
+                    "option": [
+                        "助战信息-2501300",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2501200",
+                    "label": "389. 诺克娜蕾·雅兰杜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501200"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25012000.png",
+                    "option": [
+                        "助战信息-2501200",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2501100",
+                    "label": "373. 库库尔坎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501100"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25011000.png",
+                    "option": [
+                        "助战信息-2501100",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500900",
+                    "label": "334. 暗之高扬斯卡娅",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500900"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25009000.png",
+                    "option": [
+                        "助战信息-2500900",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2501000",
+                    "label": "324. 雅克·德·莫莱",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2501000"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25010000.png",
+                    "option": [
+                        "助战信息-2501000",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500800",
+                    "label": "308. 谜之偶像X〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500800"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25008000.png",
+                    "option": [
+                        "助战信息-2500800",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500600",
+                    "label": "295. 梵高",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500600"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25006000.png",
+                    "option": [
+                        "助战信息-2500600",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500700",
+                    "label": "289. 阿比盖尔·威廉姆斯〔夏〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500700"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25007000.png",
+                    "option": [
+                        "助战信息-2500700",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500500",
+                    "label": "281. 旅行者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500500"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25005000.png",
+                    "option": [
+                        "助战信息-2500500",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500400",
+                    "label": "275. 琰女",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500400"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25004000.png",
+                    "option": [
+                        "助战信息-2500400",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2500300",
+                    "label": "222. 谜之女主角XX",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2500300"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_25003000.png",
+                    "option": [
+                        "助战信息-2500300",
+                        "宝具等级"
+                    ]
+                },
+                {
                     "name": "2500200",
-                    "label": "葛饰北斋",
+                    "label": "198. 葛饰北斋",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -199,7 +231,7 @@
                 },
                 {
                     "name": "2500100",
-                    "label": "阿比盖尔·威廉姆斯",
+                    "label": "195. 阿比盖尔·威廉姆斯",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -210,38 +242,6 @@
                     "icon": "resource/base/image/servant_face/f_25001000.png",
                     "option": [
                         "助战信息-2500100",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2500700",
-                    "label": "阿比盖尔·威廉姆斯〔夏〕",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2500700"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25007000.png",
-                    "option": [
-                        "助战信息-2500700",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2501000",
-                    "label": "雅克·德·莫莱",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2501000"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_25010000.png",
-                    "option": [
-                        "助战信息-2501000",
                         "宝具等级"
                     ]
                 }

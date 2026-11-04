@@ -8,6 +8,7 @@ import json
 import os
 import re
 import logging
+from pathlib import Path
 from typing import Optional
 
 import mfaalog
@@ -24,6 +25,12 @@ logger = logging.getLogger(__name__)
 
 # 本地队伍缓存目录（相对 agent 运行的工作目录，即资源包根的 config/Battle）
 CACHE_DIR = os.path.join("config", "Battle")
+
+# 仅为正式交付的试炼示例提供离线回退，不扩大其他文件名的搜索范围。
+_BUNDLED_BATTLE_PRESETS = frozenset({
+    "地狱的试炼_202610_阿兹赖尔.json",
+    "地狱的试炼_202610_补贯通.json",
+})
 
 
 def _build_cache_name(share_data: dict, quest_id, team_id) -> str:
@@ -134,12 +141,22 @@ def _save_cache(name: str, data: dict) -> None:
         logger.warning(f"[Chaldea] 保存缓存失败({name}): {e}")
 
 
+def _is_battle_document(data: object) -> bool:
+    """Recognize explicit battle trees, including actions/strategy-only files."""
+    return isinstance(data, dict) and (
+        isinstance(data.get("team"), dict)
+        or isinstance(data.get("actions"), list)
+        or isinstance(data.get("maaAdvancedStrategy"), dict)
+    )
+
+
 def _load_local_file(source: str) -> Optional[dict]:
     """尝试把输入当作本地文件路径/文件名加载 BattleShareData。
 
     支持:
     - 绝对/相对路径: G:/xxx/team.json / ./team.json
-    - 纯文件名: 自动在 CACHE_DIR (config/Battle) 中查找
+    - 纯文件名: 优先在 CACHE_DIR (config/Battle) 中查找；本期内置示例
+      在本地同名文件不存在时再查 resource/base/battle_presets
     - .json 后缀可省略
     返回加载成功的 dict, 不是文件输入返回 None。
     """
@@ -165,11 +182,28 @@ def _load_local_file(source: str) -> Optional[dict]:
         for name in names:
             candidates.append(os.path.join(CACHE_DIR, name))
 
+    local_exists = False
     for path in candidates:
         if os.path.isfile(path):
+            local_exists = True
             data = _load_cache_file(path)
-            if data and isinstance(data.get("team"), dict):
+            if _is_battle_document(data):
                 return data
+
+    # 用户的同名文件即使损坏也不能被示例静默替代；显式路径不做回退。
+    if is_explicit_path or local_exists:
+        return None
+    project_root = Path(__file__).resolve().parents[2]
+    for resource_root in (project_root / "assets/resource/base", project_root / "resource/base"):
+        for name in names:
+            if name not in _BUNDLED_BATTLE_PRESETS:
+                continue
+            preset = resource_root / "battle_presets" / name
+            if preset.is_file():
+                data = _load_cache_file(str(preset))
+                if _is_battle_document(data):
+                    mfaalog.info(f"[Chaldea] 使用内置试炼示例（可另存为本地方案）: {preset}")
+                    return data
     return None
 
 

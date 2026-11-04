@@ -1,0 +1,8 @@
+{
+  "打开编队与战斗编辑器": {
+    "recognition": "DirectHit",
+    "action": {"type": "Custom", "param": {"custom_action": "open_battle_editor"}},
+    "attach": {"editor_operation": "open"},
+    "on_error": []
+  }
+}

@@ -3,11 +3,23 @@
         "英灵选择": {
             "type": "select",
             "label": "英灵选择",
+            "description": "选择“0-不要求英灵”后，在 ALL 职介中仅按礼装要求查找，忽略英灵、技能、宝具和等级要求。",
             "default": "剑士",
             "cases": [
                 {
+                    "name": "不要求英灵",
+                    "label": "0-不要求英灵",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "class_name": "any"
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "他人格",
-                    "label": "他人格",
+                    "label": "他(alterEgo)",
                     "option": [
                         "他人格"
                     ],
@@ -21,7 +33,7 @@
                 },
                 {
                     "name": "伪装者",
-                    "label": "伪装者",
+                    "label": "伪(pretender)",
                     "option": [
                         "伪装者"
                     ],
@@ -35,7 +47,7 @@
                 },
                 {
                     "name": "兽",
-                    "label": "兽",
+                    "label": "兽(beast)",
                     "option": [
                         "兽"
                     ],
@@ -49,7 +61,7 @@
                 },
                 {
                     "name": "剑士",
-                    "label": "剑士",
+                    "label": "剑(saber)",
                     "option": [
                         "剑士"
                     ],
@@ -63,7 +75,7 @@
                 },
                 {
                     "name": "复仇者",
-                    "label": "复仇者",
+                    "label": "仇(avenger)",
                     "option": [
                         "复仇者"
                     ],
@@ -77,7 +89,7 @@
                 },
                 {
                     "name": "弓兵",
-                    "label": "弓兵",
+                    "label": "弓(archer)",
                     "option": [
                         "弓兵"
                     ],
@@ -91,7 +103,7 @@
                 },
                 {
                     "name": "暗杀者",
-                    "label": "暗杀者",
+                    "label": "杀(assassin)",
                     "option": [
                         "暗杀者"
                     ],
@@ -105,7 +117,7 @@
                 },
                 {
                     "name": "月之癌",
-                    "label": "月之癌",
+                    "label": "月(moonCancer)",
                     "option": [
                         "月之癌"
                     ],
@@ -119,7 +131,7 @@
                 },
                 {
                     "name": "枪兵",
-                    "label": "枪兵",
+                    "label": "枪(lancer)",
                     "option": [
                         "枪兵"
                     ],
@@ -133,7 +145,7 @@
                 },
                 {
                     "name": "狂战士",
-                    "label": "狂战士",
+                    "label": "狂(berserker)",
                     "option": [
                         "狂战士"
                     ],
@@ -147,7 +159,7 @@
                 },
                 {
                     "name": "盾兵",
-                    "label": "盾兵",
+                    "label": "盾(shielder)",
                     "option": [
                         "盾兵"
                     ],
@@ -161,7 +173,7 @@
                 },
                 {
                     "name": "裁定者",
-                    "label": "裁定者",
+                    "label": "尺(ruler)",
                     "option": [
                         "裁定者"
                     ],
@@ -175,7 +187,7 @@
                 },
                 {
                     "name": "降临者",
-                    "label": "降临者",
+                    "label": "降(foreigner)",
                     "option": [
                         "降临者"
                     ],
@@ -189,7 +201,7 @@
                 },
                 {
                     "name": "骑兵",
-                    "label": "骑兵",
+                    "label": "骑(rider)",
                     "option": [
                         "骑兵"
                     ],
@@ -203,7 +215,7 @@
                 },
                 {
                     "name": "魔术师",
-                    "label": "魔术师",
+                    "label": "术(caster)",
                     "option": [
                         "魔术师"
                     ],

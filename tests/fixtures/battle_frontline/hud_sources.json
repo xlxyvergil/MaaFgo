@@ -1,0 +1,26 @@
+[
+  {
+    "file": "jp_support_hud_20261031.png",
+    "source": "stopped_turn2.png",
+    "roi": [
+      0,
+      385,
+      954,
+      160
+    ],
+    "sha256": "876e2020583365c209ebcf27efb4e751663873350682ada23fb111e2fbfc03ef",
+    "source_sha256": "b328c99bd894db3fd8ce4f53b179f7f972a82a8399fda69396e830879ca631f4"
+  },
+  {
+    "file": "jp_np_animation_no_hud_20261031.png",
+    "source": "resume_t5_progress.png",
+    "roi": [
+      0,
+      385,
+      954,
+      160
+    ],
+    "sha256": "bfa4abcd5e6104039e365c8c1f728566382b85f7334c3067f210c5e11a32fc57",
+    "source_sha256": "31b72a5850036300bc7a6373c1af39ea5128c158bf3a86074e3af783bd133e7b"
+  }
+]

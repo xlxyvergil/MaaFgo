@@ -107,6 +107,32 @@
                         "file"
                     ],
                     "description": "MaaFGO MXU 文件选择输入"
+                },
+                "file_dialog_dir": {
+                    "type": "string",
+                    "minLength": 1,
+                    "description": "MXU 文件选择器起始目录，相对于 interface.json 所在目录；目录不存在时回退到软件根目录"
+                },
+                "file_dialog_filters": {
+                    "type": "array",
+                    "minItems": 1,
+                    "description": "MXU 文件选择器类型筛选，首项为默认筛选；扩展名不带前导点，星号表示所有文件",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {"type": "string", "minLength": 1},
+                            "extensions": {
+                                "type": "array",
+                                "minItems": 1,
+                                "items": {
+                                    "type": "string",
+                                    "pattern": "^(\\*|[A-Za-z0-9][A-Za-z0-9_-]*)$"
+                                }
+                            }
+                        },
+                        "required": ["name", "extensions"],
+                        "additionalProperties": false
+                    }
                 }
             },
             "required": [

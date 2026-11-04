@@ -1,0 +1,28 @@
+[
+  {
+    "file": "jp_hellish_glare_20261031.png",
+    "source": "battle1_turn2.png",
+    "source_sha256": "891c96008b5ac681cd8eff9bdd3ad4bba2416b9ef51cb7e7c9c85e735579155b",
+    "roi": [
+      265,
+      70,
+      751,
+      300
+    ],
+    "description": "MaaMCP 1280x720 JP upper NP strip; glare has NP2/NP3; clear has NP1/NP2/NP3",
+    "sha256": "fe2450d0fb8fe43f469281dd88907f7194374ce5eb053c0a04ec2247c3c6d8cd"
+  },
+  {
+    "file": "jp_hellish_clear_20261031.png",
+    "source": "turn3_cards_phase3.png",
+    "source_sha256": "5774b69e4600ffe71cfc08c6454de92f4cef6d2891eff1f22d428a29289375d6",
+    "roi": [
+      265,
+      70,
+      751,
+      300
+    ],
+    "description": "MaaMCP 1280x720 JP upper NP strip; glare has NP2/NP3; clear has NP1/NP2/NP3",
+    "sha256": "9b5fbb6b2c44f628441a375fd336317be6a355db804e50a423768460d4d7428a"
+  }
+]

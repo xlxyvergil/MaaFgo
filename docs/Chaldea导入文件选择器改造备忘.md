@@ -1,28 +1,36 @@
-# Chaldea 队伍导入：文件选择器改造备忘
+# Chaldea 队伍导入：文件选择器配置
 
-状态：暂缓实施。当前打包版及任务选项保持原样，不应只修改任务 JSON 就宣称功能已生效。
+状态：MXU v2.5.5 起已支持，MaaFGO 的两个导入入口均已配置。发行包需要同时包含新版 MXU 可执行文件与这两份选项 JSON；只更新其中一侧不会启用完整功能。
 
-## 期望行为
+## 使用行为
 
-战斗任务中的「Chaldea 队伍导入」点击文件按钮时，默认打开软件目录下的 `config/Battle`，文件类型默认筛选 `.json`。用户仍可在同一输入框手动填写 Chaldea 分享链接、队伍 ID、关卡 ID 或本地文件路径；已保存的输入值和导入逻辑不变。`config/Battle` 尚不存在时，文件对话框退回到软件目录。
+「Chaldea 队伍导入」点击文件按钮时，默认打开本安装目录的 `config/Battle`，优先显示 `.json`，也可切换到「所有文件」。目录不存在、不是目录或不可访问时，回退到软件目录，不自动创建目录。选择文件后仍把绝对路径写回原输入框。
 
-## 当前限制
+输入框仍可手动填写 Chaldea 分享链接、队伍 ID、关卡 ID、本地文件路径或已缓存的队伍文件名。已有输入值、默认值、校验正则和导入脚本不变。对话框位置来自项目配置，不把输入框中的链接、ID 或旧安装路径当作默认目录。WebUI 保持文本输入，不在浏览器中弹出宿主电脑的原生文件对话框。
 
-任务选项的 `input_type: "file"` 只能让 MXU 显示文件按钮，不能配置对话框的起始目录或文件类型。MXU 的 `src/components/FormControls.tsx` 中，`FileInput` 调用 `open({ multiple: false, filters })`，默认筛选为可执行文件和所有文件。`src/components/OptionEditor.tsx` 没有向它传递任务级目录或筛选配置。任务 JSON 的 `default` 是输入值，不能用它设置文件对话框位置。
+## 配置契约
 
-## 实施步骤
+MXU `InputItem` 增加两个可选字段，位于 `input_type: "file"` 同级：
 
-1. 在 MXU 源码 `src/types/interface.ts` 的 `InputItem` 中增加可选字段：`file_dialog_dir?: string`（相对于 `interface.json` 所在目录）和 `file_dialog_filters?: { name: string; extensions: string[] }[]`。
-2. 在 `src/components/OptionEditor.tsx` 的 `input_type === 'file'` 分支，把这两个字段以及已有的项目根路径 `basePath` 传给 `FileInput`。
-3. 在 `src/components/FormControls.tsx` 的 `FileInput` 中，仅当设置了相对目录时，用 Tauri 路径 API 将其与 `basePath` 拼成绝对路径，再作为 `open()` 的 `defaultPath`；目录不存在时回退到 `basePath`。优先使用选项指定的 `filters`，未指定时保留现有通用筛选。选中后的绝对路径仍写回输入框，以兼容现有导入脚本。
-4. MXU 客户端支持这些字段后，在 MaaFGO 的 `assets/options/Chaldea导入手动输入.json` 和 `assets/options/chaldea_team_config.json` 的 `chaldea_import_source` 输入项中加入：
+```json
+"file_dialog_dir": "config/Battle",
+"file_dialog_filters": [
+  {"name": "JSON", "extensions": ["json"]},
+  {"name": "所有文件", "extensions": ["*"]}
+]
+```
 
-   ```json
-   "file_dialog_dir": "config/Battle",
-   "file_dialog_filters": [{"name": "JSON", "extensions": ["json"]}]
-   ```
+`file_dialog_dir` 相对于 `interface.json`／MXU 软件根目录解析，与进程当前工作目录无关。中文、空格目录通过 Tauri 路径 API 组合；绝对路径、盘符、UNC 或父目录跳转不作为有效的项目相对目录使用。
 
-5. 同步更新 MaaFGO 的 `deps/tools/interface.schema.json` 中 `inputItem` 的字段定义，否则资源校验会将新增字段判为未知属性。
-6. 验证 MXU 前端构建、MaaFGO 选项 Schema、首次运行（目录不存在）、已有缓存文件、手动输入链接/ID，以及两个 Chaldea 导入入口。重新编译 MXU 后才能让打包版按钮生效；同步打包版前遵循项目的差异比较、备份和哈希校验约定，不覆盖 `interface.json` 的版本号。
+`file_dialog_filters` 的首项是默认类型，扩展名不带前导点，`*` 表示所有文件。未设置这些字段的其他文件输入维持原行为，包括通用启动程序选择器的可执行文件筛选。两个 Chaldea 入口分别是：
 
-只改 MaaFGO 的选项文件不会改变当前打包版的按钮行为，因此本备忘未提前加入上述配置字段。
+- `assets/options/Chaldea导入手动输入.json` → `Chaldea导入手动输入.inputs`
+- `assets/options/chaldea_team_config.json` → `chaldea_team_config.inputs`
+
+客户端的 `OptionEditor` 把配置和项目 `basePath` 传给 `FileInput`；后者解析可用的默认目录，再把 `defaultPath` 与筛选传给 Tauri `open()`。MaaFGO 的 `deps/tools/interface.schema.json` 已接受新字段，并校验筛选结构。安卓转换将文件输入降为文本时，同时删除目录和筛选字段，不把电脑路径配置带进 APK。
+
+## 发布与验收边界
+
+客户端工程为 `xlxyvergil/MXU-scan_select-`，功能已通过 PR #3 合入并发布于 v2.5.5。MaaFGO 的 `.github/workflows/install.yml` 从该仓库最新正式 Release 下载客户端，无需更换下载来源。发布 MaaFGO 前还须确认本文件列出的两份选项配置已进入所打的 tag。
+
+专项回归覆盖两个源入口、Schema 对有效与错误字段的判断、安卓剔除及原有链接／ID／路径输入兼容。修改选项后需运行 `python tools/run_tests.py --suite static`，客户端还需通过前端构建与目录回退测试。真正的系统文件对话框需要在新版 MXU 可执行文件上确认起始目录和默认筛选，不能用浏览器模拟的参数检查代替整包实点验收。

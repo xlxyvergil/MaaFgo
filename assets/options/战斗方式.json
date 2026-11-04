@@ -3,8 +3,8 @@
         "battle_mode": {
             "type": "select",
             "label": "战斗方式",
-            "description": "选择 BBC 或原生自动战斗；使用 BBC 前需启动 BBC。",
-            "default": "bbc",
+            "description": "选择原生自动战斗或 BBC；使用 BBC 前需启动 BBC。",
+            "default": "native",
             "cases": [
                 {
                     "name": "bbc",
@@ -32,12 +32,15 @@
                 },
                 {
                     "name": "native",
-                    "label": "原生自动战斗",
+                    "label": "原生自动战斗（推荐）",
                     "option": [
                         "原生自动战斗次数",
                         "原生自动战斗跳过剧情",
+                        "原生自动战斗是否使用茶壶",
                         "原生自动战斗使用Chaldea队伍",
-                        "原生自动战斗助战方式"
+                        "原生自动战斗助战方式",
+                        "原生自动战斗羁绊满停止",
+                        "原生自动战斗高级策略"
                     ],
                     "pipeline_override": {
                         "通用战斗调度": {

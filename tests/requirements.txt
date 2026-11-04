@@ -2,5 +2,7 @@ maafw==5.10.4
 opencv-python-headless
 numpy
 Pillow
+imagequant==1.1.5
 jsonschema==4.26.0
 referencing==0.37.0
+psutil>=5.9

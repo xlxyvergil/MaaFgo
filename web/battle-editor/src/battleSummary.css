@@ -1,0 +1,27 @@
+.summary-turn-content{min-width:0;flex:1}
+.summary-actions{display:flex;flex-direction:column;gap:8px}
+.summary-action{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;min-height:34px;font-size:14px;line-height:1.5;color:var(--text)}
+.summary-person,.summary-skill,.summary-recipient,.summary-swap-pair,.summary-enemy,.summary-action-label{display:inline-flex;align-items:center;gap:6px;min-width:0;max-width:100%}
+.summary-person-name{display:inline-flex;align-items:baseline;flex-wrap:wrap;gap:3px 5px;min-width:0}
+.summary-person-name>small{font-size:10px;color:var(--muted);white-space:nowrap}
+.summary-person-name>span,.summary-skill>span:last-child{min-width:0;overflow-wrap:anywhere}
+.summary-portrait{display:inline-flex;align-items:center;justify-content:center;width:28px;height:32px;flex:0 0 28px;border:1px solid var(--line-bright);border-radius:3px;overflow:hidden;background:var(--surface-2);color:var(--muted);font-size:12px}
+.summary-portrait>img{width:100%;height:100%;object-fit:contain}
+.summary-skill>.skill-icon{width:26px;height:26px;flex:0 0 26px}
+.summary-arrow{flex-shrink:0;color:var(--purple)}
+.summary-muted{font-size:12px;color:var(--muted)}
+.summary-unresolved{color:var(--muted)}
+.summary-enemy{font-size:12px;color:var(--muted);padding:3px 6px;border:1px solid var(--line);border-radius:3px}
+.summary-enemy>svg,.summary-action-label>svg{flex-shrink:0;color:var(--purple)}
+.summary-swap-pair{flex-wrap:wrap}
+.summary-attack{padding-top:4px}
+.summary-action-label{color:var(--muted);font-size:12px}
+.summary-attack-cards{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;max-width:100%}
+.summary-card-step{display:inline-flex;align-items:center;gap:8px;min-width:0;max-width:100%}
+.summary-card-item{display:inline-flex;align-items:center;flex-wrap:wrap;gap:6px;min-width:0;max-width:100%;padding:4px 7px;border:1px solid var(--line);border-radius:4px;background:var(--surface-2)}
+.visual-battle-summary .summary-card-artwork.card-artwork{display:inline-flex;width:34px;height:42px;min-height:0;flex:0 0 34px;aspect-ratio:auto}
+.summary-card-artwork.card-artwork>img{width:100%;height:100%;object-fit:contain}
+.summary-card-artwork .card-artwork-message{min-height:0;height:100%;width:100%;padding:2px;gap:0}
+.summary-card-artwork .card-artwork-message>strong,.summary-card-artwork .card-artwork-message>small{display:none}
+.summary-card-label{font-size:13px;overflow-wrap:anywhere}
+@media(max-width:600px){.summary-action{font-size:13px;gap:5px 6px}.summary-portrait{width:25px;height:29px;flex-basis:25px}.summary-skill>.skill-icon{width:24px;height:24px;flex-basis:24px}.summary-card-item{padding:3px 5px}}

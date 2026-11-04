@@ -7,6 +7,8 @@
 """
 from __future__ import annotations
 
+from .special_skills import SpecialSkillChoices
+
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
 
@@ -32,6 +34,7 @@ class Confidence:
 # 单帧采集：确认页为静态界面，单帧全库匹配即可给出结论。
 # formation_action.IDENTITY_FRAME_NODES 与 formation_session 的 publish 校验共用此值。
 REQUIRED_FRAME_COUNT = 1
+VERIFIED_FORMATION_SOURCE = "chaldea_formation_verified"
 
 
 @dataclass(frozen=True)
@@ -71,7 +74,7 @@ class FormationSlot:
 
 @dataclass(frozen=True)
 class InitialFormation:
-    """一次真实采集的不可变快照；复用时也不改写采集时间或初始位置。"""
+    """实际采集或编队最终复核的不可变结果；source 区分证据来源。"""
 
     slots: Tuple[FormationSlot, ...]
     task_id: int
@@ -181,11 +184,23 @@ class CardPick:
 
 
 @dataclass(frozen=True)
+class ActorBinding:
+    """An instance in the initial formation, independent of its current slot."""
+    initial_slot: int             # 0..5, matching the editor JSON
+    servant_id: str
+
+
+@dataclass(frozen=True)
 class PlannedCard:
-    """攻略中的出卡意图；面卡位置由当前截图的从者归属与卡色解析。"""
+    """攻略中的出卡意图；面卡位置由当前截图的从者归属与卡色解析。
+
+    Maa 默认普通卡占位使用 SELECT_CARD、servant_slot=0、color=None，
+    保留此出卡位置，交由现有面卡策略补齐。
+    """
     kind: PrimitiveKind
     servant_slot: int
     color: CardColor | None = None
+    actor: ActorBinding | None = None
 
 
 @dataclass(frozen=True)
@@ -193,18 +208,28 @@ class ServantSkillAction:
     servant_slot: int             # 1..3
     skill_index: int              # 1..3
     target_ally: Optional[int] = None   # 1..3
+    target_enemy: Optional[int] = None  # 1..3，施放此技能前切换敌方目标
+    actor: ActorBinding | None = None
 
 
 @dataclass(frozen=True)
 class MasterSkillAction:
     skill_index: int              # 1..3
     target_ally: Optional[int] = None   # 1..3
+    target_enemy: Optional[int] = None  # 1..3，施放此技能前切换敌方目标
 
 
 @dataclass(frozen=True)
 class OrderChangeAction:
     starting_member_idx: int      # 1..3
     sub_member_idx: int           # 4..6
+
+
+@dataclass(frozen=True)
+class RetireAction:
+    """Wait for a declared natural departure; never click to kill a servant."""
+    servant_slot: int             # 1..3
+    actor: ActorBinding
 
 
 @dataclass(frozen=True)
@@ -215,7 +240,7 @@ class TurnPlan:
     order_change: Optional[OrderChangeAction] = None
     np_order: Tuple[int, ...] = ()       # 希望释放的宝具（从者槽位，1..3）
     target_enemy: Optional[int] = None   # 需要选中的敌人目标
-    skill_sequence: Tuple[ServantSkillAction | MasterSkillAction | OrderChangeAction, ...] = ()
+    skill_sequence: Tuple[ServantSkillAction | MasterSkillAction | OrderChangeAction | RetireAction, ...] = ()
     card_sequence: Tuple[PlannedCard, ...] = ()
 
 
@@ -223,15 +248,21 @@ class TurnPlan:
 class BattlePlan:
     """整场战斗的固定计划：按回合索引取 TurnPlan。
 
-    turns 为 0-based 索引列表；超出长度时返回空 TurnPlan（平A/宝具兜底）。
+    turns 为 0-based 索引列表；active_turn 越界返回 None，恢复通用策略。
+    turn 保留历史的越界空回合返回值，供旧调用方使用。
     """
     turns: Tuple[TurnPlan, ...] = ()
+    special_choices: SpecialSkillChoices = SpecialSkillChoices()
+
+    def active_turn(self, index: int) -> TurnPlan | None:
+        """仅返回实际配置的回合；空回合与没有计划分别用对象和 None 表示。"""
+        if 0 <= index < len(self.turns):
+            return self.turns[index]
+        return None
 
     def turn(self, index: int) -> TurnPlan:
         """获取第 index 回合（0-based）的计划；越界返回空计划。"""
-        if 0 <= index < len(self.turns):
-            return self.turns[index]
-        return TurnPlan()
+        return self.active_turn(index) or TurnPlan()
 
 
 @dataclass(frozen=True)
@@ -242,7 +273,7 @@ class BattleAction:
     master_skills: Tuple[MasterSkillAction, ...] = ()
     order_change: Optional[OrderChangeAction] = None
     rationale_tag: str = ""
-    skill_sequence: Tuple[ServantSkillAction | MasterSkillAction | OrderChangeAction, ...] = ()
+    skill_sequence: Tuple[ServantSkillAction | MasterSkillAction | OrderChangeAction | RetireAction, ...] = ()
 
 
 @dataclass(frozen=True)

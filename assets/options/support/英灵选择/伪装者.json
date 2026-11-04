@@ -6,24 +6,88 @@
             "default": "2800400",
             "cases": [
                 {
-                    "name": "2800400",
-                    "label": "九纹龙伊丽莎",
+                    "name": "2801200",
+                    "label": "459. 所罗门",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "2800400"
+                                "servant": "2801200"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_28004000.png",
+                    "icon": "resource/base/image/servant_face/f_28012000.png",
                     "option": [
-                        "助战信息-2800400",
+                        "助战信息-2801200",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2801100",
+                    "label": "441. 堤丰·厄斐墨洛斯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2801100"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28011000.png",
+                    "option": [
+                        "助战信息-2801100",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2801000",
+                    "label": "437. 但丁·阿利吉耶里",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2801000"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28010000.png",
+                    "option": [
+                        "助战信息-2801000",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2800900",
+                    "label": "431. Phantasmoon",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800900"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28009000.png",
+                    "option": [
+                        "助战信息-2800900",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2800800",
+                    "label": "430. 阿比盖尔·威廉姆斯〔圣诞〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800800"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28008000.png",
+                    "option": [
+                        "助战信息-2800800",
                         "宝具等级"
                     ]
                 },
                 {
                     "name": "2800700",
-                    "label": "亚历山德罗·迪·卡利奥斯特罗",
+                    "label": "410. 亚历山德罗·迪·卡利奥斯特罗",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -39,7 +103,7 @@
                 },
                 {
                     "name": "2800600",
-                    "label": "凯特·库·米可科尔",
+                    "label": "392. 凯特·库·米可科尔",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -55,7 +119,7 @@
                 },
                 {
                     "name": "2800500",
-                    "label": "特拉洛克",
+                    "label": "372. 特拉洛克",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -70,8 +134,40 @@
                     ]
                 },
                 {
+                    "name": "2800400",
+                    "label": "367. 九纹龙伊丽莎",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800400"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28004000.png",
+                    "option": [
+                        "助战信息-2800400",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2800300",
+                    "label": "353. 阿瓦隆女士",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2800300"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_28003000.png",
+                    "option": [
+                        "助战信息-2800300",
+                        "宝具等级"
+                    ]
+                },
+                {
                     "name": "2800200",
-                    "label": "赫费斯提翁",
+                    "label": "335. 赫费斯提翁",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -86,72 +182,8 @@
                     ]
                 },
                 {
-                    "name": "2800800",
-                    "label": "阿比盖尔·威廉姆斯〔圣诞〕",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2800800"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28008000.png",
-                    "option": [
-                        "助战信息-2800800",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2800900",
-                    "label": "Phantasmoon",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2800900"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28009000.png",
-                    "option": [
-                        "助战信息-2800900",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2801000",
-                    "label": "但丁·阿利吉耶里",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2801000"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28010000.png",
-                    "option": [
-                        "助战信息-2801000",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2801100",
-                    "label": "堤丰·厄斐墨洛斯",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2801100"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28011000.png",
-                    "option": [
-                        "助战信息-2801100",
-                        "宝具等级"
-                    ]
-                },
-                {
                     "name": "2800100",
-                    "label": "奥伯龙",
+                    "label": "316. 奥伯龙",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -162,38 +194,6 @@
                     "icon": "resource/base/image/servant_face/f_28001000.png",
                     "option": [
                         "助战信息-2800100",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2801200",
-                    "label": "所罗门",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2801200"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28012000.png",
-                    "option": [
-                        "助战信息-2801200",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2800300",
-                    "label": "阿瓦隆女士",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2800300"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_28003000.png",
-                    "option": [
-                        "助战信息-2800300",
                         "宝具等级"
                     ]
                 }

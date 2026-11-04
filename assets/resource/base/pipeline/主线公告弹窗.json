@@ -1,0 +1,24 @@
+{
+  "主线-右上公告关闭": {
+    "doc": "国服节点临时兼容副本，日服待实图验证。2026-10-30主线进度公告实图裁剪；仅匹配右上角菱形叉号，不依赖活动名称。主线interrupt在地图识别前调用，识别后点击并重拍；区别于底部关闭按钮的进本-普通告知弹窗关闭。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "roi": [
+          1200,
+          0,
+          80,
+          85
+        ],
+        "template": "main_story/公告右上关闭.png",
+        "threshold": 0.9
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "post_delay": 500,
+    "next": [],
+    "on_error": []
+  }
+}

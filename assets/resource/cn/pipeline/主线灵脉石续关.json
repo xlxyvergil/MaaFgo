@@ -1,0 +1,126 @@
+{
+  "主线-使用灵脉石": {
+    "doc": "国服正式识别，2026-10-30卡美洛续关实图：续关标题、完整使用灵脉石按钮及右上正数库存必须同时命中。无道具或只显示令咒/圣晶石时不点击。base保留同结构兼容副本，日服待实图验证。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "cn/主线灵脉石续关/主线-使用灵脉石/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  540,
+                  105,
+                  200,
+                  70
+                ],
+                "expected": [
+                  "^续关$"
+                ],
+                "threshold": 0.8
+              }
+            }
+          },
+          {
+            "sub_name": "cn/主线灵脉石续关/主线-使用灵脉石/OCR2",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  210,
+                  280,
+                  245,
+                  45
+                ],
+                "expected": [
+                  "^使用灵脉石$"
+                ],
+                "threshold": 0.8
+              }
+            }
+          },
+          {
+            "sub_name": "cn/主线灵脉石续关/主线-使用灵脉石/OCR3",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  1040,
+                  141,
+                  75,
+                  36
+                ],
+                "expected": [
+                  "^[1-9][0-9]*$"
+                ],
+                "threshold": 0.9
+              }
+            }
+          }
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  },
+  "主线-灵脉石确认": {
+    "doc": "国服正式识别：完整使用1个灵脉石续关提示和右侧决定必须同时命中。确认后由脚本等实际战斗，最多点击一次，不重复消费。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "cn/主线灵脉石续关/主线-灵脉石确认/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  450,
+                  262,
+                  380,
+                  51
+                ],
+                "expected": [
+                  "是否使用\\s*1\\s*个灵脉石续关"
+                ],
+                "threshold": 0.85
+              }
+            }
+          },
+          {
+            "sub_name": "cn/主线灵脉石续关/主线-灵脉石确认/OCR2",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  725,
+                  395,
+                  315,
+                  62
+                ],
+                "expected": [
+                  "^[决決]\\s*定$"
+                ],
+                "threshold": 0.85
+              }
+            }
+          }
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "post_delay": 1500,
+    "next": [],
+    "on_error": []
+  }
+}

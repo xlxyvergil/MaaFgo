@@ -1,0 +1,6510 @@
+{
+    "搓丸子-底卡候选就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-底卡详情就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-底卡选定": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-素材候选就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-素材详情就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-素材已选择": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-详情已关闭": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-选择素材完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-强化一批完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-成品完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-半成品保护完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-素材不足": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-无底卡": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-识别失败": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-QP不足": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-标记模式就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-标记模式已退出": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-候选标记完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-保管室候选就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-存储一批完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-保管室已满": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-制作一轮": {
+        "doc": "进入现有强化导航并打开礼装底卡列表，设置丸子星级及固定排序，返回底卡候选就绪。业务端逐张预览白名单身份后再选卡；本入口不自行消耗素材。",
+        "attach": {
+            "grid": {
+                "x": [
+                    74,
+                    207,
+                    341,
+                    474,
+                    607,
+                    741,
+                    874
+                ],
+                "y": [
+                    190,
+                    332,
+                    474
+                ],
+                "w": 117,
+                "h": 128,
+                "columns": 7,
+                "rows": 3,
+                "source": "1280x720 seven-column grid; pending full material-selection calibration"
+            },
+            "ce_navigation_override": {
+                "强化从者-点从者强化条": {
+                    "recognition": {
+                        "type": "TemplateMatch",
+                        "param": {
+                            "template": "搓丸子/礼装强化菜单入口.png",
+                            "threshold": 0.8,
+                            "roi": [
+                                700,
+                                350,
+                                500,
+                                220
+                            ]
+                        }
+                    },
+                    "next": [
+                        "搓丸子-详情判定"
+                    ]
+                },
+                "强化从者-已在强化界面": {
+                    "recognition": {
+                        "type": "And",
+                        "param": {
+                            "all_of": [
+                                {
+                                    "sub_name": "base/搓丸子/搓丸子-制作一轮/OCR1",
+                                    "recognition": {
+                                        "type": "OCR",
+                                        "param": {
+                                            "roi": [
+                                                50,
+                                                0,
+                                                1200,
+                                                130
+                                            ],
+                                            "threshold": 0.8,
+                                            "expected": [
+                                                "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                            ]
+                                        }
+                                    }
+                                },
+                                {
+                                    "recognition": {
+                                        "type": "TemplateMatch",
+                                        "param": {
+                                            "template": "强化从者/强化完成界面.png",
+                                            "threshold": 0.8,
+                                            "roi": [
+                                                360,
+                                                620,
+                                                220,
+                                                100
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        }
+                    },
+                    "next": [
+                        "搓丸子-详情判定"
+                    ]
+                },
+                "强化从者-已在强化列表": {
+                    "recognition": {
+                        "type": "TemplateMatch",
+                        "param": {
+                            "template": "搓丸子/统一锁定列表标志.png",
+                            "threshold": 0.8,
+                            "roi": [
+                                0,
+                                300,
+                                90,
+                                115
+                            ]
+                        }
+                    },
+                    "next": [
+                        "搓丸子-底卡列表已打开"
+                    ]
+                },
+                "强化从者-强化快速跳转": {
+                    "enabled": false
+                },
+                "强化从者-点菜单进强化": {
+                    "recognition": {
+                        "param": {
+                            "roi": [
+                                1070,
+                                590,
+                                210,
+                                130
+                            ],
+                            "order_by": "Score"
+                        }
+                    }
+                }
+            }
+        },
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-进入礼装强化"
+        ],
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "timeout": 15000
+    },
+    "搓丸子-进入礼装强化": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡列表已打开",
+            "搓丸子-详情判定",
+            "强化从者-导航到强化界面"
+        ]
+    },
+    "搓丸子-详情判定": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-详情判定/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-打开底卡列表"
+        ]
+    },
+    "搓丸子-打开底卡列表": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-打开底卡列表/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    70,
+                    128,
+                    225,
+                    45
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡列表已打开"
+        ],
+        "post_delay": 700
+    },
+    "搓丸子-底卡列表已打开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡筛选准备"
+        ]
+    },
+    "搓丸子-底卡筛选准备": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    953,
+                    107,
+                    60,
+                    47
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡筛选重置"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-底卡筛选重置": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    100,
+                    580,
+                    280,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡筛选复位"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-底卡筛选分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡星级已选",
+            "搓丸子-底卡只选丸子星级"
+        ]
+    },
+    "搓丸子-底卡只选丸子星级": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/1星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    930,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡星级已选"
+        ],
+        "post_delay": 350,
+        "max_hit": 1,
+        "doc": "默认一星；二星时运行时须同时覆盖本节点template/roi与底卡星级已选的对应模板/ROI，不能仅换点击位置。"
+    },
+    "搓丸子-底卡星级已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/1星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    970,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-底卡筛选待确认"
+        ]
+    },
+    "搓丸子-底卡筛选确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    950,
+                    580,
+                    220,
+                    110
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡图标分派"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-底卡图标分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡图标正常",
+            "搓丸子-底卡调整大图标",
+            "搓丸子-底卡调整小图标"
+        ]
+    },
+    "搓丸子-底卡图标正常": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮小.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡打开排序"
+        ],
+        "doc": "固定七列小图标，与制作一轮/保管室现有网格一致。国服129中图标为六列（中模板0.994133）；日服055/014小图标为七列（小模板约0.978/0.975），不能把中图标当作网格已就绪。保持模板阈值与未知状态停止行为。"
+    },
+    "搓丸子-底卡调整大图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮大.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "仅在已识别大图标时点击一次缩放，回分派复核，直到小图标；本节点max_hit=3有界，不盲点未知状态。"
+    },
+    "搓丸子-底卡调整小图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮中.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "为兼容已有接口保留调整小图标节点名；本节点实际识别并调整的是中图标，目标为七列小图标。每次只点击一次后回分派复核，max_hit=3有界；未知状态不输入。"
+    },
+    "搓丸子-底卡打开排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1065,
+                    109,
+                    110,
+                    40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡排序分派"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-底卡排序分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡关闭选择排序",
+            "搓丸子-底卡开启智能筛选",
+            "搓丸子-底卡选排序类型",
+            "搓丸子-底卡确认排序"
+        ]
+    },
+    "搓丸子-底卡关闭选择排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载已选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    980,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1000,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-底卡开启智能筛选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载未选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    535,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    555,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-底卡选排序类型": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/持有数排序未选中.png",
+                "threshold": 0.9,
+                "roi": [
+                    570,
+                    290,
+                    150,
+                    65
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-底卡排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-底卡确认排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "整理礼物盒/筛选面板决定按钮.png",
+                                "threshold": 0.84,
+                                "roi": [
+                                    700,
+                                    580,
+                                    310,
+                                    135
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载未选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    980,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载已选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    535,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/持有数排序已选中.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    570,
+                                    290,
+                                    150,
+                                    65
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    760,
+                    605,
+                    185,
+                    60
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡列表固定完成"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-底卡列表固定完成": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡候选就绪"
+        ],
+        "doc": "选择排序已明确关闭，防止每次点击素材后列表重排；运行时仍须逐项复核详情，不复用旧计划坐标。"
+    },
+    "搓丸子-素材图标分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材图标正常",
+            "搓丸子-素材调整大图标",
+            "搓丸子-素材调整小图标"
+        ]
+    },
+    "搓丸子-素材图标正常": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮小.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材打开排序"
+        ],
+        "doc": "固定七列小图标，与制作一轮/保管室现有网格一致。国服129中图标为六列（中模板0.994133）；日服055/014小图标为七列（小模板约0.978/0.975），不能把中图标当作网格已就绪。保持模板阈值与未知状态停止行为。"
+    },
+    "搓丸子-素材调整大图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮大.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-素材图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "仅在已识别大图标时点击一次缩放，回分派复核，直到小图标；本节点max_hit=3有界，不盲点未知状态。"
+    },
+    "搓丸子-素材调整小图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮中.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-素材图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "为兼容已有接口保留调整小图标节点名；本节点实际识别并调整的是中图标，目标为七列小图标。每次只点击一次后回分派复核，max_hit=3有界；未知状态不输入。"
+    },
+    "搓丸子-素材打开排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1065,
+                    109,
+                    110,
+                    40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材排序分派"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-素材排序分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材关闭选择排序",
+            "搓丸子-素材开启智能筛选",
+            "搓丸子-素材选排序类型",
+            "搓丸子-素材确认排序"
+        ]
+    },
+    "搓丸子-素材关闭选择排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载已选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    980,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1000,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-素材开启智能筛选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载未选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    535,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    555,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-素材选排序类型": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/等级排序未选中.png",
+                "threshold": 0.9,
+                "roi": [
+                    250,
+                    200,
+                    150,
+                    65
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-素材排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-素材确认排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "整理礼物盒/筛选面板决定按钮.png",
+                                "threshold": 0.84,
+                                "roi": [
+                                    700,
+                                    580,
+                                    310,
+                                    135
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载未选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    980,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载已选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    535,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/等级排序已选中.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    250,
+                                    200,
+                                    150,
+                                    65
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    760,
+                    605,
+                    185,
+                    60
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材列表固定完成"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-素材列表固定完成": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材候选就绪"
+        ],
+        "doc": "选择排序已明确关闭，防止每次点击素材后列表重排；运行时仍须逐项复核详情，不复用旧计划坐标。"
+    },
+    "搓丸子-保管室图标分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保管室图标正常",
+            "搓丸子-保管室调整大图标",
+            "搓丸子-保管室调整小图标"
+        ]
+    },
+    "搓丸子-保管室图标正常": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮小.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室打开排序"
+        ],
+        "doc": "固定七列小图标，与制作一轮/保管室现有网格一致。国服129中图标为六列（中模板0.994133）；日服055/014小图标为七列（小模板约0.978/0.975），不能把中图标当作网格已就绪。保持模板阈值与未知状态停止行为。"
+    },
+    "搓丸子-保管室调整大图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮大.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "仅在已识别大图标时点击一次缩放，回分派复核，直到小图标；本节点max_hit=3有界，不盲点未知状态。"
+    },
+    "搓丸子-保管室调整小图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮中.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "为兼容已有接口保留调整小图标节点名；本节点实际识别并调整的是中图标，目标为七列小图标。每次只点击一次后回分派复核，max_hit=3有界；未知状态不输入。"
+    },
+    "搓丸子-保管室打开排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1065,
+                    109,
+                    110,
+                    40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室排序分派"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-保管室排序分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保管室关闭选择排序",
+            "搓丸子-保管室开启智能筛选",
+            "搓丸子-保管室选排序类型",
+            "搓丸子-保管室确认排序"
+        ]
+    },
+    "搓丸子-保管室关闭选择排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载已选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    980,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1000,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-保管室开启智能筛选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载未选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    535,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    555,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-保管室选排序类型": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/等级排序未选中.png",
+                "threshold": 0.9,
+                "roi": [
+                    250,
+                    200,
+                    150,
+                    65
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-保管室确认排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "整理礼物盒/筛选面板决定按钮.png",
+                                "threshold": 0.84,
+                                "roi": [
+                                    700,
+                                    580,
+                                    310,
+                                    135
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载未选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    980,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载已选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    535,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/等级排序已选中.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    250,
+                                    200,
+                                    150,
+                                    65
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    760,
+                    605,
+                    185,
+                    60
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室列表固定完成"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-保管室列表固定完成": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室礼装就绪"
+        ],
+        "doc": "选择排序已明确关闭，防止每次点击素材后列表重排；运行时仍须逐项复核详情，不复用旧计划坐标。"
+    },
+    "搓丸子-成品图标分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-成品图标正常",
+            "搓丸子-成品调整大图标",
+            "搓丸子-成品调整小图标"
+        ]
+    },
+    "搓丸子-成品图标正常": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮小.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品打开排序"
+        ],
+        "doc": "固定七列小图标，与制作一轮/保管室现有网格一致。国服129中图标为六列（中模板0.994133）；日服055/014小图标为七列（小模板约0.978/0.975），不能把中图标当作网格已就绪。保持模板阈值与未知状态停止行为。"
+    },
+    "搓丸子-成品调整大图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮大.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-成品图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "仅在已识别大图标时点击一次缩放，回分派复核，直到小图标；本节点max_hit=3有界，不盲点未知状态。"
+    },
+    "搓丸子-成品调整小图标": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/图标缩放按钮中.png",
+                "threshold": 0.86,
+                "roi": [
+                    0,
+                    595,
+                    100,
+                    125
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-成品图标分派"
+        ],
+        "post_delay": 350,
+        "max_hit": 3,
+        "doc": "为兼容已有接口保留调整小图标节点名；本节点实际识别并调整的是中图标，目标为七列小图标。每次只点击一次后回分派复核，max_hit=3有界；未知状态不输入。"
+    },
+    "搓丸子-成品打开排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1065,
+                    109,
+                    110,
+                    40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品排序分派"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-成品排序分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-成品关闭选择排序",
+            "搓丸子-成品关闭智能筛选",
+            "搓丸子-成品选排序类型",
+            "搓丸子-成品确认排序"
+        ]
+    },
+    "搓丸子-成品关闭选择排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载已选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    980,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1000,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-成品关闭智能筛选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/自动加载已选中.png",
+                "threshold": 0.92,
+                "roi": [
+                    535,
+                    430,
+                    85,
+                    85
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    555,
+                    452,
+                    30,
+                    28
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-成品选排序类型": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/等级排序未选中.png",
+                "threshold": 0.9,
+                "roi": [
+                    250,
+                    200,
+                    150,
+                    65
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-成品排序分派"
+        ],
+        "post_delay": 300,
+        "max_hit": 2
+    },
+    "搓丸子-成品确认排序": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "整理礼物盒/筛选面板决定按钮.png",
+                                "threshold": 0.84,
+                                "roi": [
+                                    700,
+                                    580,
+                                    310,
+                                    135
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载未选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    980,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/自动加载未选中.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    535,
+                                    430,
+                                    85,
+                                    85
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/等级排序已选中.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    250,
+                                    200,
+                                    150,
+                                    65
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    760,
+                    605,
+                    185,
+                    60
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品列表固定完成"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-成品列表固定完成": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品列表就绪"
+        ],
+        "doc": "选择排序已明确关闭，防止每次点击素材后列表重排；运行时仍须逐项复核详情，不复用旧计划坐标。"
+    },
+    "搓丸子-列表标志": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        }
+    },
+    "搓丸子-列表到底": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一锁定列表标志.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    300,
+                                    90,
+                                    115
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/列表滚动到底标志.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    993,
+                                    675,
+                                    40,
+                                    27
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "doc": "到底标志的识别区域按1280×720基准配置；临时图须实机标定。必须同时确认列表，不能凭滑动无变化推断到底。"
+    },
+    "搓丸子-翻页完成": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-下一页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-翻页前已到底",
+            "搓丸子-滑动下一页"
+        ],
+        "doc": "每次最多滑动一次，两行步长并重叠一行；调用方负责最多页数及当页候选重新定位。"
+    },
+    "搓丸子-翻页前已到底": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "搓丸子-列表到底"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-翻页完成"
+        ]
+    },
+    "搓丸子-滑动下一页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    600,
+                    615
+                ],
+                "end": [
+                    600,
+                    331
+                ],
+                "duration": 600,
+                "end_hold": 350
+            }
+        },
+        "next": [
+            "搓丸子-翻页后列表复查"
+        ],
+        "post_delay": 500,
+        "post_wait_freezes": 250
+    },
+    "搓丸子-翻页后列表复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-翻页完成"
+        ]
+    },
+    "搓丸子-上一页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    600,
+                    331
+                ],
+                "end": [
+                    600,
+                    615
+                ],
+                "duration": 600,
+                "end_hold": 350
+            }
+        },
+        "next": [
+            "搓丸子-翻页后列表复查"
+        ],
+        "post_delay": 500,
+        "post_wait_freezes": 250,
+        "doc": "仅在列表身份成立时执行一次反向滑动；业务侧按页数返回后须重新枚举核验，不复用旧坐标。"
+    },
+    "搓丸子-底卡名称": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    75,
+                    0,
+                    1205,
+                    260
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "搓丸子-材料名称": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    75,
+                    0,
+                    1205,
+                    260
+                ],
+                "threshold": 0.8
+            }
+        }
+    },
+    "搓丸子-底卡等级": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    790,
+                    240,
+                    160,
+                    70
+                ],
+                "threshold": 0.8,
+                "only_rec": true
+            }
+        },
+        "doc": "国服2026-10-27实机134宽ROI把1和/10拆开且1分0.668低于原0.8阈值；135紧ROI只识别1/10分0.998918。133/139真实SDK离线回放本ROI[790,240,160,70]加only_rec均为1/10分0.996399且不夹邻行；宽160预留100/100横向空间，当前两张实图只验证了1/10。保持0.8阈值，业务解析等级/上限，无法解析不视为0或满级。"
+    },
+    "搓丸子-材料等级": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    790,
+                    240,
+                    160,
+                    70
+                ],
+                "threshold": 0.8,
+                "only_rec": true
+            }
+        },
+        "doc": "国服2026-10-27实机134宽ROI把1和/10拆开且1分0.668低于原0.8阈值；135紧ROI只识别1/10分0.998918。133/139真实SDK离线回放本ROI[790,240,160,70]加only_rec均为1/10分0.996399且不夹邻行；宽160预留100/100横向空间，当前两张实图只验证了1/10。保持0.8阈值，业务解析等级/上限，无法解析不视为0或满级。"
+    },
+    "搓丸子-底卡星级验证": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    70,
+                    0,
+                    1210,
+                    300
+                ],
+                "threshold": 0.8
+            }
+        },
+        "doc": "运行时可用已选名称匹配目录星级；未知身份不能仅因筛选状态就当作所选星级。"
+    },
+    "搓丸子-当前底卡为空": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "And",
+                            "param": {
+                                "all_of": [
+                                    {
+                                        "sub_name": "base/搓丸子/搓丸子-当前底卡为空/OCR1",
+                                        "recognition": {
+                                            "type": "OCR",
+                                            "param": {
+                                                "roi": [
+                                                    50,
+                                                    0,
+                                                    1200,
+                                                    130
+                                                ],
+                                                "threshold": 0.8,
+                                                "expected": [
+                                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "强化从者/强化完成界面.png",
+                                                "threshold": 0.8,
+                                                "roi": [
+                                                    360,
+                                                    620,
+                                                    220,
+                                                    100
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化界面标志.png",
+                                "threshold": 0.88,
+                                "roi": [
+                                    80,
+                                    270,
+                                    240,
+                                    260
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "doc": "只说明当前强化页没有底卡，不证明刚才强化已满级。业务侧必须重回列表，读取已知ID实际等级和上限后才计成品。"
+    },
+    "搓丸子-详情已锁定": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情已锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        }
+    },
+    "搓丸子-详情未锁定": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情未锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        }
+    },
+    "搓丸子-详情标记": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/卡片已标记.png",
+                "threshold": 0.9,
+                "roi": [
+                    0,
+                    280,
+                    100,
+                    240
+                ],
+                "method": 10001
+            }
+        },
+        "doc": "详情若不显示标记不能据此证明未标记；应结合列表当前格的卡片标记节点排除。"
+    },
+    "搓丸子-卡片已标记": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/卡片已标记.png",
+                "threshold": 0.9,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "method": 10001,
+                "roi_offset": [
+                    -14,
+                    -7,
+                    20,
+                    13
+                ]
+            }
+        }
+    },
+    "搓丸子-素材已选中": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/素材选中绿框.png",
+                "threshold": 0.9,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "method": 10001,
+                "green_mask": true,
+                "roi_offset": [
+                    -5,
+                    -10,
+                    10,
+                    15
+                ]
+            }
+        },
+        "doc": "运行时覆盖ROI为当前格。仅匹配外侧绿框，源图中心已设绿幕排除卡面内容。"
+    },
+    "搓丸子-识别底卡候选": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/卡片空位.png",
+                "threshold": 0.95,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ]
+            }
+        },
+        "enabled": false,
+        "doc": "可选的ID模板定位入口，默认禁用。需要调用方覆盖真实模板和ROI后启用。"
+    },
+    "搓丸子-预览底卡": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "duration": 1500,
+                "target_offset": [
+                    58,
+                    64,
+                    -116,
+                    -127
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡详情等待"
+        ],
+        "post_delay": 600,
+        "doc": "国服2026-10-27实机130：700ms随机卡片边缘长按只选中底卡；138在列表卡片中心[132,254,1,1]长按1500ms成功打开139详情。保留运行时覆盖target的卡片框接口，由target_offset把默认117×128框缩到中心1px，123×134运行时框缩为中心7×7区；详情等待只复核状态，不重复长按。"
+    },
+    "搓丸子-预览素材": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "duration": 1500,
+                "target_offset": [
+                    58,
+                    64,
+                    -116,
+                    -127
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材详情等待"
+        ],
+        "post_delay": 600,
+        "doc": "国服2026-10-27实机130：700ms随机卡片边缘长按只选中底卡；138在列表卡片中心[132,254,1,1]长按1500ms成功打开139详情。保留运行时覆盖target的卡片框接口，由target_offset把默认117×128框缩到中心1px，123×134运行时框缩为中心7×7区；详情等待只复核状态，不重复长按。"
+    },
+    "搓丸子-预览当前底卡": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-预览当前底卡/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    190,
+                    320,
+                    1,
+                    1
+                ],
+                "duration": 1500
+            }
+        },
+        "next": [
+            "搓丸子-底卡详情等待"
+        ],
+        "post_delay": 600,
+        "doc": "国服2026-10-27实机132在已选当前底卡正中[190,320,1,1]长按1500ms真实打开133详情；复用现有预览与详情等待，不从列表第一格推断当前强化对象，不重复长按。"
+    },
+    "搓丸子-底卡详情等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡详情显示"
+        ],
+        "doc": "详情下载失败时背景锁与标题仍可见；必须优先处理通信不良再宣布详情就绪。"
+    },
+    "搓丸子-素材详情等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材详情显示"
+        ],
+        "doc": "详情下载失败时背景锁与标题仍可见；必须优先处理通信不良再宣布详情就绪。"
+    },
+    "搓丸子-底卡详情显示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-底卡详情显示/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡详情就绪"
+        ]
+    },
+    "搓丸子-素材详情显示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-素材详情显示/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材详情就绪"
+        ]
+    },
+    "搓丸子-关闭详情": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-关闭详情执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-关闭详情执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "友情召唤/详情关闭按钮.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    0,
+                                    0,
+                                    200,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    25,
+                    20,
+                    -50,
+                    -40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-详情关闭复查"
+        ],
+        "post_delay": 500,
+        "max_hit": 1,
+        "doc": "日服2026-10-30关闭详情识别框[6,11,69,59]曾随机点击到[74,38]卡面边缘，详情未关闭；将69×59框缩至中心19×19再点击，仍由原后继复核返回。基础与国服模板尺寸相同，识别阈值和单次点击上限不变。"
+    },
+    "搓丸子-详情关闭复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-关闭回列表",
+            "搓丸子-关闭回强化页"
+        ]
+    },
+    "搓丸子-关闭回列表": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-详情已关闭"
+        ]
+    },
+    "搓丸子-关闭回强化页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-关闭回强化页/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-详情已关闭"
+        ]
+    },
+    "搓丸子-选定底卡": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    74,
+                    190,
+                    117,
+                    128
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡选定等待"
+        ],
+        "post_delay": 500,
+        "doc": "调用方必须在本次详情验证允许ID与等级后覆盖点击格；不得用旧截图计划直接点第一张。"
+    },
+    "搓丸子-底卡选定为空": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "搓丸子-当前底卡为空"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡已取消"
+        ],
+        "on_error": [],
+        "timeout": 0
+    },
+    "搓丸子-底卡已取消": {
+        "doc": "本次候选点击取消了已有底卡，未提交消耗；只允许回列表重新定位一次。"
+    },
+    "搓丸子-底卡选定等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡选定为空",
+            "搓丸子-底卡选定复查"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-底卡选定复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-底卡选定复查/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-底卡选定复查/OCR2",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    460,
+                                    432,
+                                    125,
+                                    52
+                                ],
+                                "expected": [
+                                    "[0-9]+\\s*/\\s*[0-9]+"
+                                ],
+                                "threshold": 0.8,
+                                "only_rec": true
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡选定"
+        ],
+        "doc": "选卡后必须读到当前底卡等级/上限，不能仅凭礼装标题与帮助图标把空底卡页当作选定成功。日服2026-10-30复选当前已选卡会取消选择；空位由底卡选定为空分支处理，运行时最多重定位一次，不能直接再次点击旧坐标。"
+    },
+    "搓丸子-打开素材列表": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-打开素材列表/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    405,
+                    202,
+                    35,
+                    45
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材列表等待"
+        ],
+        "post_delay": 450
+    },
+    "搓丸子-素材列表等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材列表已打开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-素材列表已打开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材筛选准备"
+        ]
+    },
+    "搓丸子-素材筛选准备": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    953,
+                    107,
+                    60,
+                    47
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材筛选重置"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-素材筛选重置": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    100,
+                    580,
+                    280,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-材料选择1星"
+        ],
+        "post_delay": 350
+    },
+    "搓丸子-材料选择1星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-材料1星已选",
+            "搓丸子-材料点1星"
+        ]
+    },
+    "搓丸子-材料点1星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/1星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    930,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-材料1星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-材料1星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/1星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    970,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-材料选择2星"
+        ]
+    },
+    "搓丸子-材料选择2星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-材料2星已选",
+            "搓丸子-材料点2星"
+        ]
+    },
+    "搓丸子-材料点2星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/2星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    743,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-材料2星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-材料2星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/2星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    783,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-材料选择3星"
+        ]
+    },
+    "搓丸子-材料选择3星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-材料选择4星"
+        ],
+        "doc": "调用方按eat3/eat4把next覆写为材料点N星或保持跳过。"
+    },
+    "搓丸子-材料点3星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/3星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    556,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-材料3星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-材料3星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/3星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    596,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-材料选择4星"
+        ]
+    },
+    "搓丸子-材料选择4星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材筛选确认"
+        ],
+        "doc": "调用方按eat3/eat4把next覆写为材料点N星或保持跳过。"
+    },
+    "搓丸子-材料点4星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/4星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    369,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-材料4星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-材料4星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/4星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    409,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-素材筛选确认"
+        ]
+    },
+    "搓丸子-素材筛选确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    950,
+                    580,
+                    220,
+                    110
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-素材图标分派"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-选择素材": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    74,
+                    190,
+                    117,
+                    128
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-选择素材等待"
+        ],
+        "post_delay": 250,
+        "doc": "每张点击前必须重新核验身份、等级、锁、标记，且固定排序；每张点击后由素材已选中验证。"
+    },
+    "搓丸子-选择素材等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-选择素材后复查"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-选择素材后复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一锁定列表标志.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    300,
+                                    90,
+                                    115
+                                ]
+                            }
+                        }
+                    },
+                    "搓丸子-素材已选中"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-选择素材完成"
+        ]
+    },
+    "搓丸子-确认素材": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-确认素材执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-确认素材执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一锁定列表标志.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    300,
+                                    90,
+                                    115
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": [
+                                    "决定.png",
+                                    "battle/编队决定.png"
+                                ],
+                                "threshold": 0.82,
+                                "roi": [
+                                    1050,
+                                    620,
+                                    230,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1080,
+                    640,
+                    150,
+                    55
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材确认等待"
+        ],
+        "post_delay": 500,
+        "max_hit": 1,
+        "doc": "日服2026-10-30素材选择页启用的決定按钮，决定.png约0.642，已有battle/编队决定.png约0.917。保留原模板并补充既有字形，阈值0.82不变；仍要求列表身份及业务逐张复核、选中成功后调用，不额外放开高星素材确认。"
+    },
+    "搓丸子-素材确认等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-高星素材决定确认",
+            "搓丸子-素材回到强化页"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-拒绝未授权高星材料": {
+        "on_error": [],
+        "next": [
+            "搓丸子-识别失败"
+        ],
+        "doc": "无输入转接到唯一失败终点；两阶段高星警告默认拒绝，局部白名单授权仍只覆盖各警告的next。"
+    },
+    "搓丸子-高星素材决定确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    250,
+                    150,
+                    800,
+                    350
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "高.*稀有|高.*レア|[34３４]星|[★☆][34３４]|[34３４].*以上.*(?:礼装|礼裝)"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-拒绝未授权高星材料"
+        ],
+        "doc": "默认无输入并停止。仅本批素材白名单、等级、锁标记及实际所选状态逐张复核后，业务局部覆盖next为高星素材决定授权确认。手选素材链兼容游戏的高星素材警告。"
+    },
+    "搓丸子-高星素材决定授权确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-高星素材决定授权确认/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    250,
+                                    150,
+                                    800,
+                                    350
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "高.*稀有|高.*レア|[34３４]星|[★☆][34３４]|[34３４].*以上.*(?:礼装|礼裝)"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/高星素材确认决定.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    730,
+                                    510,
+                                    230,
+                                    110
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    740,
+                    540,
+                    200,
+                    47
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-高星素材确认等待"
+        ],
+        "post_delay": 500,
+        "max_hit": 1,
+        "doc": "局部授权入口，不能加入默认next。高星警告文字与限定区域内的决定按钮同时成立才单击一次，之后须复查强化页。"
+    },
+    "搓丸子-高星素材确认等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-素材回到强化页"
+        ],
+        "doc": "高星确认提交后只等待强化页；通信不良重试不会重新选择素材或确认。"
+    },
+    "搓丸子-素材回到强化页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-素材回到强化页/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-素材已选择"
+        ]
+    },
+    "搓丸子-自动填充一轮": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-自动填充一轮/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1048,
+                    153,
+                    83,
+                    33
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-自动填充设置"
+        ],
+        "post_delay": 500,
+        "doc": "只准备自动填充，不接提交强化；默认业务使用可逐张核验的素材列表。"
+    },
+    "搓丸子-自动填充设置": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    0,
+                    1050,
+                    100
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "自动|自動|加载|ロード"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-自动填充候选就绪"
+        ]
+    },
+    "搓丸子-自动填充候选就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-提交强化": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-提交强化执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-提交强化执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "And",
+                            "param": {
+                                "all_of": [
+                                    {
+                                        "sub_name": "base/搓丸子/搓丸子-提交强化执行/OCR1",
+                                        "recognition": {
+                                            "type": "OCR",
+                                            "param": {
+                                                "roi": [
+                                                    50,
+                                                    0,
+                                                    1200,
+                                                    130
+                                                ],
+                                                "threshold": 0.8,
+                                                "expected": [
+                                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "强化从者/强化完成界面.png",
+                                                "threshold": 0.8,
+                                                "roi": [
+                                                    360,
+                                                    620,
+                                                    220,
+                                                    100
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "从者技能强化/强化按钮.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    1020,
+                                    605,
+                                    240,
+                                    115
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-强化确认分派"
+        ],
+        "post_delay": 600,
+        "doc": "只有业务侧确认实际所选材料与计划一致，且至少有一张新素材时才调用。本节点不在默认准备链上。",
+        "max_hit": 1
+    },
+    "搓丸子-强化确认分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-QP不足提示",
+            "搓丸子-高星材料确认",
+            "搓丸子-强化二次确认",
+            "搓丸子-强化结果页",
+            "搓丸子-强化缺素材提示"
+        ]
+    },
+    "搓丸子-强化二次确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-强化二次确认/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    280,
+                                    140,
+                                    760,
+                                    400
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "强化|強化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "决定.png",
+                                "threshold": 0.86,
+                                "roi": [
+                                    700,
+                                    490,
+                                    360,
+                                    160
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    735,
+                    565,
+                    195,
+                    45
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-强化结果等待"
+        ],
+        "post_delay": 900,
+        "max_hit": 1
+    },
+    "搓丸子-高星材料确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    250,
+                    150,
+                    800,
+                    350
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "高.*稀有|高.*レア|[34３４]星|[★☆][34３４]|[34３４].*以上.*(?:礼装|礼裝)"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-拒绝未授权高星材料"
+        ],
+        "doc": "默认无输入并停止。仅本批素材已逐张复核且确有允许的3/4星时，业务局部覆盖next为高星材料授权确认。"
+    },
+    "搓丸子-高星材料授权确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-高星材料授权确认/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    250,
+                                    150,
+                                    800,
+                                    350
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "高.*稀有|高.*レア|[34３４]星|[★☆][34３４]|[34３４].*以上.*(?:礼装|礼裝)"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/高星素材确认决定.png",
+                                "threshold": 0.9,
+                                "roi": [
+                                    730,
+                                    510,
+                                    230,
+                                    110
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    740,
+                    540,
+                    200,
+                    47
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-强化确认分派"
+        ],
+        "post_delay": 500,
+        "max_hit": 1,
+        "doc": "仅业务对本批明确授权时可达。文字与决定按钮双guard，点击一次后仍走通常强化二次确认，不能直接视作完成。"
+    },
+    "搓丸子-强化缺素材提示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/无素材提示.png",
+                "threshold": 0.8
+            }
+        },
+        "next": [
+            "搓丸子-素材不足"
+        ]
+    },
+    "搓丸子-QP不足提示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    240,
+                    120,
+                    850,
+                    420
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "(?:QP|量子).*(?:不足|足りません|不够|不夠)|(?:不足|足りません|不够|不夠).*(?:QP|量子)"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-QP不足"
+        ],
+        "doc": "日服2026-10-30普通强化确认框有所持QP余额及90QP费用，不能仅因所持QP字样报告不足；必须同段读到QP/量子与不足、足りません等明确否定文案。正常余额确认框为反例，仍只停止而不自动扩大消耗。"
+    },
+    "搓丸子-强化结果等待": {
+        "timeout": 45000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-QP不足提示",
+            "搓丸子-强化结果页",
+            "搓丸子-返还经验提示",
+            "搓丸子-跳过强化动画"
+        ]
+    },
+    "搓丸子-强化结果页": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "And",
+                            "param": {
+                                "all_of": [
+                                    {
+                                        "sub_name": "base/搓丸子/搓丸子-强化结果页/OCR1",
+                                        "recognition": {
+                                            "type": "OCR",
+                                            "param": {
+                                                "roi": [
+                                                    50,
+                                                    0,
+                                                    1200,
+                                                    130
+                                                ],
+                                                "threshold": 0.8,
+                                                "expected": [
+                                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "强化从者/强化完成界面.png",
+                                                "threshold": 0.8,
+                                                "roi": [
+                                                    360,
+                                                    620,
+                                                    220,
+                                                    100
+                                                ]
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/槽位标志.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    370,
+                                    175,
+                                    140,
+                                    140
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-强化一批完成"
+        ],
+        "doc": "仅表示一次强化后回到空素材槽。业务侧还须预览当前底卡名称和Lv/上限验证实际进展与满级。"
+    },
+    "搓丸子-返还经验提示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "强化从者/关闭按钮.png",
+                "threshold": 0.85,
+                "roi": [
+                    250,
+                    220,
+                    800,
+                    480
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-强化结果等待"
+        ],
+        "post_delay": 500,
+        "max_hit": 2
+    },
+    "搓丸子-跳过强化动画": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1180,
+                    70,
+                    35,
+                    20
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-强化结果等待"
+        ],
+        "post_delay": 400,
+        "max_hit": 40,
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    100,
+                    90,
+                    1080,
+                    480
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "強化成功|强化成功|大成功|極大成功|极大成功|SUCCESS"
+                ]
+            }
+        },
+        "doc": "仅在正向识别强化成功动画后点击；未知页面不进行盲点。"
+    },
+    "搓丸子-锁定当前礼装": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-锁定详情已开"
+        ]
+    },
+    "搓丸子-锁定详情已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "友情召唤/详情已锁定.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    0,
+                                    120,
+                                    90,
+                                    110
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "友情召唤/详情未锁定.png",
+                                "threshold": 0.92,
+                                "roi": [
+                                    0,
+                                    120,
+                                    90,
+                                    110
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-详情锁已开",
+            "搓丸子-点击详情锁定"
+        ]
+    },
+    "搓丸子-详情锁已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情已锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-半成品保护完成"
+        ]
+    },
+    "搓丸子-点击详情锁定": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情未锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-详情锁定复查"
+        ],
+        "post_delay": 400,
+        "max_hit": 1
+    },
+    "搓丸子-详情锁定复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-详情锁已开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-确认成品等级": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    70,
+                    160,
+                    1210,
+                    510
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "50[ /]+50|55[ /]+55"
+                ]
+            }
+        },
+        "doc": "业务侧按丸子星级限制最大等级50或55，并核实名称，不能以临时突破上限当成品。"
+    },
+    "搓丸子-进入标记模式": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-标记模式已开启",
+            "搓丸子-点击打开标记模式"
+        ]
+    },
+    "搓丸子-点击打开标记模式": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一标记模式关闭.png",
+                "threshold": 0.93,
+                "roi": [
+                    0,
+                    420,
+                    90,
+                    105
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-标记模式开启等待"
+        ],
+        "post_delay": 350,
+        "max_hit": 1
+    },
+    "搓丸子-标记模式开启等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-标记模式已开启"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-标记模式已开启": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一标记模式开启.png",
+                "threshold": 0.93,
+                "roi": [
+                    0,
+                    420,
+                    90,
+                    105
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-标记模式就绪"
+        ]
+    },
+    "搓丸子-标记当前候选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-候选已有标记",
+            "搓丸子-给候选补标记"
+        ],
+        "doc": "只对重新核验的满级成品格调用；调用方覆盖给候选补标记.target、候选已有标记.roi及候选标记后复查.roi。已标记时不点击，避免解除标记。"
+    },
+    "搓丸子-候选已有标记": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/卡片已标记.png",
+                "threshold": 0.9,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "method": 10001,
+                "roi_offset": [
+                    -14,
+                    -7,
+                    20,
+                    13
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-候选标记完成"
+        ]
+    },
+    "搓丸子-给候选补标记": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一锁定列表标志.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    300,
+                                    90,
+                                    115
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一标记模式开启.png",
+                                "threshold": 0.93,
+                                "roi": [
+                                    0,
+                                    420,
+                                    90,
+                                    105
+                                ],
+                                "method": 10001
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    74,
+                    190,
+                    117,
+                    128
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-候选标记等待"
+        ],
+        "post_delay": 350,
+        "max_hit": 1
+    },
+    "搓丸子-候选标记等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-候选标记后复查"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-候选标记后复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/卡片已标记.png",
+                "threshold": 0.9,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "method": 10001,
+                "roi_offset": [
+                    -14,
+                    -7,
+                    20,
+                    13
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-候选标记完成"
+        ]
+    },
+    "搓丸子-退出标记模式": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-退出标记模式执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-退出标记模式执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一标记模式开启.png",
+                "threshold": 0.93,
+                "roi": [
+                    0,
+                    420,
+                    90,
+                    105
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-标记模式退出等待"
+        ],
+        "post_delay": 350,
+        "max_hit": 1
+    },
+    "搓丸子-标记模式退出等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-标记模式已关闭"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-标记模式已关闭": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一标记模式关闭.png",
+                "threshold": 0.93,
+                "roi": [
+                    0,
+                    420,
+                    90,
+                    105
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-标记模式已退出"
+        ]
+    },
+    "搓丸子-保管室类型准备": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子整理/保管室持有列表.png",
+                "threshold": 0.8,
+                "roi": [
+                    1010,
+                    130,
+                    270,
+                    180
+                ]
+            }
+        },
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保管室概念礼装已选",
+            "搓丸子-保管室选择概念礼装"
+        ]
+    },
+    "搓丸子-保管室选择概念礼装": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/概念礼装类型未选.png",
+                "threshold": 0.9,
+                "roi": [
+                    200,
+                    80,
+                    180,
+                    80
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室概念礼装已选"
+        ],
+        "post_delay": 350
+    },
+    "搓丸子-保管室概念礼装已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/概念礼装类型已选.png",
+                "threshold": 0.9,
+                "roi": [
+                    200,
+                    80,
+                    180,
+                    80
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-保管室筛选准备"
+        ]
+    },
+    "搓丸子-保管室切礼装": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保管室类型准备"
+        ],
+        "attach": {
+            "grid": {
+                "x": [
+                    75,
+                    208,
+                    341,
+                    475,
+                    608,
+                    741,
+                    875
+                ],
+                "y": [
+                    181,
+                    323,
+                    465
+                ],
+                "w": 123,
+                "h": 134,
+                "columns": 7,
+                "rows": 3,
+                "source": "1280x720 seven-column grid; pending full material-selection calibration"
+            }
+        }
+    },
+    "搓丸子-保管室礼装就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-保管室筛选准备": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    953,
+                    107,
+                    60,
+                    47
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室筛选重置"
+        ],
+        "post_delay": 400
+    },
+    "搓丸子-保管室筛选重置": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    100,
+                    580,
+                    280,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室点1星"
+        ],
+        "post_delay": 350
+    },
+    "搓丸子-保管室点1星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/1星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    930,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室1星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-保管室1星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/1星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    970,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-保管室点2星"
+        ]
+    },
+    "搓丸子-保管室点2星": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/2星未选中.png",
+                "threshold": 0.87,
+                "roi": [
+                    743,
+                    200,
+                    190,
+                    100
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室2星已选"
+        ],
+        "post_delay": 300,
+        "max_hit": 1
+    },
+    "搓丸子-保管室2星已选": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/2星已选中.png",
+                "threshold": 0.88,
+                "roi": [
+                    783,
+                    210,
+                    95,
+                    75
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-保管室筛选确认"
+        ]
+    },
+    "搓丸子-保管室筛选确认": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/贩卖-筛选决定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    950,
+                    580,
+                    220,
+                    110
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保管室图标分派"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-存入成品": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-存入成品执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-存入成品执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子整理/保管室持有列表.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    1010,
+                                    130,
+                                    270,
+                                    180
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "决定.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    1050,
+                                    620,
+                                    230,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    1080,
+                    640,
+                    150,
+                    55
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-存储确认分派"
+        ],
+        "post_delay": 400,
+        "doc": "须先由业务核实所选对象全部为允许的已锁已标记满级成品；此入口不批量选择未知卡。",
+        "max_hit": 1
+    },
+    "搓丸子-存储确认分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保管室满提示",
+            "搓丸子-确认存入"
+        ]
+    },
+    "搓丸子-保管室满提示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    150,
+                    120,
+                    1000,
+                    420
+                ],
+                "threshold": 0.8,
+                "expected": [
+                    "保管.*满|保管.*上限|保管.*いっぱい|保管.*一杯"
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保管室已满"
+        ]
+    },
+    "搓丸子-确认存入": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子整理/存储执行按钮.png",
+                "threshold": 0.85,
+                "roi": [
+                    650,
+                    520,
+                    400,
+                    170
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-存储结果等待"
+        ],
+        "post_delay": 600,
+        "max_hit": 1
+    },
+    "搓丸子-存储结果等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-存储完成提示"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-存储完成提示": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/变还关闭按钮.png",
+                "threshold": 0.85,
+                "roi": [
+                    480,
+                    540,
+                    370,
+                    180
+                ]
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-存储完成等待"
+        ],
+        "post_delay": 400,
+        "max_hit": 1
+    },
+    "搓丸子-存储完成等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-存储一批完成"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护半成品": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品详情已开",
+            "搓丸子-保护半成品退出素材列表",
+            "搓丸子-保护半成品预览底卡"
+        ]
+    },
+    "搓丸子-保护半成品详情已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护半成品详情已开/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保护半成品锁定分派"
+        ]
+    },
+    "搓丸子-保护半成品退出素材列表": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "搓丸子/统一锁定列表标志.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    300,
+                                    90,
+                                    115
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                            "template": [
+                                "强化从者/返回强化菜单按钮.png",
+                                "后退按钮.png"
+                            ],
+                                "threshold": 0.8,
+                                "roi": [
+                                    0,
+                                    0,
+                                    220,
+                                    110
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保护半成品预览底卡"
+        ],
+        "post_delay": 450,
+        "doc": "日服2026-10-30实机素材选择页左上为閉じる，强化从者/返回强化菜单按钮仅0.378，已有后退按钮为0.986；保留原模板并复用后退按钮覆盖该样式。仍要求统一锁定列表身份，box_index=1使点击使用关闭按钮框；参考强化从者-点后退的通用模板回退，不用Android返回键在列表间往返。"
+    },
+    "搓丸子-保护半成品预览底卡": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护半成品预览底卡/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    190,
+                    320,
+                    1,
+                    1
+                ],
+                "duration": 1500
+            }
+        },
+        "next": [
+            "搓丸子-保护半成品详情等待"
+        ],
+        "post_delay": 500,
+        "doc": "与搓丸子-预览当前底卡复用同一已选卡中心长按位置及1500ms时长；本入口在强化页预览当前半成品，不使用列表卡片框或随机名称区域。"
+    },
+    "搓丸子-保护半成品详情等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品详情已开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护半成品锁定分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品锁已开",
+            "搓丸子-保护半成品点击锁"
+        ]
+    },
+    "搓丸子-保护半成品锁已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情已锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-保护半成品关闭详情"
+        ]
+    },
+    "搓丸子-保护半成品点击锁": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情未锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保护半成品锁定复查"
+        ],
+        "post_delay": 350,
+        "max_hit": 1
+    },
+    "搓丸子-保护半成品锁定复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品锁已开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护半成品关闭详情": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品关闭详情执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-保护半成品关闭详情执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "友情召唤/详情关闭按钮.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    0,
+                                    0,
+                                    200,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    25,
+                    20,
+                    -50,
+                    -40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保护半成品关闭等待"
+        ],
+        "post_delay": 450,
+        "max_hit": 1,
+        "doc": "日服2026-10-30关闭详情识别框[6,11,69,59]曾随机点击到[74,38]卡面边缘，详情未关闭；将69×59框缩至中心19×19再点击，仍由原后继复核返回。基础与国服模板尺寸相同，识别阈值和单次点击上限不变。"
+    },
+    "搓丸子-保护半成品关闭等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护半成品关闭复查"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护半成品关闭复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护半成品关闭复查/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-半成品保护完成"
+        ]
+    },
+    "搓丸子-成品待标记": {
+        "doc": "成品已锁定，请重新定位已确认的满级礼装后补标记。",
+        "focus": {
+            "Node.Action.Succeeded": "成品已锁定，请重新定位已确认的满级礼装后补标记。"
+        }
+    },
+    "搓丸子-成品列表就绪": {
+        "doc": "可由调用方命中计数读取的单轮结果；无后续输入。"
+    },
+    "搓丸子-成品列表准备": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品图标分派"
+        ],
+        "doc": "查找满级成品前专用：关闭智能筛选防止满级对象被隐藏，按等级排序并关闭选择排序，固定中图标后才枚举。"
+    },
+    "搓丸子-保护成品": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品详情已开",
+            "搓丸子-保护成品预览底卡"
+        ]
+    },
+    "搓丸子-保护成品预览底卡": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护成品预览底卡/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "LongPress",
+            "param": {
+                "target": [
+                    70,
+                    128,
+                    225,
+                    45
+                ],
+                "duration": 700
+            }
+        },
+        "next": [
+            "搓丸子-保护成品详情等待"
+        ],
+        "post_delay": 500
+    },
+    "搓丸子-保护成品详情等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品详情已开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护成品详情已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护成品详情已开/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保护成品锁定分派"
+        ]
+    },
+    "搓丸子-保护成品锁定分派": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品锁已开",
+            "搓丸子-保护成品点击锁"
+        ]
+    },
+    "搓丸子-保护成品锁已开": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情已锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "next": [
+            "搓丸子-保护成品关闭详情"
+        ]
+    },
+    "搓丸子-保护成品点击锁": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "友情召唤/详情未锁定.png",
+                "threshold": 0.94,
+                "roi": [
+                    0,
+                    120,
+                    90,
+                    110
+                ],
+                "method": 10001
+            }
+        },
+        "action": {
+            "type": "Click"
+        },
+        "next": [
+            "搓丸子-保护成品锁定复查"
+        ],
+        "post_delay": 350,
+        "max_hit": 1
+    },
+    "搓丸子-保护成品锁定复查": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品锁已开"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护成品关闭详情": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品关闭详情执行"
+        ],
+        "doc": "先处理通信不良，再根据当前页面执行一次；重连不重发此动作。"
+    },
+    "搓丸子-保护成品关闭详情执行": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情已锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "友情召唤/详情未锁定.png",
+                                                "threshold": 0.92,
+                                                "roi": [
+                                                    0,
+                                                    120,
+                                                    90,
+                                                    110
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "友情召唤/详情关闭按钮.png",
+                                "threshold": 0.85,
+                                "roi": [
+                                    0,
+                                    0,
+                                    200,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 1
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    25,
+                    20,
+                    -50,
+                    -40
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保护成品关闭等待"
+        ],
+        "post_delay": 450,
+        "max_hit": 1,
+        "doc": "日服2026-10-30关闭详情识别框[6,11,69,59]曾随机点击到[74,38]卡面边缘，详情未关闭；将69×59框缩至中心19×19再点击，仍由原后继复核返回。基础与国服模板尺寸相同，识别阈值和单次点击上限不变。"
+    },
+    "搓丸子-保护成品关闭等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品打开列表"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护成品打开列表": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-保护成品打开列表/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    50,
+                                    0,
+                                    1200,
+                                    130
+                                ],
+                                "threshold": 0.8,
+                                "expected": [
+                                    "概念礼装|概念礼裝|概念礼装強化|概念礼装强化"
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "强化从者/强化完成界面.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    360,
+                                    620,
+                                    220,
+                                    100
+                                ]
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    70,
+                    128,
+                    225,
+                    45
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-保护成品列表等待"
+        ],
+        "post_delay": 450
+    },
+    "搓丸子-保护成品列表等待": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-保护成品列表就绪"
+        ],
+        "doc": "通信不良优先；重连返回此等待，仅复查状态，不重复前一个动作。"
+    },
+    "搓丸子-保护成品列表就绪": {
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-成品待标记"
+        ],
+        "doc": "这里不自动点第一格或标记。业务侧须重新识别成品具体格，再进入标记模式处理。"
+    },
+    "搓丸子-候选为当前底卡": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ],
+                "expected": [
+                    "^(?:はずす|卸下|卸除)$"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "doc": "日服底卡重选列表中当前底卡显示はずす；点击卡面可能留在列表，点击该按钮会取消底卡。运行时先识别当前候选标记，命中后关闭列表保留原底卡，再复查实际等级与详情身份，不能当普通候选重复点击。"
+    },
+    "搓丸子-复用当前底卡": {
+        "next": [
+            "搓丸子-保护半成品退出素材列表"
+        ],
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "attach": {
+            "navigation_override": {
+                "搓丸子-保护半成品退出素材列表": {
+                    "next": [
+                        "搓丸子-底卡选定等待"
+                    ]
+                }
+            }
+        },
+        "doc": "复用保护半成品退出素材列表的列表身份+关闭按钮联合识别及点击，仅本次覆盖后继为底卡选定等待；退出重选列表不消耗材料，随后仍核验等级与详情身份。"
+    },
+    "搓丸子-候选等级标志": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "OCR",
+            "param": {
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    38
+                ],
+                "expected": [
+                    "(?i)(?:Lv|等级|等級)\\.?\\s*(?:[0-9]+|MAX)"
+                ],
+                "threshold": 0.8
+            }
+        },
+        "doc": "日服2026-10-30实机素材列表仅两张卡时，蓝色空格背景变化使旧空位模板漏检；不得把空位模板未命中当作有卡。候选为空排除后，用本节点在同帧单格顶部ROI正向确认Lv数字或Lv.MAX，避开卡面干扰后再进入预览素材／预览底卡；等级未读到则跳过，具体身份和等级仍由详情核验，不扩大素材范围。"
+    },
+    "搓丸子-候选为空": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "搓丸子/卡片空位.png",
+                    "搓丸子/卡片空位另一种.png"
+                ],
+                "threshold": 0.85,
+                "roi": [
+                    74,
+                    190,
+                    117,
+                    128
+                ]
+            }
+        },
+        "doc": "正向空位探针，业务须先确认搓丸子-列表标志，再以本节点hit判断空格。真实Maa内存验证context.run_recognition不应用节点顶层inverse；不能靠inverse把空位模板变成有卡。"
+    },
+    "搓丸子-底卡筛选待确认": {
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡筛选无对象",
+            "搓丸子-底卡筛选确认"
+        ],
+        "timeout": 10000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "doc": "日服实机选择1星但库存无符合对象时，决定位置显示対象がありません；先检测此正常停止条件，不降低决定按钮阈值。"
+    },
+    "搓丸子-底卡筛选无对象": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "整理礼物盒/初始设定按钮.png",
+                                "threshold": 0.8,
+                                "roi": [
+                                    100,
+                                    580,
+                                    280,
+                                    100
+                                ]
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-底卡筛选无对象/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    940,
+                                    595,
+                                    230,
+                                    85
+                                ],
+                                "expected": [
+                                    "対象がありません|没有符合|無符合|无符合"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡无对象取消筛选"
+        ],
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "timeout": 1000
+    },
+    "搓丸子-底卡无对象取消筛选": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "搓丸子-底卡筛选无对象",
+                    {
+                        "sub_name": "base/搓丸子/搓丸子-底卡无对象取消筛选/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    700,
+                                    600,
+                                    235,
+                                    80
+                                ],
+                                "expected": [
+                                    "キャンセル|取消"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    760,
+                    620,
+                    100,
+                    35
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-底卡无对象返回列表"
+        ],
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "timeout": 5000,
+        "post_delay": 500,
+        "doc": "只在筛选面板和无对象文案同时确认后取消筛选，不选择其他星级也不点击底卡。"
+    },
+    "搓丸子-底卡无对象返回列表": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "搓丸子/统一锁定列表标志.png",
+                "threshold": 0.8,
+                "roi": [
+                    0,
+                    300,
+                    90,
+                    115
+                ]
+            }
+        },
+        "next": [
+            "搓丸子-无底卡"
+        ],
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "timeout": 5000
+    },
+    "搓丸子-筛选弹窗身份": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "整理礼物盒/初始设定按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                    100,
+                    580,
+                    280,
+                    100
+                ]
+            }
+        }
+    },
+    "搓丸子-底卡筛选复位": {
+        "timeout": 1500,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "next": [
+            "[JumpBack]搓丸子网络-重试",
+            "搓丸子网络-重试耗尽",
+            "搓丸子-底卡星级区就绪",
+            "搓丸子-底卡筛选向上复位"
+        ],
+        "doc": "初始设定只重置条件，不会重置滚动位置；先恢复固定星级ROI，再执行底卡筛选分派。"
+    },
+    "搓丸子-底卡星级区就绪": {
+        "timeout": 0,
+        "on_error": [],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "搓丸子-筛选弹窗身份",
+                    {
+                        "recognition": {
+                            "type": "Or",
+                            "param": {
+                                "any_of": [
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "整理礼物盒/1星未选中.png",
+                                                "threshold": 0.87,
+                                                "roi": [
+                                                    930,
+                                                    200,
+                                                    190,
+                                                    100
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "recognition": {
+                                            "type": "TemplateMatch",
+                                            "param": {
+                                                "template": "搓丸子/1星已选中.png",
+                                                "threshold": 0.88,
+                                                "roi": [
+                                                    970,
+                                                    210,
+                                                    95,
+                                                    75
+                                                ],
+                                                "method": 10001
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "搓丸子-底卡筛选分派"
+        ]
+    },
+    "搓丸子-底卡筛选向上复位": {
+        "timeout": 1000,
+        "on_error": [
+            "搓丸子-识别失败"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "搓丸子-筛选弹窗身份"
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    850,
+                    180,
+                    10,
+                    10
+                ],
+                "end": [
+                    850,
+                    525,
+                    10,
+                    10
+                ],
+                "duration": 650,
+                "end_hold": 300
+            }
+        },
+        "post_delay": 500,
+        "max_hit": 9,
+        "next": [
+            "搓丸子-底卡筛选复位"
+        ],
+        "doc": "日服MCP 049从底部7次向下手势回到星级区；本节点最多9次，每次先检查固定星级ROI，未知弹窗不滑动。后续素材/保管室须单独校准，不能视作已验收。"
+    }
+}

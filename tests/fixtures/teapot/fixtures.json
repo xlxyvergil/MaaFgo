@@ -1,0 +1,212 @@
+{
+  "description": "Small real MaaMCP UI crops only; JP and CN teapot contexts on 2026-11-01, CN formation guard on 2026-10-31.",
+  "canvasSize": [
+    1280,
+    720
+  ],
+  "parts": {
+    "bar_tea_off": {
+      "image": "bar_tea_off.png",
+      "roi": [
+        750,
+        649,
+        165,
+        62
+      ],
+      "source": "direct_initial.png"
+    },
+    "bar_tea_on": {
+      "image": "bar_tea_on.png",
+      "roi": [
+        750,
+        649,
+        165,
+        62
+      ],
+      "source": "direct_on.png"
+    },
+    "bar_storm_on": {
+      "image": "bar_storm_on.png",
+      "roi": [
+        750,
+        649,
+        165,
+        62
+      ],
+      "source": "regular_bar_00.png"
+    },
+    "bar_transition": {
+      "image": "bar_transition.png",
+      "roi": [
+        673,
+        649,
+        242,
+        62
+      ],
+      "source": "regular_bar_01.png"
+    },
+    "header_jp": {
+      "image": "header_jp.png",
+      "roi": [
+        780,
+        94,
+        90,
+        60
+      ],
+      "source": "direct_initial.png"
+    },
+    "header_cn": {
+      "image": "header_cn.png",
+      "roi": [
+        780,
+        94,
+        90,
+        60
+      ],
+      "source": "cn_initial.png"
+    },
+    "header_popup": {
+      "image": "header_popup.png",
+      "roi": [
+        780,
+        94,
+        90,
+        60
+      ],
+      "source": "popup_off.png"
+    },
+    "header_equipment": {
+      "image": "header_equipment.png",
+      "roi": [
+        780,
+        94,
+        90,
+        60
+      ],
+      "source": "male_selected_20.png"
+    },
+    "popup_tea_icon": {
+      "image": "popup_tea_icon.png",
+      "roi": [
+        688,
+        373,
+        43,
+        34
+      ],
+      "source": "initial_16384.png"
+    },
+    "popup_tea_off": {
+      "image": "popup_tea_off.png",
+      "roi": [
+        787,
+        377,
+        55,
+        55
+      ],
+      "source": "initial_16384.png"
+    },
+    "popup_tea_on": {
+      "image": "popup_tea_on.png",
+      "roi": [
+        786,
+        377,
+        55,
+        55
+      ],
+      "source": "popup_off.png"
+    },
+    "popup_storm_on": {
+      "image": "popup_storm_on.png",
+      "roi": [
+        533,
+        374,
+        61,
+        61
+      ],
+      "source": "initial_16384.png"
+    },
+    "popup_frame": {
+      "image": "popup_frame.png",
+      "roi": [
+        175,
+        88,
+        65,
+        70
+      ],
+      "source": "popup_off.png"
+    },
+    "cn_toggle_on": {
+      "image": "cn_toggle_on.png",
+      "roi": [
+        850,
+        646,
+        68,
+        70
+      ],
+      "source": "cn_direct_on_verified.png"
+    },
+    "cn_toggle_off": {
+      "image": "cn_toggle_off.png",
+      "roi": [
+        850,
+        646,
+        68,
+        70
+      ],
+      "source": "cn_direct_off_verified.png"
+    },
+    "cn_popup_title": {
+      "image": "cn_popup_title.png",
+      "roi": [
+        475,
+        100,
+        330,
+        45
+      ],
+      "source": "D34571330CB8694FA3D1FE2914C0FEC5.png"
+    },
+    "cn_popup_storm_on": {
+      "image": "cn_popup_storm_on.png",
+      "roi": [
+        440,
+        365,
+        175,
+        85
+      ],
+      "source": "D34571330CB8694FA3D1FE2914C0FEC5.png"
+    },
+    "cn_popup_tea_off": {
+      "image": "cn_popup_tea_off.png",
+      "roi": [
+        680,
+        365,
+        175,
+        85
+      ],
+      "source": "D34571330CB8694FA3D1FE2914C0FEC5.png"
+    }
+  },
+  "popupCases": [
+    {
+      "name": "off",
+      "parts": [
+        "popup_frame",
+        "popup_tea_icon",
+        "popup_tea_off",
+        "popup_storm_on",
+        "header_popup"
+      ]
+    },
+    {
+      "name": "on",
+      "parts": [
+        "popup_frame",
+        "popup_tea_icon",
+        "popup_tea_on",
+        "popup_storm_on",
+        "bar_tea_on",
+        "header_popup"
+      ]
+    }
+  ]
+}

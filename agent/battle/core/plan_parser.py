@@ -5,12 +5,13 @@
 from __future__ import annotations
 
 import json
+import math
 from typing import Tuple
 
 from battle.core.enums import CardColor
 from battle.core.models import (BattlePlan, MasterSkillAction, OrderChangeAction,
-                                ServantSkillAction, TurnPlan)
-from battle.core.policy import (BattlePolicy, CardPolicy, Goal, SkillPolicy,
+                                ServantSkillAction, TurnPlan, is_slot)
+from battle.core.policy import (BattlePolicy, CardPolicy, Goal, NativeCardStrategy, OpeningHandPolicy, SkillPolicy,
                                 StrategyProfile)
 
 
@@ -74,10 +75,14 @@ def _parse_plan(param: dict | None) -> BattlePlan | None:
             target_ally = s.get("target_ally")
             if target_ally is not None and (not isinstance(target_ally, int) or not 1 <= target_ally <= 3):
                 continue
+            target_enemy = s.get("target_enemy")
+            if target_enemy is not None and not is_slot(target_enemy, 1, 3):
+                continue
             svts = (*svts, ServantSkillAction(
                 servant_slot=s["servant_slot"],
                 skill_index=s["skill_index"],
                 target_ally=target_ally,
+                target_enemy=target_enemy,
             ))
 
         masters: tuple[MasterSkillAction, ...] = ()
@@ -89,9 +94,13 @@ def _parse_plan(param: dict | None) -> BattlePlan | None:
             target_ally = m.get("target_ally")
             if target_ally is not None and (not isinstance(target_ally, int) or not 1 <= target_ally <= 3):
                 continue
+            target_enemy = m.get("target_enemy")
+            if target_enemy is not None and not is_slot(target_enemy, 1, 3):
+                continue
             masters = (*masters, MasterSkillAction(
                 skill_index=m["skill_index"],
                 target_ally=target_ally,
+                target_enemy=target_enemy,
             ))
 
         oc = None
@@ -153,7 +162,22 @@ def _parse_battle_policy(param: dict) -> BattlePolicy:
             "goal": "finish_wave",
             "color_priority": ["B", "A", "Q"],
             "np_first": true,
-            "prefer_mighty_chain": true
+            "prefer_mighty_chain": true,
+            "native_strategy": {
+                "enabled": true,
+                "prefer_brave_chain": true,
+                "brave_chain_weight": 12,
+                "mighty_chain_weight": 8,
+                "same_color_chain_weight": 5,
+                "preferred_servant_ids": [100100],
+                "preferred_slots": [1],
+                "servant_priority_weight": 6,
+                "color_weights": {"B": 3, "A": 2, "Q": 1},
+                "np_colors_by_servant_id": {"605300": "A"},
+                "np_colors_by_slot": {"1": "A"},
+                "avoid_np_color_before_np": true,
+                "np_color_preservation_weight": 20
+            }
         },
         "skill_policy": {
             "auto_servant_skills": true,
@@ -195,6 +219,7 @@ def _parse_battle_policy(param: dict) -> BattlePolicy:
         color_priority=color_priority,
         np_first=bool(card_param.get("np_first", True)),
         prefer_mighty_chain=bool(card_param.get("prefer_mighty_chain", True)),
+        native_strategy=_parse_native_card_strategy(card_param.get("native_strategy")),
     )
 
     skill_param = param.get("skill_policy", {})
@@ -222,3 +247,96 @@ def _parse_battle_policy(param: dict) -> BattlePolicy:
     )
 
     return BattlePolicy(card=card, skill=skill)
+
+
+def _parse_native_card_strategy(value: object) -> NativeCardStrategy:
+    """解析显式启用的补充策略；非法数值回退，权重限于 0..100。
+
+    接受 JSON 数字而非数字字符串，避免布尔值、NaN 或无穷大参与评分。
+    ID 接受正整数或数字字符串；位置仅接受当前前排 1..3 的整数。
+    宝具颜色映射接受 B/A/Q，JSON 对象的槽位键使用 "1"/"2"/"3"。
+    """
+    if not isinstance(value, dict):
+        return NativeCardStrategy()
+    defaults = NativeCardStrategy()
+
+    def servant_id(raw: object) -> str | None:
+        if type(raw) is int and 0 < raw < 10**12:
+            return str(raw)
+        if (isinstance(raw, str) and 0 < len(raw.strip()) <= 12
+                and raw.strip().isascii() and raw.strip().isdigit() and int(raw.strip()) > 0):
+            return str(int(raw.strip()))
+        return None
+
+    def weight(key: str, default: float) -> float:
+        raw = value.get(key, default)
+        if type(raw) not in (int, float) or (type(raw) is float and not math.isfinite(raw)):
+            return default
+        return float(max(0, min(raw, 100)))
+
+    raw_ids = value.get("preferred_servant_ids")
+    ids: list[str] = []
+    if isinstance(raw_ids, list):
+        for sid in raw_ids:
+            normalized = servant_id(sid)
+            if normalized is not None and normalized not in ids:
+                ids.append(normalized)
+
+    raw_slots = value.get("preferred_slots")
+    slots = tuple(dict.fromkeys(slot for slot in raw_slots if is_slot(slot, 1, 3))) if isinstance(raw_slots, list) else ()
+    raw_colors = value.get("color_weights")
+    colors = []
+    if isinstance(raw_colors, dict):
+        for color in (CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK):
+            raw = raw_colors.get(color.value)
+            if type(raw) in (int, float) and not (type(raw) is float and not math.isfinite(raw)):
+                colors.append((color, float(max(0, min(raw, 100)))))
+
+    np_id_colors: dict[str, CardColor] = {}
+    np_slot_colors: dict[int, CardColor] = {}
+    supported_colors = {color.value: color for color in (CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK)}
+    raw_np_ids = value.get("np_colors_by_servant_id")
+    if isinstance(raw_np_ids, dict):
+        for key, color in raw_np_ids.items():
+            sid = servant_id(key)
+            if sid is not None and isinstance(color, str) and color in supported_colors:
+                np_id_colors[sid] = supported_colors[color]
+    raw_np_slots = value.get("np_colors_by_slot")
+    if isinstance(raw_np_slots, dict):
+        for key, color in raw_np_slots.items():
+            slot = int(key) if type(key) is str and key in {"1", "2", "3"} else key
+            if is_slot(slot, 1, 3) and isinstance(color, str) and color in supported_colors:
+                np_slot_colors[slot] = supported_colors[color]
+
+    opening = OpeningHandPolicy()
+    raw_opening = value.get("opening_hand")
+    if isinstance(raw_opening, dict):
+        required = raw_opening.get("required_colors")
+        valid_colors = (isinstance(required, list) and 1 <= len(required) <= 3
+                        and all(isinstance(color, str) and color in supported_colors for color in required))
+        max_wait = raw_opening.get("max_wait_turns", 2)
+        slot = raw_opening.get("servant_slot", raw_opening.get("slot"))
+        opening = OpeningHandPolicy(
+            enabled=raw_opening.get("enabled") is True,
+            servant_id=servant_id(raw_opening.get("servant_id")),
+            servant_slot=slot if is_slot(slot, 1, 3) else None,
+            required_colors=tuple(supported_colors[color] for color in required) if valid_colors else (),
+            max_wait_turns=max_wait if type(max_wait) is int and 0 <= max_wait <= 5 else -1,
+        )
+
+    return NativeCardStrategy(
+        enabled=value.get("enabled") is True,
+        prefer_brave_chain=value.get("prefer_brave_chain", defaults.prefer_brave_chain) is True,
+        brave_chain_weight=weight("brave_chain_weight", defaults.brave_chain_weight),
+        mighty_chain_weight=weight("mighty_chain_weight", defaults.mighty_chain_weight),
+        same_color_chain_weight=weight("same_color_chain_weight", defaults.same_color_chain_weight),
+        preferred_servant_ids=tuple(ids),
+        preferred_slots=slots,
+        servant_priority_weight=weight("servant_priority_weight", defaults.servant_priority_weight),
+        color_weights=tuple(colors),
+        np_colors_by_servant_id=tuple(np_id_colors.items()),
+        np_colors_by_slot=tuple(np_slot_colors.items()),
+        opening_hand=opening,
+        avoid_np_color_before_np=value.get("avoid_np_color_before_np") is True,
+        np_color_preservation_weight=weight("np_color_preservation_weight", defaults.np_color_preservation_weight),
+    )

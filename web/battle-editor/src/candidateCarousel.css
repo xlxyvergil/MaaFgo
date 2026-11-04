@@ -1,0 +1,6 @@
+.fgo-equip-preview{position:relative}
+.fgo-candidate-count{position:absolute;right:4px;bottom:4px;padding:1px 5px;border:1px solid #d6e5ef99;border-radius:3px;background:#123b62c9;color:#fff;font-size:10px;line-height:1.5;pointer-events:none;letter-spacing:.3px}
+.grand-equips .fgo-candidate-count{right:2px;bottom:2px;padding:0 3px;font-size:8px}
+.fgo-candidate-pulse{animation:fgo-candidate-breathe 3.6s ease-in-out both}
+@keyframes fgo-candidate-breathe{0%,100%{opacity:.5}18%,72%{opacity:1}}
+@media(prefers-reduced-motion:reduce){.fgo-candidate-pulse{animation:none}}

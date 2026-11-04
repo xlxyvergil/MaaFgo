@@ -30,10 +30,11 @@ class SettlementTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = {}
-        for name in ("原生自动战斗调度", "战斗完成", "跳过剧情", "Dummy"):
+        for name in ("原生自动战斗调度", "原生自动战斗", "地狱的试炼", "战斗完成", "跳过剧情", "Dummy"):
             cls.source.update(json.loads((ROOT / f"assets/resource/base/pipeline/{name}.json").read_text("utf-8")))
 
-    def run_scenario(self, entry, screens, *, succeeds=True, blind_limit=None):
+    def run_scenario(self, entry, screens, *, succeeds=True, blind_limit=None,
+                     bond_enabled=False, extra_nodes=None, fail_bond_save=False):
         # Include only the reachable graph, retaining production next ordering,
         # JumpBack edges and max_hit. Replace visual algorithms and clicks only.
         nodes = {}
@@ -41,7 +42,10 @@ class SettlementTests(unittest.TestCase):
             name = name.removeprefix("[JumpBack]")
             if name in nodes:
                 return
-            node = copy.deepcopy(self.source[name])
+            node = copy.deepcopy((extra_nodes or {}).get(name, self.source.get(name)))
+            self.assertIsNotNone(node, f"missing pipeline node {name}")
+            if name == "结算-羁绊满停止":
+                node["enabled"] = bond_enabled
             nodes[name] = node
             for raw in node.get("next", []) + node.get("on_error", []):
                 include(raw)
@@ -56,7 +60,7 @@ class SettlementTests(unittest.TestCase):
                 state["seen"].append(argv.node_name)
                 if state["index"] < len(screens) and argv.node_name in screens[state["index"]]:
                     state["index"] += 1
-                return True
+                return not (fail_bond_save and argv.node_name == "结算-羁绊满停止")
         for name, node in nodes.items():
             node.pop("focus", None)
             node.pop("post_wait_freezes", None)
@@ -65,7 +69,10 @@ class SettlementTests(unittest.TestCase):
             if node.get("recognition", {}).get("type", "DirectHit") != "DirectHit":
                 node["recognition"] = {"type": "Custom", "param": {"custom_recognition": "screen"}}
                 node.pop("inverse", None)
-            node["action"] = {"type": "Custom", "param": {"custom_action": "record"}}
+            # Keep the real StopTask semantics: replacing it with a recorder
+            # would miss an accidental JumpBack return into another battle.
+            if node.get("action", {}).get("type") != "StopTask":
+                node["action"] = {"type": "Custom", "param": {"custom_action": "record"}}
             if blind_limit is not None and name.startswith("结算推进_点击右上角"):
                 node["max_hit"] = blind_limit
         with tempfile.TemporaryDirectory() as temp:
@@ -123,6 +130,82 @@ class SettlementTests(unittest.TestCase):
     def test_unknown_screen_exhausts_blind_limit(self):
         seen = self.run_scenario("结束战斗_不回主界面", [], succeeds=False, blind_limit=3)
         self.assertEqual(seen.count("结算推进_点击右上角"), 3)
+
+    def test_activity_close_exits_once_before_generic_close_or_blind_click(self):
+        for entry in ("结束战斗_不回主界面", "结束战斗_连续出击继续",
+                      "结算推进_点击右上角", "结算推进_点击右上角_继续"):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [
+                    {"结算-活动报酬返回地图", "战斗结束关闭_不回主界面"},
+                    {"可能已经结束战斗_不回主界面"},
+                ])
+                self.assertEqual(seen.count("结算-活动报酬返回地图"), 1)
+                self.assertIn("可能已经结束战斗_不回主界面", seen)
+                self.assertNotIn("战斗结束关闭_不回主界面", seen)
+                self.assertNotIn("连续出击_继续", seen)
+                # Direct entry into the existing blind node itself clicks once;
+                # its next poll must exit via the new branch without more clicks.
+                blind = [n for n in seen if n.startswith("结算推进_点击右上角")]
+                self.assertEqual(blind, [entry] if entry.startswith("结算推进_") else [])
+
+    def test_activity_escape_without_map_confirmation_fails_without_extra_input(self):
+        seen = self.run_scenario("结束战斗_不回主界面", [
+            {"结算-活动报酬返回地图"},
+        ], succeeds=False)
+        self.assertEqual(seen.count("结算-活动报酬返回地图"), 1)
+        self.assertNotIn("结算推进_点击右上角", seen)
+
+    def test_bond_max_preempts_final_continuous_and_trial_advancement(self):
+        for entry in ("结束战斗_不回主界面", "结束战斗_连续出击继续",
+                      "地狱的试炼-结算调度"):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [{
+                    "结算-羁绊满停止", "作战成功_结束战斗", "作战成功_结束战斗_继续",
+                    "连续出击_继续", "地狱的试炼-结算下一步",
+                    "战斗结束关闭_不回主界面", "地狱的试炼-结算关闭",
+                }], bond_enabled=True)
+                self.assertEqual(seen, [entry, "结算-羁绊满停止"])
+
+    def test_bond_guard_covers_every_settlement_repoll(self):
+        for entry in ("作战成功_结束战斗", "作战成功_结束战斗_继续",
+                      "好友申请界面_不回主界面", "好友申请界面_连续出击继续",
+                      "结算推进_点击右上角", "结算推进_点击右上角_继续"):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [{entry}, {"结算-羁绊满停止", "连续出击_继续"}],
+                                         bond_enabled=True)
+                self.assertEqual(seen, [entry, "结算-羁绊满停止"])
+
+    def test_bond_guard_disabled_preserves_original_continue_behavior(self):
+        seen = self.run_scenario("结束战斗_连续出击继续", [{
+            "结算-羁绊满停止", "连续出击_继续",
+        }])
+        self.assertNotIn("结算-羁绊满停止", seen)
+        self.assertIn("连续出击_继续", seen)
+
+    def test_bond_enabled_without_max_allows_original_next_and_continue(self):
+        seen = self.run_scenario("结束战斗_连续出击继续", [
+            {"作战成功_结束战斗_继续"}, {"连续出击_继续"},
+        ], bond_enabled=True)
+        self.assertNotIn("结算-羁绊满停止", seen)
+        self.assertIn("作战成功_结束战斗_继续", seen)
+        self.assertIn("连续出击_继续", seen)
+
+    def test_bond_stop_unwinds_jumpback_without_parent_completion(self):
+        extra = {
+            "测试父调度": {"next": ["[JumpBack]结束战斗_连续出击继续", "测试父下一场"]},
+            "测试父下一场": {},
+        }
+        seen = self.run_scenario("测试父调度", [{
+            "结算-羁绊满停止", "连续出击_继续",
+        }], bond_enabled=True, extra_nodes=extra)
+        self.assertEqual(seen, ["测试父调度", "结束战斗_连续出击继续", "结算-羁绊满停止"])
+        self.assertNotIn("测试父下一场", seen)
+
+    def test_bond_screenshot_failure_still_stops_before_any_advance(self):
+        seen = self.run_scenario("结束战斗_连续出击继续", [{
+            "结算-羁绊满停止", "连续出击_继续",
+        }], bond_enabled=True, fail_bond_save=True)
+        self.assertEqual(seen, ["结束战斗_连续出击继续", "结算-羁绊满停止"])
 
 
 if __name__ == "__main__":

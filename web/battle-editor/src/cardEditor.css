@@ -1,0 +1,22 @@
+.card-intent-label {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-width:0;width:100%;}
+.card-intent-label .advanced-card-artwork {width:112px;max-width:100%;aspect-ratio:226/246;}
+.card-intent-label small {max-width:100%;overflow-wrap:anywhere;}
+.card-type-picker {grid-template-columns:repeat(4,minmax(0,1fr));align-items:stretch;}
+.card-type-picker:has(.card-artwork) > button {display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;min-width:0;padding:8px 3px;}
+.card-type-picker .picker-card-artwork {width:112px;max-width:100%;aspect-ratio:226/246;}
+.card-type-picker > button > span:last-child {font-size:12px;white-space:nowrap;}
+@media(max-width:640px){.card-intent-label .advanced-card-artwork {width:96px;}.card-type-picker .picker-card-artwork {width:90px;}.card-type-picker {grid-template-columns:repeat(2,minmax(0,1fr));}}
+
+/* Card order always reads left to right, including narrower inspector layouts. */
+.battle-action-inspector .card-intents{display:grid;grid-template-columns:none;grid-auto-flow:column;grid-auto-columns:minmax(170px,1fr);overflow-x:auto;padding-bottom:4px}
+.battle-action-inspector .card-intent{flex-direction:column;align-items:stretch;gap:8px;padding:8px 10px}
+.card-intent-topline{display:flex;align-items:center;justify-content:space-between;gap:6px;min-height:32px}
+.card-intent-topline>.card-index{display:grid;place-items:center;width:20px;height:20px;padding:0;border:1px solid var(--line-bright);border-radius:50%;color:var(--purple)}
+.battle-action-inspector .card-tools{display:flex;flex-direction:row;justify-content:center;gap:10px;border-top:1px solid var(--line);padding-top:6px}
+.battle-action-inspector .card-tools>.icon,.attack-card-swap-tools>.icon{min-width:36px;min-height:30px;padding:5px 8px;border:1px solid var(--line-bright);background:var(--surface-2);color:var(--purple)}
+.battle-action-inspector .card-tools>.icon:disabled,.attack-card-swap-tools>.icon:disabled{opacity:.35}
+.battle-action-inspector .card-intent>.card-placeholder{display:grid;place-items:center;flex:1;min-height:120px;text-align:center}
+.attack-card-topline{height:32px}
+.card-intent-remove,.attack-card-topline>.attack-card-remove{display:grid;place-items:center;flex:none;width:32px;height:32px;margin-left:auto;padding:0;border:1px solid var(--error);border-radius:5px;background:var(--surface);color:var(--error);box-shadow:0 1px 3px #1232;cursor:pointer;touch-action:manipulation}
+.card-intent-remove:hover,.attack-card-topline>.attack-card-remove:hover{background:var(--surface-3);box-shadow:0 0 0 1px var(--error)}
+.card-intent-remove:focus-visible,.battle-action-inspector .card-tools>.icon:focus-visible{outline:2px solid var(--purple);outline-offset:2px}

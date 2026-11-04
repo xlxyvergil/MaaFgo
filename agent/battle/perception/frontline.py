@@ -10,7 +10,11 @@ import cv2
 import numpy as np
 
 from ..core.models import Confidence
-from .card_owner import _load_servant_templates, _normalize_image
+from .card_owner import _load_servant_templates, _normalize_image, VISIBLE_TEMPLATE_TOP
+
+# A support ribbon can cross the upper hairline of the status portrait.
+# Keep the full original band first; only a failed match may use this crop.
+_SUPPORT_FALLBACK_TOP = 45
 
 
 @dataclass(frozen=True)
@@ -20,6 +24,7 @@ class FrontlineIdentity:
     confidence: Confidence
     margin: float = 0.0
     matched_template: str = ""
+    visible_top: int = VISIBLE_TEMPLATE_TOP
 
 
 @lru_cache(maxsize=1)
@@ -32,9 +37,9 @@ def _status_roots() -> tuple[str, ...]:
 
 
 @lru_cache(maxsize=64)
-def _prepared_templates(roots, servant_id, scales, sx, sy):
+def _prepared_templates(roots, servant_id, scales, sx, sy, visible_top=VISIBLE_TEMPLATE_TOP):
     prepared = []
-    for item in _load_servant_templates(roots, servant_id):
+    for item in _load_servant_templates(roots, servant_id, visible_top):
         for scale in scales:
             size = (round(item.bgr.shape[1] * scale * sx),
                     round(item.bgr.shape[0] * scale * sy))
@@ -47,6 +52,24 @@ def _prepared_templates(roots, servant_id, scales, sx, sy):
 
 
 class FrontlineServantRecognizer:
+    @staticmethod
+    def _rank_templates(region, templates):
+        ranked, matches = [], {}
+        for sid, variants in templates.items():
+            best, path = 0.0, ""
+            for template, mask, relative_path in variants:
+                if template.shape[0] > region.shape[0] or template.shape[1] > region.shape[1]:
+                    continue
+                response = cv2.matchTemplate(region, template, cv2.TM_CCOEFF_NORMED, mask=mask)
+                response = np.nan_to_num(response, nan=-1.0, posinf=-1.0, neginf=-1.0)
+                _, score, _, location = cv2.minMaxLoc(response)
+                if score > best:
+                    best, path = float(score), relative_path
+                    matches[sid] = (location, template.shape[:2], mask)
+            ranked.append((best, sid, path))
+        ranked.sort(key=lambda item: (-item[0], item[1]))
+        return ranked, matches
+
     def __init__(self, rois, scales, min_score, min_margin, analysis_scale, *, roots=None):
         self.rois = tuple(tuple(roi) for roi in rois)
         self.scales = tuple(scales)
@@ -98,26 +121,32 @@ class FrontlineServantRecognizer:
             if slot in self._unmatched and np.array_equal(region, self._unmatched[slot]):
                 results.append(FrontlineIdentity(slot, None, Confidence(0.0, "status_template")))
                 continue
-            ranked = []
-            matches = {}
-            for sid, variants in templates.items():
-                best, path = 0.0, ""
-                for template, mask, relative_path in variants:
-                    if template.shape[0] > region.shape[0] or template.shape[1] > region.shape[1]:
-                        continue
-                    response = cv2.matchTemplate(region, template, cv2.TM_CCOEFF_NORMED, mask=mask)
-                    response = np.nan_to_num(response, nan=-1.0, posinf=-1.0, neginf=-1.0)
-                    _, score, _, location = cv2.minMaxLoc(response)
-                    if score > best:
-                        best, path = float(score), relative_path
-                        matches[sid] = (location, template.shape[:2], mask)
-                ranked.append((best, sid, path))
-            ranked.sort(key=lambda item: (-item[0], item[1]))
+            ranked, matches = self._rank_templates(region, templates)
             score, sid, path = ranked[0]
             margin = score - (ranked[1][0] if len(ranked) > 1 else 0.0)
             identified = score >= self.min_score and margin >= self.min_margin
+            crop_tops = dict.fromkeys(candidates, VISIBLE_TEMPLATE_TOP)
+            if not identified:
+                # Do not lower the global score or margin. Compare every
+                # candidate with the same reduced hairline so a similar wrong
+                # portrait can still veto a cropped match by its margin.
+                fallback = {candidate: _prepared_templates(
+                    self.roots, candidate, self.scales, sx, sy, _SUPPORT_FALLBACK_TOP,
+                ) for candidate in candidates}
+                fallback_ranked, fallback_matches = self._rank_templates(region, fallback)
+                combined = {item[1]: item for item in ranked}
+                for item in fallback_ranked:
+                    if item[0] > combined[item[1]][0]:
+                        combined[item[1]] = item
+                        matches[item[1]] = fallback_matches[item[1]]
+                        crop_tops[item[1]] = _SUPPORT_FALLBACK_TOP
+                ranked = sorted(combined.values(), key=lambda item: (-item[0], item[1]))
+                score, sid, path = ranked[0]
+                margin = score - (ranked[1][0] if len(ranked) > 1 else 0.0)
+                identified = score >= self.min_score and margin >= self.min_margin
             identity = FrontlineIdentity(
                 slot, sid if identified else None, Confidence(score, "status_template"), margin, path,
+                crop_tops[sid],
             )
             if identified:
                 (left, top), (height, width), mask = matches[sid]

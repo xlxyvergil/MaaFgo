@@ -148,12 +148,17 @@ class CompleteBondFormation(AutoFormationFromChaldea):
         self.full_existing_slots = set()
         self.memory_store = None
         self.memory_task_key = None
+        self._formation_update = None
+        self._bond_initial_layout = None
+        self._verified_formation_layout = None
         try:
             node = context.get_node_data(argv.node_name) or {}
             attach = node.get("attach") or {}
             if not _truthy(attach.get("bond_completion_enabled", False)):
                 mfaalog.info("[羁绊补齐] 功能未开启，保持原自动编队结果")
                 return CustomAction.RunResult(success=True)
+
+            self._begin_verified_formation_update()
 
             source = str(
                 attach.get("chaldea_import_source")
@@ -262,6 +267,7 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 return self._abort_safe(
                     "bond_completion_slot_invalid: 助战身份或替代目标不匹配"
                 )
+            self._bond_initial_layout = [dict(state) for state in detected]
             self.equip_probe_slots = [
                 i for i, item in enumerate(detected)
                 if item["kind"] not in {"EMPTY", "SUPPORT"}
@@ -442,6 +448,7 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 return self._abort_safe("bond_completion_final_mismatch: 未能点击编队决定")
             self.opened_edit = False
             self._confirm_formation_change_if_present()
+            self._publish_verified_layout(self._verified_formation_layout)
             self._save_auto_memory(final_memory_signature)
             status = "bond_completion_no_change" if not (self.added_servants or self.added_equips) else "bond_completion_complete"
             if status == "bond_completion_no_change":
@@ -466,6 +473,9 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             if getattr(self, "opened_edit", False):
                 return self._abort_safe(f"bond_completion_unhandled: {exc}")
             return CustomAction.RunResult(success=False)
+        finally:
+            # 安全取消也可能返回成功；只有显式发布过最终复核结果才能复用。
+            self._discard_unpublished_formation()
 
     # ---------- 数据与资源 ----------
 
@@ -594,10 +604,13 @@ class CompleteBondFormation(AutoFormationFromChaldea):
                 "当前禁止替换未指定从者，保持编队并继续战斗"
             )
             self._focus_user("发现满羁绊从者；当前禁止替换，保持编队", "orange")
+        if getattr(self, "_formation_update", None) is not None:
+            self._record_bond_verified_layout(self._shot(), protected_verified=False)
         if not self._run_pipeline("羁绊补齐-编队决定"):
             return self._abort_safe("bond_completion_final_mismatch: 自动记忆命中后未能点击编队决定")
         self.opened_edit = False
         self._confirm_formation_change_if_present()
+        self._publish_verified_layout(getattr(self, "_verified_formation_layout", None))
         mfaalog.info("[羁绊补齐] bond_completion_memory_hit: 编队一致，已跳过完整羁绊优化")
         if not full_locked_slots:
             self._focus_user("编队与羁绊记忆一致，已跳过重复优化", "green")
@@ -2500,7 +2513,33 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             match = self._match_equip_id(image, equip["id"], slot)
             if match is None or match[0] < EQUIP_VERIFY_THRESHOLD:
                 return False
+        self._record_bond_verified_layout(image, protected_verified=True)
         return True
+
+    def _record_bond_verified_layout(self, image, *, protected_verified):
+        """只整理已在本阶段复核的身份；不按 Chaldea EMPTY 假设实际为空。"""
+        initial = getattr(self, "_bond_initial_layout", None)
+        if getattr(self, "_formation_update", None) is None or initial is None or image is None:
+            return
+        layout = [dict(state) for state in initial]
+        local = {**self.unspecified_servants_by_slot, **self.added_servants}
+        for index, state in enumerate(layout):
+            expected = self.expected[index]
+            if expected["kind"] == "LOCAL":
+                if protected_verified:
+                    state = {"kind": "LOCAL", "svt_id": expected["svt_id"]}
+                elif state.get("kind") != "LOCAL" or state.get("svt_id") != expected["svt_id"]:
+                    state = {"kind": "OTHER", "svt_id": None}
+            elif index in local:
+                state = {"kind": "LOCAL", "svt_id": local[index]["id"]}
+            if state.get("kind") == "SUPPORT":
+                match = self._match_template(image, self.support_marker, self._slot_roi(index))
+                if match is None or match[0] < 0.75:
+                    state = {"kind": "UNKNOWN", "svt_id": None}
+            elif state.get("kind") == "EMPTY" and not self._is_empty_slot(image, self._slot_roi(index)):
+                state = {"kind": "OTHER", "svt_id": None}
+            layout[index] = state
+        self._verified_formation_layout = layout
 
     def _on_confirm_page(self):
         match = self._match_template(self._shot(), self.config_marker)
@@ -2547,7 +2586,8 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             # 恢复进入本 Action 前的第一阶段队伍；没有实际变更时则会直接返回
             # 编队确认页，此时不能继续等待一个不会出现的弹窗。
             self.opened_edit = False
-            if not self._confirmed_now(self._on_confirm_page):
+            # 取消后返回确认页有短暂过渡；不能用单次旧帧判断必须有放弃弹窗。
+            if not self._wait_for(self._on_confirm_page, 3.0):
                 self._run_pipeline("羁绊补齐-取消变更确认")
             if self._wait_for(self._on_confirm_page, 6.0):
                 self._focus_user("羁绊优化已取消，原编队已恢复", "orange")

@@ -17,6 +17,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from formation_test_support import ROOT, formation as f, battle_action as a
 from battle.runtime.formation_session import context_session, sessions
+from battle.core.models import FormationSlot, VERIFIED_FORMATION_SOURCE
 from maa.controller import CustomController
 from maa.custom_action import CustomAction
 from maa.define import LoggingLevelEnum
@@ -79,7 +80,7 @@ class FrameworkTests(unittest.TestCase):
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
 
-    def run_pipeline(self, page_ok, fail_capture=False):
+    def run_pipeline(self, page_ok, fail_capture=False, verified_slots=None):
         source = json.loads((ROOT / "assets/resource/base/pipeline/自动编队.json").read_text(encoding="utf-8"))
         nodes = {n: v for n, v in source.items() if n.startswith("编队身份-")}
         nodes.update({
@@ -94,6 +95,10 @@ class FrameworkTests(unittest.TestCase):
             "verified": True, "calibration_id": "synthetic-test-only",
             "identity_threshold": .95, "identity_margin": .25,
         }
+        if verified_slots is not None:
+            nodes["root"]["next"] = ["seed_verified"]
+            nodes["seed_verified"] = {"action": {"type": "Custom", "param": {
+                "custom_action": "seed_verified"}}, "next": ["进本-点击队伍确认"], "on_error": []}
         for node in nodes.values():
             node.update(rate_limit=1, post_delay=0, timeout=200)
         with tempfile.TemporaryDirectory() as temp:
@@ -118,9 +123,17 @@ class FrameworkTests(unittest.TestCase):
                     later_screenshots.append(bool(visible))
                     return bool(visible)
 
+            class SeedVerified(CustomAction):
+                def run(self, context, argv):
+                    root, token = context_session(context)
+                    revision = sessions.begin_update(root, token)
+                    sessions.publish_verified(root, token, revision, verified_slots)
+                    return True
+
             resource.register_custom_action("begin_native_formation_session", a.BeginNativeFormationSession())
             resource.register_custom_action("capture_initial_formation", f.CaptureInitialFormation())
             resource.register_custom_action("observe_snapshot", Observe())
+            resource.register_custom_action("seed_verified", SeedVerified())
             resource.register_custom_recognition("formation_identity_frame", f.FormationIdentityFrame())
             image = self.fixture.image if page_ok else np.zeros_like(self.fixture.image)
             controller = MemoryController(image, fail_capture)
@@ -156,13 +169,16 @@ class FrameworkTests(unittest.TestCase):
                 self.assertLessEqual(len(observed), 1)
                 self.assertEqual(later_screenshots, [False] * len(observed))
             else:
-                self.assertEqual(len(received_images), 1)
+                complete = verified_slots is not None and all(s.status != "unknown" for s in verified_slots)
+                self.assertEqual(len(received_images), 0 if complete else 1)
                 self.assertEqual(len(observed), 1)
                 self.assertEqual(later_screenshots, [True])
             if page_ok and not fail_capture:
                 snapshot = observed[0]
                 self.assertEqual(snapshot.task_id, job.job_id)
                 self.assertTrue(all(slot.servant_id == "1000" for slot in snapshot.slots))
+                if verified_slots is not None:
+                    self.assertEqual(snapshot.source, VERIFIED_FORMATION_SOURCE)
                 self.assertFalse(sessions.valid(snapshot.task_id, snapshot.session_id))
             elif observed:
                 self.assertIsNone(observed[0])
@@ -179,6 +195,16 @@ class FrameworkTests(unittest.TestCase):
 
     def test_screenshot_failure_still_stops_when_later_battle_cannot_observe(self):
         self.run_pipeline(True, fail_capture=True)
+
+    def test_verified_complete_result_skips_identity_callback_through_real_context(self):
+        known = tuple(FormationSlot(i, "identified", "1000", is_support=False) for i in range(1, 7))
+        self.run_pipeline(True, verified_slots=known)
+
+    def test_verified_partial_result_fills_unknown_through_real_context(self):
+        known = tuple(FormationSlot(i, "identified", "1000", is_support=False)
+                      if i != 6 else FormationSlot(i, "unknown", is_support=False)
+                      for i in range(1, 7))
+        self.run_pipeline(True, verified_slots=known)
 
 
 if __name__ == "__main__":

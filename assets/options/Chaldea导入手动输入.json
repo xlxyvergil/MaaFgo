@@ -2,8 +2,8 @@
     "option": {
         "原生自动战斗使用Chaldea队伍": {
             "type": "switch",
-            "label": "是否使用 Chaldea 队伍",
-            "description": "使用 Chaldea 编队和战斗技能释放逻辑。\n\n[使用指南](https://www.bilibili.com/video/BV1Lueb6bEbW/)",
+            "label": "使用编辑器/chaldea配置",
+            "description": "使用编辑器或 Chaldea 方案中的编队与逐回合战斗配置。 [使用指南](https://www.bilibili.com/video/BV1Lueb6bEbW/)\n\n[启动编队与战斗编辑器](./打开编队编辑器.cmd) · [打开已启动的编辑器](http://127.0.0.1:18765/)",
             "default_case": "No",
             "cases": [
                 {
@@ -36,15 +36,20 @@
         },
         "Chaldea导入手动输入": {
             "type": "input",
-            "label": "Chaldea 队伍导入",
-            "description": "本地文件：config/Battle 下的缓存文件名。",
+            "label": "编辑器/chaldea方案导入",
+            "description": "本地文件：config/Battle 下的队伍文件名。\n\n[启动编队与战斗编辑器](./打开编队编辑器.cmd) · [打开已启动的编辑器](http://127.0.0.1:18765/)",
             "inputs": [
                 {
                     "name": "chaldea_import_source",
                     "label": "分享链接 / 队伍ID / 关卡ID / 本地文件",
                     "default": "",
                     "verify": ".*",
-                    "input_type": "file"
+                    "input_type": "file",
+                    "file_dialog_dir": "config/Battle",
+                    "file_dialog_filters": [
+                        {"name": "JSON", "extensions": ["json"]},
+                        {"name": "所有文件", "extensions": ["*"]}
+                    ]
                 }
             ],
             "pipeline_override": {
@@ -54,8 +59,7 @@
                         "param": {
                             "custom_action": "auto_battle",
                             "custom_action_param": {
-                                "chaldea_import_source": "{chaldea_import_source}",
-                                "max_turns": 20
+                                "chaldea_import_source": "{chaldea_import_source}"
                             }
                         }
                     }
@@ -66,8 +70,7 @@
                         "param": {
                             "custom_action": "auto_battle_repeat",
                             "custom_action_param": {
-                                "chaldea_import_source": "{chaldea_import_source}",
-                                "max_turns": 20
+                                "chaldea_import_source": "{chaldea_import_source}"
                             }
                         }
                     }
@@ -97,7 +100,7 @@
         "Chaldea编队方式": {
             "type": "select",
             "label": "编队方式",
-            "description": "手动核对从者并调整位置；自动按数据编队。",
+            "description": "手动核对从者并调整位置；自动按数据编队。有御主礼装数据时，手动只校验，不匹配则停止；自动完成更换。",
             "default": "手动",
             "cases": [
                 {

@@ -173,6 +173,40 @@ def validate_file(file_path, validator):
         return False
 
 
+def validate_battle_preset_file(file_path):
+    """Check shipped BattleShareData with the same offline validator as the editor."""
+    try:
+        project_root = str(Path(__file__).resolve().parents[1])
+        if project_root not in sys.path:
+            sys.path.insert(0, project_root)
+        from agent.battle_editor.validation import validate_battle
+
+        report = validate_battle(load_jsonc(file_path))
+        errors = [issue for issue in report["issues"] if issue["severity"] == "error"]
+        if not report["valid"]:
+            print(f"\n❌ Battle preset validation failed for {file_path}:")
+            for issue in errors[:10]:
+                print(
+                    f"::error file={file_path},title=Battle Preset Validation Error::"
+                    f"{issue['path']}: {issue['message']}"
+                )
+            return False
+        print(f"✓ Battle preset {file_path}")
+        return True
+    except Exception as exc:
+        print(f"\n❌ Error validating battle preset {file_path}: {exc}")
+        print(f"::error file={file_path},title=Battle Preset Validation Error::{exc}")
+        return False
+
+
+def validate_resource_file(file_path, pipeline_validator):
+    """Only the dedicated base/battle_presets data directory has a different contract."""
+    file_path = Path(file_path)
+    if file_path.parent.name == "battle_presets" and file_path.parent.parent.name == "base":
+        return validate_battle_preset_file(file_path)
+    return validate_file(file_path, pipeline_validator)
+
+
 def create_validator(schema, schema_store):
     """创建 validator，使用新的 referencing API 或回退到 RefResolver"""
     ValidatorClass = get_validator_class(schema)
@@ -375,13 +409,13 @@ def main():
                 continue
             if is_excluded(file_path):
                 continue
-            if not validate_file(file_path, pipeline_validator):
+            if not validate_resource_file(file_path, pipeline_validator):
                 all_valid = False
 
         for file_path in resource_path.rglob("*.jsonc"):
             if is_excluded(file_path):
                 continue
-            if not validate_file(file_path, pipeline_validator):
+            if not validate_resource_file(file_path, pipeline_validator):
                 all_valid = False
 
     print("\nValidating interface files...")

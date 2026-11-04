@@ -1,6 +1,7 @@
 *
 !.gitignore
 !test_*.py
+!run_maa_battle_editor_integration.py
 !formation_test_support.py
 !requirements.txt
 !unit/
@@ -8,3 +9,12 @@
 !fixtures/
 !android/
 !android/*.kt
+# Real-image regressions for NP glare and support HUD recognition only.
+!fixtures/battle_np/jp_hellish_glare_20261031.png
+!fixtures/battle_np/jp_hellish_clear_20261031.png
+!fixtures/battle_frontline/jp_support_hud_20261031.png
+!fixtures/battle_frontline/jp_np_animation_no_hud_20261031.png
+# Retained bond-result and automatic level-up overlay regressions.
+!fixtures/bond_stop/
+!fixtures/bond_stop/jp_bond_slot5_max.png
+!fixtures/bond_stop/jp_bond_level_up_overlay.png

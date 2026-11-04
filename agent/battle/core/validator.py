@@ -5,7 +5,7 @@ from collections import Counter
 from dataclasses import dataclass, replace
 
 from .enums import PrimitiveKind, Scene
-from .models import (BattleAction, BattleState, OrderChangeAction,
+from .models import (ActorBinding, BattleAction, BattleState, OrderChangeAction, RetireAction,
                      ServantSkillAction, is_slot)
 from .policy import StrategyProfile
 
@@ -27,7 +27,7 @@ def skip_unusable_servant_skills(
 ) -> tuple[BattleAction, tuple[str, ...]]:
     """跳过无法确认可执行的从者技能，保留结构非法动作给 Validator 拒绝。"""
     ordered_swap = (
-        any(isinstance(step, OrderChangeAction) for step in action.skill_sequence)
+        any(isinstance(step, (OrderChangeAction, RetireAction)) for step in action.skill_sequence)
         and sum(isinstance(step, ServantSkillAction) for step in action.skill_sequence)
         == len(action.servant_skills)
     )
@@ -37,6 +37,7 @@ def skip_unusable_servant_skills(
             not is_slot(skill.servant_slot, 1, 3)
             or not is_slot(skill.skill_index, 1, 3)
             or (skill.target_ally is not None and not is_slot(skill.target_ally, 1, 3))
+            or (skill.target_enemy is not None and not is_slot(skill.target_enemy, 1, 3))
         ):
             return action, ()
         key = (skill.servant_slot, skill.skill_index)
@@ -51,7 +52,7 @@ def skip_unusable_servant_skills(
         skipped = []
         after_swap = False
         for step in action.skill_sequence:
-            if isinstance(step, OrderChangeAction):
+            if isinstance(step, (OrderChangeAction, RetireAction)):
                 after_swap = True
             if isinstance(step, ServantSkillAction) and not after_swap:
                 field = f"servant[{step.servant_slot}].skill[{step.skill_index}].available"
@@ -123,16 +124,13 @@ def skip_unusable_master_skills(
     过滤后为空），则同时移除 order_change——换人无法触发时跳过换人，而不是
     让 validate_main_action 以 order_change_without_master_skill 中止整场战斗。
     """
-    seen: set[int] = set()
     for skill in action.master_skills:
         if (
             not is_slot(skill.skill_index, 1, 3)
             or (skill.target_ally is not None and not is_slot(skill.target_ally, 1, 3))
+            or (skill.target_enemy is not None and not is_slot(skill.target_enemy, 1, 3))
         ):
             return action, ()
-        if skill.skill_index in seen:
-            return action, ()
-        seen.add(skill.skill_index)
 
     master_states = {idx + 1: st for idx, st in enumerate(state.master_skills)}
     kept = []
@@ -186,7 +184,14 @@ def validate_main_action(
     post_swap_flags = []
     after_swap = False
     for step in action.skill_sequence:
-        if isinstance(step, OrderChangeAction):
+        if isinstance(step, RetireAction) and (
+            not is_slot(step.servant_slot, 1, 3)
+            or not isinstance(step.actor, ActorBinding)
+            or type(step.actor.initial_slot) is not int or not 0 <= step.actor.initial_slot <= 5
+            or not step.actor.servant_id
+        ):
+            return Verdict(False, "invalid_retirement")
+        if isinstance(step, (OrderChangeAction, RetireAction)):
             after_swap = True
         elif isinstance(step, ServantSkillAction):
             post_swap_flags.append(after_swap)
@@ -200,6 +205,8 @@ def validate_main_action(
         # 不校验同回合重复技能: 减CD策略/部分英灵技能允许同一技能一回合多次释放
         if skill.target_ally is not None and not is_slot(skill.target_ally, 1, 3):
             return Verdict(False, "invalid_skill_target")
+        if skill.target_enemy is not None and not is_slot(skill.target_enemy, 1, 3):
+            return Verdict(False, "invalid_skill_enemy_target")
 
         # 换人后该位置属于新从者；当前帧里仍是换人前的技能状态。
         if post_swap_flags[index]:
@@ -216,16 +223,15 @@ def validate_main_action(
         if skill_state.available is False:
             return Verdict(False, "skill_not_available", fatal=False)
 
-    seen_master_skills: set[int] = set()
     master_states = {idx + 1: st for idx, st in enumerate(state.master_skills)}
     for skill in action.master_skills:
         if not is_slot(skill.skill_index, 1, 3):
             return Verdict(False, "invalid_master_skill")
-        if skill.skill_index in seen_master_skills:
-            return Verdict(False, "duplicate_master_skill")
-        seen_master_skills.add(skill.skill_index)
+        # 同回合减 CD / 再使用机制允许重复御主技能，保留次序与每项安全门。
         if skill.target_ally is not None and not is_slot(skill.target_ally, 1, 3):
             return Verdict(False, "invalid_skill_target")
+        if skill.target_enemy is not None and not is_slot(skill.target_enemy, 1, 3):
+            return Verdict(False, "invalid_skill_enemy_target")
 
         skill_state = master_states.get(skill.skill_index)
         if skill_state is None:

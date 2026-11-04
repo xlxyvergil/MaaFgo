@@ -1,0 +1,11 @@
+{
+  "task": [{
+    "name": "自动清free本",
+    "label": "🗺️ 自动清free本",
+    "description": "从当前章节地图、Free Quest 详情、助战或编队开始，寻找数字地图点并反复完成未 CLEAR 的 Free 本；确认 CLEAR 后返回地图，遍历无目标时停止。默认沿用当前编队，可选编辑器/Chaldea 配置，不处理主线编队限制。",
+    "entry": "自动清free本调度",
+    "controller": ["安卓设备"],
+    "option": ["Free-战斗上限", "吃苹果", "Free-战斗方式"],
+    "group": ["战斗相关"]
+  }]
+}

@@ -28,6 +28,8 @@ TOOLS = Path(__file__).resolve().parent
 if str(TOOLS) not in sys.path:
     sys.path.insert(0, str(TOOLS))
 from prepare_command_card_composition_assets import deploy_packs, palette_png
+from command_card_palette import PROFILE, transform_metadata
+from command_card_metadata import transformed_ids
 
 ROOT = TOOLS.parent
 DEFAULT_CSV = Path('F:/KumikoPythonCode/FGO主线剧情epub/servant_list.csv')
@@ -115,7 +117,7 @@ def command_assets(record):
     return assets
 
 
-def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=False, fetcher=fetch):
+def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=False, metadata_cache=None, fetcher=fetch):
     project = project.resolve()
     rows = read_csv(csv_path)
     selected = set(selected_ids)
@@ -126,7 +128,7 @@ def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=Fals
         rows = [r for r in rows if r['servantId'] in selected]
     run = project / '.workbuddy/backups' / ('csv-command-assets-' + datetime.now(timezone(timedelta(hours=8))).strftime('%Y%m%d-%H%M%S-%f'))
     run.mkdir(parents=True)
-    report = {'csv': str(csv_path), 'csv_rows': len(rows), 'write': write, 'new_servants': [], 'no_commands': [], 'csv_not_in_atlas': [], 'atlas_not_in_csv': [], 'planned': [], 'missing': [], 'downloaded': [], 'backup': str(run)}
+    report = {'csv': str(csv_path), 'csv_rows': len(rows), 'write': write, 'new_servants': [], 'forms': {}, 'no_commands': [], 'csv_not_in_atlas': [], 'atlas_not_in_csv': [], 'planned': [], 'missing': [], 'downloaded': [], 'backup': str(run)}
     roots = {r: project / f'assets/resource/{pack}/image/CommandCards' for r, pack in [('JP','base'),('CN','cn')]}
     portrait_path = roots['JP'] / 'manifest'
     portraits = read_manifest(portrait_path, {'schema_version':1, 'region':'JP', 'servants':{}})
@@ -139,7 +141,12 @@ def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=Fals
     old_compositions = copy.deepcopy(compositions)
 
     def get_json(url, filename):
-        raw = fetcher(url)
+        candidates = [metadata_cache / filename] if metadata_cache else []
+        if metadata_cache and filename.startswith('nice-'):
+            sid = filename.removeprefix('nice-').removesuffix('.json')
+            candidates += [metadata_cache / f'nice-JP-{sid}.json', metadata_cache / f'form-JP-{sid}.json']
+        cached = next((p for p in candidates if p.is_file()), None)
+        raw = cached.read_bytes() if cached else fetcher(url)
         if raw is None:
             raise ValueError(f'Atlas metadata missing: {url}')
         value = json.loads(raw)
@@ -181,23 +188,41 @@ def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=Fals
         record = get_json(API+f'/nice/JP/servant/{row["collectionNo"]}', f'nice-{sid}.json')
         if str(record.get('id')) != sid or int(record.get('collectionNo',0)) != int(row['collectionNo']):
             raise ValueError(f'NiceServant identity mismatch for {sid}')
-        return sid, command_assets(record)
+        return sid, record
 
     jobs = []
     with ThreadPoolExecutor(max_workers=4) as pool:
-        for sid, assets in pool.map(nice, need_records):
-            if not assets:
-                report['no_commands'].append({'id':sid,'reason':'NiceServant.extraAssets.commands is empty'})
+        pending = list(pool.map(nice, need_records))
+    visited = set()
+    while pending:
+        sid, record = pending.pop(0)
+        if sid in visited:
+            continue
+        visited.add(sid)
+        assets = command_assets(record)
+        if not assets:
+            report['no_commands'].append({'id':sid,'reason':'NiceServant.extraAssets.commands is empty'})
+            if sid in active:
                 active.remove(sid)
-                continue
-            existing = {e['file']:e for e in portraits['servants'].get(sid,[])}
-            for filename, info in assets.items():
-                relative = f'{sid}/{filename}'
-                entry = existing.get(relative)
-                if entry and entry['source'] != info['source']:
-                    raise ValueError(f'Existing portrait source changed; review explicitly: {relative}')
-                if not entry or not existing_ok(roots['JP'],entry):
-                    jobs.append({'kind':'portrait','region':'JP','id':sid,'file':relative,**info})
+            continue
+        if sid not in active:
+            active.append(sid)
+        existing = {e['file']:e for e in portraits['servants'].get(sid,[])}
+        for filename, info in assets.items():
+            relative = f'{sid}/{filename}'
+            entry = existing.get(relative)
+            if entry and entry['source'] != info['source']:
+                raise ValueError(f'Existing portrait source changed; review explicitly: {relative}')
+            if not entry or not existing_ok(roots['JP'],entry):
+                jobs.append({'kind':'portrait','region':'JP','id':sid,'file':relative,**info})
+        forms = transformed_ids(record)
+        if forms:
+            report['forms'][sid] = sorted(forms, key=int)
+        for form_id in sorted(forms - visited, key=int):
+            form = get_json(API+f'/nice/JP/servant/{form_id}', f'nice-{form_id}.json')
+            if str(form.get('id')) != form_id:
+                raise ValueError(f'Transformed NiceServant identity mismatch: {form_id}')
+            pending.append((form_id, form))
 
     for sid in active:
         for region in ('JP','CN'):
@@ -233,7 +258,7 @@ def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=Fals
         output = run/'staged'/job['region']/job['file']
         output.parent.mkdir(parents=True,exist_ok=True)
         output.write_bytes(data)
-        entry = {'file':job['file'],'source':job['source'],'source_sha256':digest(raw),'sha256':digest(data)}
+        entry = {'file':job['file'],'source':job['source'],'source_sha256':digest(raw),'sha256':digest(data), 'quantization_profile': PROFILE, 'fully_transparent_changed_pixels': 0}
         if job['kind']=='portrait':
             entry.update(group=job['group'],key=job['key'])
         else:
@@ -258,7 +283,10 @@ def sync(project, csv_path, *, write=False, selected_ids=(), check_existing=Fals
                 compositions[region]['np_names'][sid]=entry
                 compositions[region]['missing'].pop(sid,None)
         if any(job['kind']=='portrait' for job in report['downloaded']):
-            portraits.setdefault('image_transform',{'colors':256,'mode':'P','quantize':'FASTOCTREE','dither':'NONE','optimize':True,'compress_level':9,'size':[256,256]})
+            portraits['image_transform'] = {**transform_metadata(), 'size': [256, 256]}
+        for region in roots:
+            if any(job['kind']=='np' and job['region']==region for job in report['downloaded']):
+                compositions[region]['transform'] = transform_metadata()
         def stage_manifest(region,relative,value,old):
             if value==old:
                 return
@@ -285,9 +313,10 @@ def main():
     parser.add_argument('--csv',type=Path,default=DEFAULT_CSV)
     parser.add_argument('--servant-id',action='append',default=[])
     parser.add_argument('--check-existing',action='store_true',help='Also query NiceServant for every selected existing servant')
+    parser.add_argument('--metadata-cache',type=Path,help='Explicitly reuse prior Atlas metadata, including linked forms')
     parser.add_argument('--write',action='store_true',help='Download, quantize, validate and deploy; otherwise API-only preview')
     args=parser.parse_args()
-    report=sync(args.project,args.csv,write=args.write,selected_ids=args.servant_id,check_existing=args.check_existing)
+    report=sync(args.project,args.csv,write=args.write,selected_ids=args.servant_id,check_existing=args.check_existing,metadata_cache=args.metadata_cache)
     print(json.dumps({'csv_rows':report['csv_rows'],'new_servants':report['new_servants'],'no_commands':len(report['no_commands']),'planned_images':len(report['planned']),'downloaded':len(report['downloaded']),'missing':len(report['missing']),'report':str(Path(report['backup'])/'report.json')},ensure_ascii=False,indent=2))
 
 

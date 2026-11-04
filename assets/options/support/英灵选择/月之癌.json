@@ -6,120 +6,8 @@
             "default": "2300100",
             "cases": [
                 {
-                    "name": "2300100",
-                    "label": "BB",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300100"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23001000.png",
-                    "option": [
-                        "助战信息-2300100",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2300700",
-                    "label": "岸波白野",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300700"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23007000.png",
-                    "option": [
-                        "助战信息-2300700",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2300800",
-                    "label": "岸波白野",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300800"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23008000.png",
-                    "option": [
-                        "助战信息-2300800",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2301000",
-                    "label": "特诺奇蒂特兰",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2301000"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23010000.png",
-                    "option": [
-                        "助战信息-2301000",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2300500",
-                    "label": "Archetype：Earth",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300500"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23005000.png",
-                    "option": [
-                        "助战信息-2300500",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2300200",
-                    "label": "BB",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300200"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23002000.png",
-                    "option": [
-                        "助战信息-2300200",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "2300300",
-                    "label": "伟大的石像神",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "2300300"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_23003000.png",
-                    "option": [
-                        "助战信息-2300300",
-                        "宝具等级"
-                    ]
-                },
-                {
                     "name": "2301100",
-                    "label": "玉兔",
+                    "label": "448. 玉兔",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -134,24 +22,72 @@
                     ]
                 },
                 {
-                    "name": "2300400",
-                    "label": "瞑生院祈荒",
+                    "name": "2300800",
+                    "label": "425. 岸波白野",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "2300400"
+                                "servant": "2300800"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_23004000.png",
+                    "icon": "resource/base/image/servant_face/f_23008000.png",
                     "option": [
-                        "助战信息-2300400",
+                        "助战信息-2300800",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300700",
+                    "label": "424. 岸波白野",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300700"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23007000.png",
+                    "option": [
+                        "助战信息-2300700",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2301000",
+                    "label": "422. 特诺奇蒂特兰",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2301000"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23010000.png",
+                    "option": [
+                        "助战信息-2301000",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300600",
+                    "label": "421. ＢＢ迪拜",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300600"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23006000.png",
+                    "option": [
+                        "助战信息-2300600",
                         "宝具等级"
                     ]
                 },
                 {
                     "name": "2300900",
-                    "label": "谜之代行者C.I.E.L",
+                    "label": "418. 谜之代行者C.I.E.L",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -166,18 +102,82 @@
                     ]
                 },
                 {
-                    "name": "2300600",
-                    "label": "ＢＢ迪拜",
+                    "name": "2300500",
+                    "label": "351. Archetype：Earth",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "2300600"
+                                "servant": "2300500"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_23006000.png",
+                    "icon": "resource/base/image/servant_face/f_23005000.png",
                     "option": [
-                        "助战信息-2300600",
+                        "助战信息-2300500",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300400",
+                    "label": "285. 瞑生院祈荒",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300400"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23004000.png",
+                    "option": [
+                        "助战信息-2300400",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300300",
+                    "label": "244. 伟大的石像神",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300300"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23003000.png",
+                    "option": [
+                        "助战信息-2300300",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300200",
+                    "label": "220. BB",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300200"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23002000.png",
+                    "option": [
+                        "助战信息-2300200",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "2300100",
+                    "label": "166. BB",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "2300100"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_23001000.png",
+                    "option": [
+                        "助战信息-2300100",
                         "宝具等级"
                     ]
                 }

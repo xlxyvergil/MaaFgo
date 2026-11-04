@@ -1,0 +1,1042 @@
+{
+  "搓丸子-从者列表复位顶部": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者列表回顶执行"
+    ],
+    "on_error": [],
+    "timeout": 15000,
+    "attach": {
+      "servant_templates": {
+        "704000": [
+          "强化从者/实机头像/摩根-冬之女王.png"
+        ]
+      }
+    }
+  },
+  "搓丸子-从者列表回顶执行": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化列表",
+          "搓丸子-从者强化标题"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          1005,
+          198,
+          16,
+          8
+        ]
+      }
+    },
+    "post_delay": 1000,
+    "max_hit": 1,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者列表复位完成"
+    ],
+    "on_error": [],
+    "timeout": 5000,
+    "doc": "复用自动编队-从者列表复位顶部的点击滚动条顶端方式；强化列表右侧有材料统计栏，滚动条在x1012，不能照抄全宽列表的x1231。仅从者强化选择列表身份成立时执行一次。"
+  },
+  "搓丸子-从者列表复位完成": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化列表"
+        ]
+      }
+    },
+    "on_error": [],
+    "timeout": 5000
+  },
+  "搓丸子-升级从者头像候选": {
+    "enabled": false,
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "servant_face/f_7040300.png"
+        ],
+        "threshold": 0.9,
+        "roi": [
+          60,
+          160,
+          960,
+          560
+        ],
+        "order_by": "Score"
+      }
+    },
+    "on_error": [],
+    "timeout": 0,
+    "doc": "仅由业务按目标ID提供仓库适用模板并启用；匹配在Pipeline，脚本只读分数/框，至少0.90且候选唯一。原Atlas全脸会被等级/星级覆盖，摩根冬之女王使用同一强化仓库实图的无覆盖人脸区域。"
+  },
+  "搓丸子-已选从者名称": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          125,
+          622,
+          150,
+          24
+        ],
+        "expected": [
+          "^永不匹配默认名称$"
+        ],
+        "threshold": 0.9,
+        "only_rec": true
+      }
+    },
+    "on_error": [],
+    "timeout": 0,
+    "doc": "所选卡面名字小字需精确ROI只识别模式(only_rec)，不做整页检测；摩根实机0.9988，严格目标名称与0.90阈值，不匹配则不报告定位成功/不提交。"
+  },
+  "搓丸子-进入从者选择": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者选择列表已到",
+      "搓丸子-点击从者再选择",
+      "搓丸子-点击空从者卡"
+    ],
+    "on_error": [],
+    "timeout": 15000,
+    "doc": "Android返回键111会在从者选择列表与强化页间往返；搓丸子退出应先复用强化从者-狗粮消耗完毕的模板后退流程，再进入通用回主界面，且两阶段都核验业务终点。"
+  },
+  "搓丸子-点击从者再选择": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "base/搓丸子从者/搓丸子-点击从者再选择/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  700,
+                  0,
+                  580,
+                  100
+                ],
+                "expected": [
+                  "サーヴァント強化|从者强化|從者強化"
+                ],
+                "threshold": 0.8
+              }
+            }
+          },
+          {
+            "sub_name": "base/搓丸子从者/搓丸子-点击从者再选择/OCR2",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  185,
+                  0,
+                  130,
+                  85
+                ],
+                "expected": [
+                  "サーヴァント|再選択|選択|从者|從者"
+                ],
+                "threshold": 0.8
+              }
+            }
+          }
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          195,
+          12,
+          105,
+          55
+        ]
+      }
+    },
+    "next": [
+      "搓丸子-从者选择列表等待"
+    ],
+    "post_delay": 800,
+    "max_hit": 1,
+    "on_error": [],
+    "timeout": 5000,
+    "doc": "强化页选择/再选择从者按钮，避免复用脚本连续点击卡片坐标；已在列表时由前一分支直接结束。"
+  },
+  "搓丸子-从者选择列表等待": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者选择列表已到"
+    ],
+    "on_error": [],
+    "timeout": 15000
+  },
+  "搓丸子-从者选择列表已到": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化列表"
+        ]
+      }
+    },
+    "on_error": [],
+    "timeout": 0
+  },
+  "搓丸子-点击空从者卡": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化界面"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          100,
+          280,
+          180,
+          180
+        ]
+      }
+    },
+    "next": [
+      "搓丸子-从者选择列表等待"
+    ],
+    "post_delay": 800,
+    "max_hit": 1,
+    "on_error": [],
+    "timeout": 3000,
+    "doc": "未选对象时没有顶栏再选择按钮；复用强化从者-已在强化界面的空卡识别，再点空卡。"
+  },
+  "搓丸子-候选已是当前从者": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          250,
+          500,
+          200,
+          100
+        ],
+        "expected": [
+          "^はずす$|^移除$|^卸下$|^卸除$"
+        ],
+        "threshold": 0.9
+      }
+    },
+    "on_error": [],
+    "timeout": 0,
+    "doc": "当前已选对象在列表卡片下方显示はずす；业务按候选框覆盖ROI。不能再次点选而把正确目标解除。 国服实机146/当前选择项使用卸除，必须完整词匹配，不以部分名称或相似字授权再次点击。"
+  },
+  "搓丸子-关闭从者选择": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-关闭从者选择执行"
+    ],
+    "on_error": [],
+    "timeout": 5000
+  },
+  "搓丸子-关闭从者选择执行": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化列表"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          25,
+          12,
+          135,
+          55
+        ]
+      }
+    },
+    "post_delay": 800,
+    "max_hit": 1,
+    "on_error": [],
+    "timeout": 3000
+  },
+  "搓丸子-点击升级从者候选": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-点击升级从者候选执行"
+    ],
+    "on_error": [],
+    "timeout": 5000
+  },
+  "搓丸子-点击升级从者候选执行": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "强化从者-已在强化列表"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          0,
+          0,
+          1,
+          1
+        ]
+      }
+    },
+    "post_delay": 800,
+    "max_hit": 1,
+    "on_error": [],
+    "timeout": 3000,
+    "doc": "仅业务复核唯一候选后以运行时target点选，使用Pipeline完成坐标映射；不直接调用controller点击。"
+  },
+  "搓丸子-从者强化标题": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          680,
+          0,
+          600,
+          100
+        ],
+        "expected": [
+          "サーヴァント強化|从者强化|從者強化"
+        ],
+        "threshold": 0.8
+      }
+    },
+    "on_error": [],
+    "timeout": 0,
+    "doc": "仅搓丸子从者升级复用的正向类别身份：顶部必须为国服从者强化/日服サーヴァント強化。测试模式只有同一帧该标题与目标精确名称共同成立才跳过导航；否则先回主界面，再进入旧从者强化流程，避免概念礼装共用图标造成类别误判。"
+  },
+  "搓丸子-从者强化已选页面": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者强化标题",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  375,
+                  652,
+                  144,
+                  63
+                ],
+                "template": "强化从者/强化完成界面.png",
+                "threshold": 0.85,
+                "order_by": "Score"
+              }
+            }
+          }
+        ],
+        "box_index": 0
+      }
+    }
+  },
+  "搓丸子-从者资料资料页签": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          690,
+          95,
+          200,
+          85
+        ],
+        "expected": [
+          "^\\s*(?:资\\s*料|資\\s*料|プロフィール)\\s*$"
+        ],
+        "threshold": 0.8
+      }
+    }
+  },
+  "搓丸子-从者资料战斗页签": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          890,
+          95,
+          200,
+          85
+        ],
+        "expected": [
+          "^\\s*(?:战斗形象|戰鬥形象|バトルキャラ)\\s*$"
+        ],
+        "threshold": 0.8
+      }
+    }
+  },
+  "搓丸子-从者资料语音页签": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          1090,
+          95,
+          190,
+          85
+        ],
+        "expected": [
+          "^\\s*(?:语\\s*音|語\\s*音|ボイス)\\s*$"
+        ],
+        "threshold": 0.8
+      }
+    }
+  },
+  "搓丸子-从者资料页面": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者资料资料页签",
+          "搓丸子-从者资料战斗页签",
+          "搓丸子-从者资料语音页签",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  0,
+                  0,
+                  100,
+                  100
+                ],
+                "template": "友情召唤/详情关闭按钮.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  0,
+                  110,
+                  100,
+                  135
+                ],
+                "template": [
+                  "友情召唤/详情已锁定.png",
+                  "友情召唤/详情未锁定.png"
+                ],
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          }
+        ],
+        "box_index": 0
+      }
+    },
+    "doc": "国服179角色资料：资料/战斗形象/语音三页签、左上关闭与锁任一态同时成立才确认资料页，不以姓名单独证明页面。复用既有关闭/锁图，现场分约0.934/0.976。"
+  },
+  "搓丸子-打开当前从者资料": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-长按当前从者资料"
+    ]
+  },
+  "搓丸子-长按当前从者资料": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者强化已选页面"
+        ],
+        "box_index": 0
+      }
+    },
+    "action": {
+      "type": "LongPress",
+      "param": {
+        "target": [
+          190,
+          320,
+          1,
+          1
+        ],
+        "duration": 1500
+      }
+    },
+    "post_delay": 600,
+    "max_hit": 1,
+    "next": [
+      "搓丸子-等待当前从者资料"
+    ],
+    "doc": "国服178只长按已选从者卡中心1500ms打开179资料，不点强化。后续等待只重验资料，不重复长按。"
+  },
+  "搓丸子-等待当前从者资料": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者资料就绪"
+    ]
+  },
+  "搓丸子-从者资料就绪": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者资料页面"
+        ],
+        "box_index": 0
+      }
+    }
+  },
+  "搓丸子-资料从者名称": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          500,
+          0,
+          780,
+          65
+        ],
+        "expected": [
+          "^永不匹配默认名称$"
+        ],
+        "threshold": 0.9
+      }
+    },
+    "doc": "国服179右上大字号姓名；运行时只允许目标中文/日文精确名称。旧强化小字不可读时回退本节点，不放宽小字阈值；不匹配保留资料现场停止。"
+  },
+  "搓丸子-关闭当前从者资料": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-执行关闭从者资料"
+    ]
+  },
+  "搓丸子-执行关闭从者资料": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者资料页面",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  0,
+                  0,
+                  100,
+                  100
+                ],
+                "template": "友情召唤/详情关闭按钮.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          }
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 1,
+    "post_delay": 600,
+    "next": [
+      "搓丸子-等待从者资料关闭"
+    ]
+  },
+  "搓丸子-等待从者资料关闭": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-从者资料已关闭"
+    ]
+  },
+  "搓丸子-从者资料已关闭": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者强化已选页面"
+        ],
+        "box_index": 0
+      }
+    },
+    "doc": "姓名已确认并关闭资料后，必须重新确认从者强化标题与已选卡页面，不能在资料页报告定位完成。"
+  },
+  "搓丸子-测试从者素材费用零": {
+    "on_error": [],
+    "timeout": 0,
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          835,
+          630,
+          55,
+          38
+        ],
+        "expected": [
+          "^\\s*0\\s*$"
+        ],
+        "threshold": 0.9,
+        "only_rec": true
+      }
+    }
+  },
+  "搓丸子-测试从者素材已清空": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者强化已选页面",
+          "搓丸子-测试从者素材费用零",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  391,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  478,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  565,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  652,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  739,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  826,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  913,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1000,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1087,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1174,
+                  187,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  391,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  478,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  565,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  652,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  739,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  826,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  913,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1000,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1087,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [
+                  1174,
+                  285,
+                  86,
+                  96
+                ],
+                "template": "强化从者/槽位标志.png",
+                "threshold": 0.9,
+                "order_by": "Score"
+              }
+            }
+          }
+        ],
+        "box_index": 0
+      }
+    },
+    "doc": "国服176：从者强化已选页面、费用0和两排共20个独立槽位空图同时成立，才证明测试无预选素材；费用0不能单独授权。既有空位图在176约0.983、173满槽最高0.361，不触碰自动配置ON。"
+  },
+  "搓丸子-清除测试从者素材": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-测试从者素材已清空",
+      "搓丸子-执行清除测试从者素材"
+    ]
+  },
+  "搓丸子-执行清除测试从者素材": {
+    "on_error": [],
+    "timeout": 15000,
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子-从者强化已选页面",
+          {
+            "sub_name": "base/搓丸子从者/搓丸子-执行清除测试从者素材/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  1150,
+                  145,
+                  130,
+                  45
+                ],
+                "expected": [
+                  "^\\s*(?:清\\s*除|クリア)\\s*$"
+                ],
+                "threshold": 0.8
+              }
+            }
+          }
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 1,
+    "post_delay": 500,
+    "next": [
+      "搓丸子-等待测试从者素材清空"
+    ],
+    "doc": "仅test成功退出前清除游戏自动预选素材，保留自动配置开关；只点清除一次，等待与网络恢复不重发清除，不点击强化。"
+  },
+  "搓丸子-等待测试从者素材清空": {
+    "on_error": [],
+    "timeout": 15000,
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子-测试从者素材已清空"
+    ]
+  }
+}

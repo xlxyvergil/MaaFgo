@@ -1,0 +1,42 @@
+{
+    "搓丸子": {
+        "on_error": [],
+        "next": ["执行搓丸子"]
+    },
+    "执行搓丸子": {
+        "on_error": [],
+        "action": {
+            "type": "Custom",
+            "param": {"custom_action": "execute_expball"}
+        },
+        "attach": {
+            "mode": "normal",
+            "make_ball": true,
+            "ball_star": 1,
+            "eat3": false,
+            "eat4": false,
+            "draw_fp": false,
+            "draw_batch": 10,
+            "direction": "left",
+            "max_draw_batches": 50,
+            "friend_points_reserve": 0,
+            "max_cycles": 200,
+            "stop_targets": false,
+            "store4": false,
+            "store5": false,
+            "store_balls": false,
+            "sell_servants": false,
+            "sell4": false,
+            "sell5": false,
+            "sell_wz": false,
+            "aqf": false,
+            "levelup": false,
+            "level_servant_id": "",
+            "target_level": 0
+        },
+        "next": ["搓丸子完成"]
+    },
+    "搓丸子完成": {
+        "on_error": []
+    }
+}

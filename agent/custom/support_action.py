@@ -11,11 +11,12 @@
   1. 截图 -> YOLO 检测助战条目框(按 y 排序, 即条目顺序)
   2. 对每个框判定(全屏坐标 = 框左上角 + 框内锚点):
      a. 英灵   : attach.servant(servantId) -> servant_list.json.images(f_xxx);
-                 attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入
+                 attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入;
+                 any=不要求英灵, 使用 ALL 列表并跳过英灵及其技能/宝具/等级要求
                  与框内(95,76)中心 60x60 头像窗口匹配, 任一模板满足即可
      b. 礼装   : 普通 ce / 冠位 ce_1+ce_2(lizhuang 模板; 0_空.png 跳过)
      c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 >= 期望
-     d. 宝具等级: np_level/{ch|jp} 模板匹配, 识别等级 >= 期望(目录按资源包选择)
+     d. 宝具等级: nplevel 模板匹配, 识别等级 >= 期望(目录按资源包选择)
      e. 英灵等级: 等级区域 x62-180,y15-42 数字拼接识别 >= 期望
      f. 被动技能: skill_passive_1~5 独立键: 全0跳过;
                  有非0 -> 运行被动切换流水线 -> 重新截图 -> 按被动锚点匹配
@@ -23,10 +24,12 @@
   4. 无框满足 -> 失败
 
 素材路径约定(相对 MaaFgo 根目录):
-  pkg   = "cn" if resource_package=="cn" else "base"
-  servant_face : resource/{pkg}/image/servant_face/f_*.png        (158x158, 已有)
-  lizhuang     : resource/{pkg}/image/lizhuang/                    (礼装模板, 待放)
-  np_level     : resource/{pkg}/image/np_level/ch|jp/              (宝具模板, 待放)
+  pkg   = 实际加载资源层的 loaded_resource_package；旧资源无标记时兼容 resource_package
+  servant_face : resource/base/image/servant_face/f_*.png          (头像共用)
+  lizhuang     : resource/base/image/lizhuang/                     (礼装共用)
+  np_level     : resource/{pkg}/image/nplevel/                      (宝具等级模板)
+  skill        : resource/{pkg}/image/skill/                        (主动/被动视图模板)
+  support      : resource/{pkg}/image/support/                      (参照物模板)
   servant_list : agent/custom/servant_list.json                    (已有)
   support_det  : agent/utils/support_det.onnx                       (YOLO ONNX 模型)
 """
@@ -49,9 +52,11 @@ if _custom_dir not in sys.path:
     sys.path.insert(0, _custom_dir)
 
 import mfaalog
+from resource_package import resolve_resource_package
 from chaldea import fetch_share_data
 from chaldea.servant_aliases import build_servant_lookup
 from chaldea.support_criteria import build_support_criteria
+from battle.runtime.formation_session import context_session, sessions
 
 # ---------------- 路径常量 ----------------
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -77,6 +82,7 @@ CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口
 CE_ANCHOR_GRAND = [(179, 35), (179, 129)]   # 冠位助战 礼装1/礼装2 左上角(166x53 窗口)
 BOND_ROI = (180, 84, 29, 29)          # 冠位助战 羁绊区域: 中心(194,99) 29x29 (相对框, 实测图案中心对齐)
 BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> 模板(带绿幕), 纯图案多服通用, 固定取 base 包 skill 目录
+TH_BOND = 0.40                     # 较高分须严格超过此值，才确认羁绊效果图标
 SKILL_ACTIVE = [(791, 154, 27, 22), (836, 154, 29, 22), (881, 154, 28, 22)]   # 主动技能 1-3 数字方框 (x,y,w,h)
 SKILL_PASSIVE = [(791, 156, 25, 20), (828, 156, 29, 20), (866, 156, 26, 20),
                  (903, 156, 24, 20), (941, 156, 25, 20)]        # 被动技能 1-5 数字方框 (x,y,w,h)
@@ -91,6 +97,7 @@ VIEW_ROI = (782, 102, 138, 39)     # 视图判断: 技能卡 x782-920 y102-141 (
 # 求出它与标定位置的差, 再把框顶点平移过去 —— 平移后图内坐标即等于标定坐标系, 上面锚点常量可直接套用。
 REF_BASE = (1051, 26)   # 参照物左上角在标定坐标系中的位置(上面锚点常量即在该坐标系下量的)
 REF_PAD = 40            # 参照物搜索范围: 以期望位置为中心向外扩 px
+TH_REF = 0.80           # 低分参照物不能用于平移头像/技能等所有识别区域
 
 # ---------------- 职介筛选 tab(全屏坐标, 助战选择界面顶部职介栏) ----------------
 CLASS_TABS = {
@@ -121,6 +128,11 @@ def _image_dir(package, *parts):
         return packaged
     return os.path.join(_ROOT_DIR, "assets", "resource", relative)
 
+
+def _resolve_resource_package(context):
+    """Use the loaded image layer, not a possibly stale per-task option."""
+    return resolve_resource_package(context, caller="助战")
+
 # ---------------- ROI 尺寸 ----------------
 CE_ROI = (166, 53)        # 礼装匹配窗口(w,h): 左上角锚点, 与礼装模板(约153x40)同量级(左右各+3, 向下+3)
 
@@ -144,8 +156,9 @@ SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到
 SWIPE_END = (559, 349)           # 滑动终点(全屏): 垂直向上滑动 320px（较原 400px 缩小 20%）
 SWIPE_DURATION = 500            # 滑动持续时间(ms)
 SWIPE_SETTLE = 1              # 滑动结束后等待列表稳定再识别(秒), 避免惯性滚动导致识别不准
-MAX_SWIPE_BEFORE_REFRESH = 12    # 连续滑动6次未匹配 -> 执行"助战刷新"流水线
+MAX_SWIPE_BEFORE_REFRESH = 12    # 连续滑动12次未匹配 -> 执行"助战刷新"流水线
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
+FALLBACK_REFRESH_LIMIT = 10
 CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
 TH_WHITE = 245                  # 纯白判定阈值(灰度 >= 该值视为白)
 # 实测: 正常助战列表该区域白占比 0-0.3%, 连接中约 33%; 阈值取 10% 区分度充足
@@ -164,6 +177,27 @@ def _imread(path, gray=False):
         return None
     img = cv2.imdecode(np.fromfile(path, dtype=np.uint8), flag)
     return img
+
+
+def _ce_template_paths(ce_dir, ce_name, status):
+    """任意满破状态共用已有两态模板，不引入独立资源目录。"""
+    statuses = CE_SUB_SWAP if status == "任意" else (status,)
+    return [os.path.join(ce_dir, sub, ce_name) if sub else os.path.join(ce_dir, ce_name)
+            for sub in statuses]
+
+
+def _custom_ce_candidates(attach, key):
+    """多选使用独立 attach 键，避免多个 case 的列表覆盖；兼容旧单选。"""
+    if attach.get(f"{key}-多选") is True:
+        prefix = f"{key}-候选:"
+        return [name[len(prefix):] for name, selected in attach.items()
+                if name.startswith(prefix) and selected is True] or [EMPTY_CE[0]]
+    value = attach[key]
+    # 也接受直接传入的文件名列表，便于复用 action 的外部调用。
+    values = value if isinstance(value, list) else [value]
+    if not all(isinstance(name, str) for name in values):
+        raise ValueError(f"礼装候选必须是文件名或文件名列表: {key}")
+    return list(dict.fromkeys(name.strip() for name in values if name.strip())) or [EMPTY_CE[0]]
 
 
 def _norm_img(img):
@@ -318,12 +352,13 @@ class SupportAction(CustomAction):
     # ---------- 参照物定位(消除 YOLO 框偏移) ----------
     def _ref_shift(self, img, bx, by):
         """在框内定位参照物 {资源包}/image/support/助战编入确认.png, 返回框顶点所需的平移 (dx,dy);
-        平移后参照物回到标定位置 REF_BASE, 框内坐标即等于标定坐标系"""
+        平移后参照物回到标定位置 REF_BASE, 框内坐标即等于标定坐标系。
+        定位不可信时返回 None，调用方跳过该条目，禁止使用低分坐标。"""
         import cv2
         tpl = _imread(os.path.join(self._ref_dir, self._ref_name), gray=True)
         if tpl is None:
             mfaalog.error(f"[SupportAction] 参照模板缺失: {self._ref_name} ({self._ref_dir})")
-            return 0, 0
+            return None
         th, tw = tpl.shape[:2]
         ex, ey = bx + REF_BASE[0], by + REF_BASE[1]      # 参照物期望左上角(全屏)
         x0, y0 = max(0, ex - REF_PAD), max(0, ey - REF_PAD)
@@ -331,9 +366,15 @@ class SupportAction(CustomAction):
         roi = img[y0:y1, x0:x1]
         if roi.shape[0] < th or roi.shape[1] < tw:
             mfaalog.error("[SupportAction] 参照物搜索区小于模板, 无法定位")
-            return 0, 0
+            return None
         res = cv2.matchTemplate(cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY), tpl, cv2.TM_CCOEFF_NORMED)
         _, score, _, (mx, my) = cv2.minMaxLoc(res)
+        if not np.isfinite(score) or score < TH_REF:
+            mfaalog.warning(
+                f"[SupportAction] 参照物 {self._ref_name}: score={score:.3f}/{TH_REF:.2f} "
+                "定位不可信，跳过当前助战条目，不应用平移"
+            )
+            return None
         dx, dy = x0 + mx - ex, y0 + my - ey
         mfaalog.info(f"[SupportAction] 参照物 {self._ref_name}: 实测=({x0 + mx},{y0 + my}) "
                      f"期望=({ex},{ey}) score={score:.3f} -> 框顶点平移=({dx},{dy})")
@@ -373,10 +414,12 @@ class SupportAction(CustomAction):
         if ce_name in EMPTY_CE:
             mfaalog.info("[SupportAction] 礼装为空(跳过匹配)")
             return True
-        tpl_path = os.path.join(ce_dir, ce_sub, ce_name) if ce_sub else os.path.join(ce_dir, ce_name)
-        tpl = _imread(tpl_path, gray=True)
+        tpl_paths = _ce_template_paths(ce_dir, ce_name, ce_sub)
+        tpl = next((image for path in tpl_paths
+                    if (image := _imread(path, gray=True)) is not None), None)
         if tpl is None:
-            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} (目录 {os.path.dirname(tpl_path)})")
+            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} "
+                            f"(目录 {'/'.join(os.path.dirname(path) for path in tpl_paths)})")
             return False
         # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
         # 固定尺度整卡匹配: 模板与卡面显示同尺寸, 不做缩放搜索
@@ -393,6 +436,9 @@ class SupportAction(CustomAction):
         if score < TH_CE:
             mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}(未过)")
             return False
+        if ce_sub == "任意":
+            mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}，不限制满破状态")
+            return True
         # 右下角形态校验: 满破/非满破等仅右下角不同的礼装整卡主体相同得分均高,
         # 在最佳匹配位置取卡面右下角约30x30区域与模板右下角匹配。
         # 该标记很淡, 绝对分数不可靠, 故与同名的另一状态模板(满破<->非满破)比谁更像, 取高者定状态
@@ -420,8 +466,8 @@ class SupportAction(CustomAction):
         """羁绊区域(中心(194,99) 29x29)与 base/image/skill/{50np,羁绊}.png 匹配
         模板带绿幕, 先抠掉绿幕背景再与截图区域灰度滑动匹配
         模板是纯图案(不含文字), 多服通用, 故固定取 base 包而非当前 pkg
-        两张模板本身形似、绝对分数偏低且受卡面立绘干扰, 故不设绝对阈值:
-        对两张模板分别打分, 取分高者作为识别结果"""
+        两张模板分别打分，较高分须严格大于 0.40 且两者不相等，才确认效果；
+        低分或同分视为未识别到，跳过当前条目。不限效果时保持跳过检查。"""
         import cv2
         if bond_opt not in BOND_TEMPLATES:
             return True
@@ -443,6 +489,15 @@ class SupportAction(CustomAction):
             t[green] = 255
             scores[opt] = float(cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED).max())
         best = max(scores, key=scores.get)
+        if (not all(np.isfinite(score) for score in scores.values())
+                or scores[best] <= TH_BOND
+                or scores["50np"] == scores["original"]):
+            mfaalog.info(
+                "[SupportAction] 未能确认羁绊礼装效果图标：" +
+                " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
+                f"，需较高分大于 {TH_BOND:.2f} 且两者分数不同，跳过当前助战条目"
+            )
+            return False
         mfaalog.info(f"[SupportAction] 羁绊: " +
                      " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
                      f" -> {best} (期望 {bond_opt})")
@@ -699,6 +754,21 @@ class SupportAction(CustomAction):
         return white >= WHITE_RATIO
 
     # ---------- 主流程 ----------
+    def _select_fallback(self, context, controller, root, token):
+        """撤销职介筛选并复用首个助战入口，不在本子任务中执行编队。"""
+        if context.tasker.stopping:
+            return CustomAction.RunResult(success=False)
+        mfaalog.info("[SupportAction] 刷新10次仍未找到目标，改用首个助战并跳过 Chaldea 配置")
+        detail = context.run_task(
+            "助战兜底-选择首个助战",
+            pipeline_override={"进本-选择助战": {"next": [], "on_error": []}},
+        )
+        if context.tasker.stopping or detail is None or not detail.status.succeeded:
+            mfaalog.error("[SupportAction] 首个助战选择失败，停止任务")
+            return CustomAction.RunResult(success=False)
+        sessions.set_support_fallback(root, token, True)
+        return CustomAction.RunResult(success=True)
+
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         try:
             param = {}
@@ -710,13 +780,32 @@ class SupportAction(CustomAction):
             source_mode = param.get("source_mode")
             node = context.get_node_data(argv.node_name)
             attach = node.get("attach") or {}
+            fallback_enabled = attach.get("fallback_after_refresh") is True
+            root, token = None, ""
+            try:
+                root, token = context_session(context)
+                if not sessions.valid(root, token):
+                    root, token = None, ""
+            except (AttributeError, TypeError, ValueError):
+                root, token = None, ""  # 独立助战/BBC 不创建原生会话。
+            if fallback_enabled and not token:
+                mfaalog.error("[SupportAction] 助战兜底需要有效的原生战斗会话")
+                return CustomAction.RunResult(success=False)
+            skip_servant = False
             if source_mode == "chaldea":
                 if attach.get("chaldea_enabled") is not True:
-                    mfaalog.error("[SupportAction] 使用 Chaldea 配置需要先开启‘是否使用 Chaldea 队伍’")
+                    mfaalog.error(
+                        "[SupportAction] 助战方式已选择使用编辑器/Chaldea 配置，但尚未开启方案导入。"
+                        "请开启战斗选项中的“使用编辑器/chaldea配置”，并填写“编辑器/chaldea方案导入”；"
+                        "如需在 MAA 中直接设置助战，请将助战方式改为“自定义助战”。"
+                    )
                     return CustomAction.RunResult(success=False)
                 source = str(attach.get("chaldea_import_source") or "").strip()
                 if not source:
-                    mfaalog.error("[SupportAction] 使用 Chaldea 配置但未填写 Chaldea 队伍导入")
+                    mfaalog.error(
+                        "[SupportAction] 已开启使用编辑器/Chaldea 配置，但没有填写队伍方案。"
+                        "请在“编辑器/chaldea方案导入”中填写分享链接、队伍 ID、关卡 ID 或选择本地队伍文件。"
+                    )
                     return CustomAction.RunResult(success=False)
                 share_data, _, _ = fetch_share_data(source)
                 try:
@@ -726,13 +815,19 @@ class SupportAction(CustomAction):
                     return CustomAction.RunResult(success=False)
                 support_type = criteria["support_type"]
                 class_name = criteria["class_name"]
+                skip_servant = class_name == "any"
                 class_all = "def"
                 servant_id = criteria["servant_id"]
                 ce_bond = criteria["ce_bond"]
+                groups = criteria.get("ce_groups")
+                if groups is None:
+                    groups = [{"slot": spec["slot"], "candidates": [spec]}
+                              for spec in criteria["ce_specs"]]
                 ce_targets = [
-                    (spec["name"], CE_ANCHOR_GRAND[spec["slot"] - 1]
-                     if support_type == "grand" else CE_ANCHOR_NORMAL, spec["status"])
-                    for spec in criteria["ce_specs"]
+                    ([(spec["name"], spec["status"]) for spec in group["candidates"]],
+                     CE_ANCHOR_GRAND[group["slot"] - 1]
+                     if support_type == "grand" else CE_ANCHOR_NORMAL)
+                    for group in groups
                 ]
                 active = criteria["active"]
                 passive = criteria["passive"]
@@ -742,49 +837,51 @@ class SupportAction(CustomAction):
                 support_type = param.get("support_type", "normal")
                 class_name = str(attach["class_name"]).strip()   # 玩家点击的职介
                 class_all = str(attach["class_all"]).strip()     # all=ALL 阶, def=按职介
-                servant_id = str(attach["servant"]).strip()
-                # 既有自定义助战选项共用礼装状态；Chaldea 模式可逐格指定不同状态。
+                skip_servant = class_name == "any"
+                servant_id = "" if skip_servant else str(attach["servant"]).strip()
+                # 新配置逐格保存状态；旧配置仍兼容共用的 礼装状态 字段。
                 ce_status = str(attach["礼装状态"]).strip()
                 if support_type == "grand":
                     ce_bond = str(attach["ce_bond"]).strip()
-                    ce_targets = [
-                        (str(attach[f"冠位助战-1号礼装-{ce_status}"]).strip(), CE_ANCHOR_GRAND[0], ce_status),
-                        (str(attach[f"冠位助战-2号礼装-{ce_status}"]).strip(), CE_ANCHOR_GRAND[1], ce_status),
-                    ]
+                    slots = [(f"冠位助战-{i}号礼装", anchor) for i, anchor in enumerate(CE_ANCHOR_GRAND, 1)]
                 else:
                     ce_bond = "any"
-                    ce_targets = [
-                        (str(attach[f"普通助战-礼装-{ce_status}"]).strip(), CE_ANCHOR_NORMAL, ce_status),
-                    ]
+                    slots = [("普通助战-礼装", CE_ANCHOR_NORMAL)]
+                ce_targets = []
+                for slot, anchor in slots:
+                    status = str(attach.get(f"{slot}-状态", ce_status)).strip()
+                    ce_targets.append(([(name, status) for name in
+                                        _custom_ce_candidates(attach, f"{slot}-{status}")], anchor))
                 # 技能等级: 0=不要求。
-                active = [int(attach[f"skill_active_{i}"]) for i in range(1, 4)]
-                passive = [int(attach[f"skill_passive_{i}"]) for i in range(1, 6)]
-                np_level = int(attach["np_level"])
-                level = int(attach["level"])
+                active = [0] * 3 if skip_servant else [int(attach[f"skill_active_{i}"]) for i in range(1, 4)]
+                passive = [0] * 5 if skip_servant else [int(attach[f"skill_passive_{i}"]) for i in range(1, 6)]
+                np_level = 0 if skip_servant else int(attach["np_level"])
+                level = 0 if skip_servant else int(attach["level"])
 
             passive_need = any(v > 0 for v in passive)
 
-            ce_names = [n for n, _, _ in ce_targets if n]
+            ce_names = ["|".join(name for name, _ in choices) for choices, _ in ce_targets]
             mfaalog.info(f"[SupportAction] 助战类型={support_type} 职介={class_name or '(未选)'} "
-                         f"英灵={servant_id or '(未选)'} "
+                         f"英灵={servant_id or ('(不要求)' if skip_servant else '(未选)')} "
                          f"礼装={'/'.join(ce_names) if ce_names else '(空)'} 主动={active} 被动={passive} "
                          f"宝具={np_level} 等级={level}")
 
-            resource_package = str(context.get_node_data("资源包配置")["attach"]["resource_package"])
-            pkg = "cn" if resource_package == "cn" else "base"
+            pkg = _resolve_resource_package(context)
             base_dir = _image_dir(pkg)
             # 英灵头像/礼装固定放 base, 不用 pkg 区分
             face_dir = _image_dir("base", "servant_face")
             ce_dir = _image_dir("base", "lizhuang")
             if source_mode == "chaldea":
-                for ce_name, _, status in ce_targets:
-                    if not os.path.isfile(os.path.join(ce_dir, status, ce_name)):
-                        display_name = os.path.splitext(ce_name)[0]
-                        mfaalog.error(
-                            f"[SupportAction] 暂时没有 Chaldea 数据中礼装「{display_name}」的"
-                            f"{status}模板图。请联系 MaaFGO 开发者补充模板，或改用“自定义助战”继续任务。"
-                        )
-                        return CustomAction.RunResult(success=False)
+                for choices, _ in ce_targets:
+                    for ce_name, status in choices:
+                        if not any(os.path.isfile(path)
+                                   for path in _ce_template_paths(ce_dir, ce_name, status)):
+                            display_name = os.path.splitext(ce_name)[0]
+                            mfaalog.error(
+                                f"[SupportAction] 暂时没有 Chaldea 数据中礼装「{display_name}」的"
+                                f"{status}模板图。请联系 MaaFGO 开发者补充模板，或改用“自定义助战”继续任务。"
+                            )
+                            return CustomAction.RunResult(success=False)
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
             skill_dir = os.path.join(base_dir, "skill")   # 视图判断模板(主动/被动), 按 pkg 动态选择
             mfaalog.info(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
@@ -792,15 +889,17 @@ class SupportAction(CustomAction):
             self._ref_dir = _image_dir(pkg, "support")
             self._ref_name = "助战编入确认.png"
 
-            if not servant_id:
-                mfaalog.error("[SupportAction] 未选择英灵")
-                return CustomAction.RunResult(success=False)
+            srv = None
+            if not skip_servant:
+                if not servant_id:
+                    mfaalog.error("[SupportAction] 未选择英灵")
+                    return CustomAction.RunResult(success=False)
 
-            smap = self._get_servant_map()
-            srv = smap.get(servant_id)
-            if not srv or not srv.get("images"):
-                mfaalog.error(f"[SupportAction] servant_list 无该英灵: {servant_id}")
-                return CustomAction.RunResult(success=False)
+                smap = self._get_servant_map()
+                srv = smap.get(servant_id)
+                if not srv or not srv.get("images"):
+                    mfaalog.error(f"[SupportAction] servant_list 无该英灵: {servant_id}")
+                    return CustomAction.RunResult(success=False)
 
             detector = self._get_detector()
 
@@ -809,7 +908,7 @@ class SupportAction(CustomAction):
 
             # 执行所有助战选择前, 先点击对应职介的筛选 tab(全屏坐标); 间隔0.5s点击3次
             if class_name:
-                if "all" in class_all:
+                if skip_servant or "all" in class_all:
                     tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
                 else:
                     tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
@@ -820,6 +919,8 @@ class SupportAction(CustomAction):
 
             # 识别一次: 截图->YOLO检测->逐个框判定; 命中点击条目并返回 True(未命中 False)
             def try_match():
+                if context.tasker.stopping:
+                    return False
                 img = self._shot_base(controller)
                 if img is None:
                     mfaalog.error("[SupportAction] 截图失败")
@@ -833,25 +934,31 @@ class SupportAction(CustomAction):
                 for (bx, by, bx2, by2, conf) in boxes:
                     mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
                     # 框内参照物重定位: 平移框顶点到标定坐标系, 消除 YOLO 框偏移
-                    dx, dy = self._ref_shift(img, bx, by)
+                    shift = self._ref_shift(img, bx, by)
+                    if shift is None:
+                        continue
+                    dx, dy = shift
                     bx, by, bx2, by2 = bx + dx, by + dy, bx2 + dx, by2 + dy
                     mfaalog.info(f"[SupportAction] 重定位后 框=({bx},{by})-({bx2},{by2})")
-                    if not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
+                    if not skip_servant and not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
                         continue
-                    if not all(self._match_ce(img, ce_dir, bx, by, name, anc, sub)
-                               for name, anc, sub in ce_targets):
+                    if not all(any(self._match_ce(img, ce_dir, bx, by, name, anc, sub)
+                                   for name, sub in choices)
+                               for choices, anc in ce_targets):
                         continue
                     # 冠位助战羁绊判断(50np/original/any)
                     if support_type == "grand" and not self._match_bond(img, bx, by, ce_bond):
                         continue
                     # 主动视图(主动技能+宝具+英灵等级): 单帧判定, 失败跳过该条目
-                    if not self._check_active_view(img, bx, by, active, np_dir, np_level, level):
+                    if not skip_servant and not self._check_active_view(img, bx, by, active, np_dir, np_level, level):
                         continue
 
                     # 主动/宝具/等级 均满足, 剩被动
                     if not passive_need:
                         cx, cy = (bx + bx2) // 2, (by + by2) // 2
                         self._tap(controller, cx, cy)
+                        if token:
+                            sessions.set_support_fallback(root, token, False)
                         mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                         return True
 
@@ -873,6 +980,8 @@ class SupportAction(CustomAction):
                         continue
                     cx, cy = (bx + bx2) // 2, (by + by2) // 2
                     self._tap(controller, cx, cy)
+                    if token:
+                        sessions.set_support_fallback(root, token, False)
                     mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                     return True
 
@@ -882,9 +991,10 @@ class SupportAction(CustomAction):
             if try_match():
                 return CustomAction.RunResult(success=True)
 
-            # 整体未匹配: 滑动->重新识别循环; 连续滑动6次未匹配 -> 执行"助战刷新"
+            # 每轮先查顶部再滑动查完整列表；刷新10次后的列表也完整查找后才兜底。
             mfaalog.info("[SupportAction] 首次识别无匹配, 进入滑动/刷新循环")
             swipe_count = 0
+            refresh_count = 0
             while True:
                 # 监听停止信号: MXU 点停止后立即中断查找流程
                 if context.tasker.stopping:
@@ -898,8 +1008,14 @@ class SupportAction(CustomAction):
                     return CustomAction.RunResult(success=True)
                 if swipe_count >= MAX_SWIPE_BEFORE_REFRESH:
                     swipe_count = 0
+                    if fallback_enabled and refresh_count >= FALLBACK_REFRESH_LIMIT:
+                        return self._select_fallback(context, controller, root, token)
                     mfaalog.info(f"[SupportAction] 连续{MAX_SWIPE_BEFORE_REFRESH}次滑动未匹配, 执行{REFRESH_TASK}")
-                    context.run_task(REFRESH_TASK)
+                    detail = context.run_task(REFRESH_TASK)
+                    if context.tasker.stopping or detail is None or not detail.status.succeeded:
+                        mfaalog.error("[SupportAction] 助战刷新失败，停止查找")
+                        return CustomAction.RunResult(success=False)
+                    refresh_count += 1
                     # 刷新后持续检测连接状态: 连接区白像素占比>=10%(WHITE_RATIO) 时不能继续检测, 等待其消失
                     mfaalog.info("[SupportAction] 等待刷新连接完成...")
                     while self._is_connecting(controller):
@@ -908,8 +1024,8 @@ class SupportAction(CustomAction):
                             return CustomAction.RunResult(success=False)
                         time.sleep(0.5)
                     mfaalog.info("[SupportAction] 刷新完成, 继续检测")
-                    # 说明: 本循环仅在命中助战条目时 return True 退出;
-                    # 持续未命中时靠任务停止/中断机制结束, 不会走到循环外
+                    if try_match():
+                        return CustomAction.RunResult(success=True)
         except Exception as e:
             import traceback
             mfaalog.error(f"[SupportAction] 异常: {e}\n{traceback.format_exc()}")

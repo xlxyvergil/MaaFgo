@@ -3,7 +3,7 @@
     {
       "name": "Chaldea 自动编队",
       "label": "🧩 Chaldea 自动编队",
-      "description": "从编队页启动，或在战斗任务中启用；按 Chaldea 数据编队。",
+      "description": "从编队页启动，或在战斗任务中启用；按 Chaldea 数据编队。\n\n[启动编队与战斗编辑器](./打开编队编辑器.cmd) · [打开已启动的编辑器](http://127.0.0.1:18765/)",
       "doc": "docs/Chaldea自动编队使用说明.md",
       "entry": "自动编队",
       "controller": ["安卓设备"],

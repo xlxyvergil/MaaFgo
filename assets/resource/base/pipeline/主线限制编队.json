@@ -1,0 +1,112 @@
+{
+  "主线限制-关闭提示": {
+    "doc": "主线专用限制提示叶子：只接受明确限制标题与底部关闭按钮，不继承特殊编队-限制提示关闭的后续开战链。与来源取消、自动编成确认并列轮询，关闭后必须重新截图。国服样本包括连续编制限制和助战编制条件；日文候选沿用既有編成制限/編成条件语义，未据此宣称实机验收。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-关闭提示/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [360, 55, 620, 110], "expected": ["^(?:编[制成队]限制|助战编制条件|編成制限|編成条件|サポート編成条件)$"], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-关闭提示/OCR2", "recognition": {"type": "OCR", "param": {
+        "roi": [450, 550, 380, 100], "expected": ["^(?:关闭|閉じる)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "主线限制-编成条件未满足": {
+    "doc": "游戏明确拒绝编成条件时关闭提示，由主线状态机安排有限次数游戏自动编队恢复；不能在此叶子里直接开始任务。复用特殊编队-编成条件未满足的标题与关闭范围。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-编成条件未满足/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [360, 55, 620, 110], "expected": ["无法满足编成条件|編成条件を満たしていません|編成条件を満たしていない"], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-编成条件未满足/OCR2", "recognition": {"type": "OCR", "param": {
+        "roi": [450, 550, 380, 100], "expected": ["^(?:关闭|閉じる)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "主线限制-取消编队来源": {
+    "doc": "只处理选择编队来源弹窗，点击底部取消后由主线状态机打开左下自动编队。不能点从持有从者中编队或从助战中编队，避免进入仓库/助战的另一条选择链。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-取消编队来源/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [400, 80, 480, 90], "expected": ["^选择编队来源$", "編成元.*選択|編成.*選択元|編成元選択"], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-取消编队来源/OCR2", "recognition": {"type": "OCR", "param": {
+        "roi": [450, 520, 380, 100], "expected": ["^(?:取消|キャンセル)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "主线限制-自动编成确认": {
+    "doc": "国服既有自动编成执行确认，也有手动点左下自动编队后出现的自动编成弹窗；标题与右下自动编成按钮必须同时命中，兼容两种按钮高度。参考特殊编队-自动编成确认；只点击本按钮，不执行其next，由主线重新截图后决定是否保存编队。日服可再由原进本-自动编队确认模板兜底。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-自动编成确认/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [360, 40, 620, 145], "expected": ["^(?:自动编成(?:执行确认)?|自動編成(?:実行確認)?)$"], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-自动编成确认/OCR2", "recognition": {"type": "OCR", "param": {
+        "roi": [740, 510, 350, 140], "expected": ["^(?:自动编成|自動編成する|自動編成)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 1200, "next": [], "on_error": []
+  },
+  "主线限制-空槽": {
+    "doc": "编队确认页必填空槽的限制文字位于卡片上半部y280-330；与已有人物中部y331-378的编队限制标签分开。先判空槽再判固定成员；只读取，不点击格子，不把普通选择空槽或不可用的出战数量格当作必填限制。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认",
+      {"sub_name": "base/主线限制编队/主线限制-空槽/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [35, 280, 1210, 50], "expected": ["编队限制|編成制限"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "DoNothing"}, "next": [], "on_error": []
+  },
+  "主线限制-固定成员": {
+    "doc": "仅识别编队确认页已有人物卡片中部的编队限制标签；该行与必填空槽限制标题错开。用户样本标签在首槽，但ROI覆盖六槽，不绑定特定从者。只读取标记，由主线在本关跳过Chaldea并保留现有阵容；若同时有空槽标记仍须先自动编队。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认",
+      {"sub_name": "base/主线限制编队/主线限制-固定成员/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [35, 331, 1210, 47], "expected": ["编队限制|編成制限"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "DoNothing"}, "next": [], "on_error": []
+  },
+  "主线限制-多个助战": {
+    "doc": "仅由主线在编队确认页检查。复用当前资源层的助战标记与编队识别阈值，index=1要求至少两个独立匹配；兼容剧情多助战没有编队限制标签的情况。命中后按本关限制编队处理，不执行Chaldea单助战核对或换人。",
+    "recognition": {"type": "TemplateMatch", "param": {
+      "template": "battle/助战标记.png", "roi": [35, 160, 1210, 276],
+      "threshold": 0.75, "order_by": "Horizontal", "index": 1
+    }},
+    "action": {"type": "DoNothing"}, "next": [], "on_error": []
+  },
+  "主线限制-打开自动编队": {
+    "doc": "仅受限且仍需游戏编队时调用。先确认队伍开始按钮，再识别左下自动编队文字；参考特殊编队-打开自动编队，不把该叶子的next带入主线。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认",
+      {"sub_name": "base/主线限制编队/主线限制-打开自动编队/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [260, 640, 85, 75], "expected": ["^自动$", "自動編成|^自動$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 700, "next": [], "on_error": []
+  },
+  "主线限制-关闭职阶相性": {
+    "doc": "仅在当前关卡已确认受限时调用。职阶相性说明可能透出右下决定；必须先关闭此覆盖层并重新截图，不能直接点击背后的编队决定。国服用户22:33:27截图中标题在左上、关闭在底部偏左，与普通居中关闭弹窗位置不同。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-关闭职阶相性/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [350, 110, 250, 70], "expected": ["职阶相性|職階相性|クラス相性"], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-关闭职阶相性/OCR2", "recognition": {"type": "OCR", "param": {
+        "roi": [330, 510, 300, 100], "expected": ["^(?:关闭|閉じる)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "主线限制-编队决定": {
+    "doc": "只在主线受限编队状态下调用，保存游戏自动编队的编辑结果；模板和决定/決定OCR同时命中右下角，不误点开始任务。参考自动编队-检测编辑决定，但此叶子只点击一次，不继续开战。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"recognition": {"type": "TemplateMatch", "param": {
+        "template": "battle/编队决定.png", "roi": [1050, 610, 230, 110], "threshold": 0.8
+      }}},
+      {"sub_name": "base/主线限制编队/主线限制-编队决定/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [1050, 610, 230, 110], "expected": ["^(?:决定|決定)$"], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 700, "next": [], "on_error": []
+  }
+}

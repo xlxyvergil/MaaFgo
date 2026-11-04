@@ -15,13 +15,21 @@ Exact original URLs, source/packaged SHA-256 and available name rows are in
 this pack's extensionless schema-v2 manifest (region=CN). Missing names are
 recorded in missing; never substitute Japanese names or ordinary labels.
 
-All PNGs: FASTOCTREE 256 colours, no dithering, optimize=True, compress_level=9.
-The manifest records any alpha>=128 mask changes. No Unity/game bundle,
+All PNGs: guarded libimagequant 256 colours, no dithering, optimize=True, compress_level=9.
+Alpha classes 0, 1..127 and 128..255 are repaired against the original source,
+preserving fully transparent positions and the alpha>=128 mask; intermediate
+alpha is lossy. Uses tools/command_card_palette.py for offline maintenance only.
+No Unity/game bundle,
 decryptor, font or new runtime dependency is included.
 
 Game artwork/text belong to the respective Fate/Grand Order rights holders;
 Atlas Academy is the asset mirror, not the copyright owner.
 
 Maintenance: tools/prepare_command_card_composition_assets.py
+Additional NP sheets: tools/sync_command_card_np_assets.py discovers NP icons,
+ascension/costume name overrides and explicit transformServant targets from
+Atlas NiceServant metadata. Original owner folders and PNG basenames remain
+unchanged. Extra filenames are recorded in np_extra_names; per-file HTTP 404s
+are recorded in np_missing. Existing default sheets are not overwritten.
 Runtime: agent/battle/card_composer.py (OpenCV/NumPy only, no network)
 Details: docs/指令卡归属识别.md

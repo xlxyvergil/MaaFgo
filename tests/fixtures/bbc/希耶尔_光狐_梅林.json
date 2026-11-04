@@ -1,0 +1,150 @@
+{
+  "servant_0_name": "谜之代行者C.I.E.L",
+  "servant_1_name": "光之高扬斯卡娅",
+  "servant_2_name": "梅林",
+  "servant_3_name": null,
+  "servant_4_name": null,
+  "servant_5_name": null,
+  "assistIdx": 1,
+  "assistEquip": "迦勒底午茶时光",
+  "master_equip": 1,
+  "round1_extraStrategy": null,
+  "round1_extraSkill": [],
+  "round2_extraStrategy": null,
+  "round2_extraSkill": [],
+  "round3_extraStrategy": null,
+  "round3_extraSkill": [],
+  "server": "JP",
+  "onlyFriendAssist": 0,
+  "fullEquip": 0,
+  "NPlevel": 1,
+  "servantLevel": 1,
+  "skillsLevel": [
+    10,
+    10,
+    10,
+    0,
+    0,
+    0,
+    0,
+    0
+  ],
+  "assistMode": "仅从者",
+  "round1_turns": 1,
+  "round1_turn0_skill": [
+    [
+      5,
+      1
+    ],
+    [
+      6,
+      1
+    ],
+    7,
+    8,
+    [
+      9,
+      1
+    ],
+    1,
+    2,
+    3,
+    [
+      13,
+      3
+    ]
+  ],
+  "round1_turn0_np": [
+    1
+  ],
+  "round1_turn0_strategy": [
+    {
+      "card1": {
+        "type": 1,
+        "cards": [
+          "1B"
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "card2": {
+        "type": 0,
+        "cards": [
+          1
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "card3": {
+        "type": 1,
+        "cards": [
+          "1B"
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "breakpoint": [
+        false,
+        false
+      ],
+      "colorFirst": true
+    }
+  ],
+  "round1_turn0_condition": null,
+  "round2_turns": 1,
+  "round2_turn0_skill": [
+    [
+      4,
+      1
+    ],
+    [
+      12,
+      1
+    ],
+    1,
+    2,
+    3
+  ],
+  "round2_turn0_np": [
+    1
+  ],
+  "round2_turn0_strategy": [
+    {
+      "card1": {
+        "type": 1,
+        "cards": [
+          "1B"
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "card2": {
+        "type": 0,
+        "cards": [
+          1
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "card3": {
+        "type": 1,
+        "cards": [
+          "1B"
+        ],
+        "criticalStar": 0,
+        "more_or_less": true
+      },
+      "breakpoint": [
+        false,
+        false
+      ],
+      "colorFirst": true
+    }
+  ],
+  "round2_turn0_condition": null,
+  "round3_turns": 1,
+  "round3_turn0_skill": [],
+  "round3_turn0_np": [],
+  "round3_turn0_strategy": null,
+  "round3_turn0_condition": null
+}

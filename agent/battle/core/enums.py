@@ -14,6 +14,7 @@ class Scene(str, Enum):
 
 
 class CardColor(str, Enum):
+    UNKNOWN = "unknown"
     BUSTER = "B"
     ARTS = "A"
     QUICK = "Q"

@@ -1,0 +1,1337 @@
+{
+  "schemaVersion": 1,
+  "mysticCodes": [
+    {
+      "id": 1,
+      "name": "魔术礼装·迦勒底",
+      "nameJp": "魔術礼装･カルデア",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00001.png",
+          "sourceSha256": "8332765fc3482c0a1d374ec824a7500030fa49b32b783c9e312a21e61016280c",
+          "sha256": "7186811cfc0b5d9d7fb04c1417c275f7d445be70ab4932ac25654273c87c8246",
+          "size": [
+            102,
+            136
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00001.png",
+          "sourceSha256": "dc8318e9c2143e2d5da6902cfbca5c0b6f7ffa5f3f5160122e41f36dbf1def72",
+          "sha256": "abc1208b7be8915db666affded2a8d6796bd72dcafcf90254c573a70d2882735",
+          "size": [
+            102,
+            136
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00002.png",
+          "sourceSha256": "ff74aa2537179d8919968bdb756c0328d1f245a67f0fc6e39e9e472610e4f51e",
+          "sha256": "9257a74281895246963391d6b5965eb83db25bc01bacc8446aad8f46c5288a19",
+          "size": [
+            128,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00002.png",
+          "sourceSha256": "f9a9be28b0bb8fb0625ff63615e5d0f80df51f85ba5e2c1ed7b1875af13bce8a",
+          "sha256": "bd7ba72e2d3a1809d230d00052efdf5b78be83793a99a91b3e9015b16e560ab6",
+          "size": [
+            128,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 1,
+      "femaleImageId": 2
+    },
+    {
+      "id": 20,
+      "name": "魔术礼装·迦勒底战斗服",
+      "nameJp": "魔術礼装･カルデア戦闘服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00021.png",
+          "sourceSha256": "f9af1248931d3ec6851cd475133f94114659ef15566fedbbc9e826386da79f43",
+          "sha256": "73f912fa36d5bd7a17600d7fb7fbe2d925530f1527e76633227d471daab75c59",
+          "size": [
+            92,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00021.png",
+          "sourceSha256": "fbfcd4c908a5b99852ece140b9cdcc8f8116af54131981a29632fb8442a3bad6",
+          "sha256": "904538c3ae6064c5f984f65c0ec5b0576221109c6e869ee83865b7a2605eb592",
+          "size": [
+            92,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00022.png",
+          "sourceSha256": "2e54ac28222b42e9fc66db994a9054f1ebffc456b9a56f9e94551ca077f2dc15",
+          "sha256": "448e004f81b841bcdcdc62cca14e4c9c00af678e7d814ad926c3b2c4816eefd9",
+          "size": [
+            143,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00022.png",
+          "sourceSha256": "b4f527161fe9a79d7ce5bad2b6f4bb7c6bf514610ac4f9db0953b4f5cb0f1a50",
+          "sha256": "75f07844b464214ceb79cafdbd69533db811f7707a4dd0aca965fb4b514e2cb5",
+          "size": [
+            143,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 21,
+      "femaleImageId": 22
+    },
+    {
+      "id": 30,
+      "name": "魔术礼装·魔术协会制服",
+      "nameJp": "魔術礼装･魔術協会制服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00031.png",
+          "sourceSha256": "a4334d3c75d54b1f02f8de697b24714f4469f607055ea1c69129b78f3e2c044c",
+          "sha256": "53107c59b78168c61e7cbe7e400397d408f30ade1aea9a14aae728631da34505",
+          "size": [
+            131,
+            143
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00031.png",
+          "sourceSha256": "148cf98fa676f6497df8eb2a102cc2895297181ebfcb70f3ae6912d86853e261",
+          "sha256": "1c6760d1448b774a61206d0e14714b0df04e2cc72b56a41230049a634c64d546",
+          "size": [
+            131,
+            143
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00032.png",
+          "sourceSha256": "58c336527ac9337fae7a882fb1b4c66aa4d51938926b6a69401233482907e764",
+          "sha256": "0ecacade096def167f4ed2b11d3d914c9ecfe2bf469f5243546071ffb5e81df1",
+          "size": [
+            146,
+            133
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00032.png",
+          "sourceSha256": "5f82c1de9c54b2fcadaed0d024e9cf3d87fc411c5571a5a18f1fa5a404dbd6a9",
+          "sha256": "38e728808bf0e9de6b8a0b2f0eb86910b6a0e0ee3e0e423e609619c236bc358d",
+          "size": [
+            146,
+            133
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 31,
+      "femaleImageId": 32
+    },
+    {
+      "id": 40,
+      "name": "魔术礼装·阿特拉斯院制服",
+      "nameJp": "魔術礼装･アトラス院制服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00041.png",
+          "sourceSha256": "c26a3f76a4e180fb355a2a9af4aaf14e4f8fdce229c5645a4f7122f58dcb6b8c",
+          "sha256": "1f8ed92076942848aebd9bf49a026250c56a3e9d6ac3698c288400cf8df85ee3",
+          "size": [
+            98,
+            124
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00041.png",
+          "sourceSha256": "bf694a28eb9b76399aa3c5263000703bbc8e8aa915081fa36aaf4723a064a864",
+          "sha256": "34595c0c0c59092d12c5e5e835ca596b3ba63767d6f0b17f0be05c7ded252d57",
+          "size": [
+            98,
+            124
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00042.png",
+          "sourceSha256": "9a08d998f8c3329f41452f2f2f05bd5d775b3309e0815b1ed8dcf02552daa6ab",
+          "sha256": "fec8d5e16857363d176db5bbec337ff96c6b77bb90aeaf2801ec41ad518d18dc",
+          "size": [
+            126,
+            134
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00042.png",
+          "sourceSha256": "7a7191a0c6380a20f86c9d65c341604f828fc3fdcd69625f0448d30686351e4c",
+          "sha256": "c6c44c899984b97cb96b68c2a0bccb8c99f27b78cf64da63d8de3df8443c91fa",
+          "size": [
+            126,
+            134
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 41,
+      "femaleImageId": 42
+    },
+    {
+      "id": 50,
+      "name": "金色庆典",
+      "nameJp": "アニバーサリー・ブロンド",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00051.png",
+          "sourceSha256": "866056c3e8c6dbda12691a9bb6082689a2587e7aaa6918e20e4540cc64c36b9d",
+          "sha256": "587b187d6f7d4125cfce18b343853d9e7fc10ed956fb1b20b6addf033bc7e13e",
+          "size": [
+            101,
+            143
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00051.png",
+          "sourceSha256": "d66f72719cb37326c1aff70670b25be7c0550a5458c00994952cef1319985171",
+          "sha256": "709848136fe15975a2692f44b2fe1b3f917a90828f830b604911146beb8e1317",
+          "size": [
+            101,
+            143
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00052.png",
+          "sourceSha256": "1a20e0d08d0acd6c77d844be9d17be1f8a040a7e9844e1406d5c69463457a4c8",
+          "sha256": "023b12d645168774739e06b4b1bc1f05fea0b94c9a13c3a10109b451e62897f1",
+          "size": [
+            118,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00052.png",
+          "sourceSha256": "d7aac87dbc66f717db0854f1b2a2f711bd03f60b683f0854b434ce34744c7a13",
+          "sha256": "13fc562f280e6cbab7d27d7174c8f929855c1bbe9c0ecc0e68071cc145158d1e",
+          "size": [
+            118,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 51,
+      "femaleImageId": 52
+    },
+    {
+      "id": 60,
+      "name": "王室品牌",
+      "nameJp": "ロイヤルブランド",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00061.png",
+          "sourceSha256": "27171bddb0a41e5de338d7e737102b9c6c3bd0ddb536eb647083ce2f037ab99b",
+          "sha256": "e91de3526ff2686359b17f271c3c18a178e8181cc376d88d1d993d63dfc2bdd9",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00061.png",
+          "sourceSha256": "499b02178baf3115314c3d303e23cf7ccea31c65d173c978e14db3ee25cca099",
+          "sha256": "f32c5f9863d893a8a7655d12551fbd3bbfe5833ba1547fac05c65488ea147b49",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00062.png",
+          "sourceSha256": "7ad245d8676d6cb87f1ce2a44fae1cd7f548ff13c7b7d261aecdaf339ecf4516",
+          "sha256": "e3020bb593fa3cb22b59f696b79ae58f1f297e23bbc85372a9133f30fe2efc06",
+          "size": [
+            134,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00062.png",
+          "sourceSha256": "2a3b22faaeb455cbbfc7590208fa923fb1286230a066209141264c1e736856ba",
+          "sha256": "ff556b302e743413ca60ac2f7ffde0fd006be2c3e8b3808bbf4f0899c9e1f0fe",
+          "size": [
+            134,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 61,
+      "femaleImageId": 62
+    },
+    {
+      "id": 70,
+      "name": "明亮夏日",
+      "nameJp": "ブリリアントサマー",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00071.png",
+          "sourceSha256": "730d9db1d8694fc7627993cda81cd8aa00ed352177b57f478f8ef5c02bf96bdd",
+          "sha256": "b33808064949e0513178f4f13ef350259ef48e5aee373bae73cd989ce0a2ae70",
+          "size": [
+            117,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00071.png",
+          "sourceSha256": "ee3c73db4b3befb33a3c6a627cfe1473e961a2d3c21490348d5dec68abf30244",
+          "sha256": "480801f21ad84459cbe984df6c04182dbc7ddae855f6e31a3e1504cbea68295c",
+          "size": [
+            117,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00072.png",
+          "sourceSha256": "788c370c8ed20fa359ff10758aa096d6b8d7a5d4871ff272d265e1a94ef7363f",
+          "sha256": "083f796bc2908747045e184272ace6a368bcc0e83950eab7ff218f1cd2a04a2a",
+          "size": [
+            140,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00072.png",
+          "sourceSha256": "db192c94e8806aa42191453aa8ad60c532f9a909595a459f136437855560f5e2",
+          "sha256": "0459353cd68002a3a4b58b899fc47f60c0c4093e9a5b4b4036e7f2e9bbbfe3f6",
+          "size": [
+            140,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 71,
+      "femaleImageId": 72
+    },
+    {
+      "id": 80,
+      "name": "月之海的记忆",
+      "nameJp": "月の海の記憶",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00081.png",
+          "sourceSha256": "754dc7cccd461bdb91417b4cff017fba611b9e8340358aea196c998fa137be25",
+          "sha256": "a14f29b60bd83f54e741018eb3c89d594d6794eafabdcba1367a0aa0293d892a",
+          "size": [
+            101,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00081.png",
+          "sourceSha256": "00b466494d67da50d37a12d73a5537f638ef3983aac40dead6059e727ad37bb6",
+          "sha256": "ebab8ea0262879a3ae2ec07ba3d4c1c71c36e1382c01a4d42cec9e8c5bdeb75f",
+          "size": [
+            101,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00082.png",
+          "sourceSha256": "da8dbc06cc6cdb5a45c180f53c60525171bdb8988f2d80e78d42e47efbf67f44",
+          "sha256": "11d6ea62971d2619740e5826f299698b50f0dd2ae16619dd88277232f8d6f352",
+          "size": [
+            136,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00082.png",
+          "sourceSha256": "5fc6bb206664dc217b71950fe1ae4ef3f60527551bc86bfaccfbdb86b0c36a23",
+          "sha256": "e68bf28800c27d886b6075b970291c35b9122bcac2c7dd5b3d35d7364ec33850",
+          "size": [
+            136,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 81,
+      "femaleImageId": 82
+    },
+    {
+      "id": 90,
+      "name": "月之背面的记忆",
+      "nameJp": "月の裏側の記憶",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00091.png",
+          "sourceSha256": "768373980cbfae5a639b1148869643a69cb1915c0fe0741df521ca8af8b5039f",
+          "sha256": "e8482ee135b87afd385ece4572d8bdf2d7f8930c51e184f5bb3c8de25e45e3d0",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00091.png",
+          "sourceSha256": "9713cb6dd897208a946b24d436fd7666c7bd725faa633f7a2da4a36572fc634f",
+          "sha256": "412e38bc2cf8be078ac4e4f78a0610dad39cfa3ed09c0224b6aa9047a99adf32",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00092.png",
+          "sourceSha256": "4675b34502c97dee1efc8c22d8ece32076fadc54bf15722032fed49af59ff124",
+          "sha256": "4df5b34e5f64cd4fadbd62c3c9c2da92569d5c5d86bb93a91adea37aab44fa7d",
+          "size": [
+            135,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00092.png",
+          "sourceSha256": "565eb73f851e972092b99c24d6cf1b8799a186425de403073d09c20fd76102bf",
+          "sha256": "5299d455f906f21341f8c5ef4c5149c684daa35a3b94283a72ef1f604d6b41a6",
+          "size": [
+            135,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 91,
+      "femaleImageId": 92
+    },
+    {
+      "id": 100,
+      "name": "2004年的碎片",
+      "nameJp": "2004年の断片",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00101.png",
+          "sourceSha256": "ff6168e07b93d01f140768cad12ac61075ab2fd8b94a3fb72c4c71c4b299c826",
+          "sha256": "1b0ea81b45614d892e0ecd39bb47b39767a11bfbe01cd1c62acc1f783c53c14f",
+          "size": [
+            102,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00101.png",
+          "sourceSha256": "8fa0b27efd7e4cc46959a6d7560475d29d7c55f0bc5180f24b41c6dadf2ece86",
+          "sha256": "977691a104e57ccf7ae9cd88db360278aeb50ee541459617a3918e2f099c6344",
+          "size": [
+            102,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00102.png",
+          "sourceSha256": "56b4867a99f6eb141b7295e6e2ab36edd632c9650518e181cc553232b05adb88",
+          "sha256": "595072ec4e1b5b826d5addee1cfc4aad52c839c77432fd1dea10df6654a0c73c",
+          "size": [
+            139,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00102.png",
+          "sourceSha256": "b47417b8750a8f6a26ad41f55cfa8fe090d40892c2195f5a40bad2741f87abba",
+          "sha256": "f9dbe6677aaca65927e88512afa6526907a06080632cbe664d12634f11210852",
+          "size": [
+            139,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 101,
+      "femaleImageId": 102
+    },
+    {
+      "id": 110,
+      "name": "魔术礼装·极地用迦勒底制服",
+      "nameJp": "魔術礼装･極地用カルデア制服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00111.png",
+          "sourceSha256": "584fbd1f26693b3e65480c0bad2b39c6145e36b5611a966bbec1540a23063350",
+          "sha256": "645613b29a9b2b4460cd9b190c11fadf324b372a3d970004b242f41e3c6fa328",
+          "size": [
+            95,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00111.png",
+          "sourceSha256": "e1e613d3cdf514ab299ba6b1c84eabda223419645ee1fb82521d9ade99a82982",
+          "sha256": "9db893eb9b71fe98fd736308c98e3a19d5c55f2a365587e5f503620be1cded41",
+          "size": [
+            95,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00112.png",
+          "sourceSha256": "9f78984583691c4d3718ecb0902f302e162af1f0d04ccf54e7df83e66d5def25",
+          "sha256": "375a63edbfd15434cfbb2b4ddf093e2b368591380e58cd6e89cbe78c3ee4b404",
+          "size": [
+            107,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00112.png",
+          "sourceSha256": "3b440697af06d893c14c65b57b66ffeada2f3c75a6252e7bfe5b72690ac29ac7",
+          "sha256": "95ce058820975303758607e9e406560ce7c9db1f39e1206e4a22914b44ec613f",
+          "size": [
+            107,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 111,
+      "femaleImageId": 112
+    },
+    {
+      "id": 120,
+      "name": "热带夏日",
+      "nameJp": "トロピカルサマー",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00121.png",
+          "sourceSha256": "e457476f93a099349fe9f1f0d3613fe1643fa6ff8c93198a135f9244c5551df9",
+          "sha256": "2a5d7369aaa51fbf466d384f8040c2d08304b47ab5c1fbc1353d333e9969054b",
+          "size": [
+            115,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00121.png",
+          "sourceSha256": "669d4fe4a995dc4c22e371d3095261d61ca6c1d4562eb668d91b3b7ed0ac6628",
+          "sha256": "8fb9499e497e6785f9f08e7aa678dd356dec0575f2600931514b5073e3c87bcc",
+          "size": [
+            115,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00122.png",
+          "sourceSha256": "4c578867f827302acd4430e34b241957bfb6864d76f3bc58caf648757c90abdf",
+          "sha256": "d5501a6f06a8be4b803740191c3b89529a451cc50316bc1009a99ab6622b9cad",
+          "size": [
+            138,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00122.png",
+          "sourceSha256": "43d6bd9e3d2c8b09ef15316d2fa82a6941bd7b1a01bd01ee18edb3ca027a7d4d",
+          "sha256": "a0539e3399d0a6fe74da03fc95c06b5b417148e0c11bc80a107f122ea3d96ba4",
+          "size": [
+            138,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 121,
+      "femaleImageId": 122
+    },
+    {
+      "id": 130,
+      "name": "华美的新年",
+      "nameJp": "晴れの新年",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00131.png",
+          "sourceSha256": "293724087ab12790c871dbdbf6df95cb52986871b5e744fb4c9c20daceac6cbc",
+          "sha256": "8db4d60232bc6bfab06f8f740386556b94828feb16fee8c892a6d120b836b155",
+          "size": [
+            117,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00131.png",
+          "sourceSha256": "60fb737d4a809c016f8822a138161a6c9c46c1b7e4dc206fdb287a21d1e64343",
+          "sha256": "7f0313d55cd9d3366402357032c76c897cdebce4f00804120eeb062e462afdc1",
+          "size": [
+            117,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00132.png",
+          "sourceSha256": "8cf2f61f08fd67bab6ad3a4d8ca84cdb4e084667c80e1fdcaf0c3a29e017047b",
+          "sha256": "cbff00dee0dffd2df6b29295c7ba6df3e58e3dffbdec3017b43da9ceada0709d",
+          "size": [
+            150,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00132.png",
+          "sourceSha256": "4b6810367c4c0533f9c22bc0aac01ad841b690dabed4c909d092941d3488f419",
+          "sha256": "08a68259c85b06b9b0f21de230e1e6af97937df6fb428f707384a3529938dba1",
+          "size": [
+            150,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 131,
+      "femaleImageId": 132
+    },
+    {
+      "id": 150,
+      "name": "迦勒底船长",
+      "nameJp": "キャプテン・カルデア",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00151.png",
+          "sourceSha256": "b9280d1de7c07c9a9057108cc8f3d4c5f5a0f8c19d0466618319922a9de2a558",
+          "sha256": "e4a60a26001f4ec2917b12eae11806c2d2a7e99c49659d451c4ba30f4d7e5f49",
+          "size": [
+            125,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00151.png",
+          "sourceSha256": "b1d9278fd7a5470d39d0388f937da1f6e772140b51b8b460a09eb6a1b23b2ea7",
+          "sha256": "3ffef5863aedcc9ede0d52bb58119ba5a84879d741fd641c8a49cc8dad78b312",
+          "size": [
+            125,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00152.png",
+          "sourceSha256": "526c00dd2d2400ba7f58df8fd94caea618d8bfeb33cc6f7d967feed0d5b0167e",
+          "sha256": "190df023e4a32caad3ff76fbcd7ca1613c568a31544213691641c30fb184110c",
+          "size": [
+            143,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00152.png",
+          "sourceSha256": "708ccf03421b230f7494fa499f2f876d1c9760801a23f7e5d012dd4ef9e05184",
+          "sha256": "fd76438f9b71bd0ec810462db9cdac28426d1e503ee46d5f4f16d48fbad63398",
+          "size": [
+            143,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 151,
+      "femaleImageId": 152
+    },
+    {
+      "id": 160,
+      "name": "第五真说要素环境用迦勒底制服",
+      "nameJp": "第五真説要素環境用カルデア制服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00161.png",
+          "sourceSha256": "2fa5eef29b5a86230a6a9070a00e4c4e16559ce5c0f91def1973a18e4a3d5505",
+          "sha256": "b0c10b93964881d44f90656c560f05d84a68533880137038555781325402ef98",
+          "size": [
+            117,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00161.png",
+          "sourceSha256": "3e4ee8cdc16cf1e2962f339a148fe2d5c0ee0b8c713b79fb23c130ea00fbdfbc",
+          "sha256": "89f17e13637f868b3d726744724d7fa05254d76201ec24fa36649ffd6f358dde",
+          "size": [
+            117,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00162.png",
+          "sourceSha256": "18c476bea8bc4fdd3cbc93a30306545994560f3da9fcd1f9266dadcff43b190b",
+          "sha256": "bbbee44cbbc50ad5ed1f6fb4f1c4f086f7581ddabfd4541661d7fa8a9918e3a5",
+          "size": [
+            136,
+            149
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00162.png",
+          "sourceSha256": "1cfb1a9520f086a1b58fa2acffd639da753e8571af044478e24627cfdff33081",
+          "sha256": "836c2ea6a65a05eac06b71b6c33c23e6df4ed6b3209aabe6f1afc5f80519ae28",
+          "size": [
+            136,
+            149
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 161,
+      "femaleImageId": 162
+    },
+    {
+      "id": 170,
+      "name": "迦勒底探险者",
+      "nameJp": "カルデア・パスファインダー",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00171.png",
+          "sourceSha256": "74762eaa06f86040e261348bdb4694060f88dfd5a68a0c230133540d7afbd262",
+          "sha256": "8136141ea02db0159ca1a1b657f109d2d6ce3a84511fd195c0fff913bf0db2eb",
+          "size": [
+            95,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00171.png",
+          "sourceSha256": "edb6fe9e68ae50613717f019af02954f5e863c438f60d39313942bff6dc91e3e",
+          "sha256": "9dca8fd16dc7e13b47229cf706512683cb1499c5ca539975a5f983e24a4fe60d",
+          "size": [
+            95,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00172.png",
+          "sourceSha256": "f384b99b1089671e2ac64e962969079db28bc5b911750947631614cc34e15867",
+          "sha256": "b8a8828c506b31b977614682855bd2b2e88645625aba21aa2126a6fe3ac11932",
+          "size": [
+            95,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00172.png",
+          "sourceSha256": "4dc3132a13e0321d2a27a28facc45002f978c3809812798cb4ce36b156998119",
+          "sha256": "98a134a6ad3256ca66a89631c3ee638a1a38141d3bef4e2e8c2bfd66aab6aacb",
+          "size": [
+            95,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 171,
+      "femaleImageId": 172
+    },
+    {
+      "id": 190,
+      "name": "万圣节王室成员",
+      "nameJp": "ハロウィン・ロイヤリティ",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00191.png",
+          "sourceSha256": "e65ea29fde2fcd0016371985e1ece4028a96c48a45fb5ca0552bd6cf2991db8a",
+          "sha256": "8249eb26387db7787a41cfd1a05c6b365aee43b3b345e3dfea760f9f6719ef92",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00191.png",
+          "sourceSha256": "c4e17f9f36481b0a7d7348bb4510ae80841c5deac992b6fc4394948f914e537f",
+          "sha256": "9cfcb95a1005c46cafdf4ccfc0bfb06105e8014ec1c815c18baec42378af731d",
+          "size": [
+            103,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00192.png",
+          "sourceSha256": "16c65626353d012315052ecb0008b73f840b40ba804ef83b99f860d0d3b26925",
+          "sha256": "e9c24b7ec5de68223c9cbdbfc9f60e858ffb604e686abdcde4003722209ac3d5",
+          "size": [
+            127,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00192.png",
+          "sourceSha256": "51b3efa9868d8e367c27e9e84f81e0e10f565d3da8b524211b15635e460b52b1",
+          "sha256": "b41e8f033977ff35d4d29c76bfa33f6e17cdbab29d045daeae6cbcdfadcd0698",
+          "size": [
+            127,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 191,
+      "femaleImageId": 192
+    },
+    {
+      "id": 210,
+      "name": "决战用迦勒底制服",
+      "nameJp": "決戦用カルデア制服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00211.png",
+          "sourceSha256": "33deb0c20565d7fbc6ba412e4f3e0f040d6619578dc65c4fd53c0f63c1e69e92",
+          "sha256": "fdab7a967f94df540e98449998ce3ce2c8713789abb0b00d20235353a347999e",
+          "size": [
+            100,
+            142
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00211.png",
+          "sourceSha256": "d8313fd85672a47b5dc65709e5d6e72789478096431ada2dd2e180890ae91efa",
+          "sha256": "95b5242f04f42f0b0e3dffb073daa12a8aa5d2a1b52eaae70bd63bb982b05806",
+          "size": [
+            100,
+            142
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00212.png",
+          "sourceSha256": "6c0449cfabd0c80e3d41c2b0b18c27deab5968135425f7ca2686599f8cf53f91",
+          "sha256": "525921beb697fe5f3cca82677a1917ac2bb0e99b29fdf6c170c4a4bf673e1815",
+          "size": [
+            124,
+            142
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00212.png",
+          "sourceSha256": "526e8b34c42ccfcc60da9aa05902ff0dd11936391efe8081adf74e17e7bddc98",
+          "sha256": "6b2073be087bd499a284d7c8ffbd959626274df2e5b6556e997e1a796a87394e",
+          "size": [
+            124,
+            142
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 211,
+      "femaleImageId": 212
+    },
+    {
+      "id": 240,
+      "name": "总耶高中校服",
+      "nameJp": "総耶高校学生服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00241.png",
+          "sourceSha256": "2f924ea23731752cfd31b213b137086edf6dc6e11167fdeb8f64dc43d056a43f",
+          "sha256": "a501b68c3ccca409a39f1e023b49ad50039bfd1c92103e4c01b144bb22f72417",
+          "size": [
+            100,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00241.png",
+          "sourceSha256": "576e0da7f957257f42ddf99a2602d5fd1140d5c314d9ee7909a215bbebdb12a6",
+          "sha256": "40b304b6b283e3669f6b169d04f57a1084fb37aa7b8870936388e67c705de2f0",
+          "size": [
+            100,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00242.png",
+          "sourceSha256": "e77ba0e422b26c3cbb9bf7449a964ee00f8342adcb6df8f9a058fe19e124e973",
+          "sha256": "14825c4a33b04970e0ecdf9eae374d3bf514a2c4c0dfa0feb282d01b45004d0e",
+          "size": [
+            121,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00242.png",
+          "sourceSha256": "627d6eb1f97124c858975a4c030bbd8e4f4da8e41d99ce9c40fb3043dee59b8b",
+          "sha256": "592883552b8be854b1b7e88697ea89270b3465db8f0cb65c21b2db569be0433f",
+          "size": [
+            121,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 241,
+      "femaleImageId": 242
+    },
+    {
+      "id": 260,
+      "name": "新春装束",
+      "nameJp": "新春の装い",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00261.png",
+          "sourceSha256": "264015e4468d41e6a3d400634e5754076acea4d5a7bcc0c7f665aeb0544ec509",
+          "sha256": "3d5fe69f38a9a029bfc988732d18f785430d37db0d6cb5642efabefe892e0ee5",
+          "size": [
+            122,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00261.png",
+          "sourceSha256": "e0a08b643fc33f16e28b56fe6c69dc823dbe3e1f15f9968c7ebaafb00c105300",
+          "sha256": "e136a738097462c3417c826b7befc95b6d7be4e7cc57ce5cebcf23fd1ccc0c6e",
+          "size": [
+            122,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00262.png",
+          "sourceSha256": "7b92d6a64a5055f0d53e0d47a24fb87f1acacf364b2273e99eebc2f20c9db1ba",
+          "sha256": "929d5b66989a4a53566919b45caded956b3aa6f1b838a1cc3db3ae6ddbd9fa2b",
+          "size": [
+            141,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00262.png",
+          "sourceSha256": "d95e0d4331b340e86f211e11e4f96975389af1ac7e2342650209f6b4be627e13",
+          "sha256": "bcb6668a2afcf760fd24feadc07b4b92c81416d5cc3d85d6454f6497207ed104",
+          "size": [
+            141,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 261,
+      "femaleImageId": 262
+    },
+    {
+      "id": 330,
+      "name": "夏日街头",
+      "nameJp": "サマー・ストリート",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00331.png",
+          "sourceSha256": "5748a633d65d93a5f4ef98b17448ee43a7bd5a99f99f0ca46ed0478768574fe7",
+          "sha256": "899b189489128ebdd5bcb18d7f72e8324651d6c58f0fa4f37fd8383c00f9527a",
+          "size": [
+            125,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00331.png",
+          "sourceSha256": "e5db2fc6ff1d8afaeb9e53a1568ee60ab5e55e78ae2a814d0cf738bca7344c25",
+          "sha256": "137a0dce1ac58c2f938b49f64ff54cf0f2419c39d0f0330ea0e04a0b56ae068e",
+          "size": [
+            125,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00332.png",
+          "sourceSha256": "a9d88832055dc52ca3843494eb1315b0da750b5121a70eef2ecfeac63c132a49",
+          "sha256": "c66b74821f2964e583e5401cfa65427e9f5d2dd98909dcb46bc51ec9980a59f8",
+          "size": [
+            137,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00332.png",
+          "sourceSha256": "a5a1b18322f7215e941cd6ee97714a1cee40c00df97349654b2ddaffad52f6fb",
+          "sha256": "2d5c25d7246ce3b0cac5ce7511b1c62895d3d1a0669db2b24b6b822fad2b2648",
+          "size": [
+            137,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 331,
+      "femaleImageId": 332
+    },
+    {
+      "id": 340,
+      "name": "白色圣诞节",
+      "nameJp": "ホワイトクリスマス",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00341.png",
+          "sourceSha256": "219ad5e048023c186a4a6c63d5a64dee5da6c797263cc204062b269e1012d04f",
+          "sha256": "1b884cc428470b3ff87db341cb65ee02545f454eee7b7e1583775fd724ffae71",
+          "size": [
+            124,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00341.png",
+          "sourceSha256": "8a6de410c4d52b4f3650ecddfd1dbee8bc034419cb27628a7118fdf75c0638e4",
+          "sha256": "f8ec724ef640448944483a07478b8f8d019c18a3f1a5c0d4c0f5c169aea68407",
+          "size": [
+            124,
+            150
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00342.png",
+          "sourceSha256": "81eed0f2935479fae0c2f96c91e66f175d0e172ed4149b4f505cbd0ecd26d39b",
+          "sha256": "1eb246d91bc09f68fcc770cb42de3426cfecc96ead2357442462bf14c47ca73b",
+          "size": [
+            147,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00342.png",
+          "sourceSha256": "0d57a6f5fec3a0a5425b85944bb59139a2e360d42adb14b9e90273d2c66a5dd4",
+          "sha256": "0892b7d5acc99c8799b3288d8270888feba5fac314b660186400791f574a6a6c",
+          "size": [
+            147,
+            144
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 341,
+      "femaleImageId": 342
+    },
+    {
+      "id": 360,
+      "name": "三咲高中校服",
+      "nameJp": "三咲高校学生服",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00361.png",
+          "sourceSha256": "8c1667c16d1cf1f35b7f6d3d478e1b70824f3fc3e8a87900cf737b518c467e45",
+          "sha256": "239fb6df50688a5758daf7f721083c2a717f81144b38b89d2eae672d1b3f9cad",
+          "size": [
+            101,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00361.png",
+          "sourceSha256": "2a01edc77d2fbd4a9500dbf9984d9f209ecbfafb12524b6057e313d47d0400a0",
+          "sha256": "27f61dcb3c75561d7a8b38e8d18aa068afb78683aae2fe106066fe8250c85a40",
+          "size": [
+            101,
+            145
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00362.png",
+          "sourceSha256": "c2457cefea9456f434b9cdb2366781ea7bedb36ad08117cc017018a84fc0096f",
+          "sha256": "96000a74e0e376304be0ec567571a2bf1782cd92f37f802044824aa50ba38a5d",
+          "size": [
+            122,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00362.png",
+          "sourceSha256": "05efbbbea6aeebba97317b5bcdf09f64d7e1024a45883f179d6d065f760f2d1c",
+          "sha256": "76b507eaaa56c53640b4430c1288a3a5cc534c5fe88d207982ef203f545cae70",
+          "size": [
+            122,
+            146
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 361,
+      "femaleImageId": 362
+    },
+    {
+      "id": 410,
+      "name": "冬日便装",
+      "nameJp": "ウィンターカジュアル",
+      "sources": {
+        "male": {
+          "source": "JP dump Items/masterequip00411.png",
+          "sourceSha256": "571eb84887522d7d9c66e0e55b3d8df1bd792d470ba390c29416d2e5fbd3ec27",
+          "sha256": "8e83d016a047caf146c804d3134f6531574a1f86ff42f2558a8348cbcc7a0c0a",
+          "size": [
+            119,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00411.png",
+          "sourceSha256": "f8e0d2c4b66b3c47c1dbe71f137e38607d215c5e1562be37177caf79c186c2b6",
+          "sha256": "913ca680d483777f3089e22143c60ab4a416428dccb7d4637c137f7525efa874",
+          "size": [
+            119,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "JP dump Items/masterequip00412.png",
+          "sourceSha256": "3c710193c6152eee961e1fad6d7b812a84c8b9779f74d78e8a5ce2dd8f2078be",
+          "sha256": "f776f0160927d02561f046319a4fe29238f45d3dfe3da5eebf84ccaf8747f7cd",
+          "size": [
+            134,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00412.png",
+          "sourceSha256": "37df3dc5fc45c0be4d60dcb9753158a5c8e2c2cdff47c2cbb4ccf9db5246b51b",
+          "sha256": "5caad605b73e061764850dbc53c93bfa69df8447b36798beb186e86cb452067a",
+          "size": [
+            134,
+            148
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 411,
+      "femaleImageId": 412
+    },
+    {
+      "id": 430,
+      "name": "浅葱的队服",
+      "nameJp": "浅葱の隊服",
+      "sources": {
+        "male": {
+          "source": "CN dump Items/masterequip00431.png",
+          "sourceSha256": "c927ad5bad7f3976ad28a9f1c86b6c01ba548371820d0455bbcd3447c789fea3",
+          "sha256": "b5a0066d1424115a9dfdb7a69fa34ac7643fc1c22971fd42ef467e614f4da324",
+          "size": [
+            119,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00431.png",
+          "sourceSha256": "c927ad5bad7f3976ad28a9f1c86b6c01ba548371820d0455bbcd3447c789fea3",
+          "sha256": "b5a0066d1424115a9dfdb7a69fa34ac7643fc1c22971fd42ef467e614f4da324",
+          "size": [
+            119,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "CN dump Items/masterequip00432.png",
+          "sourceSha256": "9e615679243fa1e244d3791138d2c6499f28812f7d84a3e5160b770795f79942",
+          "sha256": "5d2747742665bb29df4dee8b7fb58a43c513623b715804e0624d7af42f3a6768",
+          "size": [
+            138,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00432.png",
+          "sourceSha256": "9e615679243fa1e244d3791138d2c6499f28812f7d84a3e5160b770795f79942",
+          "sha256": "5d2747742665bb29df4dee8b7fb58a43c513623b715804e0624d7af42f3a6768",
+          "size": [
+            138,
+            147
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 431,
+      "femaleImageId": 432
+    },
+    {
+      "id": 440,
+      "name": "普通迦勒底制服",
+      "nameJp": "ノーマル・カルデア制服",
+      "sources": {
+        "male": {
+          "source": "CN dump Items/masterequip00441.png",
+          "sourceSha256": "331fae47ac372632d20e0a6da547d7fd26df623db06861ad9e0bf4608c76cfa4",
+          "sha256": "468b9928c8bfae8f5208f1e3b882fd01e80c034e9f51a4751822dcbc3d904de0",
+          "size": [
+            101,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "maleCn": {
+          "source": "CN dump Items/masterequip00441.png",
+          "sourceSha256": "331fae47ac372632d20e0a6da547d7fd26df623db06861ad9e0bf4608c76cfa4",
+          "sha256": "468b9928c8bfae8f5208f1e3b882fd01e80c034e9f51a4751822dcbc3d904de0",
+          "size": [
+            101,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "female": {
+          "source": "CN dump Items/masterequip00442.png",
+          "sourceSha256": "43b1a76d52b4610f2a0db2e8b4f1ab48cd8057ca832cd875c43dd6b9b05c13be",
+          "sha256": "0d561f43618cfa7ea753759e64b96c32330d95d4853282caad8464b5bbccc14f",
+          "size": [
+            124,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        },
+        "femaleCn": {
+          "source": "CN dump Items/masterequip00442.png",
+          "sourceSha256": "43b1a76d52b4610f2a0db2e8b4f1ab48cd8057ca832cd875c43dd6b9b05c13be",
+          "sha256": "0d561f43618cfa7ea753759e64b96c32330d95d4853282caad8464b5bbccc14f",
+          "size": [
+            124,
+            141
+          ],
+          "padding": "exterior-dark-flood-fill"
+        }
+      },
+      "maleImageId": 441,
+      "femaleImageId": 442
+    },
+    {
+      "id": 460,
+      "name": "クラン・カラティン",
+      "nameJp": "クラン・カラティン",
+      "sources": {
+        "male": {
+          "source": "https://static.atlasacademy.io/JP/Items/masterequip00461.png",
+          "sourceSha256": "ed3b28986e245b406d8987e38dad2858760447adb9807e9a07b65a93daaaeb33",
+          "sha256": "fff3093fbe116cfc6bc97f833a370f358daf0a347ec5a0d25362a4409497319c",
+          "size": [
+            99,
+            148
+          ],
+          "padding": "alpha-bbox"
+        },
+        "female": {
+          "source": "https://static.atlasacademy.io/JP/Items/masterequip00462.png",
+          "sourceSha256": "989de473a7a94b89ea1688ee558a01835f2de20cd6dc928d8783ecbb8f43e0fe",
+          "sha256": "ec1f87983ebbb291404cd3fb2f1d5bc39ec8fca712aadb3ad653b23d4c0a4d0f",
+          "size": [
+            148,
+            145
+          ],
+          "padding": "alpha-bbox"
+        }
+      },
+      "maleImageId": 461,
+      "femaleImageId": 462
+    },
+    {
+      "id": 470,
+      "name": "カルデア学園制服",
+      "nameJp": "カルデア学園制服",
+      "sources": {
+        "male": {
+          "source": "https://static.atlasacademy.io/JP/Items/masterequip00471.png",
+          "sourceSha256": "e53e79bc6539c8a77828e3f84826715739e1b3a41cffd0ea5476b9033e8b3005",
+          "sha256": "fd4a626dbc37147df0937e8c174ffcea471f7f09a9765c4ce90a901b597de139",
+          "size": [
+            102,
+            147
+          ],
+          "padding": "alpha-bbox"
+        },
+        "female": {
+          "source": "https://static.atlasacademy.io/JP/Items/masterequip00472.png",
+          "sourceSha256": "676e95f9d09552d8249b90b84ae87e4a826d2af6189f4c8efa0b791cc8e26255",
+          "sha256": "6da72fd49ad82eddb0cb65433eb5e61c43d2eccadfd6265d2e1e9cca7373a4c3",
+          "size": [
+            130,
+            145
+          ],
+          "padding": "alpha-bbox"
+        }
+      },
+      "maleImageId": 471,
+      "femaleImageId": 472
+    }
+  ]
+}

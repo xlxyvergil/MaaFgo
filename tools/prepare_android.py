@@ -7,12 +7,13 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "Android" / "assets"
 ANDROID_OPTION_TYPES = {"select", "switch", "checkbox", "input"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
-REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍"}
+REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍", "打开编队与战斗编辑器"}
 BILIBILI_ANDROID_LAUNCHERS = {
     "com.bilibili.fatego",
     "com.bilibili.fatego/.EmptyClass",
@@ -51,7 +52,12 @@ ANDROID_TRANSITION_TIMEOUTS = {
         "跳过剧情-点击跳过": 15000,
         "跳过剧情-直接点击跳过": 15000,
     },
-    "jp/pipeline/run_FGO.json": {"如果要SKIP": 15000, "点击是": 15000},
+    "jp/pipeline/run_FGO.json": {
+        "自动登录": 60000,
+        "自动登录2": 60000,
+        "如果要SKIP": 15000,
+        "点击是": 15000,
+    },
 }
 
 
@@ -109,11 +115,32 @@ def adapt_wait_freezes(value):
             adapt_wait_freezes(child)
 
 
+def adapt_screencap_focus(value):
+    """安卓外壳将截图保存在全局日志目录 log/screencap 下。"""
+    if isinstance(value, dict):
+        focus = value.get("focus")
+        if isinstance(focus, str):
+            value["focus"] = focus.replace("debug/screencap/", "log/screencap/")
+        elif isinstance(focus, dict):
+            for event, message in focus.items():
+                if isinstance(message, str):
+                    focus[event] = message.replace("debug/screencap/", "log/screencap/")
+        for child in value.values():
+            adapt_screencap_focus(child)
+    elif isinstance(value, list):
+        for child in value:
+            adapt_screencap_focus(child)
+
+
 def copy_agent(source: Path, target: Path):
     def ignore(folder, names):
         patterns = ["__pycache__", "*.pyc"]
+        if Path(folder) == source:
+            patterns += ["battle_editor"]
         if Path(folder) == source / "custom":
-            patterns += ["bbc*.py", "chaldea_import_action.py"]
+            patterns += ["bbc*.py", "chaldea_import_action.py", "battle_editor_action.py"]
+        if Path(folder) == source / "chaldea":
+            patterns += ["bbc_servant_ids.json"]
         return shutil.ignore_patterns(*patterns)(folder, names)
     # chaldea/bbc_formatter.py 是公共包的纯 Python 依赖，不能按文件名前缀全局剔除。
     shutil.copytree(source, target, ignore=ignore)
@@ -225,8 +252,30 @@ def compatibility_report(source: dict, converted: dict) -> dict:
 
 def adapt_interface(data: dict, assets: Path) -> dict:
     data = copy.deepcopy(data)
+    # The local desktop editor is not served by the APK. Keep mobile descriptions
+    # free of loopback and local CMD links while preserving unrelated guides.
+    editor_link_markers = ("http://127.0.0.1:18765/", "./打开编队编辑器.cmd")
+
+    def has_editor_link(text):
+        decoded = unquote(text).lower()
+        return any(marker in decoded for marker in editor_link_markers)
+
+    def remove_desktop_editor_links(value):
+        if isinstance(value, dict):
+            description = value.get("description")
+            if isinstance(description, str) and has_editor_link(description):
+                value["description"] = "\n".join(
+                    line for line in description.splitlines()
+                    if not has_editor_link(line)
+                ).strip()
+            for item in value.values():
+                remove_desktop_editor_links(item)
+        elif isinstance(value, list):
+            for item in value:
+                remove_desktop_editor_links(item)
+    remove_desktop_editor_links(data)
     data["description"] = "FGO 安卓自动化助手；使用 Shizuku 或 Root，后台画面固定为 1280×720。"
-    # 安卓 APK 随资源更新。桌面 Mirror酱 RID 未配置 APK，不能用于手机更新。
+    # APK 的更新来源由 profile.yaml 显式配置，不继承桌面更新字段。
     data.pop("mirrorchyan_rid", None)
     data.pop("mirrorchyan_multiplatform", None)
     data["agent"] = {"child_exec": "python3", "child_args": ["-u", "agent/main.py"]}
@@ -244,14 +293,20 @@ def adapt_interface(data: dict, assets: Path) -> dict:
             if not doc.is_relative_to(assets.parent.resolve()):
                 raise ValueError(f"任务说明越出工程目录: {doc}")
             task["description"] = task.get("description", "") + "\n\n" + doc.read_text(encoding="utf-8-sig")
+        if task["name"] == "截图" and isinstance(task.get("description"), str):
+            task["description"] = task["description"].replace("debug/screencap/", "log/screencap/")
     for preset in data.get("preset", []):
         preset["task"] = [t for t in preset["task"] if t["name"] not in REMOVED_TASKS]
 
     options = data["option"]
-    for name in ("battle_mode", "主线-战斗方式"):
-        option = options[name]
-        option["cases"] = [case for case in option["cases"] if case["name"] == "native"]
-        option["default"] = "native"
+    # 按后端分支识别，避免新增独立任务后遗漏 BBC 依赖，扫描未打包的桌面配置。
+    for option in options.values():
+        cases = option.get("cases", [])
+        if not {"bbc", "native"} <= {case["name"] for case in cases}:
+            continue
+        option["cases"] = [case for case in cases if case["name"] == "native"]
+        option.pop("default", None)
+        option["default_case"] = "native"
         option["description"] = "安卓版使用原生自动战斗，可导入 Chaldea 队伍。"
 
     # 只保留可从任务、资源和全局选项到达的选项，去掉 BBC / 模拟器路径配置。
@@ -277,6 +332,8 @@ def adapt_interface(data: dict, assets: Path) -> dict:
         for field in option.get("inputs", []):
             if field.get("input_type") == "file":
                 field.pop("input_type")
+                field.pop("file_dialog_dir", None)
+                field.pop("file_dialog_filters", None)
                 field.setdefault("pipeline_type", "string")
                 field["description"] = "可粘贴分享链接、队伍/关卡 ID，或填写手机上可读取的 JSON 路径、已缓存的队伍文件名。"
                 option["description"] = "直接输入或粘贴导入来源；本地文件使用手机路径，缓存文件可只填文件名。"
@@ -293,6 +350,7 @@ def prepare(root: Path = ROOT, output: Path = OUTPUT) -> dict:
     interface = adapt_interface(interface_source, assets)
     adapt_android_start_apps(interface)
     adapt_wait_freezes(interface)
+    adapt_screencap_focus(interface)
     output = output.resolve()
     # 此目录只放生成文件；不接受任意用户目录，避免清理误删其他工程文件。
     if output != (root / "Android" / "assets").resolve():
@@ -321,7 +379,7 @@ def prepare(root: Path = ROOT, output: Path = OUTPUT) -> dict:
         pipeline.pop("关闭bbc", None)
         pipeline["关闭游戏"].pop("next", None)
         write_json(close, pipeline)
-    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json"):
+    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json", "编队与战斗编辑器.json"):
         (output / "resource/base/pipeline" / name).unlink(missing_ok=True)
 
     for path in (output / "resource").glob("*/pipeline/**/*.json"):
@@ -329,6 +387,7 @@ def prepare(root: Path = ROOT, output: Path = OUTPUT) -> dict:
         original = copy.deepcopy(pipeline)
         adapt_android_start_apps(pipeline)
         adapt_wait_freezes(pipeline)
+        adapt_screencap_focus(pipeline)
         adapt_transition_timeouts(pipeline, path.relative_to(output / "resource").as_posix())
         if pipeline != original:
             write_json(path, pipeline)

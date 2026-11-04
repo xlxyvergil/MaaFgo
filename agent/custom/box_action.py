@@ -18,7 +18,7 @@ attach 参数（pipeline 节点「执行整理礼物盒」定义默认值，opti
     sell3/4/5     bool  是否贩卖 3/4/5 星狗粮（去灵基变还卖掉换 QP）
     aqf           bool  QP 满时是否自动点掉继续（True 继续 / False 停止贩卖）
 
-资源目录：通过「资源包配置」节点的 attach.resource_package 区分
+资源目录：优先使用实际加载层 loaded_resource_package，旧资源兼容 resource_package
     "cn"   -> resource/cn/image/整理礼物盒/   (B服)
     "base" -> resource/base/image/整理礼物盒/ (日服)
 """
@@ -36,6 +36,7 @@ from maa.pipeline import JOCR
 
 import mfaalog
 from platform_waits import platform_timeout
+from resource_package import resolve_resource_package
 
 BASE_W, BASE_H = 1280, 720
 
@@ -308,9 +309,7 @@ class ExecuteBoxTask(CustomAction):
 
     def _init_dirs(self):
         """按资源包配置初始化礼物盒模板目录。"""
-        cfg = self._context.get_node_data("资源包配置") or {}
-        pkg = str((cfg.get("attach") or {}).get("resource_package") or "base").strip()
-        layer = "cn" if pkg == "cn" else "base"
+        layer = resolve_resource_package(self._context, caller="整理礼物盒")
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
         def _resolve(resource_layer):
@@ -325,7 +324,7 @@ class ExecuteBoxTask(CustomAction):
         self.tpl_dir = _resolve(layer) or ""
         # base 作为兜底：cn 缺图时回退到 base（与 pipeline 资源分层行为一致）
         self.tpl_base_dir = _resolve("base") or self.tpl_dir
-        mfaalog.info(f"[整理礼物盒] 资源包={pkg} 模板目录={self.tpl_dir}")
+        mfaalog.info(f"[整理礼物盒] 资源包={layer} 模板目录={self.tpl_dir}")
 
     def _reset_cycle_hit_counts(self):
         """重置跨轮复用 pipeline 节点的 max_hit 计数。"""

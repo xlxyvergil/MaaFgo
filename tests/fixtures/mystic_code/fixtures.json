@@ -1,0 +1,189 @@
+{
+  "source": "MaaMCP JP/CN formation, 2026-10-31, plus explicitly marked synthetic negatives; cropped icon regions only",
+  "expectedId": 1,
+  "confusableId": 440,
+  "canvasSize": [
+    1280,
+    720
+  ],
+  "scenes": [
+    {
+      "image": "team_1.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "initial.png",
+      "gender": "female"
+    },
+    {
+      "image": "selected_1.png",
+      "scene": "selected",
+      "roi": [
+        594,
+        164,
+        153,
+        148
+      ],
+      "source": "open.png",
+      "gender": "female"
+    },
+    {
+      "image": "male_team_1.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "male_initial.png",
+      "gender": "male",
+      "expectedId": 1,
+      "confusableId": 440
+    },
+    {
+      "image": "male_selected_20.png",
+      "scene": "selected",
+      "roi": [
+        594,
+        160,
+        154,
+        154
+      ],
+      "source": "male_selected_20.png",
+      "gender": "male",
+      "expectedId": 20,
+      "confusableId": 440
+    },
+    {
+      "image": "male_team_210.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "male_auto_scroll_210.png",
+      "gender": "male",
+      "expectedId": 210,
+      "confusableId": 440,
+      "expectInnerFallback": true
+    },
+    {
+      "image": "female_team_20.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "auto_change_20.png",
+      "gender": "female",
+      "expectedId": 20,
+      "confusableId": 440
+    },
+    {
+      "image": "female_team_210.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "auto_scroll_210.png",
+      "gender": "female",
+      "expectedId": 210,
+      "confusableId": 440
+    },
+    {
+      "image": "male_team_20.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "male_auto_change_20.png",
+      "gender": "male",
+      "expectedId": 20,
+      "confusableId": 440
+    },
+    {
+      "image": "synthetic_male_team_240.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "masterequip00241.png composited at team scale 0.375 over neutral UI background",
+      "synthetic": true,
+      "gender": "male",
+      "expectedId": 240,
+      "confusableId": 90
+    },
+    {
+      "image": "cn_female_team_20.png",
+      "scene": "team",
+      "roi": [
+        10,
+        640,
+        85,
+        80
+      ],
+      "source": "cn_initial.png",
+      "resourceLayer": "cn",
+      "gender": "female",
+      "expectedId": 20,
+      "confusableId": 440
+    },
+    {
+      "image": "cn_female_selected_20.png",
+      "scene": "selected",
+      "roi": [
+        594,
+        160,
+        154,
+        154
+      ],
+      "source": "cn_auto_change_1.png",
+      "resourceLayer": "cn",
+      "gender": "female",
+      "expectedId": 20,
+      "confusableId": 440
+    }
+  ],
+  "pageMarkers": [
+    {
+      "image": "cn_page_marker.png",
+      "roi": [
+        620,
+        345,
+        150,
+        70
+      ],
+      "source": "cn_auto_change_1.png",
+      "resourceLayer": "cn"
+    },
+    {
+      "image": "jp_page_marker.png",
+      "roi": [
+        620,
+        345,
+        150,
+        70
+      ],
+      "source": "open.png",
+      "resourceLayer": "base"
+    }
+  ]
+}

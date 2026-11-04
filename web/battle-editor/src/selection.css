@@ -1,0 +1,68 @@
+/* Shared, high-contrast selection states; loaded after component styles. */
+:root {
+ --selection-bg:#176b96;
+ --selection-hover:#125b83;
+ --selection-border:#0f587f;
+ --selection-text:#fff;
+ --selection-secondary:#e1f2fc;
+ --selection-accent:#f0cf79;
+}
+:root[data-theme=dark] {
+ --selection-bg:#286b90;
+ --selection-hover:#307ca4;
+ --selection-border:#8bd5fb;
+ --selection-secondary:#e5f4ff;
+}
+
+.turn-card {transition:border-color .15s,box-shadow .15s;}
+.turn-select:hover {background:var(--surface-3);}
+.turn-card.active {
+ border-color:var(--selection-border);
+ background:var(--selection-bg);
+ box-shadow:0 0 0 1px var(--selection-border);
+}
+.turn-card.active>.turn-select {
+ color:var(--selection-text);
+ box-shadow:inset 4px 0 var(--selection-accent);
+}
+.turn-card.active>.turn-select:hover {background:var(--selection-hover);}
+.turn-card.active .turn-select b {font-weight:700;}
+.turn-card.active .turn-select small {color:var(--selection-secondary);}
+.turn-card.active .turn-node {
+ background:var(--selection-text);
+ border-color:var(--selection-text);
+ color:#155b82;
+ font-weight:700;
+}
+.turn-card.active>.turn-tools {
+ background:var(--surface-2);
+ border-top-color:var(--selection-border);
+}
+.turn-card.active>.turn-select:focus-visible {outline-color:var(--selection-text);outline-offset:-4px;}
+
+.class-filters>button.selected,
+.rarity-filters>button.selected,
+.advanced-traits button.selected,
+.target-choices>button.selected,
+.target-unspecified.active {
+ background:var(--selection-bg);
+ border-color:var(--selection-border);
+ color:var(--selection-text);
+ box-shadow:inset 0 0 0 1px var(--selection-border),inset 3px 0 var(--selection-accent);
+ font-weight:600;
+}
+.target-choices>button.selected>span {color:var(--selection-secondary);}
+.class-filters>button.selected:hover,
+.rarity-filters>button.selected:hover,
+.advanced-traits button.selected:hover,
+.target-choices>button.selected:hover:not(:disabled),
+.target-unspecified.active:hover:not(:disabled) {
+ background:var(--selection-hover);
+ border-color:var(--selection-border);
+ color:var(--selection-text);
+}
+.class-filters>button.selected:focus-visible,
+.rarity-filters>button.selected:focus-visible,
+.advanced-traits button.selected:focus-visible,
+.target-choices>button.selected:focus-visible,
+.target-unspecified.active:focus-visible {outline-color:var(--selection-accent);}

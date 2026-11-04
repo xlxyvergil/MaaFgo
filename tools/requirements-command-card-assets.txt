@@ -1,0 +1,5 @@
+# Offline asset maintenance only, not Agent or Android runtime dependencies.
+Pillow
+numpy
+opencv-python-headless
+imagequant==1.1.5

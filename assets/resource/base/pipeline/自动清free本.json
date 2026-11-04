@@ -1,0 +1,37 @@
+{
+  "自动清free本调度": {
+    "doc": "独立 Free Quest 外层循环；复用主线单场助战和结算叶子节点，但不运行主线 NEXT、剧情或限制编队。识别失败保留现场。",
+    "action": {"type": "Custom", "param": {"custom_action": "auto_free_quest"}},
+    "on_error": []
+  },
+  "Free-配置": {
+    "doc": "地图查找复用 地图轮巡.json 的蛇形动作，并按 map_horizontal_repeat 展开每行横向步数；每一步都重新识别数字/前回。2026-11-01 日服特劳姆实测需检查右侧远端点；单步动作在克隆 Context 中覆盖 repeat，保留每轮复位参数。圆章边缘误识别的处理见 Free-数字确认。",
+    "attach": {"battle_limit": 999, "transition_timeout": 120, "battle_mode": "native", "map_horizontal_repeat": 2}
+  },
+  "Free-结果提示": {},
+  "Free-地图数字": {
+    "doc": "仅在 主线-地图菜单 + 主线-地图控件 确认地图、且非详情页时调用。橙色圆章、白色外环与圈内数字共同确认，排除左下头像/礼物和右下菜单；数字章位置动态偏移到地图点。",
+    "recognition": {"type": "Custom", "param": {"custom_recognition": "free_quest_badge", "custom_recognition_param": {"click_offset_radius": [-1, 1], "digit_inset_ratio": 0.15}}},
+    "action": {"type": "Click"}
+  },
+  "Free-数字确认": {
+    "doc": "由 free_quest_badge 为每个候选动态限定圆章内部 ROI，不能直接对整屏 OCR 数字后点击。2026-11-01 日服復権界域拠点实测，整圈识别会把白边当作0；按 Free-地图数字 的 digit_inset_ratio 排除外圈再单行识别，仍保留原始圆章框计算地图点击位置。",
+    "recognition": {"type": "OCR", "param": {"expected": ["^[1-9][0-9]?$"], "only_rec": true, "threshold": 0.7, "roi": [0, 0, 1, 1]}}
+  },
+  "Free-地图前回": {
+    "doc": "仅战后直接回地图、原 Free Quest 尚待 CLEAR 复核时使用。2026-11-01 日服特劳姆 隠者の逃げ道 首通会解锁 ヨウィヌス砦 并回地图；此时先重开前回点检查 CLEAR，禁止直接选择新数字点。复用 通用大活动-地图查找上回副本 的模板及点击偏移，只执行本叶子动作，不进入活动导航链。",
+    "recognition": {"type": "TemplateMatch", "param": {"template": "event/地图上次挑战标记.png", "threshold": 0.85, "green_mask": true}},
+    "action": {"type": "Click", "param": {"target_offset": [-100, -19, -1, -1]}},
+    "post_delay": 1000
+  },
+  "Free-列表标记": {
+    "doc": "日服详情 Free Quest 左侧标记，由用户 2026-11-01 截图裁出；位置不含 NEW 和进度，以兼容三段进度及 CLEAR 后复查。逐行查找时在克隆 Context 动态限制 ROI，避免污染下一轮列表检测；动作只点该行，不能替代成上次执行关卡。日服特劳姆实测：前回実行标记出现后标题轻微位移，标题复核需允许小幅平移，不能仅比较整块背景平均色差。标题取样相对位置见 attach.title_roi_offset。",
+    "attach": {"title_roi_offset": [125, -35, 290, 40]},
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/free_label.png", "threshold": 0.88, "roi": [620, 80, 610, 510], "order_by": "Vertical"}},
+    "action": {"type": "Click"}
+  },
+  "Free-完成角标": {
+    "doc": "整包 Terminal/icon_quest_clear.png 对应的 CLEAR 角标；识别模板按用户截图 1280×720 实际渲染裁出。每次只查当前 Free Quest 左下沿，不能用同屏另一行的 CLEAR 判为目标完成。2026-11-01 日服特劳姆天嶮山脈及中つ森实机验证：第三战后出现 CLEAR 和奖励 GET，调度复用 主线-列表后退 返回地图再寻找 Free-地图数字；不能对 CLEAR 行继续进本。",
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/clear.png", "threshold": 0.88, "roi": [620, 160, 200, 470]}}
+  }
+}

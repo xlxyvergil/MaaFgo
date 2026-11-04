@@ -1,0 +1,29 @@
+{
+  "repository": "https://github.com/chaldea-center/chaldea",
+  "commit": "e656fa4b3e23228805efdec851358e0ab319aeeb",
+  "fixture": "official_contract_golden.json",
+  "method": "Hand-authored anonymous fixture compared with the pinned official generated serializer and model defaults; no Dart runtime or actual Chaldea App import was executed.",
+  "sources": [
+    {
+      "path": "lib/models/userdata/battle.dart",
+      "url": "https://github.com/chaldea-center/chaldea/blob/e656fa4b3e23228805efdec851358e0ab319aeeb/lib/models/userdata/battle.dart",
+      "sha256": "9118c7fff02c8429af2bdbe162320a13b0cb3b71295d9ea294bccd1e51134498",
+      "bytes": 41464,
+      "sections": ["BattleShareData", "BattleTeamFormation", "SvtSaveData", "MysticCodeSaveData", "BattleReplayDelegateData", "BattleActionOptions", "BattleRecordData", "BattleAttackRecordData"]
+    },
+    {
+      "path": "lib/generated/models/userdata/battle.g.dart",
+      "url": "https://github.com/chaldea-center/chaldea/blob/e656fa4b3e23228805efdec851358e0ab319aeeb/lib/generated/models/userdata/battle.g.dart",
+      "sha256": "2d25a2879c157d9f32d8882b6d407cde086cc63a6b7a973538dcbb967bc52bb2",
+      "bytes": 38205,
+      "sections": ["BattleShareData FromJson/ToJson", "BattleTeamFormation FromJson/ToJson", "SvtSaveData FromJson/ToJson", "SupportSvtTypeEnumMap", "MysticCodeSaveData FromJson/ToJson", "BattleReplayDelegateData FromJson/ToJson", "BattleActionOptions FromJson/ToJson", "BattleRecordData FromJson/ToJson", "BattleAttackRecordData FromJson/ToJson"]
+    },
+    {
+      "path": "lib/models/gamedata/common.dart",
+      "url": "https://github.com/chaldea-center/chaldea/blob/e656fa4b3e23228805efdec851358e0ab319aeeb/lib/models/gamedata/common.dart",
+      "sha256": "977667f4e21142d0ffca7f452d133c569669858e7028f870efa6273d8e4a214c",
+      "bytes": 45159,
+      "sections": ["CardType", "CardTypeConverter"]
+    }
+  ]
+}

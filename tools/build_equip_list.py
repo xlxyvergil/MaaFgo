@@ -9,7 +9,7 @@ from pathlib import Path
 
 
 # CSV 的日文入手分类映射到游戏筛选面板中的资源文件名。友情点召唤礼装在
-# 游戏的筛选器中归入“通常”；“羁绊礼装”是另一个独立筛选项，CSV 当前没有该分类。
+# 游戏的筛选器中归入“通常”；从者羁绊礼装使用独立的“羁绊礼装”筛选项。
 ACQUISITION_FILTER_TAGS = {
     "通常（ストーリー/常駐ガチャ）": "通常",
     "キャンペーン・記念配布": "纪念配布",
@@ -19,7 +19,20 @@ ACQUISITION_FILTER_TAGS = {
     "マナプリズム交換": "达芬奇工坊",
     "バレンタイン・チョコレート": "巧克力",
     "フレンドポイント（友情）ガチャ": "通常",
+    "絆礼装": "羁绊礼装",
 }
+
+
+def authoritative_categories(path: Path | None = None) -> dict:
+    """Atlas-confirmed identities override older CSV classification only."""
+    path = path or Path(__file__).resolve().parents[1] / "agent/custom/equip_categories.json"
+    if not path.is_file():
+        return {}
+    data = json.loads(path.read_text(encoding="utf-8-sig"))
+    if (not isinstance(data, dict) or data.get("schemaVersion") != 1
+            or not isinstance(data.get("equips"), dict)):
+        raise ValueError("Atlas 礼装分类权威表格式不正确")
+    return data["equips"]
 
 
 def to_int(value: str, field: str, equip_id: str) -> int:
@@ -29,17 +42,18 @@ def to_int(value: str, field: str, equip_id: str) -> int:
         raise ValueError(f"equipId={equip_id} 的 {field} 不是整数: {value!r}") from exc
 
 
-def build(source: Path, destination: Path) -> int:
+def build(source: Path, destination: Path, *, categories_path: Path | None = None) -> int:
     with source.open(encoding="utf-8-sig", newline="") as file:
         rows = list(csv.DictReader(file))
 
     equips = []
     unknown_categories = set()
+    categories = authoritative_categories(categories_path)
     for row in rows:
         if row.get("非高价值礼装") != "0":
             continue
         equip_id = row.get("equipId", "")
-        category_jp = row.get("入手分类(日文)", "")
+        category_jp = categories.get(equip_id, {}).get("acquisition_category_jp", row.get("入手分类(日文)", ""))
         filter_tag = ACQUISITION_FILTER_TAGS.get(category_jp)
         if not filter_tag:
             unknown_categories.add(category_jp)
@@ -62,6 +76,7 @@ def build(source: Path, destination: Path) -> int:
     destination.write_text(
         json.dumps({"equips": equips}, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
+        newline="\n",  # Match Git's LF bytes so the editor's source hash is portable.
     )
     return len(equips)
 

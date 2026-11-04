@@ -30,23 +30,7 @@
             "param": {
                 "all_of": [
                     {
-                        "recognition": {
-                            "type": "OCR",
-                            "param": {
-                                "roi": [
-                                    360,
-                                    55,
-                                    620,
-                                    110
-                                ],
-                                "expected": [
-                                    "无法满足编成条件"
-                                ],
-                                "threshold": 0.8
-                            }
-                        }
-                    },
-                    {
+                        "sub_name": "base/特殊编队/特殊编队-编成条件未满足/OCR2",
                         "recognition": {
                             "type": "OCR",
                             "param": {
@@ -62,12 +46,30 @@
                                 "threshold": 0.8
                             }
                         }
+                    },
+                    {
+                        "sub_name": "base/特殊编队/特殊编队-编成条件未满足/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    360,
+                                    55,
+                                    620,
+                                    110
+                                ],
+                                "expected": [
+                                    "无法满足编成条件"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 0
             }
         },
-        "doc": "仅在游戏明确拒绝编成条件且显示关闭按钮时恢复，关闭错误后调用游戏自动编队满足本关限制。",
+        "doc": "仅在游戏明确拒绝编成条件且显示关闭按钮时恢复，关闭错误后调用游戏自动编队满足本关限制。 先核对小范围按钮，再检查限制条件；全部命中后点击按钮（box_index=0）。",
         "action": {
             "type": "Click"
         },
@@ -88,6 +90,7 @@
                 "all_of": [
                     "进本-队伍确认",
                     {
+                        "sub_name": "base/特殊编队/特殊编队-打开自动编队/OCR1",
                         "recognition": {
                             "type": "OCR",
                             "param": {
@@ -126,6 +129,25 @@
             "param": {
                 "all_of": [
                     {
+                        "sub_name": "base/特殊编队/特殊编队-限制提示关闭/OCR2",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    450,
+                                    550,
+                                    380,
+                                    100
+                                ],
+                                "expected": [
+                                    "^关闭$"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
+                    },
+                    {
+                        "sub_name": "base/特殊编队/特殊编队-限制提示关闭/OCR1",
                         "recognition": {
                             "type": "OCR",
                             "param": {
@@ -142,29 +164,12 @@
                                 "color_filter": "特殊编队-白字过滤"
                             }
                         }
-                    },
-                    {
-                        "recognition": {
-                            "type": "OCR",
-                            "param": {
-                                "roi": [
-                                    450,
-                                    550,
-                                    380,
-                                    100
-                                ],
-                                "expected": [
-                                    "^关闭$"
-                                ],
-                                "threshold": 0.8
-                            }
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 0
             }
         },
-        "doc": "以限制提示用语及关闭按钮识别弹窗，连续出现的首发、禁止成员、外观及任选成员提示复用同一节点。",
+        "doc": "以限制提示用语及关闭按钮识别弹窗，连续出现的首发、禁止成员、外观及任选成员提示复用同一节点。正文保留颜色过滤，避免批量OCR提前扫描背景。 先核对小范围按钮，再检查限制条件；全部命中后点击按钮（box_index=0）。",
         "action": {
             "type": "Click"
         },
@@ -185,23 +190,7 @@
             "param": {
                 "all_of": [
                     {
-                        "recognition": {
-                            "type": "OCR",
-                            "param": {
-                                "roi": [
-                                    360,
-                                    40,
-                                    620,
-                                    145
-                                ],
-                                "expected": [
-                                    "^自动编成(?:执行确认)?$"
-                                ],
-                                "threshold": 0.8
-                            }
-                        }
-                    },
-                    {
+                        "sub_name": "base/特殊编队/特殊编队-自动编成确认/OCR2",
                         "recognition": {
                             "type": "OCR",
                             "param": {
@@ -217,12 +206,30 @@
                                 "threshold": 0.8
                             }
                         }
+                    },
+                    {
+                        "sub_name": "base/特殊编队/特殊编队-自动编成确认/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    360,
+                                    40,
+                                    620,
+                                    145
+                                ],
+                                "expected": [
+                                    "^自动编成(?:执行确认)?$"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 0
             }
         },
-        "doc": "由游戏自动编成满足本关限制的队伍，不维护指定角色组合。",
+        "doc": "由游戏自动编成满足本关限制的队伍，不维护指定角色组合。 先核对小范围按钮，再检查限制条件；全部命中后点击按钮（box_index=0）。",
         "action": {
             "type": "Click"
         },
@@ -243,11 +250,30 @@
             "param": {
                 "all_of": [
                     {
+                        "sub_name": "base/特殊编队/特殊编队-队伍决定/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": [
+                                    1040,
+                                    625,
+                                    240,
+                                    90
+                                ],
+                                "expected": [
+                                    "^决定$"
+                                ],
+                                "threshold": 0.8
+                            }
+                        }
+                    },
+                    {
                         "recognition": {
                             "type": "Or",
                             "param": {
                                 "any_of": [
                                     {
+                                        "sub_name": "base/特殊编队/特殊编队-队伍决定/OCR2",
                                         "recognition": {
                                             "type": "OCR",
                                             "param": {
@@ -265,6 +291,7 @@
                                         }
                                     },
                                     {
+                                        "sub_name": "base/特殊编队/特殊编队-队伍决定/OCR3",
                                         "recognition": {
                                             "type": "OCR",
                                             "param": {
@@ -284,29 +311,12 @@
                                 ]
                             }
                         }
-                    },
-                    {
-                        "recognition": {
-                            "type": "OCR",
-                            "param": {
-                                "roi": [
-                                    1040,
-                                    625,
-                                    240,
-                                    90
-                                ],
-                                "expected": [
-                                    "^决定$"
-                                ],
-                                "threshold": 0.8
-                            }
-                        }
                     }
                 ],
-                "box_index": 1
+                "box_index": 0
             }
         },
-        "doc": "受限队伍页由游戏校验编队条件，识别限制标识与决定按钮后确认；后续汇合于原生采集与开始边界，不套用普通 Chaldea 重新编队。",
+        "doc": "受限队伍页由游戏校验编队条件，识别限制标识与决定按钮后确认；后续汇合于原生采集与开始边界，不套用普通 Chaldea 重新编队。 先核对小范围按钮，再检查限制条件；全部命中后点击按钮（box_index=0）。",
         "action": {
             "type": "Click"
         },

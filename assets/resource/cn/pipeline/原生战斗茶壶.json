@@ -1,0 +1,374 @@
+{
+    "茶壶-识别弹窗": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-识别弹窗/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "on_error": [],
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。"
+    },
+    "茶壶-弹窗已开启": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-弹窗已开启/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/toggle_on.png",
+                                "roi": [
+                                    775,
+                                    365,
+                                    80,
+                                    85
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "on_error": [],
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。"
+    },
+    "茶壶-弹窗已关闭": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-弹窗已关闭/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/toggle_off.png",
+                                "roi": [
+                                    775,
+                                    365,
+                                    80,
+                                    85
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "next": [],
+        "on_error": [],
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。"
+    },
+    "茶壶-弹窗关闭状态并开启": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-弹窗关闭状态并开启/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/toggle_off.png",
+                                "roi": [
+                                    775,
+                                    365,
+                                    80,
+                                    85
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    814,
+                    404,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 700,
+        "on_error": [],
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。"
+    },
+    "茶壶-弹窗开启状态并关闭": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-弹窗开启状态并关闭/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/toggle_on.png",
+                                "roi": [
+                                    775,
+                                    365,
+                                    80,
+                                    85
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    814,
+                    404,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 700,
+        "on_error": [],
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。"
+    },
+    "茶壶-识别并关闭弹窗": {
+        "doc": "国服第一种UI以明确标题与右侧茶壶图标联合识别，避免日服弹窗布局和透明背景差异；状态仅读取右侧茶壶。2026-11-01用户截图为风暴罐开、茶壶关，右侧点击(814,404)、关闭(640,564)。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    {
+                        "sub_name": "cn/原生战斗茶壶/茶壶-识别并关闭弹窗/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "expected": [
+                                    "道具自动使用设定"
+                                ],
+                                "roi": [
+                                    460,
+                                    95,
+                                    360,
+                                    60
+                                ],
+                                "threshold": 0.85
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/popup_teapot_icon.png",
+                                "roi": [
+                                    680,
+                                    365,
+                                    80,
+                                    70
+                                ],
+                                "threshold": 0.9
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target": [
+                    640,
+                    564,
+                    1,
+                    1
+                ]
+            }
+        },
+        "post_delay": 700,
+        "on_error": []
+    }
+}

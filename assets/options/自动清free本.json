@@ -1,0 +1,20 @@
+{
+  "option": {
+    "Free-战斗上限": {
+      "type": "input",
+      "label": "战斗场次上限",
+      "description": "每场战斗计一次；Free 本以 CLEAR 角标判断完成。默认持续清理当前地图，最多 999 场。",
+      "inputs": [{"name": "count", "label": "场次", "default": "999", "verify": "^[1-9][0-9]{0,2}$", "pipeline_type": "int"}],
+      "pipeline_override": {"Free-配置": {"attach": {"battle_limit": "{count}"}}}
+    },
+    "Free-战斗方式": {
+      "type": "select",
+      "label": "战斗方式",
+      "default": "native",
+      "cases": [
+        {"name": "native", "label": "原生自动战斗（推荐）", "option": ["原生自动战斗是否使用茶壶", "原生自动战斗使用Chaldea队伍", "原生自动战斗助战方式", "原生自动战斗羁绊满停止", "原生自动战斗高级策略"], "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "native"}}}},
+        {"name": "bbc", "label": "BBC 单场战斗", "option": ["team_config", "apple_type", "support_order_mismatch", "team_config_error"], "pipeline_override": {"Free-配置": {"attach": {"battle_mode": "bbc"}}}}
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "option": {
+    "编队编辑器操作": {
+      "type": "select",
+      "label": "编辑器操作",
+      "description": "任务结束、停止战斗或关闭网页不会立即关闭编辑服务。保存后的 JSON 可在编辑器/chaldea方案导入中填写文件名调用。",
+      "default_case": "open",
+      "cases": [
+        {"name": "open", "label": "启动并打开", "pipeline_override": {"打开编队与战斗编辑器": {"attach": {"editor_operation": "open"}}}},
+        {"name": "stop", "label": "停止编辑服务", "pipeline_override": {"打开编队与战斗编辑器": {"attach": {"editor_operation": "stop"}}}}
+      ]
+    }
+  }
+}

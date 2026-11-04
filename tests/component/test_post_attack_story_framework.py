@@ -14,13 +14,7 @@ from battle.runtime.runtime import AutoBattleRuntime
 from battle.execution.executor import Executor
 
 
-class PostAttackStoryTests(framework.FrameworkTests):
-    # 只复用资源初始化辅助，不重复父类的四项测试。
-    test_both_bundles_and_normalized_route = None
-    test_cloned_context_does_not_leak_and_swipe_is_one_step = None
-    test_custom_support_runs_with_recognition_detail = None
-    test_custom_next_returns_click_point_through_framework = None
-
+class PostAttackStoryTests(framework.FrameworkResources, unittest.TestCase):
     def scenario(self, start, destination):
         resource = self.resource('jp')
         state = {'page': start}

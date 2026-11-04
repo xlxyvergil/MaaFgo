@@ -29,6 +29,7 @@ GUARD = "进本-盲点跳过剧情"
 BLIND = "跳过剧情-直接点击跳过"
 REPEAT = "原生自动战斗_多次入口"
 MAIN = "进本-战斗主界面已出现"
+RECONNECT = "进本-断网重连"
 
 
 class EntryRoutingTests(unittest.TestCase):
@@ -115,7 +116,7 @@ class EntryRoutingTests(unittest.TestCase):
                  "进本-自动编队确认", "自动编队-编队决定",
                  "进本-编成条件提示",
                  "进本-攻略提示关闭",
-                 "进本-队伍确认", MAIN, GUARD, BLIND,
+                 "进本-队伍确认", MAIN, RECONNECT, GUARD, BLIND,
                  "跳过剧情-确认跳过", "跳过剧情-无确认弹窗", "跳过剧情-点击跳过",
                  "跳过剧情-确认跳过-已消失", "跳过-可能在主界面", "完成跳过剧情")
         nodes = {name: copy.deepcopy(self.source[name]) for name in names}
@@ -214,6 +215,56 @@ class EntryRoutingTests(unittest.TestCase):
     def test_post_start_wait_is_bounded(self):
         seen = self.run_graph(self.entry_graph(), "进本-等待战斗主界面或剧情", succeeds=False)
         self.assertEqual(seen.count(BLIND), 3)
+
+    def post_start_graph(self):
+        nodes = self.entry_graph()
+        for name in ("进本-实际点击队伍确认", "进本-开始后弹窗检查", "进本-开始按钮已消失"):
+            nodes[name] = copy.deepcopy(self.source[name])
+        nodes["特殊编队-编成条件未满足"] = {"enabled": False}
+        return nodes
+
+    def test_reconnect_after_start_and_during_loading_does_not_restart(self):
+        start, disappeared = "进本-实际点击队伍确认", "进本-开始按钮已消失"
+        seen = self.run_graph(self.post_start_graph(), start,
+                              [{start}, {RECONNECT}, {RECONNECT}, {disappeared},
+                               {RECONNECT}, {MAIN}])
+        self.assertEqual(seen.count(start), 1)
+        self.assertEqual(seen.count(RECONNECT), 3)
+        self.assertEqual(seen[-1], MAIN)
+        self.assertNotIn(BLIND, seen)
+
+    def test_reconnect_after_notice_returns_to_post_start_checks(self):
+        start, popup, disappeared = ("进本-实际点击队伍确认", "进本-开始后弹窗检查",
+                                     "进本-开始按钮已消失")
+        seen = self.run_graph(self.post_start_graph(), start,
+                              [{start}, {popup}, {RECONNECT}, {disappeared}, {MAIN}])
+        self.assertEqual([n for n in seen if n in (start, popup, RECONNECT, disappeared, MAIN)],
+                         [start, popup, RECONNECT, disappeared, MAIN])
+        self.assertNotIn(BLIND, seen)
+
+    def test_loading_reconnect_works_with_story_skip_disabled_or_exhausted(self):
+        for disabled in (False, True):
+            with self.subTest(disabled=disabled):
+                nodes = self.post_start_graph()
+                nodes[GUARD]["enabled"] = not disabled
+                screens = ([] if disabled else [set()] * 3) + [{RECONNECT}] * 4 + [{MAIN}]
+                seen = self.run_graph(nodes, "进本-等待战斗主界面或剧情", screens)
+                self.assertEqual(seen.count(RECONNECT), 4)
+                self.assertEqual(seen.count(BLIND), 0 if disabled else 3)
+                self.assertEqual(seen[-1], MAIN)
+
+    def test_reconnect_without_battle_screen_still_fails(self):
+        seen = self.run_graph(self.post_start_graph(), "进本-等待战斗主界面或剧情",
+                              [{RECONNECT}], succeeds=False)
+        self.assertEqual(seen.count(RECONNECT), 1)
+        self.assertNotIn(MAIN, seen)
+
+    def test_normal_start_does_not_click_reconnect(self):
+        start, disappeared = "进本-实际点击队伍确认", "进本-开始按钮已消失"
+        seen = self.run_graph(self.post_start_graph(), start, [{start}, {disappeared}, {MAIN}])
+        self.assertEqual(seen.count(start), 1)
+        self.assertNotIn(RECONNECT, seen)
+        self.assertEqual(seen[-1], MAIN)
 
     def test_story_confirmation_returns_to_entry(self):
         seen = self.run_graph(self.entry_graph(), "进本流程",

@@ -286,6 +286,25 @@
       }
     },
     {
+      "id": "9400360",
+      "collection_no": 36,
+      "name": "旅途的开始",
+      "rarity": 4,
+      "important": 1,
+      "images": [
+        "f_94003600.png"
+      ],
+      "name_jp": "旅の始まり",
+      "acquisition_category_jp": "キャンペーン・記念配布",
+      "filter_tag": "纪念配布",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      }
+    },
+    {
       "id": "9400380",
       "collection_no": 38,
       "name": "封印指定　执行者",
@@ -1587,8 +1606,8 @@
         "f_93000100.png"
       ],
       "name_jp": "星の王冠",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1606,8 +1625,8 @@
         "f_93000200.png"
       ],
       "name_jp": "王の遺物",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1625,8 +1644,8 @@
         "f_93000300.png"
       ],
       "name_jp": "串刺し公の凱旋",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1644,8 +1663,8 @@
         "f_93000400.png"
       ],
       "name_jp": "天の啓示",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1663,8 +1682,8 @@
         "f_93000500.png"
       ],
       "name_jp": "竜の記憶",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1682,8 +1701,8 @@
         "f_93000600.png"
       ],
       "name_jp": "赤原猟兵",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1701,8 +1720,8 @@
         "f_93000700.png"
       ],
       "name_jp": "雪の城",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1720,8 +1739,8 @@
         "f_93000800.png"
       ],
       "name_jp": "森なりし聖",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1739,8 +1758,8 @@
         "f_93000900.png"
       ],
       "name_jp": "灼熱の抱擁",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1758,8 +1777,8 @@
         "f_93001000.png"
       ],
       "name_jp": "価値無き宝",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1777,8 +1796,8 @@
         "f_93001100.png"
       ],
       "name_jp": "永劫の孤独",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1796,8 +1815,8 @@
         "f_93001200.png"
       ],
       "name_jp": "王妃の贈り物",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1815,8 +1834,8 @@
         "f_93001300.png"
       ],
       "name_jp": "エリクサー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1834,8 +1853,8 @@
         "f_93001400.png"
       ],
       "name_jp": "わたしの首飾り",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1853,8 +1872,8 @@
         "f_93001500.png"
       ],
       "name_jp": "彼のくれた杖",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1872,8 +1891,8 @@
         "f_93001600.png"
       ],
       "name_jp": "アイアン・メイデン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1891,8 +1910,8 @@
         "f_93001700.png"
       ],
       "name_jp": "ネコエプロン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1910,8 +1929,8 @@
         "f_93001800.png"
       ],
       "name_jp": "勝利の渇き",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1929,8 +1948,8 @@
         "f_93001900.png"
       ],
       "name_jp": "親愛なる君へ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -1948,8 +1967,8 @@
         "f_93002000.png"
       ],
       "name_jp": "聖なる献身",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2043,8 +2062,8 @@
         "f_93002100.png"
       ],
       "name_jp": "王律鍵",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2062,8 +2081,8 @@
         "f_93002200.png"
       ],
       "name_jp": "ゴールデングラス",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2081,8 +2100,8 @@
         "f_93002300.png"
       ],
       "name_jp": "万雷の喝采",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2100,8 +2119,8 @@
         "f_93002400.png"
       ],
       "name_jp": "ラインの黄金",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2119,8 +2138,8 @@
         "f_93002500.png"
       ],
       "name_jp": "女神のきらめき",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2138,8 +2157,8 @@
         "f_93002600.png"
       ],
       "name_jp": "花の船出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2157,8 +2176,8 @@
         "f_93002700.png"
       ],
       "name_jp": "契約の箱",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2176,8 +2195,8 @@
         "f_93002800.png"
       ],
       "name_jp": "バビロンへの扉",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2195,8 +2214,8 @@
         "f_93002900.png"
       ],
       "name_jp": "血を啜る斧",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2214,8 +2233,8 @@
         "f_93003000.png"
       ],
       "name_jp": "叛逆せよ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2290,8 +2309,8 @@
         "f_93003100.png"
       ],
       "name_jp": "トライスター・ベルト",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2309,8 +2328,8 @@
         "f_93003200.png"
       ],
       "name_jp": "黄金の舵",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2328,8 +2347,8 @@
         "f_93003300.png"
       ],
       "name_jp": "黒騎士の兜",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2347,8 +2366,8 @@
         "f_93003400.png"
       ],
       "name_jp": "黄金のリンゴ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2366,8 +2385,8 @@
         "f_93003500.png"
       ],
       "name_jp": "カボチャの聖杯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2385,8 +2404,8 @@
         "f_93003600.png"
       ],
       "name_jp": "回転式火縄銃",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2404,8 +2423,8 @@
         "f_93003700.png"
       ],
       "name_jp": "ラムレイ二号",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2423,8 +2442,8 @@
         "f_93003800.png"
       ],
       "name_jp": "心を留めるもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2442,8 +2461,8 @@
         "f_93003900.png"
       ],
       "name_jp": "在りし日の栄光",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2461,8 +2480,8 @@
         "f_93004000.png"
       ],
       "name_jp": "山中の天",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2518,8 +2537,8 @@
         "f_93004100.png"
       ],
       "name_jp": "たまも倶楽部",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2537,8 +2556,8 @@
         "f_93004200.png"
       ],
       "name_jp": "覚悟の鉢金",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2556,8 +2575,8 @@
         "f_93004300.png"
       ],
       "name_jp": "キャリコ・ジャック",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2575,8 +2594,8 @@
         "f_93004400.png"
       ],
       "name_jp": "魔境に臨みて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2594,8 +2613,8 @@
         "f_93004500.png"
       ],
       "name_jp": "預言の星",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2613,8 +2632,8 @@
         "f_93004600.png"
       ],
       "name_jp": "ヘカテの錫杖",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2632,8 +2651,8 @@
         "f_93004700.png"
       ],
       "name_jp": "カタチのない島",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2651,8 +2670,8 @@
         "f_93004800.png"
       ],
       "name_jp": "賢者の樽",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2670,8 +2689,8 @@
         "f_93004900.png"
       ],
       "name_jp": "シャイタンの腕",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2689,8 +2708,8 @@
         "f_93005000.png"
       ],
       "name_jp": "アリアドネの糸",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2822,8 +2841,8 @@
         "f_93005100.png"
       ],
       "name_jp": "私は誰だ？",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2841,8 +2860,8 @@
         "f_93005200.png"
       ],
       "name_jp": "霧夜の倫敦",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2860,8 +2879,8 @@
         "f_93005300.png"
       ],
       "name_jp": "ワンダーランド",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2879,8 +2898,8 @@
         "f_93005400.png"
       ],
       "name_jp": "顔の無い王",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2898,8 +2917,8 @@
         "f_93005500.png"
       ],
       "name_jp": "薄緑",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2917,8 +2936,8 @@
         "f_93005600.png"
       ],
       "name_jp": "九賓の礼",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2936,8 +2955,8 @@
         "f_93005700.png"
       ],
       "name_jp": "方天画戟",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2955,8 +2974,8 @@
         "f_93005800.png"
       ],
       "name_jp": "残せるもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2974,8 +2993,8 @@
         "f_93005900.png"
       ],
       "name_jp": "熱き門",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -2993,8 +3012,8 @@
         "f_93006000.png"
       ],
       "name_jp": "ハイドン・セット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3088,8 +3107,8 @@
         "f_93006100.png"
       ],
       "name_jp": "雷電の手",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3107,8 +3126,8 @@
         "f_93006200.png"
       ],
       "name_jp": "授かりの英雄",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3126,8 +3145,8 @@
         "f_93006300.png"
       ],
       "name_jp": "貧者の一灯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3145,8 +3164,8 @@
         "f_93006400.png"
       ],
       "name_jp": "人間への道程",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3164,8 +3183,8 @@
         "f_93006500.png"
       ],
       "name_jp": "黒の兜",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3183,8 +3202,8 @@
         "f_93006600.png"
       ],
       "name_jp": "ガリア戦記",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3202,8 +3221,8 @@
         "f_93006700.png"
       ],
       "name_jp": "ローマ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3221,8 +3240,8 @@
         "f_93006800.png"
       ],
       "name_jp": "五条大橋の邂逅",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3240,8 +3259,8 @@
         "f_93006900.png"
       ],
       "name_jp": "穢れし死の仮面",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3259,8 +3278,8 @@
         "f_93007000.png"
       ],
       "name_jp": "すごく便利",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3392,8 +3411,8 @@
         "f_93007100.png"
       ],
       "name_jp": "殲滅リスト",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3411,8 +3430,8 @@
         "f_93007200.png"
       ],
       "name_jp": "消えざる炎",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3430,8 +3449,8 @@
         "f_93007300.png"
       ],
       "name_jp": "月桂樹の指輪",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3449,8 +3468,8 @@
         "f_93007400.png"
       ],
       "name_jp": "最後の戦い",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3468,8 +3487,8 @@
         "f_93007500.png"
       ],
       "name_jp": "智慧の魚",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3487,8 +3506,8 @@
         "f_93007600.png"
       ],
       "name_jp": "螺湮城教本",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3506,8 +3525,8 @@
         "f_93007700.png"
       ],
       "name_jp": "寄生爆弾蟲",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3525,8 +3544,8 @@
         "f_93007800.png"
       ],
       "name_jp": "勇士の滾り",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3544,8 +3563,8 @@
         "f_93007900.png"
       ],
       "name_jp": "忌まわしきは我が人生",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3563,8 +3582,8 @@
         "f_93008000.png"
       ],
       "name_jp": "愛、此処にはなく",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3658,8 +3677,8 @@
         "f_93008100.png"
       ],
       "name_jp": "無我識　心空妙有",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3677,8 +3696,8 @@
         "f_93008200.png"
       ],
       "name_jp": "天草四郎陣中旗",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3696,8 +3715,8 @@
         "f_93008300.png"
       ],
       "name_jp": "シャトー・ディフ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3715,8 +3734,8 @@
         "f_93008400.png"
       ],
       "name_jp": "無限のパンケーキ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3734,8 +3753,8 @@
         "f_93008500.png"
       ],
       "name_jp": "赤いジャンパー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3753,8 +3772,8 @@
         "f_93008600.png"
       ],
       "name_jp": "この世ならざる幻馬",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3772,8 +3791,8 @@
         "f_93008700.png"
       ],
       "name_jp": "友からの手紙",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3791,8 +3810,8 @@
         "f_93008800.png"
       ],
       "name_jp": "クランの猛犬",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3810,8 +3829,8 @@
         "f_93008900.png"
       ],
       "name_jp": "女神のきらめき",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3829,8 +3848,8 @@
         "f_93009000.png"
       ],
       "name_jp": "英雄の武装",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3953,8 +3972,8 @@
         "f_93009100.png"
       ],
       "name_jp": "不撓不屈",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3972,8 +3991,8 @@
         "f_93009200.png"
       ],
       "name_jp": "たった一人の戦争",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -3991,8 +4010,8 @@
         "f_93009300.png"
       ],
       "name_jp": "聖なる泉",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4010,8 +4029,8 @@
         "f_93009400.png"
       ],
       "name_jp": "不滅なる刃",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4029,8 +4048,8 @@
         "f_93009500.png"
       ],
       "name_jp": "隠された女神",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4048,8 +4067,8 @@
         "f_93009600.png"
       ],
       "name_jp": "文明の灯火",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4067,8 +4086,8 @@
         "f_93009700.png"
       ],
       "name_jp": "技量、神域に達する",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4086,8 +4105,8 @@
         "f_93009800.png"
       ],
       "name_jp": "騎士の誓い",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4105,8 +4124,8 @@
         "f_93009900.png"
       ],
       "name_jp": "エレメンタル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4124,8 +4143,8 @@
         "f_93010000.png"
       ],
       "name_jp": "真・階差機関",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4219,8 +4238,8 @@
         "f_93010100.png"
       ],
       "name_jp": "焔刑の地獄",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4238,8 +4257,8 @@
         "f_93010200.png"
       ],
       "name_jp": "ゴルディアスの結び目",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4257,8 +4276,8 @@
         "f_93010300.png"
       ],
       "name_jp": "白竜",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4276,8 +4295,8 @@
         "f_93010400.png"
       ],
       "name_jp": "陽の差さぬ此処へ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4295,8 +4314,8 @@
         "f_93010500.png"
       ],
       "name_jp": "天の衣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4314,8 +4333,8 @@
         "f_93010600.png"
       ],
       "name_jp": "黄金律の発露",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4333,8 +4352,8 @@
         "f_93010700.png"
       ],
       "name_jp": "この大地の精霊",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4352,8 +4371,8 @@
         "f_93010800.png"
       ],
       "name_jp": "銃を拝見",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4371,8 +4390,8 @@
         "f_93010900.png"
       ],
       "name_jp": "百人蔵書",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4390,8 +4409,8 @@
         "f_93011000.png"
       ],
       "name_jp": "最後の欠片",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4428,8 +4447,8 @@
         "f_93011800.png"
       ],
       "name_jp": "神便鬼毒酒",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4447,8 +4466,8 @@
         "f_93011900.png"
       ],
       "name_jp": "童子切安綱",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4466,8 +4485,8 @@
         "f_93012000.png"
       ],
       "name_jp": "ラムセウム",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4485,8 +4504,8 @@
         "f_93012100.png"
       ],
       "name_jp": "骨刀（無銘）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4504,8 +4523,8 @@
         "f_93012200.png"
       ],
       "name_jp": "ゴールデンベアー号",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4523,8 +4542,8 @@
         "f_93012300.png"
       ],
       "name_jp": "グリンガレット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4542,8 +4561,8 @@
         "f_93012400.png"
       ],
       "name_jp": "ただ一度の嘘",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4561,8 +4580,8 @@
         "f_93012500.png"
       ],
       "name_jp": "行使されざる王権",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4580,8 +4599,8 @@
         "f_93012600.png"
       ],
       "name_jp": "鬼の面",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4599,8 +4618,8 @@
         "f_93012700.png"
       ],
       "name_jp": "炊けども尽きぬ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4618,8 +4637,8 @@
         "f_93012800.png"
       ],
       "name_jp": "王の馬",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4637,8 +4656,8 @@
         "f_93012900.png"
       ],
       "name_jp": "万能の智、根底の知",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4656,8 +4675,8 @@
         "f_93013000.png"
       ],
       "name_jp": "サンセット・ビーチ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4675,8 +4694,8 @@
         "f_93013100.png"
       ],
       "name_jp": "湖の乙女",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4694,8 +4713,8 @@
         "f_93013200.png"
       ],
       "name_jp": "夏の思い出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4713,8 +4732,8 @@
         "f_93013300.png"
       ],
       "name_jp": "ただいま入浴中！",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4732,8 +4751,8 @@
         "f_93013400.png"
       ],
       "name_jp": "プリドゥエン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4751,8 +4770,8 @@
         "f_93013500.png"
       ],
       "name_jp": "砂浜ラブレター（恐怖）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4770,8 +4789,8 @@
         "f_93013600.png"
       ],
       "name_jp": "失われた右腕",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4789,8 +4808,8 @@
         "f_93013700.png"
       ],
       "name_jp": "存在の証明",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4865,8 +4884,8 @@
         "f_93013800.png"
       ],
       "name_jp": "チャンピオンカップ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4884,8 +4903,8 @@
         "f_93013900.png"
       ],
       "name_jp": "夢幻召喚（インストール）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4903,8 +4922,8 @@
         "f_93014000.png"
       ],
       "name_jp": "運命の蛇",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4922,8 +4941,8 @@
         "f_93014100.png"
       ],
       "name_jp": "ホーリー・ナックル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4941,8 +4960,8 @@
         "f_93014200.png"
       ],
       "name_jp": "最低限のたしなみ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4960,8 +4979,8 @@
         "f_93014300.png"
       ],
       "name_jp": "痛覚共有",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4979,8 +4998,8 @@
         "f_93014400.png"
       ],
       "name_jp": "地の底の信仰",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -4998,8 +5017,8 @@
         "f_93014500.png"
       ],
       "name_jp": "ハロウィンへの招待状",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5055,8 +5074,8 @@
         "f_93014700.png"
       ],
       "name_jp": "七頭の戦鎚シタ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5074,8 +5093,8 @@
         "f_93014800.png"
       ],
       "name_jp": "フワワの花",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5093,8 +5112,8 @@
         "f_93014900.png"
       ],
       "name_jp": "ピエドラ・デル・ソル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5112,8 +5131,8 @@
         "f_93015000.png"
       ],
       "name_jp": "海への扉",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5131,8 +5150,8 @@
         "f_93015100.png"
       ],
       "name_jp": "天命の粘土板",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5150,8 +5169,8 @@
         "f_93015200.png"
       ],
       "name_jp": "クリューサーオール",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5169,8 +5188,8 @@
         "f_93015300.png"
       ],
       "name_jp": "ありえざる明日",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5188,8 +5207,8 @@
         "f_93015400.png"
       ],
       "name_jp": "原初の火",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5207,8 +5226,8 @@
         "f_93015500.png"
       ],
       "name_jp": "最果ての塔",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5283,8 +5302,8 @@
         "f_93015700.png"
       ],
       "name_jp": "空の仏",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5302,8 +5321,8 @@
         "f_93015800.png"
       ],
       "name_jp": "幽谷の淵",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5435,8 +5454,8 @@
         "f_93015900.png"
       ],
       "name_jp": "黒騎士くん",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5454,8 +5473,8 @@
         "f_93016000.png"
       ],
       "name_jp": "小惑星の力学",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5473,8 +5492,8 @@
         "f_93016100.png"
       ],
       "name_jp": "干将・莫耶（拳銃）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5492,8 +5511,8 @@
         "f_93016200.png"
       ],
       "name_jp": "彼方の荒野",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5511,8 +5530,8 @@
         "f_93016300.png"
       ],
       "name_jp": "百八魔星",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5644,8 +5663,8 @@
         "f_93016400.png"
       ],
       "name_jp": "ガーデン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5739,8 +5758,8 @@
         "f_93016500.png"
       ],
       "name_jp": "誓いの羽織",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5758,8 +5777,8 @@
         "f_93016600.png"
       ],
       "name_jp": "小豆のお手玉",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5853,8 +5872,8 @@
         "f_93016700.png"
       ],
       "name_jp": "輝くばかりの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5872,8 +5891,8 @@
         "f_93016900.png"
       ],
       "name_jp": "目を逸らさずに",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5891,8 +5910,8 @@
         "f_93017000.png"
       ],
       "name_jp": "路傍の夢",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5910,8 +5929,8 @@
         "f_93017100.png"
       ],
       "name_jp": "天魔の春修行",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5929,8 +5948,8 @@
         "f_93016800.png"
       ],
       "name_jp": "揺籃の夢",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5948,8 +5967,8 @@
         "f_93017200.png"
       ],
       "name_jp": "シャフリヤール王の閨",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5967,8 +5986,8 @@
         "f_93017300.png"
       ],
       "name_jp": "洛陽の宮殿",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -5986,8 +6005,8 @@
         "f_93017400.png"
       ],
       "name_jp": "戦神の軍帯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6005,8 +6024,8 @@
         "f_93017500.png"
       ],
       "name_jp": "ニーニャ号",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6062,8 +6081,8 @@
         "f_93017800.png"
       ],
       "name_jp": "フロンティア",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6081,8 +6100,8 @@
         "f_93017700.png"
       ],
       "name_jp": "自慢の一挺",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6157,8 +6176,8 @@
         "f_93023100.png"
       ],
       "name_jp": "虹の海の黄金劇場",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6176,8 +6195,8 @@
         "f_93023200.png"
       ],
       "name_jp": "万能包帯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6195,8 +6214,8 @@
         "f_93023300.png"
       ],
       "name_jp": "太陽からの賜り物",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6214,8 +6233,8 @@
         "f_93023400.png"
       ],
       "name_jp": "天下布武～2017summer.ver～",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6233,8 +6252,8 @@
         "f_93023800.png"
       ],
       "name_jp": "女神の優勝カップ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6309,8 +6328,8 @@
         "f_93023500.png"
       ],
       "name_jp": "選定のモップ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6328,8 +6347,8 @@
         "f_93023600.png"
       ],
       "name_jp": "ニャーフ！",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6347,8 +6366,8 @@
         "f_93023700.png"
       ],
       "name_jp": "京極",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6480,8 +6499,8 @@
         "f_93024000.png"
       ],
       "name_jp": "豊穣たる牡牛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6499,8 +6518,8 @@
         "f_93024600.png"
       ],
       "name_jp": "想い、三世にわたり",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6518,8 +6537,8 @@
         "f_93024700.png"
       ],
       "name_jp": "月輪九曜",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6537,8 +6556,8 @@
         "f_93024900.png"
       ],
       "name_jp": "十文字槍",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6556,8 +6575,8 @@
         "f_93024500.png"
       ],
       "name_jp": "二階笠",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6575,8 +6594,8 @@
         "f_93024800.png"
       ],
       "name_jp": "段蔵の牛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6670,8 +6689,8 @@
         "f_93025000.png"
       ],
       "name_jp": "お姫様の折り紙",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6689,8 +6708,8 @@
         "f_93025100.png"
       ],
       "name_jp": "エレクトロジカ ダイアグラム",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6708,8 +6727,8 @@
         "f_93025200.png"
       ],
       "name_jp": "ガーディアン ジャイガンティック",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6727,8 +6746,8 @@
         "f_93025500.png"
       ],
       "name_jp": "鷹の魔女の宴",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6746,8 +6765,8 @@
         "f_93025700.png"
       ],
       "name_jp": "乾坤圏",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6765,8 +6784,8 @@
         "f_93025600.png"
       ],
       "name_jp": "ソロモン王への貢物",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6784,8 +6803,8 @@
         "f_93025400.png"
       ],
       "name_jp": "銀鍵のロザリオ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6860,8 +6879,8 @@
         "f_93025900.png"
       ],
       "name_jp": "冥界に花の咲く",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6879,8 +6898,8 @@
         "f_93026000.png"
       ],
       "name_jp": "夜空を駆ける虹",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -6955,8 +6974,8 @@
         "f_93026500.png"
       ],
       "name_jp": "富士越龍図",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7050,8 +7069,8 @@
         "f_93026700.png"
       ],
       "name_jp": "不明の杯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7069,8 +7088,8 @@
         "f_93026800.png"
       ],
       "name_jp": "なつのあめ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7259,8 +7278,8 @@
         "f_93027100.png"
       ],
       "name_jp": "ＯＴＭＡ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7278,8 +7297,8 @@
         "f_93027200.png"
       ],
       "name_jp": "カリュドーンの毛皮",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7297,8 +7316,8 @@
         "f_93027300.png"
       ],
       "name_jp": "ある真理と死",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7316,8 +7335,8 @@
         "f_93027400.png"
       ],
       "name_jp": "燎原の刃",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7335,8 +7354,8 @@
         "f_93027000.png"
       ],
       "name_jp": "イヴァン雷帝の書庫",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7430,8 +7449,8 @@
         "f_93027600.png"
       ],
       "name_jp": "世界を内包せしもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7449,8 +7468,8 @@
         "f_93027700.png"
       ],
       "name_jp": "教えること、学ぶこと",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7468,8 +7487,8 @@
         "f_93027800.png"
       ],
       "name_jp": "名前のない死",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7544,8 +7563,8 @@
         "f_93028100.png"
       ],
       "name_jp": "無穹の果て",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7563,8 +7582,8 @@
         "f_93028200.png"
       ],
       "name_jp": "あの日の空",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7582,8 +7601,8 @@
         "f_93028300.png"
       ],
       "name_jp": "とある山での出来事",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7601,8 +7620,8 @@
         "f_93028400.png"
       ],
       "name_jp": "伝説と事実",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7677,8 +7696,8 @@
         "f_93028500.png"
       ],
       "name_jp": "真・氷の叡智",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7696,8 +7715,8 @@
         "f_93028600.png"
       ],
       "name_jp": "神鉄の盾",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7753,8 +7772,8 @@
         "f_93029200.png"
       ],
       "name_jp": "神々の遺した愛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7905,8 +7924,8 @@
         "f_93033200.png"
       ],
       "name_jp": "シー・エンジェル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7924,8 +7943,8 @@
         "f_93033300.png"
       ],
       "name_jp": "大江山大花火",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7943,8 +7962,8 @@
         "f_93033400.png"
       ],
       "name_jp": "天狗なりきりセット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7962,8 +7981,8 @@
         "f_93033500.png"
       ],
       "name_jp": "積み重ねた時間の結晶",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -7981,8 +8000,8 @@
         "f_93033600.png"
       ],
       "name_jp": "深淵のラストリゾート",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8000,8 +8019,8 @@
         "f_93033700.png"
       ],
       "name_jp": "一夏のアルバム",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8019,8 +8038,8 @@
         "f_93033800.png"
       ],
       "name_jp": "地球の思い出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8038,8 +8057,8 @@
         "f_93033900.png"
       ],
       "name_jp": "波濤と細波",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8228,8 +8247,8 @@
         "f_93034000.png"
       ],
       "name_jp": "忘れえぬもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8247,8 +8266,8 @@
         "f_93034100.png"
       ],
       "name_jp": "護法の末路",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8352,8 +8371,8 @@
         "f_93034300.png"
       ],
       "name_jp": "会稽零式設計図",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8371,8 +8390,8 @@
         "f_93034400.png"
       ],
       "name_jp": "我が毒杯、我が仮面",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8390,8 +8409,8 @@
         "f_93034500.png"
       ],
       "name_jp": "トネリコの木",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8409,8 +8428,8 @@
         "f_93034200.png"
       ],
       "name_jp": "阿房宮模型",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8428,8 +8447,8 @@
         "f_93034600.png"
       ],
       "name_jp": "読みかけの本",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8447,8 +8466,8 @@
         "f_93034700.png"
       ],
       "name_jp": "素晴らしき飼葉桶",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8523,8 +8542,8 @@
         "f_93034900.png"
       ],
       "name_jp": "麗しきは美姫の指輪",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8542,8 +8561,8 @@
         "f_93035000.png"
       ],
       "name_jp": "聖夜の翼ある蛇",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8637,8 +8656,8 @@
         "f_93035300.png"
       ],
       "name_jp": "面影は春の如く",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8656,8 +8675,8 @@
         "f_93034800.png"
       ],
       "name_jp": "老いてなお",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8694,8 +8713,8 @@
         "f_93035600.png"
       ],
       "name_jp": "母の思い出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8770,8 +8789,8 @@
         "f_93035700.png"
       ],
       "name_jp": "新・源氏物語絵巻",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8808,8 +8827,8 @@
         "f_93036200.png"
       ],
       "name_jp": "それは、両手いっぱいの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -8979,8 +8998,8 @@
         "f_93036100.png"
       ],
       "name_jp": "花の矢",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9055,8 +9074,8 @@
         "f_93036300.png"
       ],
       "name_jp": "エルメロイ・ティータイム",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9074,8 +9093,8 @@
         "f_93036400.png"
       ],
       "name_jp": "星の天秤",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9093,8 +9112,8 @@
         "f_93036500.png"
       ],
       "name_jp": "墓守の宝",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9169,8 +9188,8 @@
         "f_93036800.png"
       ],
       "name_jp": "美食の門には",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9188,8 +9207,8 @@
         "f_93036900.png"
       ],
       "name_jp": "終焉、されど想いは続く",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9207,8 +9226,8 @@
         "f_93037000.png"
       ],
       "name_jp": "語られる一矢",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9226,8 +9245,8 @@
         "f_93037100.png"
       ],
       "name_jp": "刻まれていたもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9245,8 +9264,8 @@
         "f_93037200.png"
       ],
       "name_jp": "手に入れること能わず",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9264,8 +9283,8 @@
         "f_93037300.png"
       ],
       "name_jp": "蛇の杖",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9340,8 +9359,8 @@
         "f_93037500.png"
       ],
       "name_jp": "無劫の彼方",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9359,8 +9378,8 @@
         "f_93037600.png"
       ],
       "name_jp": "遺言状",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9378,8 +9397,8 @@
         "f_93037700.png"
       ],
       "name_jp": "刀八毘沙門天",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9464,8 +9483,8 @@
         "f_93038800.png"
       ],
       "name_jp": "ビューティフル・ジャーニー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9483,8 +9502,8 @@
         "f_93038100.png"
       ],
       "name_jp": "夢の終わりに",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9502,8 +9521,8 @@
         "f_93038200.png"
       ],
       "name_jp": "熟慮すべし",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9521,8 +9540,8 @@
         "f_93038300.png"
       ],
       "name_jp": "変身の指輪",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9540,8 +9559,8 @@
         "f_93038400.png"
       ],
       "name_jp": "パイレーツ・ルール",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9559,8 +9578,8 @@
         "f_93038500.png"
       ],
       "name_jp": "春を見る",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9578,8 +9597,8 @@
         "f_93038600.png"
       ],
       "name_jp": "天使の暗殺",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9597,8 +9616,8 @@
         "f_93038700.png"
       ],
       "name_jp": "ヨカナーンの首",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9730,8 +9749,8 @@
         "f_93043000.png"
       ],
       "name_jp": "忘れじの夏、二天の懐",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9749,8 +9768,8 @@
         "f_93043400.png"
       ],
       "name_jp": "戦い終わって日が暮れて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9768,8 +9787,8 @@
         "f_93043500.png"
       ],
       "name_jp": "アイアン・メイデン（夏）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9787,8 +9806,8 @@
         "f_93043600.png"
       ],
       "name_jp": "椿説弓張月",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9806,8 +9825,8 @@
         "f_93043100.png"
       ],
       "name_jp": "黄金円卓回転盤",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9825,8 +9844,8 @@
         "f_93043300.png"
       ],
       "name_jp": "ソロ・ステージ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -9844,8 +9863,8 @@
         "f_93043200.png"
       ],
       "name_jp": "蒼穹を超えて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10015,8 +10034,8 @@
         "f_93043900.png"
       ],
       "name_jp": "再会の宇宙へ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10034,8 +10053,8 @@
         "f_93044000.png"
       ],
       "name_jp": "流れ星のチアガール",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10110,8 +10129,8 @@
         "f_93044200.png"
       ],
       "name_jp": "剣は少しだけ置き去りにして",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10129,8 +10148,8 @@
         "f_93044300.png"
       ],
       "name_jp": "メリー・クリスマス",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10205,8 +10224,8 @@
         "f_93044700.png"
       ],
       "name_jp": "星の狩人",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10224,8 +10243,8 @@
         "f_93044900.png"
       ],
       "name_jp": "戦い終わって、剣は折れて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10243,8 +10262,8 @@
         "f_93044800.png"
       ],
       "name_jp": "白き牡牛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10319,8 +10338,8 @@
         "f_93045000.png"
       ],
       "name_jp": "紫玉の笛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10442,8 +10461,8 @@
         "f_93045200.png"
       ],
       "name_jp": "かるであ草子",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10556,8 +10575,8 @@
         "f_93045600.png"
       ],
       "name_jp": "冒険の象徴",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10632,8 +10651,8 @@
         "f_93045700.png"
       ],
       "name_jp": "星の光剣、星の光盤",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10651,8 +10670,8 @@
         "f_93045800.png"
       ],
       "name_jp": "海神の三叉矛",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10670,8 +10689,8 @@
         "f_93045900.png"
       ],
       "name_jp": "ソラへ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10746,8 +10765,8 @@
         "f_93046400.png"
       ],
       "name_jp": "タイタンⅢEロケット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10765,8 +10784,8 @@
         "f_93046600.png"
       ],
       "name_jp": "宮廷の琴の音",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10784,8 +10803,8 @@
         "f_93046500.png"
       ],
       "name_jp": "コードロン・シムーン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10841,8 +10860,8 @@
         "f_93047500.png"
       ],
       "name_jp": "約束の刻",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10974,8 +10993,8 @@
         "f_93046700.png"
       ],
       "name_jp": "掌上の楼閣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -10993,8 +11012,8 @@
         "f_93046800.png"
       ],
       "name_jp": "スプラッタ☆レインボー！",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11012,8 +11031,8 @@
         "f_93047000.png"
       ],
       "name_jp": "御中元",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11031,8 +11050,8 @@
         "f_93046900.png"
       ],
       "name_jp": "夏の寄り添い",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11050,8 +11069,8 @@
         "f_93047100.png"
       ],
       "name_jp": "バルーンの偃月刀",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11069,8 +11088,8 @@
         "f_93047200.png"
       ],
       "name_jp": "カルデアＶＲ（コントローラー付属）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11088,8 +11107,8 @@
         "f_93047300.png"
       ],
       "name_jp": "カルデア夏の推薦図書",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11221,8 +11240,8 @@
         "f_93052500.png"
       ],
       "name_jp": "お気に入りの一枚",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11240,8 +11259,8 @@
         "f_93052600.png"
       ],
       "name_jp": "夢録",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11259,8 +11278,8 @@
         "f_93052700.png"
       ],
       "name_jp": "魔王の手向け",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11335,8 +11354,8 @@
         "f_93053100.png"
       ],
       "name_jp": "彷徨える神秘の島にて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11354,8 +11373,8 @@
         "f_93053200.png"
       ],
       "name_jp": "自画像、カルデアにて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11430,8 +11449,8 @@
         "f_93052900.png"
       ],
       "name_jp": "証",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11449,8 +11468,8 @@
         "f_93053000.png"
       ],
       "name_jp": "終わりと始まりのものがたり",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11468,8 +11487,8 @@
         "f_93052800.png"
       ],
       "name_jp": "神剣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11544,8 +11563,8 @@
         "f_93053300.png"
       ],
       "name_jp": "堰界の理",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11563,8 +11582,8 @@
         "f_93053400.png"
       ],
       "name_jp": "クリスマスベルト",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11639,8 +11658,8 @@
         "f_93054300.png"
       ],
       "name_jp": "その後に続くもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11715,8 +11734,8 @@
         "f_93054400.png"
       ],
       "name_jp": "痣丸",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11734,8 +11753,8 @@
         "f_93054500.png"
       ],
       "name_jp": "鬼一の高下駄",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -11810,8 +11829,8 @@
         "f_93054800.png"
       ],
       "name_jp": "春に歌えば",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12009,8 +12028,8 @@
         "f_93054900.png"
       ],
       "name_jp": "キプロスの記憶",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12085,8 +12104,8 @@
         "f_93055400.png"
       ],
       "name_jp": "希望を、あなたと",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12104,8 +12123,8 @@
         "f_93055500.png"
       ],
       "name_jp": "デモテープ あなたの銀河",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12228,8 +12247,8 @@
         "f_93055700.png"
       ],
       "name_jp": "最果てにて",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12247,8 +12266,8 @@
         "f_93056000.png"
       ],
       "name_jp": "胃袋で倒せ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12266,8 +12285,8 @@
         "f_93056100.png"
       ],
       "name_jp": "不器用な歓び",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12285,8 +12304,8 @@
         "f_93055800.png"
       ],
       "name_jp": "オーロラ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12304,8 +12323,8 @@
         "f_93055900.png"
       ],
       "name_jp": "聖槍ロンギヌス",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12380,8 +12399,8 @@
         "f_93057100.png"
       ],
       "name_jp": "コヤンスカヤの野望～東海岸版～",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12418,8 +12437,8 @@
         "f_93056200.png"
       ],
       "name_jp": "２千４百年後の約束",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12437,8 +12456,8 @@
         "f_93061700.png"
       ],
       "name_jp": "亡き王女のためのパヴァーヌ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12589,8 +12608,8 @@
         "f_93056400.png"
       ],
       "name_jp": "無穹の空の片隅で",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12608,8 +12627,8 @@
         "f_93056500.png"
       ],
       "name_jp": "夏とアイスとヴィイ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12627,8 +12646,8 @@
         "f_93056700.png"
       ],
       "name_jp": "イリュージョン・フォー・ユー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12646,8 +12665,8 @@
         "f_93057000.png"
       ],
       "name_jp": "サマーアドベンチャー・メモリー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12665,8 +12684,8 @@
         "f_93056900.png"
       ],
       "name_jp": "夏の堕落セット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12684,8 +12703,8 @@
         "f_93056600.png"
       ],
       "name_jp": "大海蛇",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12703,8 +12722,8 @@
         "f_93056800.png"
       ],
       "name_jp": "あてなるもの2021",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12836,8 +12855,8 @@
         "f_93061800.png"
       ],
       "name_jp": "昏き森淵の護符",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12855,8 +12874,8 @@
         "f_93061900.png"
       ],
       "name_jp": "黄金の枷",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12874,8 +12893,8 @@
         "f_93062000.png"
       ],
       "name_jp": "休むことなきガラスの靴",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12950,8 +12969,8 @@
         "f_93062300.png"
       ],
       "name_jp": "神の骸",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12969,8 +12988,8 @@
         "f_93062400.png"
       ],
       "name_jp": "願いよ星を結べ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -12988,8 +13007,8 @@
         "f_93062200.png"
       ],
       "name_jp": "とある海での出来事",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13064,8 +13083,8 @@
         "f_93062500.png"
       ],
       "name_jp": "見上げた空…",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13183,8 +13202,8 @@
         "f_93062600.png"
       ],
       "name_jp": "打神鞭",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13202,8 +13221,8 @@
         "f_93062700.png"
       ],
       "name_jp": "ズメイ・ゴルィニシチェ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13259,8 +13278,8 @@
         "f_93063100.png"
       ],
       "name_jp": "コヤンスカヤの野望～ユーラシア版～",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13297,8 +13316,8 @@
         "f_93063200.png"
       ],
       "name_jp": "託されたもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13373,8 +13392,8 @@
         "f_93063300.png"
       ],
       "name_jp": "アンヴァル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13706,8 +13725,8 @@
         "f_93063400.png"
       ],
       "name_jp": "子象たち",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13725,8 +13744,8 @@
         "f_93063500.png"
       ],
       "name_jp": "目覚め",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13801,8 +13820,8 @@
         "f_93063600.png"
       ],
       "name_jp": "大いなる神秘",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13820,8 +13839,8 @@
         "f_93063700.png"
       ],
       "name_jp": "けだものだった頃",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13839,8 +13858,8 @@
         "f_93063800.png"
       ],
       "name_jp": "故郷",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13858,8 +13877,8 @@
         "f_93064000.png"
       ],
       "name_jp": "何もかも消えてなくなって",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13972,8 +13991,8 @@
         "f_93064100.png"
       ],
       "name_jp": "王の剣、勇者の剣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -13991,8 +14010,8 @@
         "f_93064300.png"
       ],
       "name_jp": "すべてを",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14010,8 +14029,8 @@
         "f_93064500.png"
       ],
       "name_jp": "どうでもよかったもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14029,8 +14048,8 @@
         "f_93064200.png"
       ],
       "name_jp": "論理的な悪性",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14048,8 +14067,8 @@
         "f_93064400.png"
       ],
       "name_jp": "可憐なる姫君と忠実なる騎士",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14067,8 +14086,8 @@
         "f_93064600.png"
       ],
       "name_jp": "黄巾",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14143,8 +14162,8 @@
         "f_93064700.png"
       ],
       "name_jp": "南総里見八犬伝",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14162,8 +14181,8 @@
         "f_93064800.png"
       ],
       "name_jp": "一撃、船を斬る",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14257,8 +14276,8 @@
         "f_93069600.png"
       ],
       "name_jp": "ムーン・マーガレット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14276,8 +14295,8 @@
         "f_93069700.png"
       ],
       "name_jp": "死ぬ暇もない",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14409,8 +14428,8 @@
         "f_93064900.png"
       ],
       "name_jp": "あの夏に見た、純白の",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14428,8 +14447,8 @@
         "f_93065000.png"
       ],
       "name_jp": "赤い剣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14447,8 +14466,8 @@
         "f_93065300.png"
       ],
       "name_jp": "サマーパワー・ポンポン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14466,8 +14485,8 @@
         "f_93065400.png"
       ],
       "name_jp": "エリーゼラント公式ぬい",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14485,8 +14504,8 @@
         "f_93065100.png"
       ],
       "name_jp": "エンクロミアの暗涙",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14504,8 +14523,8 @@
         "f_93065200.png"
       ],
       "name_jp": "皇帝道士の暑假",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14523,8 +14542,8 @@
         "f_93065500.png"
       ],
       "name_jp": "最後の武器",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14542,8 +14561,8 @@
         "f_93065600.png"
       ],
       "name_jp": "ＳＡＭ６６",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14561,8 +14580,8 @@
         "f_93065700.png"
       ],
       "name_jp": "戦乙女の糧食",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14694,8 +14713,8 @@
         "f_93069800.png"
       ],
       "name_jp": "水の如く花の如く",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14713,8 +14732,8 @@
         "f_93069900.png"
       ],
       "name_jp": "前を",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14732,8 +14751,8 @@
         "f_93070000.png"
       ],
       "name_jp": "黒き勾玉",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14865,8 +14884,8 @@
         "f_93070200.png"
       ],
       "name_jp": "羅天大醮",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14884,8 +14903,8 @@
         "f_93070300.png"
       ],
       "name_jp": "金眼神鶯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14903,8 +14922,8 @@
         "f_93070400.png"
       ],
       "name_jp": "九節棍史進君",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -14998,8 +15017,8 @@
         "f_93070500.png"
       ],
       "name_jp": "真紅のドレス",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15074,8 +15093,8 @@
         "f_93071800.png"
       ],
       "name_jp": "倒し得ぬもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15093,8 +15112,8 @@
         "f_93070700.png"
       ],
       "name_jp": "アメミット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15188,8 +15207,8 @@
         "f_93070600.png"
       ],
       "name_jp": "戦士の仮面",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15207,8 +15226,8 @@
         "f_93070900.png"
       ],
       "name_jp": "アストラン・マイホーム",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15226,8 +15245,8 @@
         "f_93070800.png"
       ],
       "name_jp": "最初のおくりもの",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15302,8 +15321,8 @@
         "f_93071900.png"
       ],
       "name_jp": "私の記録、私の想い",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15416,8 +15435,8 @@
         "f_93072000.png"
       ],
       "name_jp": "朝寝の後で",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15549,8 +15568,8 @@
         "f_93072500.png"
       ],
       "name_jp": "回帰",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15587,8 +15606,8 @@
         "f_93072600.png"
       ],
       "name_jp": "終末の火",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15606,8 +15625,8 @@
         "f_93072700.png"
       ],
       "name_jp": "神々の御饌",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15625,8 +15644,8 @@
         "f_93072800.png"
       ],
       "name_jp": "唸る仔犬",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15720,8 +15739,8 @@
         "f_93073000.png"
       ],
       "name_jp": "瞼に浮かぶ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15815,8 +15834,8 @@
         "f_93073200.png"
       ],
       "name_jp": "バッラヴァの包丁",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15834,8 +15853,8 @@
         "f_93073400.png"
       ],
       "name_jp": "シャクニの骰子",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15853,8 +15872,8 @@
         "f_93073300.png"
       ],
       "name_jp": "勇猛なる神獣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -15943,8 +15962,8 @@
         "f_93073100.png"
       ],
       "name_jp": "怪物の黄金剣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16038,8 +16057,8 @@
         "f_93079200.png"
       ],
       "name_jp": "一夏の城",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16171,8 +16190,8 @@
         "f_93078500.png"
       ],
       "name_jp": "2023年の―――",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16190,8 +16209,8 @@
         "f_93078600.png"
       ],
       "name_jp": "夏を駆ける",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16209,8 +16228,8 @@
         "f_93078700.png"
       ],
       "name_jp": "今だけは、ただ友として",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16228,8 +16247,8 @@
         "f_93079100.png"
       ],
       "name_jp": "ソールズベリーでもう一度",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16247,8 +16266,8 @@
         "f_93078800.png"
       ],
       "name_jp": "きみに贈るトロフィー",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16266,8 +16285,8 @@
         "f_93078900.png"
       ],
       "name_jp": "ＵＤＫ団員募集中",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16285,8 +16304,8 @@
         "f_93079000.png"
       ],
       "name_jp": "『昏い森の優しい雨』",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16361,8 +16380,8 @@
         "f_93079400.png"
       ],
       "name_jp": "ワンジナメット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16437,8 +16456,8 @@
         "f_93073600.png"
       ],
       "name_jp": "蝋板と尖筆",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16456,8 +16475,8 @@
         "f_93073800.png"
       ],
       "name_jp": "狙い、構えて、撃つ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16475,8 +16494,8 @@
         "f_93073700.png"
       ],
       "name_jp": "導きの赤い糸",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16608,8 +16627,8 @@
         "f_93079700.png"
       ],
       "name_jp": "武田の誇り",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16627,8 +16646,8 @@
         "f_93079800.png"
       ],
       "name_jp": "男の意地",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16646,8 +16665,8 @@
         "f_93079500.png"
       ],
       "name_jp": "受け継がれる魂",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16700,8 +16719,8 @@
         "f_93079600.png"
       ],
       "name_jp": "毘天が一つ太刀",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16776,8 +16795,8 @@
         "f_93080000.png"
       ],
       "name_jp": "2023年のホーリーラン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16852,8 +16871,8 @@
         "f_93080300.png"
       ],
       "name_jp": "我が愛しき日々",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16928,8 +16947,8 @@
         "f_93080600.png"
       ],
       "name_jp": "牛王大神使",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16947,8 +16966,8 @@
         "f_93080700.png"
       ],
       "name_jp": "白刀大小",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -16966,8 +16985,8 @@
         "f_93080800.png"
       ],
       "name_jp": "湊の一夜",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17042,8 +17061,8 @@
         "f_93080900.png"
       ],
       "name_jp": "神託の鎖",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17286,8 +17305,8 @@
         "f_93081800.png"
       ],
       "name_jp": "嘲りの断頭台",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17305,8 +17324,8 @@
         "f_93081900.png"
       ],
       "name_jp": "黒き刃",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17324,8 +17343,8 @@
         "f_93082000.png"
       ],
       "name_jp": "十四の石",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17343,8 +17362,8 @@
         "f_93082100.png"
       ],
       "name_jp": "王妃の首飾り",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17438,8 +17457,8 @@
         "f_93082400.png"
       ],
       "name_jp": "waiting in the sky",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17457,8 +17476,8 @@
         "f_93082600.png"
       ],
       "name_jp": "秘伝のまかない飯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17476,8 +17495,8 @@
         "f_93082500.png"
       ],
       "name_jp": "誰が駒鳥を殺したか",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17581,8 +17600,8 @@
         "f_93082700.png"
       ],
       "name_jp": "おそろいエプロン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17676,8 +17695,8 @@
         "f_93087800.png"
       ],
       "name_jp": "星剣のエピタフ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17809,8 +17828,8 @@
         "f_93083000.png"
       ],
       "name_jp": "ムーン・ボゥ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17828,8 +17847,8 @@
         "f_93083100.png"
       ],
       "name_jp": "タタールの槍",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17847,8 +17866,8 @@
         "f_93083200.png"
       ],
       "name_jp": "夕焼け空に私はぐるぐる",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17866,8 +17885,8 @@
         "f_93082900.png"
       ],
       "name_jp": "ゴールデン☆セレブナイト",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17885,8 +17904,8 @@
         "f_93083300.png"
       ],
       "name_jp": "月への移転届",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -17904,8 +17923,8 @@
         "f_93083400.png"
       ],
       "name_jp": "トリックマスター",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18015,8 +18034,8 @@
         "f_93088000.png"
       ],
       "name_jp": "卒業の証に",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18034,8 +18053,8 @@
         "f_93088100.png"
       ],
       "name_jp": "卒業の証に",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18167,8 +18186,8 @@
         "f_93088200.png"
       ],
       "name_jp": "足洗邸の余分な一時",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18243,8 +18262,8 @@
         "f_93088300.png"
       ],
       "name_jp": "母なる心臓",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18262,8 +18281,8 @@
         "f_93088400.png"
       ],
       "name_jp": "最深のともしび",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18373,8 +18392,8 @@
         "f_93088500.png"
       ],
       "name_jp": "鷲の魔女の祝宴",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18392,8 +18411,8 @@
         "f_93088600.png"
       ],
       "name_jp": "エトワール・オーナメント",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18468,8 +18487,8 @@
         "f_93088700.png"
       ],
       "name_jp": "ファンタズムロッド・麗華",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18544,8 +18563,8 @@
         "f_93089100.png"
       ],
       "name_jp": "三頭の獅子、三つ影の娘達",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18620,8 +18639,8 @@
         "f_93089700.png"
       ],
       "name_jp": "或る蛇を殺した槍",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18639,8 +18658,8 @@
         "f_93089800.png"
       ],
       "name_jp": "高梨の宝刀",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18815,8 +18834,8 @@
         "f_93089900.png"
       ],
       "name_jp": "小町のメガネ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -18964,8 +18983,8 @@
         "f_93090100.png"
       ],
       "name_jp": "罪の剣",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19040,8 +19059,8 @@
         "f_93090300.png"
       ],
       "name_jp": "神に侍る者",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19059,8 +19078,8 @@
         "f_93090400.png"
       ],
       "name_jp": "天の車輪",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19078,8 +19097,8 @@
         "f_93090500.png"
       ],
       "name_jp": "いただき貴き十字の峰",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19097,8 +19116,8 @@
         "f_93090600.png"
       ],
       "name_jp": "死、死、死",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19202,8 +19221,8 @@
         "f_93091000.png"
       ],
       "name_jp": "無常の果実",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19278,8 +19297,8 @@
         "f_93091200.png"
       ],
       "name_jp": "神が乗る象",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19354,8 +19373,8 @@
         "f_93104400.png"
       ],
       "name_jp": "いまは過ぎし星見の証",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19487,8 +19506,8 @@
         "f_93104600.png"
       ],
       "name_jp": "トライ・ザ・パンチ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19506,8 +19525,8 @@
         "f_93104700.png"
       ],
       "name_jp": "素敵な贈り物（サメ）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19525,8 +19544,8 @@
         "f_93104800.png"
       ],
       "name_jp": "あれ？　もしかして",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19544,8 +19563,8 @@
         "f_93105200.png"
       ],
       "name_jp": "境界ネコ帽子",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19563,8 +19582,8 @@
         "f_93105100.png"
       ],
       "name_jp": "夏の名残に、祈りを編む",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19582,8 +19601,8 @@
         "f_93105000.png"
       ],
       "name_jp": "渚と青春の幻影",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19601,8 +19620,8 @@
         "f_93105300.png"
       ],
       "name_jp": "汐彩・リフレイン",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19719,8 +19738,8 @@
         "f_93109300.png"
       ],
       "name_jp": "地に満ちよ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19795,8 +19814,8 @@
         "f_93109400.png"
       ],
       "name_jp": "ただの握り飯",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19814,8 +19833,8 @@
         "f_93109700.png"
       ],
       "name_jp": "からくり義肢",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19833,8 +19852,8 @@
         "f_93109500.png"
       ],
       "name_jp": "大陸の風",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19852,8 +19871,8 @@
         "f_93109600.png"
       ],
       "name_jp": "誠の旗",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19966,8 +19985,8 @@
         "f_93111400.png"
       ],
       "name_jp": "カ星を救いし槍",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -19985,8 +20004,8 @@
         "f_93111500.png"
       ],
       "name_jp": "恐るべき教団マニュアル",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20033,8 +20052,8 @@
         "f_93116600.png"
       ],
       "name_jp": "王に還る偉業",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20052,8 +20071,8 @@
         "f_93116700.png"
       ],
       "name_jp": "約束の未来へ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20128,8 +20147,8 @@
         "f_93116800.png"
       ],
       "name_jp": "刻の終わり",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20204,8 +20223,8 @@
         "f_93117300.png"
       ],
       "name_jp": "桜色の風景",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20223,8 +20242,8 @@
         "f_93117500.png"
       ],
       "name_jp": "三井の晩鐘",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20242,8 +20261,8 @@
         "f_93117400.png"
       ],
       "name_jp": "春の西風",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20318,8 +20337,8 @@
         "f_93117800.png"
       ],
       "name_jp": "アンブロシア結晶",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20486,8 +20505,8 @@
         "f_93117700.png"
       ],
       "name_jp": "我に来たれ、貴き君よ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20600,8 +20619,8 @@
         "f_93118000.png"
       ],
       "name_jp": "白紙の経典（奇の章）",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20619,8 +20638,8 @@
         "f_93118200.png"
       ],
       "name_jp": "月とラブリュス",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20638,8 +20657,8 @@
         "f_93118100.png"
       ],
       "name_jp": "死因に非ず",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20730,8 +20749,8 @@
         "f_93118300.png"
       ],
       "name_jp": "貴方への祈り",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20806,8 +20825,8 @@
         "f_93118400.png"
       ],
       "name_jp": "愛しき代償",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20825,8 +20844,8 @@
         "f_93118500.png"
       ],
       "name_jp": "光の園の思い出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20844,8 +20863,8 @@
         "f_93118600.png"
       ],
       "name_jp": "闇の園の思い出",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -20920,8 +20939,8 @@
         "f_93118800.png"
       ],
       "name_jp": "鷹の巣の落日",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21053,8 +21072,8 @@
         "f_93119600.png"
       ],
       "name_jp": "くらくら堪能セット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21072,8 +21091,8 @@
         "f_93119300.png"
       ],
       "name_jp": "レディ・ロングアームの探偵事務所",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21091,8 +21110,8 @@
         "f_93119100.png"
       ],
       "name_jp": "ドラゴンロッド　サマーヴァイパーＥＸ",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21110,8 +21129,8 @@
         "f_93119000.png"
       ],
       "name_jp": "リリン＆リリスｓグッズセット",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21129,8 +21148,8 @@
         "f_93119400.png"
       ],
       "name_jp": "ミス・トールフットの美術館",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21148,8 +21167,8 @@
         "f_93119500.png"
       ],
       "name_jp": "地獄コンパクト",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -21167,8 +21186,8 @@
         "f_93119200.png"
       ],
       "name_jp": "南海の花の衣装",
-      "acquisition_category_jp": "フレンドポイント（友情）ガチャ",
-      "filter_tag": "通常",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
       "bond": {
         "bonus_type": "none",
         "bonus": 0,
@@ -22372,6 +22391,326 @@
         "bonus": 0.0,
         "target": "",
         "effect_desc": ""
+      }
+    },
+    {
+      "id": "9401340",
+      "collection_no": 178,
+      "name": "个人训练",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94013400.png"
+      ],
+      "name_jp": "パーソナル・トレーニング",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9401710",
+      "collection_no": 242,
+      "name": "单人教学",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94017100.png"
+      ],
+      "name_jp": "パーソナル・レッスン",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9403300",
+      "collection_no": 861,
+      "name": "秉持风雅",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94033000.png"
+      ],
+      "name_jp": "風雅たれ",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9403870",
+      "collection_no": 1012,
+      "name": "私人指导",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94038700.png"
+      ],
+      "name_jp": "パーソナル・コーチング",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9404540",
+      "collection_no": 1214,
+      "name": "自由坐席",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94045400.png"
+      ],
+      "name_jp": "フリー・シーティング",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9404630",
+      "collection_no": 1273,
+      "name": "偶像培育者",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94046300.png"
+      ],
+      "name_jp": "アイドル・メイカー",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9404870",
+      "collection_no": 1314,
+      "name": "享用浪漫",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94048700.png"
+      ],
+      "name_jp": "テイク・ロマンス",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9405120",
+      "collection_no": 1384,
+      "name": "穿过乌云",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94051200.png"
+      ],
+      "name_jp": "雨雲を越えて",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9405630",
+      "collection_no": 1504,
+      "name": "寻求悠久的尽头",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94056300.png"
+      ],
+      "name_jp": "悠久の果てを求めて",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9406960",
+      "collection_no": 1797,
+      "name": "迦勒底的男人",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94069600.png"
+      ],
+      "name_jp": "カルデアの男",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9407060",
+      "collection_no": 1828,
+      "name": "暮景冥想",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94070600.png"
+      ],
+      "name_jp": "トワイライト・メディテーション",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9407360",
+      "collection_no": 1922,
+      "name": "总统之海洋",
+      "rarity": 5,
+      "important": 1,
+      "images": [
+        "f_94073600.png"
+      ],
+      "name_jp": "プレジデント・オーシャン",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9407580",
+      "collection_no": 1968,
+      "name": "旗鼓相当",
+      "rarity": 3,
+      "important": 0,
+      "images": [
+        "f_94075800.png"
+      ],
+      "name_jp": "旗鼓相当",
+      "acquisition_category_jp": "イベントガチャ（期間限定）",
+      "filter_tag": "活动召唤",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9409520",
+      "collection_no": 2704,
+      "name": "トーメンテッド・ガーディアン",
+      "rarity": 3,
+      "important": 0,
+      "images": [
+        "f_94095200.png"
+      ],
+      "name_jp": "トーメンテッド・ガーディアン",
+      "acquisition_category_jp": "イベントガチャ（期間限定）",
+      "filter_tag": "活动召唤",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9312570",
+      "collection_no": 2706,
+      "name": "ミッシングウィング",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93125700.png"
+      ],
+      "name_jp": "ミッシングウィング",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9312620",
+      "collection_no": 2707,
+      "name": "桃狐半月国傾剣",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93126200.png"
+      ],
+      "name_jp": "桃狐半月国傾剣",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
       }
     }
   ]

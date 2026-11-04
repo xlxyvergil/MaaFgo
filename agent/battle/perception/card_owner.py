@@ -22,6 +22,7 @@ import cv2
 import numpy as np
 
 from ..core.models import Confidence
+from ..data.servant_identity import servant_template_ids
 
 BASE_WIDTH = 1280
 BASE_HEIGHT = 720
@@ -121,10 +122,9 @@ def _load_servant_templates(
     seen: set[Path] = set()
     for root_text in roots:
         root = Path(root_text)
-        directory = root / servant_id
-        if not directory.is_dir():
-            continue
-        for path in sorted(directory.glob("*.png")):
+        paths = sorted(path for sid in servant_template_ids(servant_id)
+                       for path in (root / sid).glob("*.png"))
+        for path in paths:
             resolved = path.resolve()
             if resolved in seen:
                 continue
@@ -141,7 +141,7 @@ def _load_servant_templates(
                 continue
             templates.append(
                 _Template(
-                    relative_path=f"{servant_id}/{path.name}",
+                    relative_path=f"{path.parent.name}/{path.name}",
                     bgr=bgr,
                     mask=mask,
                 )

@@ -7,6 +7,8 @@
   {"strategy_profile":"farm-safe-v1","max_turns":20,"save_evidence":true}
   {"chaldea_import_source":"<链接/ID/压缩数据>", "max_turns":20}
 """
+import copy
+import json
 import os
 import sys
 
@@ -18,18 +20,27 @@ if _AGENT_DIR not in sys.path:
 from maa.agent.agent_server import AgentServer
 from maa.context import Context
 from maa.custom_action import CustomAction
+from maa.custom_recognition import CustomRecognition
 from maa.event_sink import NotificationType
 from maa.tasker import TaskerEventSink
 
 import mfaalog
 from battle.core.decider import RuleDecider
+from battle.core.advanced_strategy import (ADVANCED_STRATEGY_FIELD,
+                                          advanced_strategy_to_param,
+                                          validate_advanced_strategy)
 from battle.core.models import BattlePlan
+from battle.core.special_skills import SpecialSkillChoiceError
 from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
-                                    _parse_plan, _parse_strategy_profile)
+                                    _parse_native_card_strategy, _parse_plan,
+                                    _parse_strategy_profile)
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
+from battle.data.servant_identity import canonical_servant_id
 from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.formation_session import context_session, session_override, sessions
+from battle.runtime.bond_stop_state import bond_stops
+from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
 
 
@@ -77,14 +88,44 @@ class AutoBattleAction(CustomAction):
                 mfaalog.error(f"[auto_battle] 初始编队会话无效: {exc}")
                 return CustomAction.RunResult(success=False)
         param = _load_action_param(argv.custom_action_param)
-        profile = _parse_strategy_profile(param)
-        battle_policy = _parse_battle_policy(param)
+        node_name = getattr(argv, "node_name", "")
+        support_fallback = bool(token and sessions.support_fallback(root, token))
+        formation_reset = param.get("native_battle_formation_reset") is True
+        if support_fallback or formation_reset:
+            # 锁助战可能连带改变整队配置，不能读取旧攻略或旧编队身份。
+            param = {}
+            if support_fallback:
+                initial_formation = None
+            mfaalog.info("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
         plan = _parse_plan(param)
         chaldea_roster = None
         try:
-            if plan is None:
-                plan, chaldea_roster = _battle_setup_from_chaldea_share(param)
-        except TeamFetchError as e:
+            strategy_attach = _attached_strategy_settings(context, node_name)
+            source_mode = strategy_attach.get("native_battle_strategy_source")
+            share = (_share_data_from_param(param) if plan is None or source_mode == "editor"
+                     else None)
+            if share is not None:
+                if plan is None:
+                    plan = _build_plan_from_share(share)
+                chaldea_roster = _roster_from_share(share)
+            param = _battle_param_with_attached_config(context, node_name, param, share)
+            # Direct Custom invocations without an MXU pointer use the same
+            # defaults as all native tasks. Old explicit strategy nodes remain
+            # compatible for external integrations.
+            if not strategy_attach:
+                param = {**param, **advanced_strategy_to_param()}
+            if support_fallback or formation_reset:
+                param = _without_formation_strategy(param)
+            param = _canonical_native_strategy_param(param)
+            profile = _parse_strategy_profile(param)
+            battle_policy = _parse_battle_policy(param)
+            if (battle_policy.card.native_strategy.opening_hand.enabled
+                    and (plan is None or plan.active_turn(0) is None)):
+                mfaalog.info("[高级策略] 未设置有效首回合方案，跳过开局等待")
+                param = copy.deepcopy(param)
+                param["card_policy"]["native_strategy"]["opening_hand"]["enabled"] = False
+                battle_policy = _parse_battle_policy(param)
+        except (TeamFetchError, SpecialSkillChoiceError, ValueError) as e:
             # 队伍下载失败: 明确失败并提示, 由 pipeline on_error 走终止分支
             mfaalog.error(f"[auto_battle] {e}")
             if token:
@@ -96,6 +137,7 @@ class AutoBattleAction(CustomAction):
         # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
         # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
         controller = context.tasker.controller
+        bond_stops.set_controller(root, controller)
 
         plan_status = "loaded" if plan is not None else "none"
         plan_turns = len(plan.turns) if plan is not None else 0
@@ -117,8 +159,220 @@ class AutoBattleAction(CustomAction):
             sessions.invalidate(root, token, "battle_runtime_failed")
         mfaalog.info(f"[auto_battle] end ok={result.ok} reason={result.reason} turns={result.turns}")
 
+        # 已确认胜利后立即交接结算，避免Pipeline默认延迟错过短暂羁绊页。
+        if result.ok and result.reason == "victory":
+            inspect_victory_settlement(context, result, controller)
+
         # TODO(save_evidence)：失败时保存截图/状态证据
         return CustomAction.RunResult(success=result.ok)
+
+
+def _canonical_native_strategy_param(param: dict) -> dict:
+    """让可编辑策略 ID 与运行时识别的规范身份一致，不修改原始参数。
+
+    先复用纯 core 解析器筛掉非法 ID/颜色，保留其现有类型和边界回退。
+    数据层的别名转换仅发生在入口；目录外正数 ID 仍由 canonical 保留。
+    若别名与规范 ID 同时配置了不同颜色，明确的规范 ID 配置优先。
+    """
+    card = param.get("card_policy")
+    native = card.get("native_strategy") if isinstance(card, dict) else None
+    if not isinstance(native, dict):
+        return param
+    has_ids = isinstance(native.get("preferred_servant_ids"), list)
+    has_colors = isinstance(native.get("np_colors_by_servant_id"), dict)
+    if not has_ids and not has_colors:
+        return param
+    parsed = _parse_native_card_strategy(native)
+    result = copy.deepcopy(param)
+    normalized = result["card_policy"]["native_strategy"]
+    if has_ids:
+        normalized["preferred_servant_ids"] = list(dict.fromkeys(
+            canonical_servant_id(sid) or sid for sid in parsed.preferred_servant_ids
+        ))
+    if has_colors:
+        colors = {}
+        for sid, color in parsed.np_colors_by_servant_id:
+            canonical = canonical_servant_id(sid) or sid
+            if canonical == sid or canonical not in colors:
+                colors[canonical] = color.value
+        normalized["np_colors_by_servant_id"] = colors
+    return result
+
+
+def _attached_strategy_settings(context, node_name: str) -> dict:
+    if not node_name:
+        return {}
+    node = context.get_node_data(node_name) or {}
+    pointer = (node.get("attach") or {}).get("native_battle_config_node")
+    if not isinstance(pointer, str) or not pointer.strip():
+        return {}
+    return (context.get_node_data(pointer) or {}).get("attach") or {}
+
+
+def _manual_advanced_strategy_param(attach: dict) -> dict:
+    """Read independent MXU fields; hidden values are only read in manual mode."""
+    config = {}
+    if "native_battle_max_turns" in attach:
+        config["maxTurns"] = attach["native_battle_max_turns"]
+    if "native_battle_auto_servant_skills" in attach:
+        config["autoServantSkills"] = attach["native_battle_auto_servant_skills"]
+    overrides = attach.get("native_strategy_overrides", {})
+    if isinstance(overrides, str):
+        try:
+            overrides = json.loads(overrides.strip() or "{}")
+        except json.JSONDecodeError as exc:
+            raise ValueError("补牌策略微调必须为 JSON 对象") from exc
+    config["nativeStrategyOverrides"] = overrides
+    opening = {}
+    for external, internal in (("native_battle_opening_hand_enabled", "enabled"),
+                               ("native_battle_opening_hand_max_wait_turns", "maxWaitTurns")):
+        if external in attach:
+            opening[internal] = attach[external]
+    raw_id = attach.get("native_battle_opening_hand_servant_id")
+    if raw_id is not None and str(raw_id).strip():
+        opening["servantId"] = str(raw_id).strip()
+    raw_slot = attach.get("native_battle_opening_hand_servant_slot")
+    if raw_slot is not None and not (type(raw_slot) is int and raw_slot == 0):
+        opening["servantSlot"] = raw_slot
+    colors = attach.get("native_battle_opening_hand_required_colors")
+    if isinstance(colors, str):
+        colors = list(colors.replace(",", "").replace(" ", "").strip())
+    if colors is not None:
+        opening["requiredColors"] = colors
+    if opening:
+        config["openingHand"] = opening
+    result = advanced_strategy_to_param(config)
+    preset_card = attach.get("native_battle_card_policy", {})
+    if not isinstance(preset_card, dict):
+        raise ValueError("补牌预设必须为 JSON 对象")
+    if "native_strategy" in preset_card:
+        errors = validate_advanced_strategy({"nativeStrategyOverrides": preset_card["native_strategy"]})
+        if errors:
+            raise ValueError(errors[0]["path"] + ": " + errors[0]["message"])
+    # The preset supplies weights; the editable JSON and independent opening
+    # controls must have precedence over them.
+    for key, value in preset_card.items():
+        if key != "native_strategy":
+            result["card_policy"][key] = copy.deepcopy(value)
+    preset_native = preset_card.get("native_strategy", {})
+    result["card_policy"]["native_strategy"] = _deep_merge(
+        _deep_merge(advanced_strategy_to_param()["card_policy"]["native_strategy"], preset_native),
+        {**copy.deepcopy(overrides), "opening_hand": result["card_policy"]["native_strategy"]["opening_hand"]},
+    )
+    return result
+
+
+def _deep_merge(base, override):
+    result = copy.deepcopy(base)
+    for key, value in override.items():
+        if isinstance(value, dict) and isinstance(result.get(key), dict):
+            result[key] = _deep_merge(result[key], value)
+        else:
+            result[key] = copy.deepcopy(value)
+    return result
+
+
+def _without_formation_strategy(param: dict) -> dict:
+    result = copy.deepcopy(param)
+    native = result.get("card_policy", {}).get("native_strategy", {})
+    for key in ("preferred_servant_ids", "preferred_slots"):
+        native[key] = []
+    for key in ("np_colors_by_servant_id", "np_colors_by_slot"):
+        native[key] = {}
+    native["opening_hand"] = {"enabled": False}
+    return result
+
+
+def _battle_param_with_attached_config(context, node_name: str, param: dict,
+                                     share_data: dict | None = None) -> dict:
+    """读取所有原生入口共用的策略节点，保留固定来源与逐回合动作。
+
+    新节点按 default/editor/manual 选用独立来源，替换运行上限、技能与补牌
+    设置。旧外部集成没有来源字段时继续走原白名单合并分支；没有指针时本
+    helper 不改参数，实际 action 入口另外提供统一默认策略。
+    """
+    if not node_name:
+        return param
+    node = context.get_node_data(node_name) or {}
+    config_node = (node.get("attach") or {}).get("native_battle_config_node")
+    if not isinstance(config_node, str) or not config_node.strip():
+        return param
+    config_data = context.get_node_data(config_node) or {}
+    attach = config_data.get("attach") or {}
+    if "native_battle_strategy_source" in attach:
+        mode = attach["native_battle_strategy_source"]
+        if type(mode) is not str or mode not in {"default", "editor", "manual"}:
+            raise ValueError("未知的高级策略来源")
+        if mode == "manual":
+            strategy = _manual_advanced_strategy_param(attach)
+        elif mode == "editor" and isinstance(share_data, dict) and ADVANCED_STRATEGY_FIELD in share_data:
+            value = share_data[ADVANCED_STRATEGY_FIELD]
+            errors = validate_advanced_strategy(value)
+            if errors:
+                raise ValueError(errors[0]["path"] + ": " + errors[0]["message"])
+            strategy = advanced_strategy_to_param(value)
+        else:
+            strategy = advanced_strategy_to_param()
+        # Replacing these three whitelisted fields prevents old hidden values,
+        # trial-specific identities, or another source from leaking in.
+        return {**copy.deepcopy(param), **strategy}
+    config = attach.get("native_battle_config")
+    if not isinstance(config, dict):
+        raise ValueError(f"{config_node} 缺少 native_battle_config 对象")
+
+    def merge(base, override):
+        result = copy.deepcopy(base)
+        for key, value in override.items():
+            if isinstance(value, dict) and isinstance(result.get(key), dict):
+                result[key] = merge(result[key], value)
+            else:
+                result[key] = copy.deepcopy(value)
+        return result
+
+    allowed = {key: value for key, value in config.items()
+               if key in {"strategy_profile", "max_turns", "card_policy", "skill_policy"}}
+    result = merge(param, allowed)
+    # 选项各写入平级 attach 键，避免多个选项覆盖同一个嵌套配置对象。
+    if "native_battle_max_turns" in attach:
+        result["max_turns"] = attach["native_battle_max_turns"]
+    if "native_battle_card_policy" in attach:
+        if not isinstance(attach["native_battle_card_policy"], dict):
+            raise ValueError("补牌预设必须为 JSON 对象")
+        result = merge(result, {"card_policy": attach["native_battle_card_policy"]})
+    if "native_battle_auto_servant_skills" in attach:
+        result = merge(result, {"skill_policy": {
+            "auto_servant_skills": attach["native_battle_auto_servant_skills"],
+        }})
+    overrides = attach.get("native_strategy_overrides", {})
+    if isinstance(overrides, str):
+        try:
+            overrides = json.loads(overrides.strip() or "{}")
+        except json.JSONDecodeError as exc:
+            raise ValueError("补牌策略微调必须为 JSON 对象") from exc
+    if not isinstance(overrides, dict):
+        raise ValueError("补牌策略微调必须为 JSON 对象")
+    if overrides:
+        result = merge(result, {"card_policy": {"native_strategy": overrides}})
+    # 独立UI开关/预算最后应用；微调仍可编辑目标从者与所需卡色。
+    opening_override = {}
+    if "native_battle_opening_hand_enabled" in attach:
+        opening_override["enabled"] = attach["native_battle_opening_hand_enabled"]
+    if "native_battle_opening_hand_max_wait_turns" in attach:
+        opening_override["max_wait_turns"] = attach["native_battle_opening_hand_max_wait_turns"]
+    if opening_override:
+        result = merge(result, {"card_policy": {"native_strategy": {
+            "opening_hand": opening_override,
+        }}})
+    return result
+
+
+@AgentServer.custom_recognition("support_fallback_active")
+class SupportFallbackActive(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        root, token = context_session(context)
+        if token and sessions.valid(root, token) and sessions.support_fallback(root, token):
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="support_fallback")
+        return None
 
 
 def _plan_from_chaldea_share(param: dict) -> BattlePlan | None:
@@ -137,10 +391,18 @@ def _battle_setup_from_chaldea_share(
        选择框，路径与手填输入已合并为同一字段），复用 agent/chaldea 的
        fetch_share_data 下载/解码/本地加载。
     """
+    share = _share_data_from_param(param)
+    if share is not None:
+        return _build_plan_from_share(share), _roster_from_share(share)
+    return None, None
+
+
+def _share_data_from_param(param: dict) -> dict | None:
+    """Obtain one document for its actions, identities, and global strategy."""
     share = param.get("chaldea_share")
     if isinstance(share, dict):
         mfaalog.info(f"[auto_battle] 使用离线注入的 chaldea_share")
-        return _build_plan_from_share(share), _roster_from_share(share)
+        return share
 
     source = param.get("chaldea_import_source") or param.get("chaldea_import_source_file")
     if isinstance(source, str) and source.strip():
@@ -153,9 +415,9 @@ def _battle_setup_from_chaldea_share(
                 f"[Chaldea] 队伍接口无匹配数据: team_id={team_id}, "
                 f"请检查链接/ID是否正确, 或稍后重试"
             )
-        return _build_plan_from_share(share_data), _roster_from_share(share_data)
+        return share_data
 
-    return None, None
+    return None
 
 
 class TeamFetchError(RuntimeError):
@@ -163,7 +425,7 @@ class TeamFetchError(RuntimeError):
     pass
 
 
-def _build_plan_from_share(share: dict) -> BattlePlan:
+def _build_plan_from_share(share: dict) -> BattlePlan | None:
     """把 BattleShareData actions 转成 BattlePlan。"""
     actions = share.get("actions")
     team = share.get("team") or {}
@@ -176,27 +438,29 @@ def _build_plan_from_share(share: dict) -> BattlePlan:
         actions,
         delegate=delegate,
         mystic_code_id=mystic_code_id,
+        initial_servant_ids=_roster_from_share(share),
     )
-    mfaalog.info(f"[auto_battle] chaldea_share -> plan turns={len(plan.turns)}")
+    mfaalog.info(f"[auto_battle] chaldea_share -> plan turns={len(plan.turns) if plan is not None else 0}")
     return plan
 
 
 def _roster_from_share(share: dict) -> tuple[str | None, ...] | None:
     """Extract six semantic formation slots from Chaldea BattleShareData."""
-    members = (share.get("team") or {}).get("onFieldSvts")
-    if not isinstance(members, list):
+    team = share.get("team")
+    if not isinstance(team, dict):
         return None
-    roster: list[str | None] = []
-    for index in range(6):
-        member = members[index] if index < len(members) else None
-        servant_id = member.get("svtId") if isinstance(member, dict) else None
-        if isinstance(servant_id, int) and not isinstance(servant_id, bool) and servant_id > 0:
-            roster.append(str(servant_id))
-        elif isinstance(servant_id, str) and servant_id.strip().isdigit() and int(servant_id) > 0:
-            roster.append(str(int(servant_id)))
-        else:
-            roster.append(None)
-    return tuple(roster)
+    groups = (team.get("onFieldSvts"), team.get("backupSvts"))
+    if not any(isinstance(group, list) for group in groups):
+        return None
+    # 前排与候补各占三槽，空位不能让后续成员的位置前移。
+    members = []
+    for group in groups:
+        slots = group[:3] if isinstance(group, list) else []
+        members.extend(slots + [None] * (3 - len(slots)))
+    return tuple(
+        canonical_servant_id(member.get("svtId")) if isinstance(member, dict) else None
+        for member in members
+    )
 
 
 def _merge_rosters(
@@ -207,9 +471,11 @@ def _merge_rosters(
     visual = None
     if initial_formation is not None:
         visual = tuple(
-            slot.servant_id if slot.status == "identified" else None
+            canonical_servant_id(slot.servant_id) if slot.status == "identified" else None
             for slot in initial_formation.slots
         )
+    if chaldea_roster is not None:
+        chaldea_roster = tuple(canonical_servant_id(sid) for sid in chaldea_roster)
     if visual is None:
         return chaldea_roster or (None,) * 6
     if chaldea_roster is None:

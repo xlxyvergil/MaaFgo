@@ -1,6 +1,6 @@
 """Export a card using the same independent module future Agent callers use.
 
-PNG export defaults to FASTOCTREE/256 colours/no dithering (Pillow, tooling
+PNG export defaults to guarded libimagequant/256 colours/no dithering (tooling
 only). --rgba uses OpenCV without Pillow. The runtime import needs neither
 Pillow nor a subprocess, disk writes or network access.
 """
@@ -16,6 +16,8 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from agent.battle.card_composer import CommandCardComposer
 
@@ -28,6 +30,7 @@ def main() -> int:
     parser.add_argument('--card-type', choices=('face', 'np'), default='face')
     parser.add_argument('--region', choices=('JP', 'CN', 'NA', 'TW', 'KR'), help='Face: JP (default) or CN; NP: explicit name region required')
     parser.add_argument('--np-name-row', type=int, default=0)
+    parser.add_argument('--np-name-file', help='NP name PNG basename under _composition/np/<servant-id>/; default: card_servant_np.png')
     parser.add_argument('--width', type=int, default=1280)
     parser.add_argument('--height', type=int, default=720)
     parser.add_argument('--asset-root', type=Path, action='append')
@@ -56,7 +59,7 @@ def main() -> int:
     if args.mask_output and args.mask_output.resolve() == args.output.resolve():
         parser.error('Image and mask output paths must differ')
     try:
-        card = composer.compose(args.servant_id, args.color, portrait_variant=args.portrait_variant, card_type=args.card_type, region=args.region, np_name_row=args.np_name_row, viewport=(args.width, args.height))
+        card = composer.compose(args.servant_id, args.color, portrait_variant=args.portrait_variant, card_type=args.card_type, region=args.region, np_name_file=args.np_name_file, np_name_row=args.np_name_row, viewport=(args.width, args.height))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         export_mask = card.mask
         if args.rgba:
@@ -67,7 +70,8 @@ def main() -> int:
         else:
             from PIL import Image
             image = Image.fromarray(cv2.cvtColor(card.bgra, cv2.COLOR_BGRA2RGBA))
-            image = image.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+            from command_card_palette import quantize_image
+            image, _ = quantize_image(image)
             image.save(args.output, 'PNG', optimize=True, compress_level=9)
             export_mask = np.where(np.asarray(image.convert('RGBA'))[:, :, 3] >= 128, 255, 0).astype(np.uint8)
         if args.mask_output:

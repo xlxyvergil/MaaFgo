@@ -14,6 +14,56 @@
             }
         }
     },
+    "战斗_换人后等待技能栏稳定": {
+        "doc": "仅由runtime在确认换人后调用：先跳过换人初始静帧，再由next真正识别主界面；不点击，不更新阵容。过渡3秒、识别8秒、节点冻结5秒、runtime严格复核最多5秒及收尾0.3秒，总配置预算21.3秒，小于原25秒返回上限。",
+        "action": {
+            "type": "DoNothing"
+        },
+        "pre_delay": 0,
+        "post_delay": 3000,
+        "timeout": 8000,
+        "next": [
+            "战斗_换人后主界面与技能栏稳定"
+        ],
+        "on_error": []
+    },
+    "战斗_换人后主界面与技能栏稳定": {
+        "doc": "沿用战斗主界面模板、ROI及0.7阈值；只观察三名前排技能栏，连续稳定1秒后短等0.3秒。MFW节点冻结失败不传播，因此runtime仍须读取本节点参数并检查Context.wait_freezes布尔结果；失败停止后续技能。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "roi": [
+                    1058,
+                    508,
+                    152,
+                    54
+                ],
+                "template": "battle/scene_main_battle.png",
+                "green_mask": true,
+                "threshold": 0.7
+            }
+        },
+        "action": {
+            "type": "DoNothing"
+        },
+        "pre_delay": 0,
+        "post_wait_freezes": {
+            "time": 1000,
+            "target": [
+                40,
+                545,
+                890,
+                80
+            ],
+            "threshold": 0.95,
+            "method": 5,
+            "rate_limit": 200,
+            "timeout": 5000
+        },
+        "post_delay": 300,
+        "next": [],
+        "on_error": []
+    },
     "战斗_从者1技能1_CD": {
         "doc": "技能按钮上出现 CD 数字(0-9 任一命中)即在冷却, 滑动窗口模板匹配 digits 目录数字模板",
         "recognition": {
@@ -372,6 +422,29 @@
         }
     },
     "战斗_失败": {
+        "doc": "同时覆盖常规全灭页面与地狱试炼不可续关的战斗结束弹窗。试炼分支必须同时命中失败标题和劝退正文，仅识别，不关闭或重试。",
+        "recognition": {
+            "type": "Or",
+            "param": {
+                "any_of": [
+                    "战斗_失败_常规",
+                    "战斗_失败_地狱试炼"
+                ]
+            }
+        }
+    },
+    "战斗_失败_地狱试炼": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "地狱的试炼-失败标题",
+                    "地狱的试炼-失败劝退正文"
+                ]
+            }
+        }
+    },
+    "战斗_失败_常规": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {

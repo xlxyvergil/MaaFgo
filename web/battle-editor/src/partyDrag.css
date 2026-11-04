@@ -1,0 +1,19 @@
+/* A detached full-card mirror follows the exact point where it was grabbed. */
+.fgo-member-card.party-drag-ghost{z-index:900;opacity:1!important;overflow:hidden;pointer-events:none!important;transition:none!important;will-change:transform;box-shadow:0 14px 35px #0c253b66,0 0 0 2px #d7bd7766!important;cursor:grabbing!important;user-select:none;contain:layout style}
+.party-drag-ghost *{pointer-events:none!important;user-select:none;cursor:grabbing!important}
+body.party-pointer-drag-active .fgo-member-card.party-drag-placeholder{opacity:1;background:repeating-linear-gradient(135deg,transparent 0,transparent 10px,#3a8fbd0a 10px,#3a8fbd0a 20px),var(--surface-2);border:2px dashed var(--line-bright);box-shadow:inset 0 0 24px #285c7f0e;transition:none}
+body.party-pointer-drag-active .fgo-member-card.party-drag-placeholder>*{visibility:hidden}
+.fgo-member-card.drop-target{outline:3px solid var(--purple);outline-offset:3px;box-shadow:0 0 0 5px #2e9ed017,0 5px 22px #23658f22}
+body.party-pointer-drag-active,body.party-pointer-drag-active *{cursor:grabbing!important;user-select:none!important}
+
+/* Equipment uses its own visual mirror and leaves the member card in place. */
+.fgo-equip-button{touch-action:none}
+.fgo-equip-button[draggable=true]{cursor:grab}
+.fgo-equip-slot.equip-drop-target{outline:3px solid var(--purple);outline-offset:1px;border-radius:3px;box-shadow:0 0 0 4px #2e9ed022}
+.fgo-equip-slot.equip-drag-placeholder{border:2px dashed var(--line-bright);border-radius:3px;background:var(--surface-2)}
+.fgo-equip-slot.equip-drag-placeholder>*{visibility:hidden}
+.fgo-equip-slot.equip-drag-ghost{z-index:905;display:flex;align-items:stretch;border-radius:3px;background:var(--surface);opacity:1!important;pointer-events:none!important;transition:none!important;will-change:transform;box-shadow:0 14px 35px #0c253b66,0 0 0 2px #d7bd7766;contain:layout style}
+.equip-drag-ghost *{pointer-events:none!important;user-select:none!important}
+.equip-drag-ghost.grand-equips>.fgo-equip-clear{width:22px;height:22px;right:2px;top:2px}
+.equip-drag-ghost.grand-equips>.fgo-equip-clear>svg{width:13px;height:13px}
+body.equip-pointer-drag-active,body.equip-pointer-drag-active *{cursor:grabbing!important;user-select:none!important}

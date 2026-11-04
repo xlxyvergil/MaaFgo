@@ -1,0 +1,1260 @@
+{
+  "搓丸子整理-导航贩卖": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "shared_success_node": "整理礼物盒-导航到灵基变还完成",
+      "shared_entry": "整理礼物盒-导航到灵基变还",
+      "navigation_override": {
+        "整理礼物盒-点菜单到灵基变还": {
+          "recognition": {
+            "param": {
+              "roi": [
+                1070,
+                590,
+                210,
+                130
+              ],
+              "order_by": "Score"
+            }
+          }
+        }
+      }
+    },
+    "next": [
+      "整理礼物盒-导航到灵基变还"
+    ]
+  },
+  "搓丸子整理-筛选经验卡": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "shared_success_node": "整理礼物盒-已在灵基图标大小检测",
+      "shared_entry": "整理礼物盒-筛卖准备",
+      "reset_hit_nodes": [
+        "整理礼物盒-筛卖下滑找经验值"
+      ],
+      "star_overrides": {
+        "3": {
+          "整理礼物盒-筛卖选3星": {
+            "next": [
+              "整理礼物盒-筛卖选4星"
+            ]
+          }
+        },
+        "4": {
+          "整理礼物盒-筛卖选4星": {
+            "next": [
+              "整理礼物盒-筛卖点4星"
+            ]
+          }
+        },
+        "5": {
+          "整理礼物盒-筛卖选5星": {
+            "next": [
+              "整理礼物盒-筛卖点5星"
+            ]
+          }
+        }
+      },
+      "supported_stars": [
+        4,
+        5
+      ],
+      "sale_filter_override": {
+        "整理礼物盒-筛卖找经验值": {
+          "next": [
+            "整理礼物盒-筛卖点经验值",
+            "[JumpBack]搓丸子整理-经验筛选滚动定位",
+            "[JumpBack]整理礼物盒-筛卖下滑找经验值"
+          ]
+        }
+      }
+    },
+    "next": [
+      "整理礼物盒-筛卖准备"
+    ]
+  },
+  "搓丸子整理-预览候选": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "requires_caller_identity_approval": true,
+      "target_override_node": "搓丸子整理-预览候选",
+      "selection_override_node": "搓丸子整理-选择候选",
+      "grid_centers": [
+        [
+          135,
+          245
+        ],
+        [
+          268,
+          245
+        ],
+        [
+          401,
+          245
+        ],
+        [
+          534,
+          245
+        ],
+        [
+          667,
+          245
+        ],
+        [
+          800,
+          245
+        ],
+        [
+          933,
+          245
+        ],
+        [
+          135,
+          387
+        ],
+        [
+          268,
+          387
+        ],
+        [
+          401,
+          387
+        ],
+        [
+          534,
+          387
+        ],
+        [
+          667,
+          387
+        ],
+        [
+          800,
+          387
+        ],
+        [
+          933,
+          387
+        ],
+        [
+          135,
+          529
+        ],
+        [
+          268,
+          529
+        ],
+        [
+          401,
+          529
+        ],
+        [
+          534,
+          529
+        ],
+        [
+          667,
+          529
+        ],
+        [
+          800,
+          529
+        ],
+        [
+          933,
+          529
+        ]
+      ],
+      "read_nodes": {
+        "name": "搓丸子整理-候选名称",
+        "level": "搓丸子整理-候选等级",
+        "locked": "搓丸子整理-候选已锁定",
+        "unlocked": "搓丸子整理-候选未锁定",
+        "engraved": "搓丸子整理-候选刻印中"
+      }
+    },
+    "action": {
+      "type": "LongPress",
+      "param": {
+        "target": [
+          135,
+          245,
+          1,
+          1
+        ],
+        "duration": 700
+      }
+    },
+    "next": [
+      "搓丸子整理-等待详情"
+    ],
+    "post_delay": 600,
+    "max_hit": 1
+  },
+  "搓丸子整理-详情就绪": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "友情召唤/详情已锁定.png",
+          "友情召唤/详情未锁定.png"
+        ],
+        "threshold": 0.8,
+        "roi": [
+          0,
+          110,
+          110,
+          150
+        ]
+      }
+    }
+  },
+  "搓丸子整理-候选名称": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          130,
+          0,
+          1150,
+          260
+        ]
+      }
+    }
+  },
+  "搓丸子整理-候选等级": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          150,
+          220,
+          1130,
+          300
+        ]
+      }
+    }
+  },
+  "搓丸子整理-候选已锁定": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "友情召唤/详情已锁定.png",
+        "threshold": 0.88,
+        "roi": [
+          0,
+          110,
+          110,
+          150
+        ]
+      }
+    }
+  },
+  "搓丸子整理-候选未锁定": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "友情召唤/详情未锁定.png",
+        "threshold": 0.88,
+        "roi": [
+          0,
+          110,
+          110,
+          150
+        ]
+      }
+    }
+  },
+  "搓丸子整理-候选刻印中": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          0,
+          0,
+          1280,
+          420
+        ],
+        "expected": [
+          "刻印中",
+          "刻印済"
+        ]
+      }
+    }
+  },
+  "搓丸子整理-四星经验值候选": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "搓丸子整理/4星经验值卡特征.png",
+        "threshold": 0.88,
+        "roi": [
+          70,
+          180,
+          130,
+          142
+        ]
+      }
+    }
+  },
+  "搓丸子整理-五星经验值候选": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "搓丸子整理/5星经验值卡特征.png",
+        "threshold": 0.88,
+        "roi": [
+          70,
+          180,
+          130,
+          142
+        ]
+      }
+    }
+  },
+  "搓丸子整理-关闭详情": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-执行关闭详情"
+    ]
+  },
+  "搓丸子整理-列表就绪": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "整理礼物盒/灵基变还界面标志.png",
+          "搓丸子整理/保管室持有列表.png"
+        ],
+        "threshold": 0.75
+      }
+    }
+  },
+  "搓丸子整理-列表无对象": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          60,
+          180,
+          1050,
+          440
+        ],
+        "expected": [
+          "没有可.*(从者|素材|对象)",
+          "没有.*对象",
+          "対象.*(ありません|いません)",
+          "対象なし",
+          "所持していません"
+        ]
+      }
+    }
+  },
+  "搓丸子整理-列表到底": {
+    "timeout": 0,
+    "on_error": [],
+    "doc": "只读到底证据。先确认贩卖或保管室列表，再检查列表滚动到底模板；不能凭滑动无变化推断到底，模板需实机标定。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-列表就绪",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "搓丸子/列表滚动到底标志.png",
+                "threshold": 0.9,
+                "roi": [
+                  993,
+                  675,
+                  40,
+                  27
+                ],
+                "method": 10001
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "搓丸子整理-下一页": {
+    "timeout": 10000,
+    "on_error": [],
+    "doc": "每次最多向下翻两行并重叠一行；已到底不输入，未知页面失败不输入。调用方负责页数上限和候选重新定位。",
+    "attach": {
+      "read_only_end_probe": "搓丸子整理-列表到底",
+      "list_guard": "搓丸子整理-列表就绪",
+      "terminal": "搓丸子整理-翻页完成",
+      "max_swipes_per_call": 1
+    },
+    "next": [
+      "搓丸子整理-翻页前已到底",
+      "搓丸子整理-滑动下一页"
+    ]
+  },
+  "搓丸子整理-翻页前已到底": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-列表到底"
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-翻页完成"
+    ]
+  },
+  "搓丸子整理-滑动下一页": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-列表就绪"
+        ]
+      }
+    },
+    "action": {
+      "type": "Swipe",
+      "param": {
+        "begin": [
+          600,
+          615
+        ],
+        "end": [
+          600,
+          331
+        ],
+        "duration": 600,
+        "end_hold": 350
+      }
+    },
+    "next": [
+      "搓丸子整理-翻页后列表复查"
+    ],
+    "post_delay": 500,
+    "post_wait_freezes": 250
+  },
+  "搓丸子整理-翻页后列表复查": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-列表就绪"
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-翻页完成"
+    ]
+  },
+  "搓丸子整理-翻页完成": {
+    "timeout": 0,
+    "on_error": [],
+    "doc": "单轮翻页终点，无后续输入。命中不表示已到底；调用方须另读列表到底节点。"
+  },
+  "搓丸子整理-选择候选": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "requires_caller_identity_approval": true,
+      "must_override_selection_border_roi": true,
+      "selected_probe": "搓丸子整理-候选已选择"
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          135,
+          245,
+          1,
+          1
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-候选已选择"
+    ],
+    "post_delay": 350
+  },
+  "搓丸子整理-候选已选择": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          74,
+          181,
+          120,
+          4
+        ],
+        "lower": [
+          70,
+          220,
+          190
+        ],
+        "upper": [
+          145,
+          255,
+          250
+        ],
+        "count": 60,
+        "method": 4
+      }
+    },
+    "doc": "日服MCP实机选中边框RGB约[110,249,221]，ColorMatch method=4按RGB配置；旧BGR范围会使选中后count=0。运行时覆盖候选顶部窄条ROI，且业务另验总选择数恰为1；不以宽范围卡面颜色替代选择复核。"
+  },
+  "搓丸子整理-提交贩卖": {
+    "attach": {
+      "requires_approved_selection": true,
+      "terminals": [
+        "搓丸子整理-贩卖已完成",
+        "搓丸子整理-QP已满"
+      ],
+      "aqf_override": {
+        "搓丸子整理-QP已满": {
+          "action": {
+            "type": "Click",
+            "param": {
+              "target": [
+                920,
+                560,
+                1,
+                1
+              ]
+            }
+          },
+          "next": [
+            "搓丸子整理-等待贩卖结果"
+          ]
+        }
+      }
+    },
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-执行提交贩卖"
+    ]
+  },
+  "搓丸子整理-确认贩卖": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "reused_action_from": "整理礼物盒-贩点贩卖"
+    },
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "整理礼物盒/销毁按钮.png",
+        "threshold": 0.8
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待贩卖结果"
+    ],
+    "post_delay": 3000,
+    "max_hit": 1
+  },
+  "搓丸子整理-等待贩卖结果": {
+    "timeout": 120000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-QP已满",
+      "搓丸子整理-关闭贩卖结果"
+    ]
+  },
+  "搓丸子整理-QP已满": {
+    "timeout": 10000,
+    "on_error": [],
+    "focus": {
+      "Node.Recognition.Succeeded": "QP已满，按设置停止。"
+    },
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "整理礼物盒/QP已满提示.png",
+        "threshold": 0.7
+      }
+    }
+  },
+  "搓丸子整理-关闭贩卖结果": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "reused_action_from": "整理礼物盒-贩关奖励"
+    },
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "整理礼物盒/变还关闭按钮.png",
+        "threshold": 0.8
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待贩卖完成"
+    ],
+    "post_delay": 2000,
+    "max_hit": 1
+  },
+  "搓丸子整理-贩卖已完成": {
+    "timeout": 10000,
+    "on_error": [],
+    "focus": {
+      "Node.Recognition.Succeeded": "本轮变还完成。"
+    },
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "整理礼物盒/灵基变还界面标志.png",
+        "threshold": 0.7,
+        "roi": [
+          0,
+          0,
+          1280,
+          200
+        ]
+      }
+    }
+  },
+  "搓丸子整理-导航保管室": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "terminals": [
+        "搓丸子整理-保管室就绪"
+      ]
+    },
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室就绪",
+      "搓丸子整理-寻找保管室入口"
+    ]
+  },
+  "搓丸子整理-寻找保管室入口": {
+    "timeout": 10000,
+    "on_error": [],
+    "next": [
+      "搓丸子整理-进入保管室",
+      "搓丸子整理-打开菜单"
+    ]
+  },
+  "搓丸子整理-打开菜单": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "菜单.png",
+          "菜单2.png"
+        ],
+        "threshold": 0.65,
+        "roi": [
+          1070,
+          590,
+          210,
+          130
+        ],
+        "order_by": "Score"
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-打开编成"
+    ],
+    "post_delay": 500,
+    "doc": "复用工程菜单图片，但限定右下区域并按分数排序。CN035全屏匹配曾先命中背景0.6738而错过真正菜单0.9407；参考友情召唤-导航到友情池的局部菜单覆盖。"
+  },
+  "搓丸子整理-打开编成": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          185,
+          521,
+          235,
+          178
+        ],
+        "expected": [
+          "^编成$",
+          "^編成$",
+          "^编队$",
+          "^編隊$"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-进入保管室"
+    ],
+    "post_delay": 1500,
+    "doc": "编成是日服文案，国服为编队。沿用现有节点“编队”的菜单ROI；CN059大范围OCR漏读，CN061窄ROI准确读到编队0.9993。只匹配完整名称。"
+  },
+  "搓丸子整理-进入保管室": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "搓丸子整理/灵基保管室入口.png",
+        "threshold": 0.8,
+        "roi": [
+          600,
+          300,
+          680,
+          400
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待保管室"
+    ],
+    "post_delay": 1500
+  },
+  "搓丸子整理-保管室就绪": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "搓丸子整理/保管室持有列表.png",
+        "threshold": 0.8,
+        "roi": [
+          1000,
+          130,
+          280,
+          180
+        ]
+      }
+    }
+  },
+  "搓丸子整理-保管室切从者": {
+    "timeout": 10000,
+    "on_error": [],
+    "doc": "仅准备保管室持有列表的从者类别，不选择对象或提交。顶部仅有从者与概念礼装两个互斥页签，复用概念礼装页签状态作为从者页签的正向证据，不依赖 inverse。",
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室从者已选",
+      "搓丸子整理-保管室选择从者"
+    ]
+  },
+  "搓丸子整理-保管室从者已选": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-保管室就绪",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "搓丸子/概念礼装类型未选.png",
+                "threshold": 0.9,
+                "roi": [
+                  200,
+                  80,
+                  180,
+                  80
+                ],
+                "method": 10001
+              }
+            }
+          }
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-保管室从者就绪"
+    ]
+  },
+  "搓丸子整理-保管室选择从者": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-保管室就绪",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "搓丸子/概念礼装类型已选.png",
+                "threshold": 0.9,
+                "roi": [
+                  200,
+                  80,
+                  180,
+                  80
+                ],
+                "method": 10001
+              }
+            }
+          }
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          20,
+          105,
+          150,
+          45
+        ]
+      }
+    },
+    "post_delay": 350,
+    "next": [
+      "搓丸子整理-等待保管室从者"
+    ]
+  },
+  "搓丸子整理-保管室从者就绪": {
+    "timeout": 0,
+    "on_error": [],
+    "doc": "保管室持有列表已切回从者；无后续输入，调用方可继续读取从者保管室容量或准备经验值卡筛选。"
+  },
+  "搓丸子整理-保管室容量": {
+    "timeout": 10000,
+    "on_error": [],
+    "attach": {
+      "capacity_semantics": "remaining_total"
+    },
+    "doc": "日服 MCP 2026-10-27：右下「霊基保管室空き 102/1600」表示剩余空间/总容量，首数应直接作为可用空间；不可读取顶部「選択済み 0/102」并按已用/总量解释。调用前须确认正确的从者或礼装类别。",
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "expected": [
+          "[0-9,]+\\s*/\\s*[0-9,]+"
+        ],
+        "roi": [
+          1040,
+          565,
+          225,
+          60
+        ]
+      }
+    }
+  },
+  "搓丸子整理-保管室已满": {
+    "timeout": 10000,
+    "on_error": [],
+    "focus": {
+      "Node.Recognition.Succeeded": "保管室没有可用空间。"
+    },
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          150,
+          150,
+          1000,
+          400
+        ],
+        "expected": [
+          "(保管室|保管庫).*(已满|上限|いっぱい)",
+          "(保管室|保管庫).*空き.*ありません"
+        ]
+      }
+    }
+  },
+  "搓丸子整理-提交存储": {
+    "attach": {
+      "requires_approved_selection": true,
+      "terminals": [
+        "搓丸子整理-存储已完成",
+        "搓丸子整理-保管室已满"
+      ]
+    },
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-执行提交存储"
+    ]
+  },
+  "搓丸子整理-确认存储": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "搓丸子整理/存储执行按钮.png",
+                "threshold": 0.8,
+                "roi": [
+                  700,
+                  500,
+                  280,
+                  180
+                ]
+              }
+            }
+          },
+          {
+            "sub_name": "base/搓丸子整理/搓丸子整理-确认存储/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  0,
+                  0,
+                  1280,
+                  720
+                ],
+                "expected": [
+                  "保管室",
+                  "保管庫",
+                  "移動",
+                  "转移",
+                  "移入"
+                ]
+              }
+            }
+          }
+        ],
+        "box_index": 0
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待存储结果"
+    ],
+    "post_delay": 1500,
+    "max_hit": 1
+  },
+  "搓丸子整理-等待存储结果": {
+    "timeout": 120000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室已满",
+      "搓丸子整理-关闭存储结果"
+    ]
+  },
+  "搓丸子整理-关闭存储结果": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "整理礼物盒/变还关闭按钮.png",
+        "threshold": 0.75,
+        "roi": [
+          450,
+          500,
+          380,
+          180
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待存储完成"
+    ],
+    "post_delay": 1000,
+    "max_hit": 1
+  },
+  "搓丸子整理-存储已完成": {
+    "timeout": 10000,
+    "on_error": [],
+    "focus": {
+      "Node.Recognition.Succeeded": "本轮存储完成。"
+    },
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "搓丸子整理/保管室持有列表.png",
+        "threshold": 0.8,
+        "roi": [
+          1000,
+          130,
+          280,
+          180
+        ]
+      }
+    }
+  },
+  "搓丸子整理-已选数量": {
+    "timeout": 0,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          380,
+          85,
+          260,
+          80
+        ],
+        "expected": [
+          "[0-9][0-9,]*\\s*/\\s*[0-9][0-9,]*"
+        ],
+        "threshold": 0.8
+      }
+    },
+    "doc": "只读顶部选择计数，不读从者/礼装持有量或保管室空位。业务整理前须为0，新候选选择后须为1；已有预选或读数不明时拒绝提交，不把未逐张复核的库存一起处理。"
+  },
+  "搓丸子整理-等待详情": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-详情就绪"
+    ]
+  },
+  "搓丸子整理-执行关闭详情": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "友情召唤/详情关闭按钮.png",
+        "threshold": 0.8,
+        "roi": [
+          0,
+          0,
+          200,
+          100
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {}
+    },
+    "next": [
+      "搓丸子整理-等待关闭详情"
+    ],
+    "post_delay": 350,
+    "max_hit": 3
+  },
+  "搓丸子整理-等待关闭详情": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-列表就绪",
+      "搓丸子整理-执行关闭详情"
+    ]
+  },
+  "搓丸子整理-执行提交贩卖": {
+    "timeout": 10000,
+    "on_error": [],
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          1153,
+          671,
+          1,
+          1
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-等待贩卖确认"
+    ],
+    "post_delay": 350,
+    "max_hit": 1
+  },
+  "搓丸子整理-等待贩卖确认": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-确认贩卖"
+    ]
+  },
+  "搓丸子整理-等待贩卖完成": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-贩卖已完成"
+    ]
+  },
+  "搓丸子整理-执行提交存储": {
+    "timeout": 10000,
+    "on_error": [],
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          1153,
+          671,
+          1,
+          1
+        ]
+      }
+    },
+    "next": [
+      "搓丸子整理-等待存储确认"
+    ],
+    "post_delay": 350,
+    "max_hit": 1
+  },
+  "搓丸子整理-等待存储确认": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室已满",
+      "搓丸子整理-确认存储"
+    ]
+  },
+  "搓丸子整理-等待存储完成": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-存储已完成"
+    ]
+  },
+  "搓丸子整理-等待保管室": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室就绪"
+    ]
+  },
+  "搓丸子整理-等待保管室从者": {
+    "timeout": 30000,
+    "on_error": [],
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子整理-保管室从者已选"
+    ]
+  },
+  "搓丸子整理-贩卖已选数量": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          795,
+          95,
+          125,
+          65
+        ],
+        "expected": [
+          "[0-9][0-9,]*\\s*/\\s*[0-9][0-9,]*"
+        ],
+        "threshold": 0.8
+      }
+    },
+    "timeout": 0,
+    "on_error": [],
+    "doc": "贩卖页有从者、礼装、指令纹章三个页签，选择计数在右侧；保管室[380,85,260,80]的ROI在此会读到指令纹章持有量（实测307/1100），必须分开。日服MCP确认0/999→1/999→0/999；整理前0、单选后1由运行时复核，参照搓丸子整理-已选数量。"
+  },
+  "搓丸子整理-经验筛选滚动定位": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "整理礼物盒-筛卖点决定"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          1135,
+          250,
+          1,
+          1
+        ]
+      }
+    },
+    "post_delay": 500,
+    "max_hit": 1,
+    "next": [],
+    "on_error": [],
+    "doc": "仅贩卖经验筛选采用一次滚动条定位，再由原经验值模板决定是否命中；借鉴整理礼物盒-筛卖点顶部。CN086旧10次短滑只到职阶区，CN090点击该轨道位置后经验值可见。若未命中仍沿原有界滑动查找，不盲选。"
+  }
+}

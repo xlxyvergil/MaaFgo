@@ -234,6 +234,7 @@ class CompositionResourceTests(unittest.TestCase):
             root = ROOT / f'assets/resource/{pack}/image/CommandCards/_composition'
             manifest = json.loads((root / 'manifest').read_text('utf8'))
             entries = list(manifest['shared'].values()) + list(manifest['np_names'].values())
+            entries += [entry for names in manifest.get('np_extra_names', {}).values() for entry in names.values()]
             self.assertEqual(manifest['schema_version'],2)
             self.assertEqual(manifest['region'],region)
             self.assertEqual(len(manifest['shared']),12)

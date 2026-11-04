@@ -1,0 +1,8 @@
+{
+    "资源包配置": {
+        "doc": "实际加载的国服素材层；loaded_resource_package 由资源包声明，不由 option 覆盖。",
+        "attach": {
+            "loaded_resource_package": "cn"
+        }
+    }
+}

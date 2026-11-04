@@ -1,0 +1,21 @@
+.battle-servant-avatar{display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:0;border-radius:5px;padding:0;background:transparent;color:var(--muted);cursor:context-menu}
+.battle-servant-avatar>img{display:block;width:100%;height:100%;min-width:0;min-height:0;object-fit:contain}
+.battle-servant-avatar:hover{background:var(--purple-bg)}
+.battle-servant-avatar:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
+.battle-servant-avatar:disabled{cursor:default;opacity:.45}
+.retirement-context-menu{width:270px}
+.retirement-context-menu .retirement-menu-action{color:var(--danger,#bd3b42);font-weight:600}
+.retirement-context-menu small+small{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}
+.queue-retirement-icon{display:grid;place-items:center;flex-shrink:0;width:39px;height:39px;position:relative;color:var(--danger,#bd3b42)}
+.queue-retirement-icon>img{width:35px;height:39px;object-fit:cover;border:1px solid var(--line);border-radius:4px}
+.queue-retirement-icon>svg{position:absolute;right:-5px;bottom:-4px;width:20px;height:20px;padding:2px;border-radius:50%;background:var(--surface);color:var(--danger,#bd3b42)}
+.queue-retirement-row .queue-action-main strong{color:var(--danger,#bd3b42)}
+.retirement-detail{display:flex;flex-direction:column;gap:13px;margin:12px 0}
+.retirement-detail-person{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line);border-radius:5px;background:var(--surface-2)}
+.retirement-detail-person>div{display:flex;flex-direction:column;gap:5px;min-width:0}
+.retirement-detail-person small{font-size:11px;color:var(--muted)}
+.retirement-detail-person strong{font-size:14px;line-height:1.6}
+.summary-retirement .summary-action-label{color:var(--danger,#bd3b42)}
+.summary-retirement-error{color:var(--danger,#bd3b42);font-size:12px;line-height:1.8}
+.issue-row.error[data-issue-code="retired_actor"],.issue-row.error[data-issue-code="actor_position_mismatch"]{border-color:var(--error)}
+.issue-row.error[data-issue-code="retired_actor"] strong,.issue-row.error[data-issue-code="actor_position_mismatch"] strong{color:var(--error)}

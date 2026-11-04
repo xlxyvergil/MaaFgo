@@ -8,7 +8,10 @@
     },
     "on_error": [
       "原生自动战斗-队伍下载失败-提示"
-    ]
+    ],
+    "attach": {
+      "native_battle_config_node": "原生自动战斗-高级策略配置"
+    }
   },
   "原生自动战斗-队伍下载失败-提示": {
     "doc": "auto_battle 失败时显示具体错误提示后走失败出口。StopTask 会将任务置为成功，不能用于此错误分支。",
@@ -30,14 +33,16 @@
       "param": {
         "custom_action": "auto_battle",
         "custom_action_param": {
-          "chaldea_import_source": "https://chaldea.center/team?id=17300",
-          "max_turns": 20
+          "chaldea_import_source": "https://chaldea.center/team?id=17300"
         }
       }
     },
     "on_error": [
       "原生自动战斗-队伍下载失败-提示"
-    ]
+    ],
+    "attach": {
+      "native_battle_config_node": "原生自动战斗-高级策略配置"
+    }
   },
   "原生自动战斗_多次入口": {
     "doc": "同一顶层任务仅执行一次，JumpBack 返回通用战斗调度后应进入完成提示；不能在每场重置此入口的命中计数。battle_count 默认 1，由 option 的 attach 或 custom_action_param 注入。",
@@ -54,5 +59,25 @@
     "enabled": false,
     "doc": "故意禁用的失败屏障；上游错误提示找不到可执行后继，向原生调度及次数循环传播 failed。",
     "on_error": []
+  },
+  "原生自动战斗-羁绊停止配置": {
+    "doc": "羁绊停止独立配置。多选号位使用slot_1至slot_6布尔标记；全选按任意自有从者检测，部分选择按可信编队排除助战和空位后映射。旧all/slot参数保留兼容。",
+    "attach": {
+      "native_bond_stop_mode": "off",
+      "native_bond_stop_slot": 0,
+      "native_bond_stop_slot_1": false,
+      "native_bond_stop_slot_2": false,
+      "native_bond_stop_slot_3": false,
+      "native_bond_stop_slot_4": false,
+      "native_bond_stop_slot_5": false,
+      "native_bond_stop_slot_6": false
+    }
+  },
+  "原生自动战斗-高级策略配置": {
+    "doc": "所有原生自动战斗共享的高级策略来源和手动配置。默认值由运行时共用策略模块提供；default/editor模式不读取隐藏的手动字段。独立attach配置不随编队或多次战斗重写action参数而丢失。",
+    "attach": {
+      "native_battle_strategy_source": "default",
+      "native_battle_config": {}
+    }
   }
 }

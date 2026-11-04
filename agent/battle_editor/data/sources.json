@@ -1,0 +1,781 @@
+{
+  "version": {
+    "schema": 1,
+    "generatedAt": "2026-10-23T14:10:17.090546+00:00",
+    "atlas": {
+      "JP": {
+        "hash": "dd923f",
+        "timestamp": 1792756865,
+        "dataVer": 2689,
+        "dateVer": 1792749600
+      },
+      "CN": {
+        "hash": "813652",
+        "timestamp": 1792665645,
+        "dataVer": 989,
+        "dateVer": null
+      }
+    }
+  },
+  "sources": [
+    {
+      "url": "https://api.atlasacademy.io/export/JP/nice_servant.json",
+      "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697",
+      "bytes": 69257176
+    },
+    {
+      "url": "https://api.atlasacademy.io/export/JP/basic_equip.json",
+      "sha256": "bccabf92949769f32224995e1dc3cdc44d97f7963adaac2f00959df17c9da01a",
+      "bytes": 806912
+    },
+    {
+      "url": "https://api.atlasacademy.io/export/JP/nice_mystic_code.json",
+      "sha256": "ce6560440673fad4f36f8e08a97b20b4b5d9e2e0e1c5f262943bbf47d8b857cf",
+      "bytes": 225385
+    },
+    {
+      "url": "https://api.atlasacademy.io/export/CN/nice_servant.json",
+      "sha256": "338ac0b6740dca8786cbc6656f01f9a1f6408e56d9696dd1a14a3598ba13485b",
+      "bytes": 59784788
+    },
+    {
+      "url": "https://api.atlasacademy.io/export/CN/basic_equip.json",
+      "sha256": "4b613d58eed0f20cff10ae0efa784930f62aa78aa01c22caea65d01f0a5f80e4",
+      "bytes": 714336
+    },
+    {
+      "url": "https://api.atlasacademy.io/export/CN/nice_mystic_code.json",
+      "sha256": "fc28d5af4cd920375277551568b13e0f45669157b303645da324b23b70542280",
+      "bytes": 193947
+    }
+  ],
+  "servantCatalogSha256": "7b34ab18afa27b297804c4a310a1ec85d8c4836c5dc13a64dfa2dee3f1b330d0",
+  "missingServantIds": [],
+  "noActiveSkillMetadataIds": [
+    1700100,
+    9935530
+  ],
+  "media": [
+    {
+      "file": "mystic/masterequip00002.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00002.png",
+      "sha256": "742da83dfc6344e720d5cb5a4b5edca78a660b3aa3229be41a79efd7b174c5a3",
+      "bytes": 19537
+    },
+    {
+      "file": "mystic/masterequip00022.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00022.png",
+      "sha256": "3646fd7e30e909dd64bbd20ddf7ce8f76f9e3d559faf3fb53f4d51416be0406b",
+      "bytes": 21478
+    },
+    {
+      "file": "mystic/masterequip00032.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00032.png",
+      "sha256": "2875e296b151f1bbef435ca951e7ee7d03f7b74326a6fcb498248f4d55c042f8",
+      "bytes": 19646
+    },
+    {
+      "file": "mystic/masterequip00042.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00042.png",
+      "sha256": "864ebf84fe9b7d369c0a190b431f953374b25d0e072edb74fa44d9f4b3fee005",
+      "bytes": 21452
+    },
+    {
+      "file": "mystic/masterequip00052.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00052.png",
+      "sha256": "17868312a01431277847fbe81bce34b3def118e773142136a1f89d3312128b2e",
+      "bytes": 17728
+    },
+    {
+      "file": "mystic/masterequip00062.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00062.png",
+      "sha256": "b41ffaf44d7f6eea2a2de7eb0bf69764efc896c16e2cafc0a884a0fceba938ec",
+      "bytes": 15434
+    },
+    {
+      "file": "mystic/masterequip00072.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00072.png",
+      "sha256": "60ba03019813c441fa96ef207b847b3680ec2d0486ab36eeb753b5d38b5144d5",
+      "bytes": 25006
+    },
+    {
+      "file": "mystic/masterequip00082.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00082.png",
+      "sha256": "a5826673d943d37e5dfec89620f90145e0684e1c7e2d661186e46e083be8a6f1",
+      "bytes": 24381
+    },
+    {
+      "file": "mystic/masterequip00092.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00092.png",
+      "sha256": "096874ebc901f5bdaba8f1d9d2735ab63a5393d1175a6a0dfb01dafb44fc76ac",
+      "bytes": 22238
+    },
+    {
+      "file": "mystic/masterequip00102.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00102.png",
+      "sha256": "e8172886f2453a295c83357266114b3d73f50e58af8d7734463c64c436e6dcb3",
+      "bytes": 25933
+    },
+    {
+      "file": "mystic/masterequip00112.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00112.png",
+      "sha256": "ac6d5c378565bfdc190e283ea8d744fa47a77175760e4b726b1fd0e8d9999c8e",
+      "bytes": 16170
+    },
+    {
+      "file": "mystic/masterequip00122.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00122.png",
+      "sha256": "64585ee0143bb17fa019860d3615d9e486b75aa873ced643bb623436eb2ed947",
+      "bytes": 31024
+    },
+    {
+      "file": "mystic/masterequip00132.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00132.png",
+      "sha256": "ea5457d613689993269fcaec6d99db1674a3b21c9777f8d312be40856473911e",
+      "bytes": 34960
+    },
+    {
+      "file": "mystic/masterequip00152.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00152.png",
+      "sha256": "5313457edb3f5cc6849693c4263f879e2363d5c9e622b13475b96124ae765407",
+      "bytes": 33635
+    },
+    {
+      "file": "mystic/masterequip00162.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00162.png",
+      "sha256": "4889c478d0610d89044b8b66d6396392bb3cc62b31d3eb77908192ff9190811a",
+      "bytes": 24866
+    },
+    {
+      "file": "mystic/masterequip00172.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00172.png",
+      "sha256": "b02104969af2b1efa668f71ced495645898ef582bd8e195e0a81b3edfa92e6fe",
+      "bytes": 21063
+    },
+    {
+      "file": "mystic/masterequip00192.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00192.png",
+      "sha256": "896d5b423da0dcb6168ff87db12a685249e0092c1d8c8c907d53186b79d9a94b",
+      "bytes": 28951
+    },
+    {
+      "file": "mystic/masterequip00212.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00212.png",
+      "sha256": "31601fea8b91cb9212fa75cea82c86976267eff4f3eb23d58d6707c542827339",
+      "bytes": 22981
+    },
+    {
+      "file": "mystic/masterequip00242.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00242.png",
+      "sha256": "005f0fe3ba0445d30ce83db63598964dd508e7d0e969a3e7a7dab25c32be1ea0",
+      "bytes": 21505
+    },
+    {
+      "file": "mystic/masterequip00262.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00262.png",
+      "sha256": "916c429cac160c86a3e05b9b6f582a2cdd5646ba5f7858f1957d74a3fd3a4dc5",
+      "bytes": 24988
+    },
+    {
+      "file": "mystic/masterequip00332.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00332.png",
+      "sha256": "da6409689bcc3375b42f6da5c63f01ccb1d639d0f8bfee1faf924e1410c9b69e",
+      "bytes": 30927
+    },
+    {
+      "file": "mystic/masterequip00342.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00342.png",
+      "sha256": "76451320bcf4014eeec815cfc065af4cdff0ca456ac98fc93f2c77598e6917c3",
+      "bytes": 27784
+    },
+    {
+      "file": "mystic/masterequip00362.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00362.png",
+      "sha256": "40044414dbf1628a4f5a397d13a6cc80a0e952f7673fe0e954c5c6020a9c0e03",
+      "bytes": 20922
+    },
+    {
+      "file": "mystic/masterequip00412.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00412.png",
+      "sha256": "47b327d34e9fa1b51acb864738b8c113e1891647c9ea03fdae24d37f267909d5",
+      "bytes": 29982
+    },
+    {
+      "file": "mystic/masterequip00432.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00432.png",
+      "sha256": "42381d521ca2382c77868e700bac9a96ccc9d52c0f3bfd9d0a3aa76a61a4f3ee",
+      "bytes": 25278
+    },
+    {
+      "file": "mystic/masterequip00442.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00442.png",
+      "sha256": "06e69c365a658e31a2679321be9a6656889c9f9c984bc08610e18f22cbd69b7f",
+      "bytes": 22408
+    },
+    {
+      "file": "mystic/masterequip00462.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00462.png",
+      "sha256": "989de473a7a94b89ea1688ee558a01835f2de20cd6dc928d8783ecbb8f43e0fe",
+      "bytes": 25298
+    },
+    {
+      "file": "mystic/masterequip00472.png",
+      "url": "https://static.atlasacademy.io/JP/Items/masterequip00472.png",
+      "sha256": "676e95f9d09552d8249b90b84ae87e4a826d2af6189f4c8efa0b791cc8e26255",
+      "bytes": 22375
+    },
+    {
+      "file": "skill/skill_00300.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00300.png",
+      "sha256": "30678887e446b4d45e9a122663e850a43401e2acee8ae51d2ebfc5a1e0f846fa",
+      "bytes": 21939
+    },
+    {
+      "file": "skill/skill_00301.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00301.png",
+      "sha256": "9fc5aa8f2057d71302324df3e7f0c29431a6c8b71180e391adacf42ba4977589",
+      "bytes": 24414
+    },
+    {
+      "file": "skill/skill_00302.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00302.png",
+      "sha256": "580288985ba76a8d41506bc1f0439367e1f562aa61c62774f0142bc122aea46e",
+      "bytes": 15908
+    },
+    {
+      "file": "skill/skill_00303.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00303.png",
+      "sha256": "019f9efdef8d73fa31e4ee064de92258fafc876ca2bfa1714f1acc35557a8bab",
+      "bytes": 21874
+    },
+    {
+      "file": "skill/skill_00304.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00304.png",
+      "sha256": "b7e7f4f7c5a88f5b832aa15c3f5700bbfcc73bf7ad04a6f59ea85aa8a1964ade",
+      "bytes": 21985
+    },
+    {
+      "file": "skill/skill_00305.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00305.png",
+      "sha256": "ea607a5dadc23ae79ae8854e51f3beea3850ecac52bd77cc612b42491acdac87",
+      "bytes": 20304
+    },
+    {
+      "file": "skill/skill_00306.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00306.png",
+      "sha256": "90e9aa1a4b4c9e37c063b9b704abfba22c07d506ce3037e88e546022fffdaca4",
+      "bytes": 19620
+    },
+    {
+      "file": "skill/skill_00308.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00308.png",
+      "sha256": "7c58442fa4700e3b948bd1c734dae61e0d1ef127fdf6d8cf90928012a0682990",
+      "bytes": 20509
+    },
+    {
+      "file": "skill/skill_00309.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00309.png",
+      "sha256": "79dc4e9b01d238b70de5e97aef8505380f9e9354b2d95e67b2abb33b5e021f3b",
+      "bytes": 20730
+    },
+    {
+      "file": "skill/skill_00310.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00310.png",
+      "sha256": "3a9cd06cc8d3dd5e5f89a007d8e0fa700282e8a90eced4bda7ea373efa796cb6",
+      "bytes": 22881
+    },
+    {
+      "file": "skill/skill_00311.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00311.png",
+      "sha256": "b213fc1a1dce79ecaeb6625aad3acd8526cd891363b91da2a6d8d287349fb322",
+      "bytes": 20767
+    },
+    {
+      "file": "skill/skill_00312.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00312.png",
+      "sha256": "4951de59415f04c2c3bc0ce108a1d4cd57ceb1b4e84ca7105cf89e98e3bf4137",
+      "bytes": 24544
+    },
+    {
+      "file": "skill/skill_00313.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00313.png",
+      "sha256": "21580a0ba3b112e8aeda00cb572142517ca7a5250ec987ae8bea0f953a672477",
+      "bytes": 21216
+    },
+    {
+      "file": "skill/skill_00314.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00314.png",
+      "sha256": "6b09cdcb1178c0955e05243815dc5d2d680711ace1a4cbfeb636026f316171de",
+      "bytes": 22463
+    },
+    {
+      "file": "skill/skill_00315.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00315.png",
+      "sha256": "99496a9125cc50a3753481bd916a4441bc4f8888fdc8b5b791bfc30ecd60cb3a",
+      "bytes": 21579
+    },
+    {
+      "file": "skill/skill_00316.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00316.png",
+      "sha256": "fe620f273f51e5b0de1aecf419f7506d18ac89bfff4d2064d77950ef91f291d9",
+      "bytes": 22232
+    },
+    {
+      "file": "skill/skill_00317.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00317.png",
+      "sha256": "d37ddf89ec786615ae6d3b0d836b812b3495429b8cc0613bbdc92c1198055056",
+      "bytes": 22302
+    },
+    {
+      "file": "skill/skill_00318.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00318.png",
+      "sha256": "30faf9e450e58d3010e85044d329bacf0cd8ef3f75b1b5b98d668e4f24dde3a6",
+      "bytes": 14645
+    },
+    {
+      "file": "skill/skill_00319.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00319.png",
+      "sha256": "6b29e0a3c1a0e9b50c783f2f92b945fd6067185df94cf70c201752f3f57f5185",
+      "bytes": 15284
+    },
+    {
+      "file": "skill/skill_00321.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00321.png",
+      "sha256": "1e5a6a520d6caa959453e66847b6ab76b6abdca6c57279b341d59f72e2424e4a",
+      "bytes": 15099
+    },
+    {
+      "file": "skill/skill_00323.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00323.png",
+      "sha256": "c4553e042181b3667d4ee7658f115bf7503270a5c4e659818fd8659fde1c2a73",
+      "bytes": 24131
+    },
+    {
+      "file": "skill/skill_00325.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00325.png",
+      "sha256": "8667e24f54244bf18069b33735349fac35fe8dda205b49b00a62de1e2f9ea5a6",
+      "bytes": 20503
+    },
+    {
+      "file": "skill/skill_00328.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00328.png",
+      "sha256": "209558858334b46654332ecacb7702297d35fa6601f8d48d416b7f5f6694d6a8",
+      "bytes": 24199
+    },
+    {
+      "file": "skill/skill_00329.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00329.png",
+      "sha256": "d37823754274997be523ea3ae74b16c9a5862faa3b6690908f2b66dca64ef0a3",
+      "bytes": 20577
+    },
+    {
+      "file": "skill/skill_00331.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00331.png",
+      "sha256": "f6125b07fb359c7300544d60051523ab753a964332e2e9fcfb0431e5fa3c9b0e",
+      "bytes": 23744
+    },
+    {
+      "file": "skill/skill_00333.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00333.png",
+      "sha256": "3e3b731f0f008fa770c88a0b6e1f788120a6a0f7c04e18e87e2d4e6e0c7f2286",
+      "bytes": 15828
+    },
+    {
+      "file": "skill/skill_00334.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00334.png",
+      "sha256": "b5f87fbfd083e04a4d44038bdfba30767a7f87fb5f6d9ed1bf51f231941f7631",
+      "bytes": 22999
+    },
+    {
+      "file": "skill/skill_00400.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00400.png",
+      "sha256": "724fa8b90aef96af3cabc8f22385edb7c2851a8ac2a92c521d2a06cab1a95f7b",
+      "bytes": 21559
+    },
+    {
+      "file": "skill/skill_00401.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00401.png",
+      "sha256": "7ea01d84d4695cce6e2af93a59d20fd8b40c46ab94625ed4da611a74593c9ccf",
+      "bytes": 17323
+    },
+    {
+      "file": "skill/skill_00402.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00402.png",
+      "sha256": "0b7b97f6d469b5f89980af23620c870b4fc8f236f30b23cf78497bd230293d55",
+      "bytes": 22101
+    },
+    {
+      "file": "skill/skill_00403.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00403.png",
+      "sha256": "0904cdc0c3da139bf30d0cea72dce5b8f09b41e75acd7e373718c7fbdfd94650",
+      "bytes": 22261
+    },
+    {
+      "file": "skill/skill_00404.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00404.png",
+      "sha256": "73299e17f65cc6a72c326ef617c3bc22a3647b6ceee242ef634e6e03ecf4490d",
+      "bytes": 18953
+    },
+    {
+      "file": "skill/skill_00411.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00411.png",
+      "sha256": "ac1f37c75d2ed524a8fb4337a1b240f77cfcbd2cdc921513634d130f198ee0f1",
+      "bytes": 22447
+    },
+    {
+      "file": "skill/skill_00412.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00412.png",
+      "sha256": "2f8df53517c942fb58fa00beda690dee32cb81c03050df66891f76de6605de33",
+      "bytes": 13276
+    },
+    {
+      "file": "skill/skill_00416.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00416.png",
+      "sha256": "9f205e0aa2db63d837bfbe067f38a5a48a8a14d9088b63e58cc999a664edc5ef",
+      "bytes": 18176
+    },
+    {
+      "file": "skill/skill_00419.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00419.png",
+      "sha256": "078a77b973013ab03f85eb2e5ce93f167da3c8d25656fce2ce7fce483f1c3e19",
+      "bytes": 20858
+    },
+    {
+      "file": "skill/skill_00500.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00500.png",
+      "sha256": "fd1e0795d317dffcef73c0bb320f7c2a9601ccbfe78c0f1ef82b8e520b0521ac",
+      "bytes": 19106
+    },
+    {
+      "file": "skill/skill_00502.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00502.png",
+      "sha256": "4844c0be23cd693927994d95e9b7aed3b0afc5537f965c911eb48f87f12277d1",
+      "bytes": 17411
+    },
+    {
+      "file": "skill/skill_00503.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00503.png",
+      "sha256": "de749c856e5bcfbf39094ec82ccefe1a3f862f2bcd6d34f2b9637c713f3e4e39",
+      "bytes": 18320
+    },
+    {
+      "file": "skill/skill_00504.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00504.png",
+      "sha256": "64514dea8b2aa815a236cd56370355912099e15473f22606b2febc6e7d9094b1",
+      "bytes": 17934
+    },
+    {
+      "file": "skill/skill_00506.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00506.png",
+      "sha256": "259dcbe45398cde446b03e66fa281978ddb2b6737d75a0ce89b73b2ede6b8f57",
+      "bytes": 19090
+    },
+    {
+      "file": "skill/skill_00508.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00508.png",
+      "sha256": "3bbe2db5745694fd28c36b451740b9b36679c17fe0833fdf83d1b0ef1c4d59fb",
+      "bytes": 21068
+    },
+    {
+      "file": "skill/skill_00509.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00509.png",
+      "sha256": "9a0f5b8e22c48bd67462e8f0bf5c251c11bef0b66d0c59d693e4a54c01f704d1",
+      "bytes": 16995
+    },
+    {
+      "file": "skill/skill_00510.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00510.png",
+      "sha256": "af0daab226a31f879b31046f7e4dc8189aac428995bf57779a3944822c3947e5",
+      "bytes": 23479
+    },
+    {
+      "file": "skill/skill_00512.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00512.png",
+      "sha256": "a7d9fa678c5ecb7d37b2816c1eef9d8d67b00900f2ab8f9a6c6381129839279b",
+      "bytes": 18036
+    },
+    {
+      "file": "skill/skill_00513.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00513.png",
+      "sha256": "9d68c8db76457f886a96e9f8a2e99371904ca7684bdf6b428c69875c992178c6",
+      "bytes": 21561
+    },
+    {
+      "file": "skill/skill_00514.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00514.png",
+      "sha256": "8485b41c7a701b0dac1ec414b7363f949d7fc5fdcd6e779468cc4bc8fafd3790",
+      "bytes": 21928
+    },
+    {
+      "file": "skill/skill_00515.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00515.png",
+      "sha256": "d60eff9ca0f4c10639e4ac2dec4824cb9fab2d7a9d148faacabc8cbaa7d605b3",
+      "bytes": 21800
+    },
+    {
+      "file": "skill/skill_00520.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00520.png",
+      "sha256": "c47a164d4d41706822cd5fca60c96a844327315138612f404e636b8af7f8822b",
+      "bytes": 19785
+    },
+    {
+      "file": "skill/skill_00521.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00521.png",
+      "sha256": "6c076d2ea4924163a27199a3545207d11efc189b97607d9acdf9eca1a8919238",
+      "bytes": 18511
+    },
+    {
+      "file": "skill/skill_00522.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00522.png",
+      "sha256": "b26187ce9188d4e7de50dc52507bf51758116599782550aec4c0ac02272b141f",
+      "bytes": 21541
+    },
+    {
+      "file": "skill/skill_00524.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00524.png",
+      "sha256": "f6f36f11334a7829d8b97aaa6b6a2422ceb4d23b1ba9c34f0e08baa6870cbb3b",
+      "bytes": 21598
+    },
+    {
+      "file": "skill/skill_00527.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00527.png",
+      "sha256": "2626f130cded845d31913bd5913fb6890dad55f1540178c5d4b15931243c3440",
+      "bytes": 18348
+    },
+    {
+      "file": "skill/skill_00537.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00537.png",
+      "sha256": "dae23007c576100bcfd0111ba1d50875ba371563e3099566faefa01a9ded1835",
+      "bytes": 20605
+    },
+    {
+      "file": "skill/skill_00541.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00541.png",
+      "sha256": "688787896981e29121e9e693b972ec17373b6c5cc755df782e4466855da473b3",
+      "bytes": 21418
+    },
+    {
+      "file": "skill/skill_00543.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00543.png",
+      "sha256": "080d243e029f70f625be829924bbc59fad76d18a89ea94a7150705bfee1a614c",
+      "bytes": 15661
+    },
+    {
+      "file": "skill/skill_00545.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00545.png",
+      "sha256": "8fa5f5c7c576c233fd8b9d4db3511f066eb27f76947c8ec503fb218119830243",
+      "bytes": 20266
+    },
+    {
+      "file": "skill/skill_00600.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00600.png",
+      "sha256": "0aab3b56e97a0057cb9bb24b0c750e4860002f60370080fb1799b1e97057d7fa",
+      "bytes": 21841
+    },
+    {
+      "file": "skill/skill_00601.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00601.png",
+      "sha256": "6a6849fab44c3f48524071186bb634aad981bad01a9c6b7c197df910e67c0543",
+      "bytes": 18540
+    },
+    {
+      "file": "skill/skill_00602.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00602.png",
+      "sha256": "98f68f707a2a9a726d20a8ad2eb72354d75428d82b5d66d4ad3c1c953c573da9",
+      "bytes": 21828
+    },
+    {
+      "file": "skill/skill_00603.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00603.png",
+      "sha256": "388733e1cdc8cdacd8a4ae836ff71955c231e4e66ff32474202ec10ec81c98c0",
+      "bytes": 19013
+    },
+    {
+      "file": "skill/skill_00604.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00604.png",
+      "sha256": "e14a9870b21970fea5031a7ddbc488bd52a62e46e0e2c61d8a6f97884b6db1e8",
+      "bytes": 21102
+    },
+    {
+      "file": "skill/skill_00605.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00605.png",
+      "sha256": "cd2a851be1c2066fce95e00ffe76338a96b601b67ecd8e701358bda7294a57f2",
+      "bytes": 20230
+    },
+    {
+      "file": "skill/skill_00606.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00606.png",
+      "sha256": "e28241a536b2ec51699efd0ea72c5ecdc90bb08fb28831629b2ce42367310fce",
+      "bytes": 23217
+    },
+    {
+      "file": "skill/skill_00607.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00607.png",
+      "sha256": "e48e428373d0ceb277c1bc4faff0bc021baa299283580a6182bff6436d115059",
+      "bytes": 19580
+    },
+    {
+      "file": "skill/skill_00608.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00608.png",
+      "sha256": "4bd286bcdfd02c67ea17360b9fbbb385a8b48f3de7768c3df44823d057964d8e",
+      "bytes": 16333
+    },
+    {
+      "file": "skill/skill_00609.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00609.png",
+      "sha256": "2977b5964ffdb502b9b6cb22c7f642347aad7fa127f01a5b6d20d2cfd8bd2db6",
+      "bytes": 21464
+    },
+    {
+      "file": "skill/skill_00610.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00610.png",
+      "sha256": "4b77e5084f89c73cb49345bfc2992602f0459a7bc11027fc185d787fb99171eb",
+      "bytes": 15906
+    },
+    {
+      "file": "skill/skill_00611.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00611.png",
+      "sha256": "39d429bd510551391e3387786f8a0f85892731697f3fb104c14f19762fa48971",
+      "bytes": 21860
+    },
+    {
+      "file": "skill/skill_00700.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00700.png",
+      "sha256": "db3caa75d047667240cb6501f5cc54e8b1412b42f0c8feda6506c6e25af14ef7",
+      "bytes": 19952
+    },
+    {
+      "file": "skill/skill_00701.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00701.png",
+      "sha256": "d6825da1c34f93f9f1cf9f10165f5ef9e78c41e8ccabbb86ea65ee591fd47200",
+      "bytes": 12956
+    },
+    {
+      "file": "skill/skill_00703.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00703.png",
+      "sha256": "0df7d4bb23798edde3808bdab462403101a1c45c474da8a15e81c64154680ec8",
+      "bytes": 24487
+    },
+    {
+      "file": "skill/skill_00704.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00704.png",
+      "sha256": "c08218d210deeeb377fe41187e919c04cf62dc3c8017a3e232309aca218ddfe7",
+      "bytes": 20806
+    },
+    {
+      "file": "skill/skill_00705.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00705.png",
+      "sha256": "8582d7ca8f6c536bfdf912b2fa5cf5e75ed85caa883b5ca1ce1e9f0e73adf4ee",
+      "bytes": 25925
+    },
+    {
+      "file": "skill/skill_00706.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00706.png",
+      "sha256": "95befdf0ab0730ca4b5b286deb3be19e90f2e50207457875edb1e73703d95738",
+      "bytes": 24895
+    },
+    {
+      "file": "skill/skill_00707.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00707.png",
+      "sha256": "5319f35cfceb8593edfaa8f48a2405313d519c78c060451f6204579128041015",
+      "bytes": 19210
+    },
+    {
+      "file": "skill/skill_00708.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00708.png",
+      "sha256": "c46597886b42ea49a80a3b591bca93ff2fee969f4dc446371d5b3e088dcea5bd",
+      "bytes": 22117
+    },
+    {
+      "file": "skill/skill_00803.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00803.png",
+      "sha256": "592b8d24d2b77e48073f53947876cb3f00e19ed3bbbbc24bc31a8932bfec8067",
+      "bytes": 13172
+    },
+    {
+      "file": "skill/skill_00809.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00809.png",
+      "sha256": "a2d99c5f08b24e142d6732d9e340cf88c6457acb628ac226e870b265cef1a275",
+      "bytes": 22182
+    },
+    {
+      "file": "skill/skill_00810.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00810.png",
+      "sha256": "300efdf4eb684f66ee2483c32eedf2023dcad0a20cb649c9ff790308d36846fe",
+      "bytes": 22357
+    },
+    {
+      "file": "skill/skill_00811.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00811.png",
+      "sha256": "978e17e0d3223ac15d126ccca3b04ea05d3bacdec69756109e0944768b46ca33",
+      "bytes": 19405
+    },
+    {
+      "file": "skill/skill_00812.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00812.png",
+      "sha256": "06abc71a8716088b14cda5c165743071ae49a46d55e002797539ae74d141ab44",
+      "bytes": 21738
+    },
+    {
+      "file": "skill/skill_00813.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00813.png",
+      "sha256": "7cc40ff4293bcae4bed29a5a8191682c353361c92b42195991d4dc632983510a",
+      "bytes": 19020
+    },
+    {
+      "file": "skill/skill_00814.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00814.png",
+      "sha256": "88e2210b7b9f4569c9a7661cf742b5c95fa522ae2da6316e9e00607c95cedf54",
+      "bytes": 16114
+    },
+    {
+      "file": "skill/skill_00818.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00818.png",
+      "sha256": "cd04dc62ae1522dae6730e6796049022a639a17a475bc29ccce085b301280239",
+      "bytes": 22044
+    },
+    {
+      "file": "skill/skill_00819.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00819.png",
+      "sha256": "30a78cdaf5f93c278eeb332b132f87976f966e63802d30bbb2b20010e9532970",
+      "bytes": 20695
+    },
+    {
+      "file": "skill/skill_00821.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00821.png",
+      "sha256": "efa901ae5c88719bf70dd3c0c38a02e2f0b2261aefc0497eaceb44c8b4c0ac23",
+      "bytes": 13043
+    },
+    {
+      "file": "skill/skill_00822.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_00822.png",
+      "sha256": "096cbd94d1549d71c78218b338aa8ff255dbd182feb5bb1ad669a0fc3d9b0696",
+      "bytes": 23124
+    },
+    {
+      "file": "skill/skill_01004.png",
+      "url": "https://static.atlasacademy.io/JP/SkillIcons/skill_01004.png",
+      "sha256": "52eaaeaae54c85b8950e35016d2a74e26bcac0a1e0026a2935a201b8cc632547",
+      "bytes": 22294
+    }
+  ],
+  "missingMedia": [],
+  "incrementalUpdates": [
+    {
+      "date": "2026-10-25",
+      "servantId": 406000,
+      "collectionNo": 483,
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/483",
+          "sha256": "1c5c26b996e34b83ee11bd63984a445cec65c5d5e074dbb2472ff350369d15ab"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/2707",
+          "sha256": "346b3dfd3b528896796396c579c20ef9bcc9d18fc9095aa94ad77ac4dfcf51a9"
+        }
+      ],
+      "method": "incremental; existing servant, equip, mystic, and media records preserved"
+    }
+  ]
+}

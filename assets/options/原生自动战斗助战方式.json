@@ -9,7 +9,8 @@
                     "name": "自定义助战",
                     "label": "自定义助战",
                     "option": [
-                        "助战类型"
+                        "助战类型",
+                        "多次查找失败随机选择助战"
                     ],
                     "pipeline_override": {
                         "进本流程": {
@@ -46,7 +47,10 @@
                 },
                 {
                     "name": "使用Chaldea配置",
-                    "label": "使用 Chaldea 配置",
+                    "label": "使用编辑器/chaldea配置",
+                    "option": [
+                        "多次查找失败随机选择助战"
+                    ],
                     "pipeline_override": {
                         "进本流程": {
                             "next": [
@@ -60,6 +64,30 @@
                                 "[JumpBack]进本-盲点跳过剧情"
                             ]
                         }
+                    }
+                }
+            ]
+        },
+        "多次查找失败随机选择助战": {
+            "type": "switch",
+            "label": "多次查找失败随机选择助战",
+            "description": "刷新 10 次并查找后仍无目标时，改用首个可用助战；跳过队伍匹配、自动编队和羁绊最大化，使用无 Chaldea 配置的原生自动战斗。",
+            "default_case": "No",
+            "cases": [
+                {
+                    "name": "No",
+                    "label": "关闭",
+                    "pipeline_override": {
+                        "助战action": {"attach": {"fallback_after_refresh": false}},
+                        "Chaldea助战action": {"attach": {"fallback_after_refresh": false}}
+                    }
+                },
+                {
+                    "name": "Yes",
+                    "label": "开启",
+                    "pipeline_override": {
+                        "助战action": {"attach": {"fallback_after_refresh": true}},
+                        "Chaldea助战action": {"attach": {"fallback_after_refresh": true}}
                     }
                 }
             ]

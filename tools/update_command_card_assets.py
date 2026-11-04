@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import argparse
 import concurrent.futures
+from datetime import datetime
 import hashlib
 import json
 import os
@@ -121,10 +122,42 @@ def _download_one(
     asset: dict[str, str],
     output: Path,
     force: bool,
+    family: str = 'status',
+    previous: dict | None = None,
+    backup: Path | None = None,
 ) -> dict[str, str]:
     directory = output / servant_id
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / asset["filename"]
+    if family == 'commands':
+        from command_card_palette import PROFILE, palette_png
+        if destination.is_file() and previous:
+            if hashlib.sha256(destination.read_bytes()).hexdigest() != previous['sha256']:
+                raise ValueError(f'Existing command portrait hash mismatch: {destination}')
+            if previous.get('source') != asset['url'] and not force:
+                raise ValueError(f'Command portrait source changed; review or explicitly force: {destination}')
+            if not force and previous.get('quantization_profile') == PROFILE:
+                return dict(previous)
+        elif destination.exists():
+            raise ValueError(f'Untracked command portrait; refusing overwrite: {destination}')
+        raw = _request(asset['url'], timeout=60)
+        data, _, _ = palette_png(raw, (256, 256))
+        if backup is None:
+            raise ValueError('Command portrait update requires a backup directory')
+        original = backup / 'originals' / servant_id / destination.name
+        original.parent.mkdir(parents=True, exist_ok=True)
+        original.write_bytes(raw)
+        if destination.exists():
+            old = backup / 'before' / servant_id / destination.name
+            old.parent.mkdir(parents=True, exist_ok=True)
+            old.write_bytes(destination.read_bytes())
+        temporary = destination.with_suffix(destination.suffix + '.part')
+        temporary.write_bytes(data)
+        os.replace(temporary, destination)
+        return {'group': asset['group'], 'key': asset['key'], 'file': f'{servant_id}/{destination.name}',
+                'source': asset['url'], 'source_sha256': hashlib.sha256(raw).hexdigest(),
+                'sha256': hashlib.sha256(data).hexdigest(), 'quantization_profile': PROFILE,
+                'fully_transparent_changed_pixels': 0, 'alpha_mask_changed_pixels': 0}
     if destination.is_file() and not force:
         data = destination.read_bytes()
     else:
@@ -166,6 +199,19 @@ def update(
     else:
         manifest = {"schema_version": 1, "source": f"Atlas Academy NiceServant.extraAssets.{family}", "servants": {}}
     manifest.setdefault("servants", {})
+    if family == 'commands':
+        # Keep tool-only quantization imports out of the status/runtime paths.
+        tools_dir = str(Path(__file__).resolve().parent)
+        if tools_dir not in sys.path:
+            sys.path.insert(0, tools_dir)
+        from command_card_palette import PROFILE, transform_metadata
+        backup = ROOT / '.workbuddy/backups' / ('legacy-command-update-' + datetime.now().strftime('%Y%m%d-%H%M%S-%f'))
+        backup.mkdir(parents=True)
+        if manifest_path.exists():
+            (backup / 'manifest-before').write_bytes(manifest_path.read_bytes())
+    else:
+        backup = None
+    existing = {entry['file']: entry for group in manifest['servants'].values() for entry in group}
 
     jobs: list[tuple[str, dict[str, str]]] = []
     for servant_id, record in sorted(records.items(), key=lambda item: int(item[0])):
@@ -177,7 +223,8 @@ def update(
     errors: list[str] = []
     with concurrent.futures.ThreadPoolExecutor(max_workers=max(1, workers)) as pool:
         future_map = {
-            pool.submit(_download_one, servant_id, asset, output, force): (servant_id, asset)
+            pool.submit(_download_one, servant_id, asset, output, force, family,
+                        existing.get(f'{servant_id}/{asset["filename"]}'), backup): (servant_id, asset)
             for servant_id, asset in jobs
         }
         for future in concurrent.futures.as_completed(future_map):
@@ -190,6 +237,8 @@ def update(
     for servant_id, assets in downloaded.items():
         manifest["servants"][servant_id] = sorted(assets, key=lambda item: item["file"])
     manifest["region"] = region
+    if family == 'commands' and all(entry.get('quantization_profile') == PROFILE for group in manifest['servants'].values() for entry in group):
+        manifest['image_transform'] = {**transform_metadata(), 'size': [256, 256]}
     manifest_path.write_text(
         json.dumps(manifest, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
         encoding="utf-8",

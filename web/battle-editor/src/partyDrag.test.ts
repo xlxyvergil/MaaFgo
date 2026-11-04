@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {finishPartyDrag,partyDragTarget,partyFloatingPosition,partyFloatingTransform,partyGrabOffset,startPartyDrag,updatePartyDrag} from './partyDrag';
+
+test('a floating card retains the original grab offset rather than snapping its centre to the cursor',()=>{const offset=partyGrabOffset({left:200,top:100},{x:227,y:146});assert.deepEqual(offset,{x:27,y:46});assert.deepEqual(partyFloatingPosition({x:700,y:320},offset),{left:673,top:274});assert.equal(partyFloatingTransform({x:700,y:320},offset),'translate3d(673px, 274px, 0)');});
+test('fractional CSS pixels and off-viewport movement preserve their exact offset',()=>{const offset=partyGrabOffset({left:20.25,top:30.5},{x:30.75,y:100.25});assert.deepEqual(offset,{x:10.5,y:69.75});assert.deepEqual(partyFloatingPosition({x:5,y:4},offset),{left:-5.5,top:-65.75});});
+test('only six real slots on the same board are eligible drop targets',()=>{for(const index of [0,1,2,3,4,5]){assert.equal(partyDragTarget(index,true),index);assert.equal(partyDragTarget(index,false),null);}for(const value of [null,-1,6,NaN,Infinity,1.5])assert.equal(partyDragTarget(value,true),null);});
+test('a click below the six-pixel threshold has no target and never exchanges',()=>{const initial=startPartyDrag(1,0,20,20),click=updatePartyDrag(initial,23,24,5);assert.equal(click.active,false);assert.equal(click.target,null);assert.equal(finishPartyDrag(click),null);assert.equal(initial.active,false);});
+test('releasing on the source or outside the board does not exchange',()=>{const active=updatePartyDrag(startPartyDrag(1,0,20,20),100,50,1);assert.deepEqual(finishPartyDrag(active),[0,1]);assert.equal(finishPartyDrag(updatePartyDrag(active,20,20,0)),null);assert.equal(finishPartyDrag(updatePartyDrag(active,500,50,partyDragTarget(1,false))),null);});
+test('invalid source identity cannot become an exchange even with a valid destination',()=>{const active=updatePartyDrag(startPartyDrag(1,-1,20,20),100,50,2);assert.equal(finishPartyDrag(active),null);});

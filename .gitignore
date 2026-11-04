@@ -511,6 +511,12 @@ tools/copy_servant_up_templates.py
 # 本机 MaaMCP 运行环境启动器（依赖 .workbuddy/runtime）
 tools/start_maa_mcp.ps1
 
+# 本地图片来源、裁剪与哈希记录（不是运行时资源清单）
+/assets/resource/*/image/**/bbc_sources.manifest
+/assets/resource/*/image/**/来源.manifest
+/assets/resource/*/image/**/来源清单.manifest
+/assets/resource/*/image/**/模板来源.manifest
+
 # 羁绊数据维护工具生成的同目录备份
 *.before-atlas-append-*.csv
 *.before-atlas-servant-sync-*.csv

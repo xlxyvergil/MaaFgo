@@ -33,7 +33,7 @@ class StoryInterruptTests(unittest.TestCase):
             clock[0] += seconds
         with patch("battle.runtime.runtime.time.monotonic", side_effect=lambda: clock[0]), \
                 patch("battle.runtime.runtime.time.sleep", side_effect=sleep), \
-                patch("battle.runtime.runtime.perception.detect_scene", side_effect=lambda ctx, im: im[0]):
+                patch("battle.runtime.runtime.perception.detect_scene", side_effect=lambda ctx, im, **_kwargs: im[0]):
             ok = runtime._wait_until((Scene.MAIN_BATTLE, Scene.VICTORY, Scene.DEFEAT),
                                      timeout, tap_close=True, handle_story=handle_story)
         return ok, runtime

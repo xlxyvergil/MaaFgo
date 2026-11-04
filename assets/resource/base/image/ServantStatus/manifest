@@ -9991,6 +9991,40 @@
         "source_sha256": "ec9291413e3b9ad870a9936c65f972729f51ba269b99865543e43e36c020a33c"
       }
     ],
+    "505700": [
+      {
+        "file": "505700/status_servant_1.png",
+        "group": "ascension",
+        "key": "1",
+        "sha256": "1af2a7cf3f32f5a4685e93403f922b05cbd1f540dee4d6fb87f7164c5c07687c",
+        "source": "https://static.atlasacademy.io/JP/Servants/Status/505700/status_servant_1.png",
+        "source_sha256": "d80eaf655db9d52facfa2c9eb667555d131c6b08f5c2e2817e8dcd49c0c2f681"
+      },
+      {
+        "file": "505700/status_servant_2.png",
+        "group": "ascension",
+        "key": "2",
+        "sha256": "2171a126cc0600a9c5f814ef00835c2f065804e54ee0f1f72894dd7cb8626705",
+        "source": "https://static.atlasacademy.io/JP/Servants/Status/505700/status_servant_2.png",
+        "source_sha256": "892dce2da31c0705828056a5cf15eabc8ec9f6c5dba998c77402fb5ec5bbfd8e"
+      },
+      {
+        "file": "505700/status_servant_3.png",
+        "group": "ascension",
+        "key": "3",
+        "sha256": "71d82cff5e7f35834f057735c1c07248748b9579eaa0927b9b072561c9472846",
+        "source": "https://static.atlasacademy.io/JP/Servants/Status/505700/status_servant_3.png",
+        "source_sha256": "c9e1ec14bd02f88b46098b3f0bf166473ff764772b5ab1bbb50563fe6bce01b2"
+      },
+      {
+        "file": "505700/status_servant_11.png",
+        "group": "costume",
+        "key": "505730",
+        "sha256": "13575a06078e489a60834fdcd8fae61b351c14048e286b5ac0173e2cc241518f",
+        "source": "https://static.atlasacademy.io/JP/Servants/Status/505700/status_servant_11.png",
+        "source_sha256": "fc3c8ce6a7340f68bf5c08f72d341ab28297adb0b937e9fda0381c3e63d4cc1f"
+      }
+    ],
     "505800": [
       {
         "file": "505800/status_servant_1.png",

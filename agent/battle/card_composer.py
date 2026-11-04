@@ -1,8 +1,8 @@
-"""Offline, standalone command-card composition for future Agent callers.
+"""Offline, standalone command-card composition for Agent callers.
 
 No Maa imports, Pillow, networking or game-asset decoding. The caller supplies
 identity, artwork variant and card colour. NP callers must explicitly select
-the language and, where necessary, the already-confirmed name row; this module
+the language and, where necessary, the name filename and confirmed row; this module
 does not infer a servant's NP, ascension, colour or current transformation.
 
 Example::
@@ -14,8 +14,8 @@ Example::
                                cv2.TM_CCOEFF_NORMED, mask=noble.mask)
 
 The layout is an experimental 720p-calibrated profile, not a reproduction of
-all runtime animations, status overlays or perspective transforms. Existing
-battle recognition does not call this module.
+all runtime animations, status overlays or perspective transforms. Battle
+recognition reuses it through perception.composed_card with overlay masks.
 """
 from __future__ import annotations
 
@@ -172,9 +172,16 @@ class CommandCardComposer:
         portrait_variant: str | int = 1,
         card_type: str = 'face',
         region: str | None = None,
+        np_name_file: str | None = None,
         np_name_row: int = 0,
         viewport: tuple[int, int] = (1280, 720),
     ) -> ComposedCard:
+        """Compose one card, without inferring its NP name or colour.
+
+        ``np_name_file`` selects a PNG basename under this servant's regional
+        ``_composition/np/<id>/`` folder; omitted means ``card_servant_np.png``.
+        It is not a human-readable NP name or an arbitrary filesystem path.
+        """
         sid = _number(servant_id, 'servant_id')
         variant = _number(portrait_variant, 'portrait_variant')
         if color not in COLORS:
@@ -190,12 +197,17 @@ class CommandCardComposer:
             raise ValueError('Face composition region must be JP or CN (omitted means JP)')
         if card_type == 'face' and np_name_row != 0:
             raise ValueError('np_name_row is only valid for NP cards')
-        key = (sid, variant, color, card_type, region, np_name_row, width, height, PROFILE)
+        if card_type == 'face' and np_name_file is not None:
+            raise ValueError('np_name_file is only valid for NP cards')
+        if np_name_file is not None and (not isinstance(np_name_file, str) or not re.fullmatch(r'[A-Za-z0-9_-]+\.png', np_name_file)):
+            raise ValueError('np_name_file must be a PNG basename using letters, digits, underscores or hyphens; paths are not allowed')
+        name_file = 'card_servant_np.png' if np_name_file is None else np_name_file
+        key = (sid, variant, color, card_type, region, name_file, np_name_row, width, height, PROFILE)
         with self._lock:
             if key in self._cache:
                 self._cache.move_to_end(key)
                 return self._copy(self._cache[key])
-            card = self._render(sid, variant, color, card_type, region, np_name_row, height)
+            card = self._render(sid, variant, color, card_type, region, name_file, np_name_row, height)
             used = card.bgra.nbytes + card.mask.nbytes
             if self.cache_size and used <= self.cache_bytes:
                 self._cache[key] = card
@@ -205,7 +217,7 @@ class CommandCardComposer:
                     self._cache_used -= removed.bgra.nbytes + removed.mask.nbytes
             return self._copy(card)
 
-    def _render(self, sid: str, variant: str, color: str, card_type: str, region: str | None, row: int, height: int) -> ComposedCard:
+    def _render(self, sid: str, variant: str, color: str, card_type: str, region: str | None, name_file: str, row: int, height: int) -> ComposedCard:
         region = region or 'JP'
         scale = 1.25 * height / 720
         canvas = np.zeros((round(280 * scale), round(256 * scale), 4), dtype=np.float32)
@@ -237,10 +249,10 @@ class CommandCardComposer:
             # screenshot-verified native-size label profile.
             add(label, (126, 66) if region == 'CN' else (150, 73), (4, -46.997))
         else:
-            names = self._read(f'_composition/np/{sid}/card_servant_np.png', expected=(256, 256), region=region, localized_only=region != 'JP')
+            names = self._read(f'_composition/np/{sid}/{name_file}', expected=(256, 256), region=region, localized_only=region != 'JP')
             label = names[row * 128:(row + 1) * 128]
             if cv2.countNonZero(np.where(label[:, :, 3] >= 128, 255, 0).astype(np.uint8)) < 32:
-                raise ValueError(f'Empty NP name row {row} for {region}/{sid}; no name substitution is allowed')
+                raise ValueError(f'Empty NP name row {row} for {region}/{sid}/{name_file}; no name substitution is allowed')
             add(label, (179, 89), (0, -79.2), bottom=True)
         alpha = canvas[:, :, 3:4]
         colors = np.divide(canvas[:, :, :3], alpha, out=np.zeros_like(canvas[:, :, :3]), where=alpha > 0)

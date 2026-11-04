@@ -1,0 +1,243 @@
+{
+  "team": {
+    "name": "地狱的试炼202610_补贯通（黑杯主C，须按二条血槽调整）",
+    "mysticCode": {
+      "mysticCodeId": 70,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 205500,
+        "supportType": "none",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 90,
+        "equip1": {
+          "id": 9400650,
+          "limitBreak": true,
+          "lv": 100
+        }
+      },
+      {
+        "svtId": 605300,
+        "supportType": "friend",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 120,
+        "tdLv": 5,
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ]
+      },
+      {
+        "svtId": 504500,
+        "supportType": "none",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 90,
+        "equip1": {
+          "id": 9401470,
+          "limitBreak": true
+        }
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 2,
+          "card": 4
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 2,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": []
+  },
+  "_guideNotes": {
+    "source": "https://www.bilibili.com/video/BV1L5ar6RE7o/",
+    "part": 1,
+    "cid": 42710535505,
+    "atlasSources": [
+      "https://api.atlasacademy.io/nice/JP/quest/94162000/1",
+      "https://api.atlasacademy.io/nice/JP/skill/980019",
+      "https://api.atlasacademy.io/nice/JP/skill/980020",
+      "https://api.atlasacademy.io/nice/JP/skill/980021",
+      "https://api.atlasacademy.io/nice/JP/servant/605300",
+      "https://api.atlasacademy.io/nice/JP/skill/5108000",
+      "https://news.fate-go.jp/2026/10/hellish_ordeal/"
+    ],
+    "status": "可编辑补贯通方案；仅验证数据结构和真实转换器，尚未实测通关或任务达成。",
+    "quest": "2026年10月地狱的试炼 バトル・オブ・アイギス；HP637632→611064→664200。",
+    "expiresAt": "2026-11-01T16:59:00+08:00",
+    "purpose": "在其他场次已完成首发枪/盾任务后，使用黑杯阿兹赖尔补做必中/贯通攻击击破第二条任务。本阵容没有枪/盾首发，不单场包办15任务。",
+    "formation": "首发乌尔德/冠位阿兹赖尔助战/术呆，无候补、无换人；使用2030年的碎片、黑之圣杯、满破黄金捕鲤鱼图。自有从者Cost32+礼装24=56，助战不计Cost。",
+    "equipment": "助战阿兹赖尔Lv120宝具5、10/10/10、魔力装填10，满破Lv100黑之圣杯ID9400480；其他冠位礼装未臆填。确认开局NP至少20%以配合1技能80%自充。",
+    "mysticCode": "ID70 Brilliant Summer。1技能全体Quick提升1T；2技能单体无敌贯通1T；3技能单体回血+NP10%。Chaldea技能索引分别0/1/2，目标主C为playerTarget=1（前排第2槽）。",
+    "turn1": "乌尔德3/1；主C1→3→2自己，术呆3给主C；主CArts宝具→本人Buster→本人Quick。主C先1提供回避，若冠位杀盘気配遮断已解锁，可提高随后3技能附带弱化的成功率。须有主C B/Q手牌且实际打破第一条。",
+    "turn2": "术呆1；御主服1给全队Quick提升，2给主C贯通；主CArts宝具→乌尔德Quick→术呆Buster。只有此回合实际击破第二条时，贯通任务才满足。御主服1保留到本回合配合乌尔德Q，2不提前消耗。",
+    "turn3": "乌尔德2给主C；御主服3给主C回血+NP10%；术呆Arts→主CArts宝具→主CArts。术呆2保留，若回收不足可编辑补充给主C充能；击杀前确认特殊防御已清空。",
+    "conditions": "前三回合面卡以视频相应角色/颜色为参考，随机发牌并不保证满足。缺少指定牌、伤害不足、技能受限、NP不足都可能改变破条回合。",
+    "breakTiming": "本文件固定T2释放贯通，执行器不会自动判断Break。若T1仍停在第一条，必须把御主服2移动到实际预计击破第二条的回合；若T2未破第二条，1T贯通会到期，需重新编排或等待技能冷却，不可宣称已满足任务。",
+    "adaptations": "相比原视频移除枪龙娘及其攻击buff/强解/技能封印，改用黑杯输出和御主服70贯通；乌尔德承担强解，主C与乌尔德承担弱化。此改编不是原视频逐帧复现，伤害和回收需实测。",
+    "verification": "所有任务均要求最终通关后读取活动任务列表确认；结构校验、动作执行或预计击破均不等于任务已完成。"
+  },
+  "quest": {
+    "id": 94162000,
+    "phase": 1,
+    "enemyHash": "1_0301_fb1673a"
+  }
+}

@@ -4,7 +4,8 @@
             "type": "DoNothing"
         },
         "attach": {
-            "resource_package": "base"
+            "resource_package": "base",
+            "loaded_resource_package": "base"
         }
     }
 }

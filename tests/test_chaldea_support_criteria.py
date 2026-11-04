@@ -51,7 +51,31 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
 
         support.pop("equip2")
         result = build_support_criteria(data, self.servant_map)
+        self.assertEqual(result["ce_bond"], "50np")
+        support["classBoardData"]["grandBondEquipSkillChange"] = False
+        self.assertEqual(build_support_criteria(data, self.servant_map)["ce_bond"], "original")
+        support.pop("classBoardData")
+        result = build_support_criteria(data, self.servant_map)
         self.assertEqual(result["ce_bond"], "any")
+
+    def test_absent_limit_break_keeps_any_state_while_explicit_false_requires_non_mlb(self):
+        for source_key, break_key in (("equip1", "limitBreak"), ("ceId", "ceLimitBreak")):
+            for value, expected in ((None, "任意"), (True, "满破"), (False, "非满破")):
+                with self.subTest(source_key=source_key, value=value):
+                    data = self._sample("雨暗阿_21086_94061640.json")
+                    support = data["team"]["onFieldSvts"][0]
+                    support.pop("equip1", None)
+                    support.pop("ceId", None)
+                    if source_key == "equip1":
+                        support["equip1"] = {"id": 9400340}
+                        if value is not None:
+                            support["equip1"][break_key] = value
+                    else:
+                        support["ceId"] = 9400340
+                        if value is not None:
+                            support[break_key] = value
+                    result = build_support_criteria(data, self.servant_map, resolve_name=lambda _: "万华镜")
+                    self.assertEqual(result["ce_specs"][0]["status"], expected)
 
     def test_equip_name_normalizes_fullwidth_characters_for_template_path(self):
         data = self._sample("太女尼_78119_94149837.json")
@@ -73,11 +97,11 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
     def test_missing_or_multiple_support_fails(self):
         data = self._sample("雨暗阿_21086_94061640.json")
         data["team"]["onFieldSvts"][0]["supportType"] = "none"
-        with self.assertRaisesRegex(ValueError, "恰有一个"):
+        with self.assertRaisesRegex(ValueError, "没有标记助战.*重新导出并导入.*自定义助战"):
             build_support_criteria(data, self.servant_map)
         data["team"]["onFieldSvts"][0]["supportType"] = "friend"
         data["team"]["onFieldSvts"][1]["supportType"] = "friend"
-        with self.assertRaisesRegex(ValueError, "恰有一个"):
+        with self.assertRaisesRegex(ValueError, "标记了 2 位助战.*只保留一位"):
             build_support_criteria(data, self.servant_map)
 
     def test_missing_optional_fields_do_not_add_conditions(self):
@@ -95,10 +119,16 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
         argv = SimpleNamespace(node_name="Chaldea助战action",
                                custom_action_param='{"source_mode":"chaldea"}')
         context = SimpleNamespace(get_node_data=lambda name: {"attach": {"chaldea_enabled": False}})
-        self.assertFalse(action.run(context, argv).success)
+        with patch("support_action.mfaalog.error") as log_error:
+            self.assertFalse(action.run(context, argv).success)
+            message = log_error.call_args[0][0]
+            self.assertIn("使用编辑器/chaldea配置", message)
+            self.assertIn("自定义助战", message)
         context = SimpleNamespace(get_node_data=lambda name: {"attach": {"chaldea_enabled": True,
                                                                             "chaldea_import_source": ""}})
-        self.assertFalse(action.run(context, argv).success)
+        with patch("support_action.mfaalog.error") as log_error:
+            self.assertFalse(action.run(context, argv).success)
+            self.assertIn("分享链接、队伍 ID、关卡 ID", log_error.call_args[0][0])
 
     def test_invalid_source_or_missing_ce_template_fails_before_search(self):
         action = SupportAction()

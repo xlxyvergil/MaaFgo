@@ -1,0 +1,276 @@
+{
+  "team": {
+    "name": "地狱的试炼202610_阿兹赖尔（视频草案，须满足发牌条件）",
+    "mysticCode": {
+      "mysticCodeId": 440,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 300500,
+        "supportType": "none",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 80,
+        "skillIds": [
+          295550,
+          943450,
+          2576550
+        ]
+      },
+      {
+        "svtId": 605300,
+        "supportType": "friend",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 120,
+        "tdLv": 5,
+        "grandSvt": true,
+        "equip1": {
+          "id": 9409500,
+          "limitBreak": true,
+          "lv": 100
+        }
+      },
+      {
+        "svtId": 504500,
+        "supportType": "none",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 90,
+        "equip1": {
+          "id": 9401470,
+          "limitBreak": true
+        }
+      }
+    ],
+    "backupSvts": [
+      {
+        "svtId": 205500,
+        "supportType": "none",
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "lv": 90,
+        "equip1": {
+          "id": 9400650,
+          "limitBreak": true,
+          "lv": 100
+        }
+      },
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 2,
+          "card": 4
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  "_guideNotes": {
+    "source": "https://www.bilibili.com/video/BV1L5ar6RE7o/",
+    "part": 1,
+    "cid": 42710535505,
+    "status": "攻略视频转录与本机适配示例；相关多次挑战已累计完成15/15，非单场全自动保证。",
+    "quest": "2026年10月地狱的试炼 バトル・オブ・アイギス",
+    "expiresAt": "2026-11-01T16:59:00+08:00",
+    "formation": "首发枪龙娘/冠位阿兹赖尔助战/术呆，后排乌尔德；1号与4号换人。视频Cost68。龙娘2技能须已强化（チェイテの夜 B）。",
+    "equipment": "主C须持必中或无敌贯通；视频为ヴァリアント・ウルフ。术呆为满破黄金捕鲤鱼图，乌尔德为2030年的碎片；辅助出星礼装可替换。视频支援冠位另两格礼装未完整读取，本文件未臆填。",
+    "turn1": "阿兹赖尔Arts宝具→本人Buster→本人Quick；同时完成三色与同角色EX，保留队友三色特殊buff。发牌必须有主C B/Q；不满足时需另行编辑等待回合或由候选选卡策略重排，不能把本文件当确定3T脚本。",
+    "turn2": "主C Arts宝具→乌尔德Quick→术呆Buster；再次三色，队友Q/B携两层特殊buff，术阶攻击一次。具体队友颜色允许在满足任务条件时调整。",
+    "turn3": "乌尔德2给主C，衣服2/1给主C；术呆Arts先攻击第二次→主CArts宝具→主CArts。要先检查敌特殊防御次数已耗尽再击杀。",
+    "fallback": "固定指定面卡缺失时需任务候选策略处理；本JSON仅描述视频对应发牌，不能保证任意发牌满任务。视频未用术呆2，保留作补充充能。",
+    "verification": "2026-10-31，本机调整助战、礼装及技能出卡方案后，多次通关并核对活动任务列表累计15/15；该记录不等于本文件原样单场完成全部任务。使用时仍须核对助战、技能条件与实际发牌，以战后任务列表验收。",
+    "adaptations": "为提高冠位气配遮断带来的弱化成功率，T1阿兹赖尔改为1→3→2自己；视频顺序为3→1→2。普通黑杯助战可先完成其他任务，必中/贯通破二条须另外配置。",
+    "advancedStrategy": "全局高级策略迁移自最终15/15战斗的成功续跑配置：三色链优先，关闭等牌与自动补技能，40回合，优先阿兹赖尔并保护宝具同色。此次只迁移策略，原编队与逐回合动作保持不变；历史最终战斗先等牌2回合耗尽，再调整恢复计划并续跑4回合获胜，不能视作本文件原样单次全自动15/15。"
+  },
+  "maaAdvancedStrategy": {
+    "preset": "mighty",
+    "openingHand": {
+      "enabled": false,
+      "servantId": "605300",
+      "servantSlot": null,
+      "requiredColors": [
+        "B",
+        "Q"
+      ],
+      "maxWaitTurns": 2
+    },
+    "nativeStrategyOverrides": {
+      "preferred_servant_ids": [
+        "605300"
+      ],
+      "np_colors_by_servant_id": {
+        "605300": "A",
+        "504500": "A",
+        "205500": "A"
+      },
+      "avoid_np_color_before_np": true,
+      "np_color_preservation_weight": 40
+    },
+    "autoServantSkills": false,
+    "maxTurns": 40
+  }
+}

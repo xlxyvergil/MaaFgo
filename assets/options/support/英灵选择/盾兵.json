@@ -7,7 +7,7 @@
             "cases": [
                 {
                     "name": "800100",
-                    "label": "玛修·基列莱特",
+                    "label": "1. 玛修·基列莱特",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {

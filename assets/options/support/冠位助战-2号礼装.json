@@ -16,6 +16,613 @@
                 }
             }
         },
+        "冠位助战-2号礼装-满破-选择方式": {
+            "type": "select",
+            "label": "2号礼装(满破)选择方式",
+            "default_case": "单选",
+            "cases": [
+                {
+                    "name": "单选",
+                    "label": "单选",
+                    "option": [
+                        "冠位助战-2号礼装-满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-多选": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "多选",
+                    "label": "多选",
+                    "option": [
+                        "冠位助战-2号礼装-满破-候选"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-多选": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "冠位助战-2号礼装-满破-候选": {
+            "type": "checkbox",
+            "label": "2号礼装(满破)候选（可多选）",
+            "description": "同一槽位任意一个候选命中即通过；不勾选表示不限此格礼装。冠位助战两个槽位分别匹配，各自均需通过。",
+            "default_case": [],
+            "cases": [
+                {
+                    "name": "2030年的碎片.png",
+                    "label": "2030年的碎片",
+                    "icon": "resource/base/image/lizhuang/满破/2030年的碎片.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:2030年的碎片.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "万华镜.png",
+                    "label": "万华镜",
+                    "icon": "resource/base/image/lizhuang/满破/万华镜.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:万华镜.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "个人训练.png",
+                    "label": "个人训练",
+                    "icon": "resource/base/image/lizhuang/满破/个人训练.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:个人训练.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "享用浪漫.png",
+                    "label": "享用浪漫",
+                    "icon": "resource/base/image/lizhuang/满破/享用浪漫.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:享用浪漫.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "偶像培育者.png",
+                    "label": "偶像培育者",
+                    "icon": "resource/base/image/lizhuang/满破/偶像培育者.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:偶像培育者.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "元素转换.png",
+                    "label": "元素转换",
+                    "icon": "resource/base/image/lizhuang/满破/元素转换.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:元素转换.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "单人教学.png",
+                    "label": "单人教学",
+                    "icon": "resource/base/image/lizhuang/满破/单人教学.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:单人教学.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "名侦探芙尔摩斯.png",
+                    "label": "名侦探芙尔摩斯",
+                    "icon": "resource/base/image/lizhuang/满破/名侦探芙尔摩斯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:名侦探芙尔摩斯.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "天之杯.png",
+                    "label": "天之杯",
+                    "icon": "resource/base/image/lizhuang/满破/天之杯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:天之杯.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "宇宙棱镜.png",
+                    "label": "宇宙棱镜",
+                    "icon": "resource/base/image/lizhuang/满破/宇宙棱镜.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:宇宙棱镜.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "寻求悠久的尽头.png",
+                    "label": "寻求悠久的尽头",
+                    "icon": "resource/base/image/lizhuang/满破/寻求悠久的尽头.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:寻求悠久的尽头.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "异星之神.png",
+                    "label": "异星之神",
+                    "icon": "resource/base/image/lizhuang/满破/异星之神.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:异星之神.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "总统之海洋.png",
+                    "label": "总统之海洋",
+                    "icon": "resource/base/image/lizhuang/满破/总统之海洋.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:总统之海洋.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "手稿之翼.png",
+                    "label": "手稿之翼",
+                    "icon": "resource/base/image/lizhuang/满破/手稿之翼.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:手稿之翼.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "拂晓之前.png",
+                    "label": "拂晓之前",
+                    "icon": "resource/base/image/lizhuang/满破/拂晓之前.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:拂晓之前.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "旅途的开始.png",
+                    "label": "旅途的开始",
+                    "icon": "resource/base/image/lizhuang/满破/旅途的开始.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:旅途的开始.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "无雪之夜过后.png",
+                    "label": "无雪之夜过后",
+                    "icon": "resource/base/image/lizhuang/满破/无雪之夜过后.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:无雪之夜过后.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "暮景冥想.png",
+                    "label": "暮景冥想",
+                    "icon": "resource/base/image/lizhuang/满破/暮景冥想.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:暮景冥想.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "来自NFF的爱.png",
+                    "label": "来自NFF的爱",
+                    "icon": "resource/base/image/lizhuang/满破/来自NFF的爱.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:来自NFF的爱.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "枪械商人.png",
+                    "label": "枪械商人",
+                    "icon": "resource/base/image/lizhuang/满破/枪械商人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:枪械商人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "格兰·卡瓦洛.png",
+                    "label": "格兰·卡瓦洛",
+                    "icon": "resource/base/image/lizhuang/满破/格兰·卡瓦洛.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:格兰·卡瓦洛.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "梦想衣橱.png",
+                    "label": "梦想衣橱",
+                    "icon": "resource/base/image/lizhuang/满破/梦想衣橱.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:梦想衣橱.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "检查报告.png",
+                    "label": "检查报告",
+                    "icon": "resource/base/image/lizhuang/满破/检查报告.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:检查报告.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "步入奇妙帷幕中.png",
+                    "label": "步入奇妙帷幕中",
+                    "icon": "resource/base/image/lizhuang/满破/步入奇妙帷幕中.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:步入奇妙帷幕中.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "流转的剑圣.png",
+                    "label": "流转的剑圣",
+                    "icon": "resource/base/image/lizhuang/满破/流转的剑圣.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:流转的剑圣.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "狼的故事.png",
+                    "label": "狼的故事",
+                    "icon": "resource/base/image/lizhuang/满破/狼的故事.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:狼的故事.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "献给幸福的新娘.png",
+                    "label": "献给幸福的新娘",
+                    "icon": "resource/base/image/lizhuang/满破/献给幸福的新娘.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:献给幸福的新娘.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "私人指导.png",
+                    "label": "私人指导",
+                    "icon": "resource/base/image/lizhuang/满破/私人指导.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:私人指导.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "秉持风雅.png",
+                    "label": "秉持风雅",
+                    "icon": "resource/base/image/lizhuang/满破/秉持风雅.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:秉持风雅.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "秘密任务.png",
+                    "label": "秘密任务",
+                    "icon": "resource/base/image/lizhuang/满破/秘密任务.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:秘密任务.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "穿过乌云.png",
+                    "label": "穿过乌云",
+                    "icon": "resource/base/image/lizhuang/满破/穿过乌云.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:穿过乌云.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "自由坐席.png",
+                    "label": "自由坐席",
+                    "icon": "resource/base/image/lizhuang/满破/自由坐席.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:自由坐席.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "至诚的一针.png",
+                    "label": "至诚的一针",
+                    "icon": "resource/base/image/lizhuang/满破/至诚的一针.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:至诚的一针.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "蒙娜丽莎.png",
+                    "label": "蒙娜丽莎",
+                    "icon": "resource/base/image/lizhuang/满破/蒙娜丽莎.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:蒙娜丽莎.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "虚数环.png",
+                    "label": "虚数环",
+                    "icon": "resource/base/image/lizhuang/满破/虚数环.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:虚数环.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "虚数魔术.png",
+                    "label": "虚数魔术",
+                    "icon": "resource/base/image/lizhuang/满破/虚数魔术.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:虚数魔术.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "记忆的大图书馆.png",
+                    "label": "记忆的大图书馆",
+                    "icon": "resource/base/image/lizhuang/满破/记忆的大图书馆.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:记忆的大图书馆.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "贝拉·丽莎.png",
+                    "label": "贝拉·丽莎",
+                    "icon": "resource/base/image/lizhuang/满破/贝拉·丽莎.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:贝拉·丽莎.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迎向碧空.png",
+                    "label": "迎向碧空",
+                    "icon": "resource/base/image/lizhuang/满破/迎向碧空.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迎向碧空.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底之人.png",
+                    "label": "迦勒底之人",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底之人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底之人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底之晨.png",
+                    "label": "迦勒底之晨",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底之晨.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底之晨.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底午茶时光.png",
+                    "label": "迦勒底午茶时光",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底午茶时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底午茶时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底午餐时光.png",
+                    "label": "迦勒底午餐时光",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底午餐时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底午餐时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底晚餐时光.png",
+                    "label": "迦勒底晚餐时光",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底晚餐时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底晚餐时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底的男人.png",
+                    "label": "迦勒底的男人",
+                    "icon": "resource/base/image/lizhuang/满破/迦勒底的男人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:迦勒底的男人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "限制／零毁.png",
+                    "label": "限制／零毁",
+                    "icon": "resource/base/image/lizhuang/满破/限制／零毁.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:限制／零毁.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "黑之圣杯.png",
+                    "label": "黑之圣杯",
+                    "icon": "resource/base/image/lizhuang/满破/黑之圣杯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-候选:黑之圣杯.png": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
         "冠位助战-2号礼装-非满破": {
             "type": "scan_select",
             "label": "2号礼装(非满破)",
@@ -31,6 +638,613 @@
                     }
                 }
             }
+        },
+        "冠位助战-2号礼装-非满破-选择方式": {
+            "type": "select",
+            "label": "2号礼装(非满破)选择方式",
+            "default_case": "单选",
+            "cases": [
+                {
+                    "name": "单选",
+                    "label": "单选",
+                    "option": [
+                        "冠位助战-2号礼装-非满破"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-多选": false
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "多选",
+                    "label": "多选",
+                    "option": [
+                        "冠位助战-2号礼装-非满破-候选"
+                    ],
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-多选": true
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "冠位助战-2号礼装-非满破-候选": {
+            "type": "checkbox",
+            "label": "2号礼装(非满破)候选（可多选）",
+            "description": "同一槽位任意一个候选命中即通过；不勾选表示不限此格礼装。冠位助战两个槽位分别匹配，各自均需通过。",
+            "default_case": [],
+            "cases": [
+                {
+                    "name": "2030年的碎片.png",
+                    "label": "2030年的碎片",
+                    "icon": "resource/base/image/lizhuang/非满破/2030年的碎片.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:2030年的碎片.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "万华镜.png",
+                    "label": "万华镜",
+                    "icon": "resource/base/image/lizhuang/非满破/万华镜.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:万华镜.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "个人训练.png",
+                    "label": "个人训练",
+                    "icon": "resource/base/image/lizhuang/非满破/个人训练.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:个人训练.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "享用浪漫.png",
+                    "label": "享用浪漫",
+                    "icon": "resource/base/image/lizhuang/非满破/享用浪漫.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:享用浪漫.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "偶像培育者.png",
+                    "label": "偶像培育者",
+                    "icon": "resource/base/image/lizhuang/非满破/偶像培育者.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:偶像培育者.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "元素转换.png",
+                    "label": "元素转换",
+                    "icon": "resource/base/image/lizhuang/非满破/元素转换.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:元素转换.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "单人教学.png",
+                    "label": "单人教学",
+                    "icon": "resource/base/image/lizhuang/非满破/单人教学.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:单人教学.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "名侦探芙尔摩斯.png",
+                    "label": "名侦探芙尔摩斯",
+                    "icon": "resource/base/image/lizhuang/非满破/名侦探芙尔摩斯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:名侦探芙尔摩斯.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "天之杯.png",
+                    "label": "天之杯",
+                    "icon": "resource/base/image/lizhuang/非满破/天之杯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:天之杯.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "宇宙棱镜.png",
+                    "label": "宇宙棱镜",
+                    "icon": "resource/base/image/lizhuang/非满破/宇宙棱镜.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:宇宙棱镜.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "寻求悠久的尽头.png",
+                    "label": "寻求悠久的尽头",
+                    "icon": "resource/base/image/lizhuang/非满破/寻求悠久的尽头.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:寻求悠久的尽头.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "异星之神.png",
+                    "label": "异星之神",
+                    "icon": "resource/base/image/lizhuang/非满破/异星之神.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:异星之神.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "总统之海洋.png",
+                    "label": "总统之海洋",
+                    "icon": "resource/base/image/lizhuang/非满破/总统之海洋.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:总统之海洋.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "手稿之翼.png",
+                    "label": "手稿之翼",
+                    "icon": "resource/base/image/lizhuang/非满破/手稿之翼.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:手稿之翼.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "拂晓之前.png",
+                    "label": "拂晓之前",
+                    "icon": "resource/base/image/lizhuang/非满破/拂晓之前.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:拂晓之前.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "旅途的开始.png",
+                    "label": "旅途的开始",
+                    "icon": "resource/base/image/lizhuang/非满破/旅途的开始.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:旅途的开始.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "无雪之夜过后.png",
+                    "label": "无雪之夜过后",
+                    "icon": "resource/base/image/lizhuang/非满破/无雪之夜过后.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:无雪之夜过后.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "暮景冥想.png",
+                    "label": "暮景冥想",
+                    "icon": "resource/base/image/lizhuang/非满破/暮景冥想.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:暮景冥想.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "来自NFF的爱.png",
+                    "label": "来自NFF的爱",
+                    "icon": "resource/base/image/lizhuang/非满破/来自NFF的爱.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:来自NFF的爱.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "枪械商人.png",
+                    "label": "枪械商人",
+                    "icon": "resource/base/image/lizhuang/非满破/枪械商人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:枪械商人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "格兰·卡瓦洛.png",
+                    "label": "格兰·卡瓦洛",
+                    "icon": "resource/base/image/lizhuang/非满破/格兰·卡瓦洛.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:格兰·卡瓦洛.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "梦想衣橱.png",
+                    "label": "梦想衣橱",
+                    "icon": "resource/base/image/lizhuang/非满破/梦想衣橱.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:梦想衣橱.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "检查报告.png",
+                    "label": "检查报告",
+                    "icon": "resource/base/image/lizhuang/非满破/检查报告.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:检查报告.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "步入奇妙帷幕中.png",
+                    "label": "步入奇妙帷幕中",
+                    "icon": "resource/base/image/lizhuang/非满破/步入奇妙帷幕中.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:步入奇妙帷幕中.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "流转的剑圣.png",
+                    "label": "流转的剑圣",
+                    "icon": "resource/base/image/lizhuang/非满破/流转的剑圣.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:流转的剑圣.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "狼的故事.png",
+                    "label": "狼的故事",
+                    "icon": "resource/base/image/lizhuang/非满破/狼的故事.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:狼的故事.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "献给幸福的新娘.png",
+                    "label": "献给幸福的新娘",
+                    "icon": "resource/base/image/lizhuang/非满破/献给幸福的新娘.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:献给幸福的新娘.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "私人指导.png",
+                    "label": "私人指导",
+                    "icon": "resource/base/image/lizhuang/非满破/私人指导.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:私人指导.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "秉持风雅.png",
+                    "label": "秉持风雅",
+                    "icon": "resource/base/image/lizhuang/非满破/秉持风雅.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:秉持风雅.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "秘密任务.png",
+                    "label": "秘密任务",
+                    "icon": "resource/base/image/lizhuang/非满破/秘密任务.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:秘密任务.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "穿过乌云.png",
+                    "label": "穿过乌云",
+                    "icon": "resource/base/image/lizhuang/非满破/穿过乌云.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:穿过乌云.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "自由坐席.png",
+                    "label": "自由坐席",
+                    "icon": "resource/base/image/lizhuang/非满破/自由坐席.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:自由坐席.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "至诚的一针.png",
+                    "label": "至诚的一针",
+                    "icon": "resource/base/image/lizhuang/非满破/至诚的一针.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:至诚的一针.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "蒙娜丽莎.png",
+                    "label": "蒙娜丽莎",
+                    "icon": "resource/base/image/lizhuang/非满破/蒙娜丽莎.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:蒙娜丽莎.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "虚数环.png",
+                    "label": "虚数环",
+                    "icon": "resource/base/image/lizhuang/非满破/虚数环.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:虚数环.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "虚数魔术.png",
+                    "label": "虚数魔术",
+                    "icon": "resource/base/image/lizhuang/非满破/虚数魔术.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:虚数魔术.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "记忆的大图书馆.png",
+                    "label": "记忆的大图书馆",
+                    "icon": "resource/base/image/lizhuang/非满破/记忆的大图书馆.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:记忆的大图书馆.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "贝拉·丽莎.png",
+                    "label": "贝拉·丽莎",
+                    "icon": "resource/base/image/lizhuang/非满破/贝拉·丽莎.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:贝拉·丽莎.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迎向碧空.png",
+                    "label": "迎向碧空",
+                    "icon": "resource/base/image/lizhuang/非满破/迎向碧空.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迎向碧空.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底之人.png",
+                    "label": "迦勒底之人",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底之人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底之人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底之晨.png",
+                    "label": "迦勒底之晨",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底之晨.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底之晨.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底午茶时光.png",
+                    "label": "迦勒底午茶时光",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底午茶时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底午茶时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底午餐时光.png",
+                    "label": "迦勒底午餐时光",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底午餐时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底午餐时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底晚餐时光.png",
+                    "label": "迦勒底晚餐时光",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底晚餐时光.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底晚餐时光.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "迦勒底的男人.png",
+                    "label": "迦勒底的男人",
+                    "icon": "resource/base/image/lizhuang/非满破/迦勒底的男人.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:迦勒底的男人.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "限制／零毁.png",
+                    "label": "限制／零毁",
+                    "icon": "resource/base/image/lizhuang/非满破/限制／零毁.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:限制／零毁.png": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "黑之圣杯.png",
+                    "label": "黑之圣杯",
+                    "icon": "resource/base/image/lizhuang/非满破/黑之圣杯.png",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-候选:黑之圣杯.png": true
+                            }
+                        }
+                    }
+                }
+            ]
         }
     }
 }

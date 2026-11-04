@@ -8,6 +8,9 @@ on:
       - ".github/workflows/check.yml"
       - "maatools.config.mts"
       - "assets/**"
+      - "web/battle-editor/**"
+      - "打开编队编辑器.cmd"
+      - ".gitattributes"
       - "**.py"
       - "tests/**"
       - "deps/tools/**"
@@ -18,12 +21,29 @@ on:
       - ".github/workflows/check.yml"
       - "maatools.config.mts"
       - "assets/**"
+      - "web/battle-editor/**"
+      - "打开编队编辑器.cmd"
+      - ".gitattributes"
       - "**.py"
       - "tests/**"
       - "deps/tools/**"
   workflow_dispatch:
 
 jobs:
+  battle-editor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/battle-editor/package-lock.json
+      - name: Check and build battle editor
+        run: |
+          npm --prefix web/battle-editor ci
+          npm --prefix web/battle-editor test
+          npm --prefix web/battle-editor run build
   regression:
     runs-on: ubuntu-latest
     strategy:
@@ -40,6 +60,9 @@ jobs:
         run: python -m pip install -r tests/requirements.txt
       - name: Run regression suite
         run: python tools/run_tests.py --suite ${{ matrix.suite }}
+      - name: Check editor task in MaaFramework with local dummy controller
+        if: matrix.suite == 'component'
+        run: python tests/run_maa_battle_editor_integration.py
   resource:
     runs-on: ubuntu-latest
     steps:

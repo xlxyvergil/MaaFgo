@@ -25,6 +25,7 @@
   会透传给 auto_battle custom action。
 """
 import json
+import html
 import os
 import sys
 
@@ -38,6 +39,8 @@ from maa.custom_action import CustomAction
 
 import mfaalog
 from battle.runtime.formation_session import session_override, sessions
+from battle.runtime.bond_stop_state import bond_stops
+from bond_stop_action import save_bond_stop
 
 # pipeline 节点名
 _NODE_FIRST_BATTLE = "原生自动战斗_多次_第一场"
@@ -76,6 +79,7 @@ class AutoBattleRepeatAction(CustomAction):
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         root = context.get_task_job().job_id
+        bond_stops.begin(root)
         token = sessions.begin(root, repeat=True)
         try:
             if context.tasker.stopping or not context.override_pipeline(session_override(token)):
@@ -126,6 +130,8 @@ class AutoBattleRepeatAction(CustomAction):
                 last_error = "任务已停止"
                 break
             sessions.battle_started(root, token, current)
+            bond_stops.battle_started(root, current, keep_formation=True,
+                                      another_battle_planned=current < battle_count)
             is_first = (i == 0)
             is_last = (i == battle_count - 1)
             mfaalog.info(f"[auto_battle_repeat] === Battle {current}/{battle_count} ===")
@@ -154,6 +160,8 @@ class AutoBattleRepeatAction(CustomAction):
                 mfaalog.error(f"[auto_battle_repeat] Battle {current} {last_error}")
                 break
 
+            if bond_stops.get(root):
+                break
             if context.tasker.stopping:
                 last_error = "任务已停止"
                 break
@@ -179,6 +187,13 @@ class AutoBattleRepeatAction(CustomAction):
                 f"(累计 {success_count})"
             )
 
+        stopped = save_bond_stop(context) if bond_stops.get(root) else None
+        if stopped:
+            prefix = "条件达成停止" if stopped.reason == "bond_max" else "羁绊检查停止"
+            display_text = html.escape(f"{prefix}：{stopped.display()}（此前完成{success_count}场）")
+            context.override_pipeline({"bbc弹窗信息输出": {
+                "focus": {"Node.Recognition.Starting": display_text}}})
+            return CustomAction.RunResult(success=stopped.reason == "bond_max")
         ok = success_count == battle_count
         mfaalog.info(
             f"[auto_battle_repeat] end ok={ok} "

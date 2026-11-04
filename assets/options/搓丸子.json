@@ -1,0 +1,727 @@
+{
+  "option": {
+    "搓丸子-运行方式": {
+      "type": "select",
+      "label": "运行方式",
+      "default": "normal",
+      "cases": [
+        {
+          "name": "normal",
+          "label": "正常运行",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "mode": "normal"
+              }
+            }
+          },
+          "option": [
+            "搓丸子-自动搓丸子",
+            "搓丸子-自动抽友情",
+            "搓丸子-存储经验值卡",
+            "搓丸子-自动贩卖",
+            "搓丸子-自动喂从者",
+            "搓丸子-QP满处理",
+            "搓丸子-循环上限"
+          ]
+        },
+        {
+          "name": "test_servant",
+          "label": "仅测试从者选择",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "mode": "test_servant",
+                "make_ball": false,
+                "draw_fp": false,
+                "store4": false,
+                "store5": false,
+                "store_balls": false,
+                "sell_servants": false,
+                "sell4": false,
+                "sell5": false,
+                "sell_wz": false,
+                "levelup": false
+              }
+            }
+          },
+          "option": [
+            "搓丸子-升级从者",
+            "搓丸子-目标等级"
+          ]
+        }
+      ],
+      "description": "从者选择测试只查找配置的从者，不抽取、贩卖或强化。"
+    },
+    "搓丸子-自动搓丸子": {
+      "type": "select",
+      "label": "自动搓丸子",
+      "default": "on",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "make_ball": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "make_ball": true
+              }
+            }
+          },
+          "option": [
+            "搓丸子-丸子星级",
+            "搓丸子-额外材料",
+            "搓丸子-成品入库"
+          ]
+        }
+      ]
+    },
+    "搓丸子-丸子星级": {
+      "type": "select",
+      "label": "丸子星级",
+      "default": "1",
+      "cases": [
+        {
+          "name": "1",
+          "label": "1星丸子",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "ball_star": 1
+              }
+            }
+          }
+        },
+        {
+          "name": "2",
+          "label": "2星丸子",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "ball_star": 2
+              }
+            }
+          }
+        }
+      ],
+      "description": "决定最终强化的概念礼装星级。"
+    },
+    "搓丸子-额外材料": {
+      "type": "select",
+      "label": "额外允许消耗的礼装星级",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "仅1、2星",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "eat3": false,
+                "eat4": false
+              }
+            }
+          }
+        },
+        {
+          "name": "3",
+          "label": "额外允许3星",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "eat3": true,
+                "eat4": false
+              }
+            }
+          }
+        },
+        {
+          "name": "4",
+          "label": "额外允许4星",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "eat3": false,
+                "eat4": true
+              }
+            }
+          }
+        },
+        {
+          "name": "3_4",
+          "label": "额外允许3星和4星",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "eat3": true,
+                "eat4": true
+              }
+            }
+          }
+        }
+      ],
+      "description": "作为强化素材的礼装会被消耗；3星和4星互不连带。锁定、标记及保留目标不作为素材。"
+    },
+    "搓丸子-成品入库": {
+      "type": "select",
+      "label": "满级丸子存入保管室",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store_balls": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store_balls": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-自动抽友情": {
+      "type": "select",
+      "label": "自动抽友情",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "draw_fp": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "draw_fp": true
+              }
+            }
+          },
+          "option": [
+            "搓丸子-每批抽数",
+            "搓丸子-寻找方向",
+            "搓丸子-抽取批次上限",
+            "搓丸子-友情点保留量",
+            "搓丸子-保留对象设置"
+          ]
+        }
+      ],
+      "description": "使用友情点持续召唤，不影响原每日免费友情任务。请确认游戏自动变还设定不会处理保留对象或所需材料。"
+    },
+    "搓丸子-每批抽数": {
+      "type": "select",
+      "label": "每批抽取数量",
+      "default": "10",
+      "cases": [
+        {
+          "name": "10",
+          "label": "10抽",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "draw_batch": 10
+              }
+            }
+          }
+        },
+        {
+          "name": "100",
+          "label": "100抽",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "draw_batch": 100
+              }
+            }
+          }
+        }
+      ],
+      "description": "100抽尚未完成整批保留对象遍历，当前不允许与保留目标同时开启；流程尚待实机校准。"
+    },
+    "搓丸子-寻找方向": {
+      "type": "select",
+      "label": "寻找友情池方向",
+      "default": "left",
+      "cases": [
+        {
+          "name": "left",
+          "label": "向左",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "direction": "left"
+              }
+            }
+          }
+        },
+        {
+          "name": "right",
+          "label": "向右",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "direction": "right"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-抽取批次上限": {
+      "type": "input",
+      "label": "最多抽取批次",
+      "inputs": [
+        {
+          "name": "max_draw_batches",
+          "label": "最多抽取批次",
+          "default": "50",
+          "pipeline_type": "int",
+          "verify": "^[1-9][0-9]{0,5}$"
+        }
+      ],
+      "pipeline_override": {
+        "执行搓丸子": {
+          "attach": {
+            "max_draw_batches": "{max_draw_batches}"
+          }
+        }
+      }
+    },
+    "搓丸子-友情点保留量": {
+      "type": "input",
+      "label": "保留友情点",
+      "inputs": [
+        {
+          "name": "friend_points_reserve",
+          "label": "保留友情点",
+          "default": "0",
+          "pipeline_type": "int",
+          "verify": "^(0|[1-9][0-9]{0,9})$"
+        }
+      ],
+      "pipeline_override": {
+        "执行搓丸子": {
+          "attach": {
+            "friend_points_reserve": "{friend_points_reserve}"
+          }
+        }
+      },
+      "description": "保留量读取不可靠时停止，不能把识别失败当作余额为零。"
+    },
+    "搓丸子-保留对象设置": {
+      "type": "select",
+      "label": "保留对象设置",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不设置保留对象",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_1_kind": "none",
+                "target_2_kind": "none",
+                "target_3_kind": "none",
+                "target_4_kind": "none",
+                "target_5_kind": "none",
+                "stop_targets": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "选择保留对象",
+          "option": [
+            "搓丸子-保留目标1",
+            "搓丸子-保留目标2",
+            "搓丸子-保留目标3",
+            "搓丸子-保留目标4",
+            "搓丸子-保留目标5",
+            "搓丸子-目标全部满足停止"
+          ]
+        }
+      ],
+      "description": "从者和礼装均从已有目录选择，份数按本次新增锁定计数。"
+    },
+    "搓丸子-目标全部满足停止": {
+      "type": "select",
+      "label": "保留对象全部满足后停止",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "stop_targets": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "stop_targets": true
+              }
+            }
+          }
+        }
+      ],
+      "description": "只适用于有效的指定份数目标；与全部保留目标同时配置时会在启动前说明冲突。"
+    },
+    "搓丸子-存储经验值卡": {
+      "type": "select",
+      "label": "优先保存经验值卡",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不存入",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store4": false,
+                "store5": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "存入保管室",
+          "option": [
+            "搓丸子-存四星",
+            "搓丸子-存五星"
+          ]
+        }
+      ]
+    },
+    "搓丸子-存四星": {
+      "type": "select",
+      "label": "存入4星经验值卡",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store4": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store4": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-存五星": {
+      "type": "select",
+      "label": "存入5星经验值卡",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store5": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "store5": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-自动贩卖": {
+      "type": "select",
+      "label": "自动贩卖",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不贩卖",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell_servants": false,
+                "sell4": false,
+                "sell5": false,
+                "sell_wz": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "按所选类别贩卖",
+          "option": [
+            "搓丸子-卖从者",
+            "搓丸子-卖四星",
+            "搓丸子-卖五星",
+            "搓丸子-卖纹章"
+          ]
+        }
+      ],
+      "description": "会处理运行前已有库存。仅处理明确允许且未锁定的对象，不自动扩大类别。"
+    },
+    "搓丸子-卖从者": {
+      "type": "select",
+      "label": "贩卖友情从者",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell_servants": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell_servants": true
+              }
+            }
+          }
+        }
+      ],
+      "description": "功能配置保留；本轮尚未开放从者贩卖的逐卡核验，启用后会在任何游戏输入前停止并说明。"
+    },
+    "搓丸子-卖四星": {
+      "type": "select",
+      "label": "贩卖4星经验值卡",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell4": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell4": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-卖五星": {
+      "type": "select",
+      "label": "贩卖5星经验值卡",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell5": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell5": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-卖纹章": {
+      "type": "select",
+      "label": "贩卖低星纹章",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell_wz": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "sell_wz": true
+              }
+            }
+          }
+        }
+      ],
+      "description": "功能配置保留；本轮尚未开放纹章贩卖的逐卡核验，启用后会在任何游戏输入前停止并说明。"
+    },
+    "搓丸子-自动喂从者": {
+      "type": "select",
+      "label": "自动喂从者",
+      "default": "off",
+      "cases": [
+        {
+          "name": "off",
+          "label": "不启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "levelup": false
+              }
+            }
+          }
+        },
+        {
+          "name": "on",
+          "label": "启用",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "levelup": true
+              }
+            }
+          },
+          "option": [
+            "搓丸子-升级从者",
+            "搓丸子-目标等级"
+          ]
+        }
+      ],
+      "description": "复用现有从者强化能力。此处是从者经验值卡，与丸子所用概念礼装无关。"
+    },
+    "搓丸子-QP满处理": {
+      "type": "select",
+      "label": "贩卖时QP已满",
+      "default": "stop",
+      "cases": [
+        {
+          "name": "stop",
+          "label": "停止",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "aqf": false
+              }
+            }
+          }
+        },
+        {
+          "name": "continue",
+          "label": "继续贩卖",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "aqf": true
+              }
+            }
+          }
+        }
+      ]
+    },
+    "搓丸子-循环上限": {
+      "type": "input",
+      "label": "最多处理轮数",
+      "inputs": [
+        {
+          "name": "max_cycles",
+          "label": "最多处理轮数",
+          "default": "200",
+          "pipeline_type": "int",
+          "verify": "^[1-9][0-9]{0,5}$"
+        }
+      ],
+      "pipeline_override": {
+        "执行搓丸子": {
+          "attach": {
+            "max_cycles": "{max_cycles}"
+          }
+        }
+      }
+    }
+  }
+}

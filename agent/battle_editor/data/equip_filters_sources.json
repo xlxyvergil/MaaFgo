@@ -1,0 +1,617 @@
+{
+  "schemaVersion": 1,
+  "version": {
+    "atlas": {
+      "hash": "3f95b5",
+      "timestamp": 1793264470,
+      "dataVer": 2691,
+      "dateVer": 1793264400
+    },
+    "curatedSha256": "f15cc42ee59cc0ac49b2ea5cfabbe8d8efd892b434131b8585c95e617b7d236f",
+    "niceEquipSha256": "3c8d444a3f0d828ef14eb3439fced34503955a659434910e77dcee0494ca72ad"
+  },
+  "curatedCount": 1157,
+  "indexSha256": "2eca2d2de2b584a4c313c7000f9d8c1a61d0f1830953f2076b37c271fd8f70d9",
+  "sources": [
+    {
+      "file": "JP_info.json",
+      "url": "https://api.atlasacademy.io/export/JP/info.json",
+      "sha256": "9c5b627242be93bc4d06fd6eb87ff347d0c5f201b8790a4e791a7553ceab0f4d",
+      "bytes": 329
+    },
+    {
+      "file": "JP_nice_equip.json",
+      "url": "https://api.atlasacademy.io/export/JP/nice_equip.json",
+      "sha256": "3c8d444a3f0d828ef14eb3439fced34503955a659434910e77dcee0494ca72ad",
+      "bytes": 22192567
+    },
+    {
+      "file": "skill_967713.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/967713",
+      "sha256": "4698633027258d80571fc0c6eaf8eb19443392733c2540c7a9b9d5ee92d75464",
+      "bytes": 644
+    },
+    {
+      "file": "skill_970415.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/970415",
+      "sha256": "05c0039f9dca3d34550ed65168eb0770b58c61583487cbcb23e3f2ec37f1ca84",
+      "bytes": 1154
+    },
+    {
+      "file": "skill_970800.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/970800",
+      "sha256": "0e9168069c3c83b294bf0e7c102e653ca57482b8dc0e612a8c9528958b7955df",
+      "bytes": 614
+    },
+    {
+      "file": "skill_990148.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990148",
+      "sha256": "dd4fddf031ed2920502801f1a2ccddc8d67aea96470e96387a5439d805847b23",
+      "bytes": 2245
+    },
+    {
+      "file": "skill_990319.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990319",
+      "sha256": "8488dc8c4d79cfde4b85631ff4bea41c4a49c7023988de5dbd8b723369f34eed",
+      "bytes": 639
+    },
+    {
+      "file": "skill_990341.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990341",
+      "sha256": "2c8dc066dbdc77ad03d24c77bf8d7d92656bc8bb21883ca31079780d66836802",
+      "bytes": 666
+    },
+    {
+      "file": "skill_990344.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990344",
+      "sha256": "de28fce7ef1e8887a0603bb34db6018acde176a9899297c1a19f04886dd3628e",
+      "bytes": 1276
+    },
+    {
+      "file": "skill_990346.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990346",
+      "sha256": "cd650ac4810ae1ad4ea2367d6379d960a1d9e77c9c42c1637f0cf35114582aa3",
+      "bytes": 671
+    },
+    {
+      "file": "skill_990349.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990349",
+      "sha256": "2db409ede470d51ab0ce29334985108b22c70b900a08fe30d85d168f6afc7167",
+      "bytes": 668
+    },
+    {
+      "file": "skill_990351.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990351",
+      "sha256": "e1b0aba88c5bb3eed3c481b81a9dbc11e65fc09ffb50ca21bd1002becd9ded5d",
+      "bytes": 1163
+    },
+    {
+      "file": "skill_990359.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990359",
+      "sha256": "1f4afc860fbf3fa1937f5ef0d68fb560207631cc855bbfa7c6c862eff824650e",
+      "bytes": 1195
+    },
+    {
+      "file": "skill_990364.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990364",
+      "sha256": "44e2a4d477766fcc44849b44a8bd202f01ef99aa17d933c6104629271cc75cee",
+      "bytes": 987
+    },
+    {
+      "file": "skill_990367.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990367",
+      "sha256": "ca52bbaf7bef491a45d9752de90e9fb64d975a5890aafa35e402e29d3190a8dd",
+      "bytes": 1303
+    },
+    {
+      "file": "skill_990370.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990370",
+      "sha256": "7c5a0bf34c1c36918917d12190d8a5680ab1192779893fc1a512a0a4f0ab4c62",
+      "bytes": 643
+    },
+    {
+      "file": "skill_990378.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990378",
+      "sha256": "684076cdfdb74591fe0e67271709247b1ecf48203aefa996fdd1680d52a5258f",
+      "bytes": 1267
+    },
+    {
+      "file": "skill_990380.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990380",
+      "sha256": "38c812708efe392fcd93a81526da84bad526641dd252ef630c5d96f111c76e21",
+      "bytes": 639
+    },
+    {
+      "file": "skill_990386.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990386",
+      "sha256": "be6a7af7a486c604d13f65f67d13ceb1cd2cfefbdf3da3ac063f40930aed7fa8",
+      "bytes": 639
+    },
+    {
+      "file": "skill_990401.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990401",
+      "sha256": "87b6e3c7b6a8d5bbb310d05d3b02ab1f8b0b38186376a30c01d7d18e978b7385",
+      "bytes": 1320
+    },
+    {
+      "file": "skill_990411.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990411",
+      "sha256": "eaec2e7de9c4f4a9a6b4ba3f251fa92cc54d065af82b31e346dc05381fb28ae7",
+      "bytes": 1305
+    },
+    {
+      "file": "skill_990414.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990414",
+      "sha256": "eeab7155088986a50336ee8c540f7522a5e5a66e3d98b584f6acdce34e984ea7",
+      "bytes": 1352
+    },
+    {
+      "file": "skill_990474.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990474",
+      "sha256": "585ab8a2313aee0f60d6dd21718324a379ff6d2dcd2100e1cf66a295d67446c0",
+      "bytes": 1173
+    },
+    {
+      "file": "skill_990477.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990477",
+      "sha256": "66ae8a698d7f01c5d98870e54693fe8ae9ba309751192527e34e01797a189333",
+      "bytes": 2066
+    },
+    {
+      "file": "skill_990539.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990539",
+      "sha256": "d096bf6bc3a7aed14169e17b2b7bce094d5adeed29fe6fe161e8de7baa9b2fdf",
+      "bytes": 1232
+    },
+    {
+      "file": "skill_990825.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/990825",
+      "sha256": "84313191797df8264210341e7633eec0012a4b4a62038b085c1c86fa08e9c132",
+      "bytes": 643
+    },
+    {
+      "file": "skill_991284.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991284",
+      "sha256": "cc4bca2eb9305d826012f1cc122b5e26b738d76b352129f8137d36d49f85bd1e",
+      "bytes": 1220
+    },
+    {
+      "file": "skill_991569.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991569",
+      "sha256": "84e7194ef9e3a20a614c02097e235de304ed43df61bfcb3f9a58dd75b101f8c9",
+      "bytes": 643
+    },
+    {
+      "file": "skill_991756.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991756",
+      "sha256": "6919e25f02d5afa3ef0fc31f4aa58a9bf0ffa7b4d308c54c90f17b7d6cc6ad03",
+      "bytes": 643
+    },
+    {
+      "file": "skill_991907.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991907",
+      "sha256": "485966ad8b05c4b010d276f65f88d3cb35f126c4342f09f816854dff5ae4bbce",
+      "bytes": 643
+    },
+    {
+      "file": "skill_991916.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991916",
+      "sha256": "7586b9f0251d3e6398b504203ec5c325abcbbe2ff5bdd310c353bbbff9f788da",
+      "bytes": 1140
+    },
+    {
+      "file": "skill_991917.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991917",
+      "sha256": "77ce294a9cbf679c9ace75fe7288b8bff13f8774c5da4b937520bf14341360d8",
+      "bytes": 1225
+    },
+    {
+      "file": "skill_991939.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991939",
+      "sha256": "273ddce82eba2a6ce4eaf9533257ec0a77ea5974423f7de6f56265c47546cc45",
+      "bytes": 643
+    },
+    {
+      "file": "skill_991974.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/991974",
+      "sha256": "dab9a0fe57df84c32b3d2aaf0528c8206a5a5a8aa46f261f95a58e12b7a6601d",
+      "bytes": 616
+    },
+    {
+      "file": "skill_992001.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992001",
+      "sha256": "1c47cbe88a8c7c6e32e6359edd6b76a031beb604f29c60644c6418c79519fcee",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992025.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992025",
+      "sha256": "9751278f3a8c1de9310f96200e716e6112c550f772db72dc805d8a90c65be07e",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992026.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992026",
+      "sha256": "b587ac4a31c42a43744e7fc6f865abf809799bf3e7b2e1f5b575e2a66c2d4d80",
+      "bytes": 1124
+    },
+    {
+      "file": "skill_992039.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992039",
+      "sha256": "6fa64ac52a3fc49441ba6da9f551cc8a703fdc2fc9e8f1fa285f88046247d54d",
+      "bytes": 2011
+    },
+    {
+      "file": "skill_992342.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992342",
+      "sha256": "d909b041c29dab21fc8ffbf25a3bea0f892eaec1557029e4ea6cc8bbbfc1f722",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992418.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992418",
+      "sha256": "168dbe568ffa1904929cd82ea382f54587193129c890c389e53b4adb3911240d",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992419.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992419",
+      "sha256": "c9b31b9b1928eeb746f7bd9531aec3ec244ad7ede3e030769413ed57ae1a174c",
+      "bytes": 1263
+    },
+    {
+      "file": "skill_992515.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992515",
+      "sha256": "b916cb17b1ee3fc66d107d77591a2088253e792377909539604d72146f372916",
+      "bytes": 671
+    },
+    {
+      "file": "skill_992625.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992625",
+      "sha256": "61fc8d93ec759692d3448f112d17ca5a7a856eca672d36fee96ebeb8816f5f46",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992655.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992655",
+      "sha256": "7de8d7ba39a9ae7a10aca1693e03971d694cc5a80905e199784ba3084ea5c347",
+      "bytes": 641
+    },
+    {
+      "file": "skill_992656.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992656",
+      "sha256": "195310bc1e2a5dbe6cae4611d5a2c7ead28a756b64e380ede6c08ea9fc5a89e1",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992712.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992712",
+      "sha256": "2e3587f547589bc075d5d4dba0bb80676280370f970bdaaa83ebd80caec93aa9",
+      "bytes": 1136
+    },
+    {
+      "file": "skill_992713.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992713",
+      "sha256": "bbed754c67b69d0206c452cbb6adc74a50e1abcce08564ecca884cdb766fceb4",
+      "bytes": 638
+    },
+    {
+      "file": "skill_992753.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992753",
+      "sha256": "7fefcb38937cd95aaae8a867cc43ac43b4f6df13e21fd704af5d2270e0ca5148",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992806.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992806",
+      "sha256": "1aaffdac0e651c84cbef44aeebeb88ccbed5f7bdccb5414b215445be600e10c1",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992881.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992881",
+      "sha256": "71c28b53b69c5f758d06bbfc61c2dc288a52b3397f658c4fe0bfb457271a93d3",
+      "bytes": 640
+    },
+    {
+      "file": "skill_992902.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992902",
+      "sha256": "7d9fd4f09289433829302affe1d8cbb46ede527b21f32b9c92fcdd2dbc7f5336",
+      "bytes": 643
+    },
+    {
+      "file": "skill_992903.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992903",
+      "sha256": "8ffe235a379e17a24084ab5be112f7b09b98e44c91aef7ec61fd843c36566911",
+      "bytes": 616
+    },
+    {
+      "file": "skill_992946.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/992946",
+      "sha256": "74ae84756ecea16c218b61779cffdf0b27d5f2068628131a999acc31ce4ebedb",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993002.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993002",
+      "sha256": "73ac4296e16342049b32cee9abf7395aff77e86ca3998269b719acc3234f3949",
+      "bytes": 613
+    },
+    {
+      "file": "skill_993107.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993107",
+      "sha256": "68a8afa9cb0b4d47d0aca8d2b6a8b1d9534fcad9c85b8315d6ad6b84505dd6df",
+      "bytes": 1137
+    },
+    {
+      "file": "skill_993146.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993146",
+      "sha256": "90710a7ea2a578d1e185e13fdcafad296947b293c1afcbda3042d220ee65664f",
+      "bytes": 1152
+    },
+    {
+      "file": "skill_993150.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993150",
+      "sha256": "5de9a3c54f7c1ace0772cb297a190721abbd0d342860ec135c67982724076560",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993161.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993161",
+      "sha256": "8c3f5b54b1b1cead550ceb8ac5e55f4cece3baa0c3cd00b6c8afe497cc18149e",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993170.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993170",
+      "sha256": "8c18fac775a533bc07a34648f097fed5a92bd10fd2ee2edb2aa5009a48bf3d03",
+      "bytes": 1437
+    },
+    {
+      "file": "skill_993316.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993316",
+      "sha256": "b6b369cae69c6c609cab4d0af03f62838f217b013f1a2d3d3f8f771903094212",
+      "bytes": 644
+    },
+    {
+      "file": "skill_993318.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993318",
+      "sha256": "cd8ef4d78476bacd4fb1104fa70d8e57870c482e9c8527bd2c8658c4453f08f2",
+      "bytes": 648
+    },
+    {
+      "file": "skill_993321.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993321",
+      "sha256": "13abd13deaac24b8b927efa80c4dfeb8522f3cfaeda7e6746b2946c1c5c4a911",
+      "bytes": 644
+    },
+    {
+      "file": "skill_993422.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993422",
+      "sha256": "1fa36c2fb125c2eb8476e842d19e499e8bf09625abf134c8d6a249e50f228f5e",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993430.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993430",
+      "sha256": "7060ed2e5dee7d77cfa260f07b73cb84fa3cd7ffa0265e9be13c913141f098ec",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993458.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993458",
+      "sha256": "422cdd7f2c1f6b95497e22cca48bb2366986d96dd4589a686f372d36e399823a",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993489.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993489",
+      "sha256": "9ea81916a9a6dd1a44e18e5d8ce89a970eed5145b5448e991e0a69514dc840e6",
+      "bytes": 647
+    },
+    {
+      "file": "skill_993543.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993543",
+      "sha256": "6dd4d5500cd43c3d23bdea0008c9aeb37dac440cba31421f51fda913c7fa0ff3",
+      "bytes": 616
+    },
+    {
+      "file": "skill_993544.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993544",
+      "sha256": "ca886ee08f9674b378abe84698ea551ed660715f684f1185aa601c96ca7c4aea",
+      "bytes": 616
+    },
+    {
+      "file": "skill_993655.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993655",
+      "sha256": "5a14f2ba4e1d1f8e6d9c70ffc1f21fd2957f718d74effe6df52dc9d2cb8c776c",
+      "bytes": 1225
+    },
+    {
+      "file": "skill_993680.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993680",
+      "sha256": "399f04571bbac6afb0fa1f8b6e71c1747217eb655848d0bf35aa4e02001b0a85",
+      "bytes": 643
+    },
+    {
+      "file": "skill_993699.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993699",
+      "sha256": "69843bc99b896e0d2a0244f2917707c5c1aefa0f7c494e1e211704c745b85e32",
+      "bytes": 616
+    },
+    {
+      "file": "skill_993700.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993700",
+      "sha256": "a5b13d27d3f33b688deef12f70f12a283aa0aac0cd6731e445bb55f0449019cd",
+      "bytes": 616
+    },
+    {
+      "file": "skill_993962.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/993962",
+      "sha256": "7447b99bd4f1a90b9efa0635d43f01820b388b1297d8cf91013bc2d3a7e24fd2",
+      "bytes": 643
+    },
+    {
+      "file": "skill_994078.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994078",
+      "sha256": "a130876c7a3341cbc13126716510c1373b986d3f8d017277ce026ae3c6ff73dd",
+      "bytes": 643
+    },
+    {
+      "file": "skill_994207.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994207",
+      "sha256": "f6049b25fe2239952a4682faf693c9a758d079cc253c7ba385d99cd4e3e3eb26",
+      "bytes": 643
+    },
+    {
+      "file": "skill_994209.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994209",
+      "sha256": "26f4b62321497442ddeb92328b341598364dbe74992e0a1498aa992cceb6a040",
+      "bytes": 643
+    },
+    {
+      "file": "skill_994236.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994236",
+      "sha256": "4dff57dba4918e6a25297f9e7e972a18b616f13eaca13103ef21abab581e6f62",
+      "bytes": 2080
+    },
+    {
+      "file": "skill_994269.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994269",
+      "sha256": "1a9cff1e5f0cf36f768947a370dc8b47774c76006865646d448c4221901b3594",
+      "bytes": 644
+    },
+    {
+      "file": "skill_994270.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994270",
+      "sha256": "ec903d763b9a7a8973d189f2870a45038f44571b2d83660962df12b91c6fe24a",
+      "bytes": 1257
+    },
+    {
+      "file": "skill_994401.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994401",
+      "sha256": "f288218d3054a3401c44d8fa6bd13cdd95091bd8ca0142443d64af476d13aedf",
+      "bytes": 1236
+    },
+    {
+      "file": "skill_994442.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994442",
+      "sha256": "c09d7982262d8bdfadc5e412414c580b621741be7ece2864ae8d6dbe982a8e81",
+      "bytes": 617
+    },
+    {
+      "file": "skill_994491.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994491",
+      "sha256": "b3f5a53ed728d6ecd13bebe8a18d51f97a9507b132925eac65317055cf644d9f",
+      "bytes": 611
+    },
+    {
+      "file": "skill_994492.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994492",
+      "sha256": "0d26680d8d688c7042e42c6675c9151f0e98cbb193db0c174665f3ac4bb7a299",
+      "bytes": 611
+    },
+    {
+      "file": "skill_994552.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994552",
+      "sha256": "36afc62f241db89716ff6c1dd414c4d47666cbabfca8db9568d6abbe593e8fa7",
+      "bytes": 644
+    },
+    {
+      "file": "skill_994608.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994608",
+      "sha256": "e0c822ba7cf3a12f8d48dd3f8100e0572ea2fdb3584d519c5595df7e04e023e4",
+      "bytes": 1070
+    },
+    {
+      "file": "skill_994652.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994652",
+      "sha256": "3cccb53b0af4a0296f53c422997ce6e0a4bed76fe2883f628bf168969d647e1d",
+      "bytes": 610
+    },
+    {
+      "file": "skill_994656.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994656",
+      "sha256": "42cf185b0ac04e7bf7b1156dfa43b991158234e6ad3caf0c05162733535475bb",
+      "bytes": 1568
+    },
+    {
+      "file": "skill_994730.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994730",
+      "sha256": "8b1afc3ff03dd8ba0090008e7b072d5bd469a36ae871c62d75fd602e03b3aa77",
+      "bytes": 2071
+    },
+    {
+      "file": "skill_994753.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/994753",
+      "sha256": "a1358b972b4b1ed6eaacc0a347c3a9cbdd0971d81787f110d58cec4f63ee3312",
+      "bytes": 660
+    },
+    {
+      "file": "skill_995000.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995000",
+      "sha256": "859bef83aba2cb629dff2104eae4d2d3ab1571434f452720193d755cf3833487",
+      "bytes": 616
+    },
+    {
+      "file": "skill_995036.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995036",
+      "sha256": "1c3cc3ee2346723115adb2c7624545299abbd0d8ad18a27a32ea69495f238e03",
+      "bytes": 1241
+    },
+    {
+      "file": "skill_995074.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995074",
+      "sha256": "7269b533a95e7f11fa1dcd690787e86e8330b17777719f134fef70e8d5041dd8",
+      "bytes": 643
+    },
+    {
+      "file": "skill_995220.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995220",
+      "sha256": "bd652ee4b65983d933706262b90fb1da3b8a1ff8cb8e72a153caad939aa450d0",
+      "bytes": 1239
+    },
+    {
+      "file": "skill_995221.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995221",
+      "sha256": "fc768ec65e450ec526530205ca4bf0ce585b0394ae5e574075c65876c30cbba4",
+      "bytes": 1237
+    },
+    {
+      "file": "skill_995225.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995225",
+      "sha256": "d42fccbcefb73ff0daaa024c1514429c3a81b2a1ba970c069dcb80dc1a4adf31",
+      "bytes": 610
+    },
+    {
+      "file": "skill_995237.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995237",
+      "sha256": "7613d36810cec43fce7fcb15526d09f489217856f3c6acf0a658e45612646133",
+      "bytes": 642
+    },
+    {
+      "file": "skill_995426.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995426",
+      "sha256": "5b42983f3bf9fd3192aa0efb540991dc6b802cc842559d5a75f7955f124d6ca0",
+      "bytes": 643
+    },
+    {
+      "file": "skill_995427.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995427",
+      "sha256": "c7988ac157737aa8965dede06cf0cb6c32a3b90a550c05db01773db663745f0f",
+      "bytes": 1191
+    },
+    {
+      "file": "skill_995428.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995428",
+      "sha256": "e4c8063240cc402b83057866998192d75ca99f08475f09a0aec6567428ef8268",
+      "bytes": 1191
+    },
+    {
+      "file": "skill_995432.json",
+      "url": "https://api.atlasacademy.io/nice/JP/skill/995432",
+      "sha256": "667c12f15011adda5c7e3f2c3a1d1baf6aba7aa44c9567dc531bcab00fb5c9aa",
+      "bytes": 616
+    }
+  ]
+}

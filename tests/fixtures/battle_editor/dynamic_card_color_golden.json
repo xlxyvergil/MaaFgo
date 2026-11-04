@@ -1,0 +1,29 @@
+{
+  "team": {
+    "name": "匿名改色技能核验样例",
+    "onFieldSvts": [
+      {"svtId": 505300, "supportType": "none"},
+      {"svtId": 402700, "supportType": "friend"},
+      null
+    ],
+    "backupSvts": [
+      {"svtId": 100100, "supportType": "none"},
+      null,
+      null
+    ],
+    "mysticCode": {"mysticCodeId": 20}
+  },
+  "delegate": {"replaceMemberIndexes": [[0, 0]]},
+  "actions": [
+    {"type": "skill", "skill": 2},
+    {"type": "skill", "svt": 0, "skill": 1},
+    {
+      "type": "attack",
+      "attacks": [
+        {"svt": 0, "isTD": true, "card": -1, "cardType": 2},
+        {"svt": 0, "isTD": false, "card": 1, "cardType": 2},
+        {"svt": 0, "isTD": false, "card": 2, "cardType": 2}
+      ]
+    }
+  ]
+}

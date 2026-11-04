@@ -1079,6 +1079,23 @@ class BondCompletionOptionTest(unittest.TestCase):
             ["关闭详情", "羁绊补齐-取消配置"],
         )
 
+    def test_abort_safe_waits_for_transition_without_waiting_for_nonexistent_dialog(self):
+        action = CompleteBondFormation.__new__(CompleteBondFormation)
+        action.debug_preserve_failure = False
+        action.servant_detail_open = False
+        action._focus_user = lambda *_args: None
+        action._in_equip_select = lambda: False
+        action._in_servant_select = lambda: False
+        action._in_formation_edit = lambda: True
+        action._confirmed_now = lambda predicate: predicate()
+        states = iter((False, True, True))
+        action._on_confirm_page = lambda: next(states)
+        calls = []
+        action._run_pipeline = lambda node: calls.append(node) or True
+        action._wait_for = lambda predicate, timeout: predicate() or predicate()
+        self.assertTrue(action._abort_safe("transition").success)
+        self.assertEqual(calls, ["羁绊补齐-取消配置"])
+
     def test_abort_safe_confirms_discard_dialog_when_not_back_on_confirm_page(self):
         action = CompleteBondFormation.__new__(CompleteBondFormation)
         action.debug_preserve_failure = False

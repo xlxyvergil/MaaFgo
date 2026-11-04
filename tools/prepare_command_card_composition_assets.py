@@ -18,12 +18,17 @@ import json
 import os
 from pathlib import Path
 import shutil
+import sys
 import tempfile
 import time
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 from PIL import Image
+
+if str(Path(__file__).resolve().parent) not in sys.path:
+    sys.path.insert(0, str(Path(__file__).resolve().parent))
+from command_card_palette import PROFILE, palette_png, transform_metadata
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_ROOT = ROOT / 'assets/resource/base/image/CommandCards'
@@ -33,26 +38,6 @@ COMMON_SIZES = {'bg': (133, 170), 'icon': (185, 133), 'txt': (150, 73), 'bg_np':
 
 def digest(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
-
-
-def palette_png(data: bytes, expected_size: tuple[int, int]) -> tuple[bytes, list[int], int]:
-    with Image.open(io.BytesIO(data)) as opened:
-        opened.load()
-        if opened.format != 'PNG' or opened.size != expected_size:
-            raise ValueError(f'Expected PNG {expected_size}, got {opened.format} {opened.size}')
-        image = opened.convert('RGBA')
-    quantized = image.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
-    stream = io.BytesIO()
-    quantized.save(stream, 'PNG', optimize=True, compress_level=9)
-    decoded = quantized.convert('RGBA')
-    changed = sum((a >= 128) != (b >= 128) for a, b in zip(image.getchannel('A').getdata(), decoded.getchannel('A').getdata()))
-    rows = []
-    if image.size == (256, 256):
-        for row in (0, 1):
-            alpha = decoded.getchannel('A').crop((0, row * 128, 256, (row + 1) * 128))
-            if sum(v >= 128 for v in alpha.getdata()) >= 32:
-                rows.append(row)
-    return stream.getvalue(), rows, changed
 
 
 def download(url: str, cache: Path) -> bytes | None:
@@ -189,7 +174,7 @@ def main() -> int:
                 raise ValueError(f'Migrate the legacy/mismatched composition manifest before maintenance: {previous}')
         else:
             manifest = {'schema_version': 2, 'region': region, 'shared': {}, 'np_names': {}, 'missing': {}}
-        manifest['transform'] = {'colors': 256, 'method': 'FASTOCTREE', 'dither': 'NONE', 'optimize': True, 'compress_level': 9}
+        manifest['transform'] = transform_metadata()
         manifests[region] = manifest
 
     def prepare(region: str, data: bytes, relative: str, expected: tuple[int, int], source: str) -> dict:
@@ -200,7 +185,7 @@ def main() -> int:
         result, rows, changed = palette_png(data, expected)
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_bytes(result)
-        return {'file': relative, 'source': source, 'source_sha256': digest(data), 'sha256': digest(result), 'size': list(expected), 'mode': 'P', 'name_rows': rows, 'alpha_mask_changed_pixels': changed}
+        return {'file': relative, 'source': source, 'source_sha256': digest(data), 'sha256': digest(result), 'size': list(expected), 'mode': 'P', 'name_rows': rows, 'alpha_mask_changed_pixels': changed, 'fully_transparent_changed_pixels': 0, 'quantization_profile': PROFILE}
 
     for name in COMMON_NAMES:
         part = 'bg_np' if name.startswith('card_bg_np') else name.split('_')[1]

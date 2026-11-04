@@ -35,7 +35,7 @@ class CommandConfirmationTests(unittest.TestCase):
         ])
         pending = iter(observations)
 
-        def detect(_context, _image):
+        def detect(_context, _image, **_kwargs):
             scene, elapsed = next(pending)
             clock[0] += elapsed
             if cancel_during_recognition:

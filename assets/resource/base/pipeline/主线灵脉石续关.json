@@ -1,0 +1,30 @@
+{
+  "主线-使用灵脉石": {
+    "doc": "cn正式节点的临时兼容副本，保证日服引用存在；当前仅验证国服文字，未命中时停止，待日服实图补充后替换。左侧使用灵脉石按钮、右上蓝色道具数量均需正向确认，不点击令咒/圣晶石。只点击一次，重新截图检查二次确认。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"sub_name": "base/主线灵脉石续关/主线-使用灵脉石/OCR1", "recognition": {"type": "OCR", "param": {"roi": [540, 105, 200, 70], "expected": ["^续关$"], "threshold": 0.8}}},
+          {"sub_name": "base/主线灵脉石续关/主线-使用灵脉石/OCR2", "recognition": {"type": "OCR", "param": {"roi": [210, 280, 245, 45], "expected": ["^使用灵脉石$"], "threshold": 0.8}}},
+          {"sub_name": "base/主线灵脉石续关/主线-使用灵脉石/OCR3", "recognition": {"type": "OCR", "param": {"roi": [1040, 141, 75, 36], "expected": ["^[1-9][0-9]*$"], "threshold": 0.9}}}
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  },
+  "主线-灵脉石确认": {
+    "doc": "cn正式节点的临时兼容副本。必须命中使用1个灵脉石续关的完整提示及右侧决定；普通圣晶石/令咒确认框不能匹配。点击后等待实际战斗界面，不因按钮消失就判定续关成功。",
+    "recognition": {"type": "And", "param": {
+      "all_of": [
+        {"sub_name": "base/主线灵脉石续关/主线-灵脉石确认/OCR1", "recognition": {"type": "OCR", "param": {"roi": [450, 262, 380, 51], "expected": ["是否使用\\s*1\\s*个灵脉石续关"], "threshold": 0.85}}},
+        {"sub_name": "base/主线灵脉石续关/主线-灵脉石确认/OCR2", "recognition": {"type": "OCR", "param": {"roi": [725, 395, 315, 62], "expected": ["^[决決]\\s*定$"], "threshold": 0.85}}}
+      ], "box_index": 1
+    }},
+    "action": {"type": "Click"}, "post_delay": 1500, "next": [], "on_error": []
+  }
+}

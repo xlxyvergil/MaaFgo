@@ -9,6 +9,8 @@ on:
       - ".github/workflows/install.yml"
       - ".github/workflows/android.yml"
       - "assets/**"
+      - "web/battle-editor/**"
+      - "打开编队编辑器.cmd"
       - "**.py"
   workflow_dispatch:
 
@@ -133,6 +135,19 @@ jobs:
           ./install/python/python.exe install/python/get-pip.py
           ./install/python/python.exe -m pip install --upgrade pip
           ./install/python/python.exe -m pip install -r requirements.txt
+
+      - name: Setup Node for battle editor
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/battle-editor/package-lock.json
+
+      - name: Build battle editor
+        shell: bash
+        run: |
+          npm --prefix web/battle-editor ci
+          npm --prefix web/battle-editor run build
 
       - name: Create MXU version
         shell: bash

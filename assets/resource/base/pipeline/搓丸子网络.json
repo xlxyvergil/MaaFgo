@@ -1,0 +1,232 @@
+{
+  "搓丸子网络-重试": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "Or",
+      "param": {
+        "any_of": [
+          {
+            "recognition": {
+              "type": "And",
+              "param": {
+                "all_of": [
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试/OCR1",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          220,
+                          210,
+                          850,
+                          240
+                        ],
+                        "expected": [
+                          "ダウンロードサーバー.*通信.*切れました"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  },
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试/OCR2",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          700,
+                          510,
+                          300,
+                          110
+                        ],
+                        "expected": [
+                          "^\\s*やり直す\\s*$"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  }
+                ],
+                "box_index": 1
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "And",
+              "param": {
+                "all_of": [
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试/OCR3",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          200,
+                          170,
+                          900,
+                          340
+                        ],
+                        "expected": [
+                          "通信.*(?:切れ|失敗|エラー|中断)|サーバー.*(?:接続|通信)|(?:网络|網路|通信).*(?:中断|失败|失敗|错误|錯誤|异常|異常|连接|連接)|(?:连接|連接).*(?:失败|失敗|中断)"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  },
+                  {
+                    "recognition": {
+                      "type": "TemplateMatch",
+                      "param": {
+                        "template": "断网重连.png",
+                        "roi": [
+                          650,
+                          450,
+                          430,
+                          200
+                        ],
+                        "threshold": 0.85
+                      }
+                    }
+                  }
+                ],
+                "box_index": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 3,
+    "post_delay": 1000,
+    "next": [],
+    "doc": "只点击经过弹窗正文及右侧按钮双重验证的游戏重试。以JumpBack接入当前等待，不能回提交、长按或选择入口；不点击左侧结束。下载异常依据2026-10-27实机048-original-close-failure.png。"
+  },
+  "搓丸子网络-重试耗尽": {
+    "timeout": 10000,
+    "on_error": [],
+    "recognition": {
+      "type": "Or",
+      "param": {
+        "any_of": [
+          {
+            "recognition": {
+              "type": "And",
+              "param": {
+                "all_of": [
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试耗尽/OCR1",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          220,
+                          210,
+                          850,
+                          240
+                        ],
+                        "expected": [
+                          "ダウンロードサーバー.*通信.*切れました"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  },
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试耗尽/OCR2",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          700,
+                          510,
+                          300,
+                          110
+                        ],
+                        "expected": [
+                          "^\\s*やり直す\\s*$"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  }
+                ],
+                "box_index": 1
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "And",
+              "param": {
+                "all_of": [
+                  {
+                    "sub_name": "base/搓丸子网络/搓丸子网络-重试耗尽/OCR3",
+                    "recognition": {
+                      "type": "OCR",
+                      "param": {
+                        "roi": [
+                          200,
+                          170,
+                          900,
+                          340
+                        ],
+                        "expected": [
+                          "通信.*(?:切れ|失敗|エラー|中断)|サーバー.*(?:接続|通信)|(?:网络|網路|通信).*(?:中断|失败|失敗|错误|錯誤|异常|異常|连接|連接)|(?:连接|連接).*(?:失败|失敗|中断)"
+                        ],
+                        "threshold": 0.8
+                      }
+                    }
+                  },
+                  {
+                    "recognition": {
+                      "type": "TemplateMatch",
+                      "param": {
+                        "template": "断网重连.png",
+                        "roi": [
+                          650,
+                          450,
+                          430,
+                          200
+                        ],
+                        "threshold": 0.85
+                      }
+                    }
+                  }
+                ],
+                "box_index": 1
+              }
+            }
+          }
+        ]
+      }
+    },
+    "action": {
+      "type": "StopTask"
+    },
+    "next": [],
+    "focus": {
+      "Node.Recognition.Succeeded": "通信异常连续重试3次仍未恢复，已停止；本次提交状态待核验，不会重新提交。"
+    },
+    "doc": "必须紧接在JumpBack重试后、任何背景页面分支之前。重试达上限而弹窗仍在时停止，防止底层详情/结果按钮露出而误判成功。"
+  },
+  "搓丸子网络-等待恢复": {
+    "next": [
+      "[JumpBack]搓丸子网络-重试",
+      "搓丸子网络-重试耗尽",
+      "搓丸子网络-界面无通信弹窗"
+    ],
+    "on_error": [],
+    "timeout": 10000,
+    "doc": "供复用从者定位脚本在查找/点击后调用。网络识别与重试全在Pipeline；持续异常停止，不能继续点击背景或滑动。"
+  },
+  "搓丸子网络-界面无通信弹窗": {
+    "on_error": [],
+    "post_delay": 0,
+    "doc": "本节点是等待恢复分派的无输入终点，只在前置两种网络检查均未命中时到达；不能单独作为页面身份识别。"
+  }
+}

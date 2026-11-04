@@ -1,0 +1,568 @@
+{
+  "地狱的试炼-入口": {
+    "doc": "单场高难入口。优先本期活动页和关内页面，再处理廟内已展开MENU、其他页面菜单tile、门户试炼按钮，最后才点击正向识别的MENU按钮；未知界面10秒后保留现场失败。2026-10-31 03:24导航task200005751已覆盖廟内MENU展开→关闭→门户→本期活动页并Succeeded；测试在活动页改为DoNothing停止，未进关。其他入口分支的覆盖以各节点doc为准。各步只点一次，均等待下一页正向标志。",
+    "next": [
+      "地狱的试炼-活动页本期关卡",
+      "地狱的试炼-重复挑战确认",
+      "地狱的试炼-失败后提示",
+      "地狱的试炼-已在助战编队战斗",
+      "地狱的试炼-已在廟关闭MENU",
+      "地狱的试炼-菜单进入廟",
+      "地狱的试炼-门户进入试炼",
+      "地狱的试炼-打开MENU"
+    ],
+    "timeout": 10000,
+    "on_error": []
+  },
+  "地狱的试炼-MENU关闭标记": {
+    "doc": "复用自动推主线.json/主线-地图菜单的MENU模板、green_mask与右下ROI，只识别未展开时的MENU按钮。main_menu_trial_entry.png离线匹配0.981，navigation_menu.png展开后0.114，阈值0.90。门户标题和试炼按钮在MENU展开时仍可透出并匹配，因此门户点击必须同时要求此关闭态。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "菜单.png",
+        "green_mask": true,
+        "roi": [
+          1080,
+          580,
+          200,
+          140
+        ],
+        "threshold": 0.9
+      }
+    }
+  },
+  "地狱的试炼-打开MENU": {
+    "doc": "仅识别到右下MENU按钮后打开一次，动作点击识别框。随后最多等待15秒，先处理已在廟且MENU展开的关闭分支，再识别其他页面菜单内的廟tile；不循环点击MENU，也不在未知页盲点。参考个人库存-打开菜单的模板门禁，本节点不复用其编队跳转。",
+    "recognition": {
+      "type": "Or",
+      "param": {
+        "any_of": [
+          "地狱的试炼-MENU关闭标记"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 1,
+    "post_delay": 500,
+    "next": [
+      "地狱的试炼-已在廟关闭MENU",
+      "地狱的试炼-菜单进入廟"
+    ],
+    "timeout": 15000,
+    "on_error": []
+  },
+  "地狱的试炼-菜单进入廟": {
+    "doc": "navigation_menu.png原尺寸裁取廟tile的图标与名称，排除月限倒计时和红点。离线正样本1.000，活动/助战/编队/门户/失败负样本最高0.264，阈值0.92。865,600已由MaaMCP验证进入门户（menu_tile_entered.png）；若原本已在廟，点击已选tile不会收起MENU（task200005750现场），因此应先走已在廟关闭MENU分支。跳转后仍可能有MENU，先处理该分支再等待门户标题、试炼按钮和MENU关闭态，不按固定delay连点。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/menu_mausoleum_tile.png",
+        "roi": [
+          765,
+          525,
+          215,
+          150
+        ],
+        "threshold": 0.92
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          865,
+          600,
+          1,
+          1
+        ]
+      }
+    },
+    "max_hit": 1,
+    "post_delay": 300,
+    "next": [
+      "地狱的试炼-已在廟关闭MENU",
+      "地狱的试炼-门户进入试炼"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-MENU展开CLOSE标记": {
+    "doc": "导航失败task200005750现场右侧CLOSE按钮原尺寸裁图，仅在MENU展开位置查找，避开顶部关闭与其他弹窗按钮。task200005751实机匹配0.999999；和廟标题、廟tile共同用于已在廟的菜单收起分支，不在其他页面单独触发点击。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/menu_close.png",
+        "roi": [
+          1085,
+          425,
+          195,
+          100
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-已在廟关闭MENU": {
+    "doc": "已在廟门户时，点已选中的tile不会收起MENU，task200005750曾在此保留现场超时。因此本分支必须排在菜单进入廟前。2026-10-31 03:24 task200005751实机：廟标题0.998124、tile1.000、CLOSE0.999999同时命中，点击1180,474一次后确认MENU关闭态并进入门户试炼，最终到活动页Succeeded。仅引用tile识别，不执行其动作；其他页面菜单路径保持原样。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-门户标题",
+          "地狱的试炼-菜单进入廟",
+          "地狱的试炼-MENU展开CLOSE标记"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          1180,
+          474,
+          1,
+          1
+        ]
+      }
+    },
+    "max_hit": 1,
+    "post_delay": 300,
+    "next": [
+      "地狱的试炼-门户进入试炼"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-门户标题": {
+    "doc": "main_menu_trial_entry.png右上アズライールの廟标题原尺寸裁图；离线门户1.000，活动/助战/编队/失败最高0.328。菜单展开时底图仍命中0.999，不能单独据此点击门户按钮。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/mausoleum_title.png",
+        "roi": [
+          820,
+          0,
+          460,
+          90
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-门户试炼按钮": {
+    "doc": "门户地獄の試練按钮中央文字裁图，不包含倒计时、右上红点或人物。离线门户1.000，活动/助战/编队/失败最高0.335；展开菜单底图也为1.000，所以必须由门户进入试炼组合节点判断MENU关闭态。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/portal_hellish_trial_button.png",
+        "roi": [
+          850,
+          195,
+          330,
+          100
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-门户进入试炼": {
+    "doc": "必须同时确认廟标题、试炼按钮和MENU关闭态，MENU展开处理排在本节点前，防止点到底图。2026-10-31 03:24 task200005751实机组合分数依次0.998169、1.000、0.985143，点击929,250后成功识别本期活动页；此次导航测试在活动页停止，未点关卡。正式流程仍须本期标题门禁后再点关卡。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-门户标题",
+          "地狱的试炼-门户试炼按钮",
+          "地狱的试炼-MENU关闭标记"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          929,
+          250,
+          1,
+          1
+        ]
+      }
+    },
+    "max_hit": 1,
+    "post_delay": 300,
+    "next": [
+      "地狱的试炼-活动页本期关卡"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-活动标题": {
+    "doc": "2026-10-31日服initial.png右上地獄の試練标题原尺寸裁图。离线原图匹配1.000，助战/编队页最高0.222；正式阈值0.92。模板放base/image，不因日服来源放入jp/image。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/activity_title.png",
+        "roi": [
+          940,
+          0,
+          340,
+          90
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-本期关卡标题": {
+    "doc": "只匹配2026年10月バトル・オブ・アイギス标题，避开NEW/CLEAR、剩余天数与任务进度。原图离线1.000，助战/编队页最高0.330；0.92阈值保守。下期标题变化时应停止并更新本期模板及编队方案，不能沿用固定位置误进其他月关卡。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/quest_202610_battle_of_aegis.png",
+        "roi": [
+          720,
+          130,
+          390,
+          78
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-活动页前景白字": {
+    "doc": "模板相关系数可能在半透明奖励遮罩下仍然很高，因此活动页点击/结算出口还要确认标题为前景亮白字。initial.png此ROI内RGB各通道>=210的像素3670，整体压暗至80%时为0；阈值1600。参考原生自动战斗调度.json/剧情奖励-前景白字过滤的遮罩判别理由。",
+    "recognition": {
+      "type": "ColorMatch",
+      "param": {
+        "roi": [
+          978,
+          9,
+          287,
+          49
+        ],
+        "method": 4,
+        "lower": [
+          210,
+          210,
+          210
+        ],
+        "upper": [
+          255,
+          255,
+          255
+        ],
+        "count": 1600
+      }
+    }
+  },
+  "地狱的试炼-活动页本期关卡": {
+    "doc": "活动标题、本期关卡标题和前景白字同时命中才点击。2026-10-31 03:24 task200005751实机识别分数1.000/1.000、亮字3670；该次测试override为DoNothing并停止，只覆盖活动页识别，未点关卡。901,201已在同日单步MaaMCP进入关卡验证；正式组合仅点一次，随后等待重复挑战确认或已知进本界面。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-活动标题",
+          "地狱的试炼-本期关卡标题",
+          "地狱的试炼-活动页前景白字"
+        ]
+      }
+    },
+    "max_hit": 1,
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          901,
+          201,
+          1,
+          1
+        ]
+      }
+    },
+    "post_delay": 1000,
+    "next": [
+      "地狱的试炼-重复挑战确认",
+      "地狱的试炼-已在助战编队战斗"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-重复挑战提示标题": {
+    "doc": "final_run_support.png已通关后重复挑战弹窗的～注意～标题原尺寸裁图。必须与专属正文同时命中，不能把通用注意弹窗直接确认为开始。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/repeat_challenge_title.png",
+        "roi": [
+          485,
+          145,
+          320,
+          100
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-重复挑战提示正文": {
+    "doc": "仅匹配このクエストは繰り返し挑戦可能ですが起始的三行说明：羁绊、EXP、战利品和通关报酬只有首次通关获得。不包含背景任务进度或按钮；用于用户已授权的多次挑战补任务。离线正负验证见本轮evidence/repeat_challenge_template_verification.json。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/repeat_challenge_message.png",
+        "roi": [
+          175,
+          225,
+          930,
+          160
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-重复挑战确认": {
+    "doc": "已通关后再点本期关卡会出现这张确认页，属于正式进本流程。标题与三行重复挑战专属正文同时命中才点开始838,565，最多一次；入口也允许从此页继续。点后最多等待30秒正向确认助战/编队/战斗页，不按固定延时连续点击。新组合链待MaaMCP覆盖。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-重复挑战提示标题",
+          "地狱的试炼-重复挑战提示正文"
+        ]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {
+        "target": [
+          838,
+          565,
+          1,
+          1
+        ]
+      }
+    },
+    "max_hit": 1,
+    "post_delay": 500,
+    "next": [
+      "地狱的试炼-已在助战编队战斗"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-已在助战编队战斗": {
+    "doc": "只复用现有节点的识别，不执行这些被引用节点的动作。助战和编队参照进本流程.json，主战斗与选卡参照自动战斗_感知.json；从关内启动时由使用者确认当前关卡，页面本身不显示月份。未命中30秒后保留现场失败。",
+    "recognition": {
+      "type": "Or",
+      "param": {
+        "any_of": [
+          "进本-选择助战",
+          "进本-队伍确认",
+          "战斗_主界面",
+          "战斗_选卡场景"
+        ]
+      }
+    },
+    "next": [
+      "原生自动战斗调度"
+    ],
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-结算调度": {
+    "doc": "专用单场结算。2026-10-31日服task200002709在02:08:39、task200004136在03:03:20均经本调度返回本期活动页并Tasker.Task.Succeeded；实际覆盖下一步、底部触摸提示及关闭分支，好友申请分支未覆盖。失败蓝窗必须排在关闭按钮前，保留现场失败，不自动退出或重试。仅推进正向识别按钮，没有右上盲点；未知页30秒后失败。",
+    "next": [
+      "结算-羁绊满停止",
+      "地狱的试炼-失败后提示",
+      "地狱的试炼-已返回活动页",
+      "地狱的试炼-结算下一步",
+      "地狱的试炼-好友申请关闭",
+      "地狱的试炼-结算关闭",
+      "地狱的试炼-结算触摸提示"
+    ],
+    "max_hit": 50,
+    "timeout": 30000,
+    "on_error": []
+  },
+  "地狱的试炼-失败标题": {
+    "doc": "resume_current_late.png蓝色战败弹窗戦闘終了标题原尺寸裁图。离线正样本1.000，活动/助战/编队/门户/菜单负样本最高0.294；必须再要求劝退正文，不能把战斗结束标题单独解释为胜败。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/defeat_title.png",
+        "roi": [
+          510,
+          90,
+          260,
+          85
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-失败劝退正文": {
+    "doc": "同一蓝色战败弹窗特有的强化从者/礼装后再次挑战三行正文，排除关闭按钮。离线正样本1.000，活动/助战/编队/门户/菜单最高0.093；与失败标题组合后只观察，不关闭弹窗。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/hellish_trial/defeat_retry_message.png",
+        "roi": [
+          280,
+          245,
+          720,
+          180
+        ],
+        "threshold": 0.92
+      }
+    }
+  },
+  "地狱的试炼-失败后提示": {
+    "doc": "只有战败标题与劝退正文同时命中才提示失败；不点击关闭、不返回、不重试。与原生自动战斗-队伍下载失败-提示同样走禁用失败屏障，不能用StopTask伪装为成功。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-失败标题",
+          "地狱的试炼-失败劝退正文"
+        ]
+      }
+    },
+    "focus": {
+      "Node.Action.Starting": "<span style=\"color: #FF0000;\">本场地狱的试炼战败，已保留蓝色战斗结束弹窗。未自动退出或重试，请检查战斗日志和策略。</span>"
+    },
+    "action": {
+      "type": "DoNothing"
+    },
+    "next": [
+      "原生自动战斗-失败出口"
+    ],
+    "timeout": 1,
+    "on_error": []
+  },
+  "地狱的试炼-运行失败判分": {
+    "doc": "仅本task的auto_battle错误出口。先观察战败蓝窗以显示明确原因；其他错误仍走现有原生错误提示和失败屏障。两条分支均不操作界面。",
+    "next": [
+      "地狱的试炼-失败后提示",
+      "原生自动战斗-队伍下载失败-提示"
+    ],
+    "timeout": 1000,
+    "on_error": []
+  },
+  "地狱的试炼-已返回活动页": {
+    "doc": "本场流程出口：同时确认地獄の試練、本期关卡标题及亮字前景，停在任务列表供核对。2026-10-31两次完整结算已覆盖：task200002709标题0.944572/关卡1.000/亮字3613，task200004136为1.000/1.000/3670，均Succeeded。此节点本身不代表15项任务已达成，也不领取或点击其他关卡。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "地狱的试炼-活动标题",
+          "地狱的试炼-本期关卡标题",
+          "地狱的试炼-活动页前景白字"
+        ]
+      }
+    },
+    "focus": {
+      "Node.Action.Starting": "本场试炼已返回活动页，请核对15项任务进度。"
+    },
+    "next": [],
+    "on_error": []
+  },
+  "地狱的试炼-结算下一步": {
+    "doc": "复用原生自动战斗调度.json/作战成功_结束战斗的下一步模板与点击识别框动作；改回专用结算，禁止通用盲点兜底。2026-10-31 task200002709在02:08:27、task200004136在03:03:00均实机命中并点击，后续成功返回活动页。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/下一步.png",
+        "threshold": 0.8
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 12,
+    "post_delay": 1000,
+    "next": [
+      "地狱的试炼-结算调度"
+    ],
+    "on_error": []
+  },
+  "地狱的试炼-好友申请关闭": {
+    "doc": "复用好友申请界面_不回主界面的左下关闭模板和ROI，仅关闭已识别申请，不走连续出击或通用结算。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": "battle/关闭好友申请.png",
+        "roi": [
+          125,
+          521,
+          399,
+          187
+        ],
+        "threshold": 0.8
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 3,
+    "post_delay": 1000,
+    "next": [
+      "地狱的试炼-结算调度"
+    ],
+    "on_error": []
+  },
+  "地狱的试炼-结算关闭": {
+    "doc": "复用战斗结束关闭_不回主界面的关闭模板，仅在下半屏弹窗按钮区查找，避免把活动页左上关闭当作结算按钮。2026-10-31 task200004136在03:03:14至03:03:19经本节点有界关闭后，确认返回活动页并Succeeded。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "template": [
+          "trees/交换完成关闭.png",
+          "close_botton.png"
+        ],
+        "roi": [
+          240,
+          430,
+          800,
+          290
+        ],
+        "threshold": 0.85
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 6,
+    "post_delay": 1000,
+    "next": [
+      "地狱的试炼-结算调度"
+    ],
+    "on_error": []
+  },
+  "地狱的试炼-结算触摸提示": {
+    "doc": "只识别日服奖励展示底部的画面をタッチ提示并点击识别框，没有提示时不操作。2026-10-31 task200002709在02:08:37实机命中并点击，02:08:39确认返回活动页Succeeded。与剧情奖励-展示继续不同，不点击右上角。",
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          320,
+          590,
+          650,
+          130
+        ],
+        "expected": [
+          "画面をタッチ(してください)?"
+        ],
+        "threshold": 0.85
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "max_hit": 12,
+    "post_delay": 1000,
+    "next": [
+      "地狱的试炼-结算调度"
+    ],
+    "on_error": []
+  }
+}

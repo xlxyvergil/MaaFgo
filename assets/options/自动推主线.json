@@ -1,5 +1,25 @@
 {
   "option": {
+    "主线-是否自动使用灵脉石": {
+      "type": "switch",
+      "label": "是否自动使用灵脉石",
+      "description": "战败后使用灵脉石续战，每关最多3次；无道具或识别不确定时停止。续战改用默认战斗逻辑，不使用令咒或圣晶石。",
+      "default_case": "No",
+      "cases": [
+        {"name": "No", "label": "关闭", "pipeline_override": {"主线-配置": {"attach": {"use_spirit_stone": false}}}},
+        {"name": "Yes", "label": "开启", "pipeline_override": {"主线-配置": {"attach": {"use_spirit_stone": true}}}}
+      ]
+    },
+    "主线-自动处理编队限制": {
+      "type": "switch",
+      "label": "自动处理编队限制情况",
+      "description": "限制关（含编队中有多个助战）按游戏要求编队，本关忽略 Chaldea 编队与战斗配置，使用默认战斗逻辑；下一关恢复。关闭后遇到限制将停止。",
+      "default_case": "Yes",
+      "cases": [
+        {"name": "Yes", "label": "开启", "pipeline_override": {"主线-配置": {"attach": {"auto_handle_restrictions": true}}}},
+        {"name": "No", "label": "关闭", "pipeline_override": {"主线-配置": {"attach": {"auto_handle_restrictions": false}}}}
+      ]
+    },
     "主线-推进上限": {
       "type": "input",
       "label": "推进关卡上限",
@@ -28,10 +48,15 @@
       "cases": [
         {
           "name": "native",
-          "label": "原生自动战斗",
+          "label": "原生自动战斗（推荐）",
           "option": [
+            "主线-是否自动使用灵脉石",
+            "主线-自动处理编队限制",
+            "原生自动战斗是否使用茶壶",
             "原生自动战斗使用Chaldea队伍",
-            "原生自动战斗助战方式"
+            "原生自动战斗助战方式",
+            "原生自动战斗羁绊满停止",
+            "原生自动战斗高级策略"
           ],
           "pipeline_override": {
             "主线-配置": {

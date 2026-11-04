@@ -6,104 +6,24 @@
             "default": "1100100",
             "cases": [
                 {
-                    "name": "1100100",
-                    "label": "安哥拉曼纽",
+                    "name": "1102000",
+                    "label": "469. 无地王约翰",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "1100100"
+                                "servant": "1102000"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_11001000.png",
+                    "icon": "resource/base/image/servant_face/f_11020000.png",
                     "option": [
-                        "助战信息-1100100",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1100600",
-                    "label": "安东尼奥·萨列里",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1100600"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11006000.png",
-                    "option": [
-                        "助战信息-1100600",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1101600",
-                    "label": "克洛伊·冯·爱因兹贝伦",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101600"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11016000.png",
-                    "option": [
-                        "助战信息-1101600",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1101400",
-                    "label": "宇津见绘里濑",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101400"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11014000.png",
-                    "option": [
-                        "助战信息-1101400",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1100400",
-                    "label": "戈耳工",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1100400"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11004000.png",
-                    "option": [
-                        "助战信息-1100400",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1101900",
-                    "label": "方巿",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101900"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11019000.png",
-                    "option": [
-                        "助战信息-1101900",
+                        "助战信息-1102000",
                         "宝具等级"
                     ]
                 },
                 {
                     "name": "1102200",
-                    "label": "终结之伊丽莎白",
+                    "label": "458. 终结之伊丽莎白",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -119,7 +39,7 @@
                 },
                 {
                     "name": "1102100",
-                    "label": "藤堂平助",
+                    "label": "454. 藤堂平助",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -134,88 +54,24 @@
                     ]
                 },
                 {
-                    "name": "1101200",
-                    "label": "谜之兰丸X",
+                    "name": "1101900",
+                    "label": "420. 方巿",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "1101200"
+                                "servant": "1101900"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_11012000.png",
+                    "icon": "resource/base/image/servant_face/f_11019000.png",
                     "option": [
-                        "助战信息-1101200",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1100500",
-                    "label": "黑森·罗伯",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1100500"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11005000.png",
-                    "option": [
-                        "助战信息-1100500",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1100900",
-                    "label": "太空伊什塔尔",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1100900"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11009000.png",
-                    "option": [
-                        "助战信息-1100900",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1101500",
-                    "label": "尼托克丽丝〔Alter〕",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101500"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11015000.png",
-                    "option": [
-                        "助战信息-1101500",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1100200",
-                    "label": "岩窟王",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1100200"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11002000.png",
-                    "option": [
-                        "助战信息-1100200",
+                        "助战信息-1101900",
                         "宝具等级"
                     ]
                 },
                 {
                     "name": "1101700",
-                    "label": "岩窟王　基督山",
+                    "label": "409. 岩窟王　基督山",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -230,56 +86,8 @@
                     ]
                 },
                 {
-                    "name": "1101000",
-                    "label": "平景清",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101000"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11010000.png",
-                    "option": [
-                        "助战信息-1101000",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1102000",
-                    "label": "无地王约翰",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1102000"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11020000.png",
-                    "option": [
-                        "助战信息-1102000",
-                        "宝具等级"
-                    ]
-                },
-                {
-                    "name": "1101800",
-                    "label": "源赖光／丑御前",
-                    "pipeline_override": {
-                        "助战action": {
-                            "attach": {
-                                "servant": "1101800"
-                            }
-                        }
-                    },
-                    "icon": "resource/base/image/servant_face/f_11018000.png",
-                    "option": [
-                        "助战信息-1101800",
-                        "宝具等级"
-                    ]
-                },
-                {
                     "name": "1101300",
-                    "label": "玛丽·安托瓦内特〔Alter〕",
+                    "label": "407. 玛丽·安托瓦内特〔Alter〕",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -294,8 +102,136 @@
                     ]
                 },
                 {
+                    "name": "1101800",
+                    "label": "403. 源赖光／丑御前",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101800"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11018000.png",
+                    "option": [
+                        "助战信息-1101800",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101600",
+                    "label": "388. 克洛伊·冯·爱因兹贝伦",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101600"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11016000.png",
+                    "option": [
+                        "助战信息-1101600",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101500",
+                    "label": "370. 尼托克丽丝〔Alter〕",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101500"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11015000.png",
+                    "option": [
+                        "助战信息-1101500",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101400",
+                    "label": "356. 宇津见绘里濑",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101400"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11014000.png",
+                    "option": [
+                        "助战信息-1101400",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101200",
+                    "label": "328. 谜之兰丸X",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101200"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11012000.png",
+                    "option": [
+                        "助战信息-1101200",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101100",
+                    "label": "321. 迦摩",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101100"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11011000.png",
+                    "option": [
+                        "助战信息-1101100",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1101000",
+                    "label": "303. 平景清",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1101000"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11010000.png",
+                    "option": [
+                        "助战信息-1101000",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1100900",
+                    "label": "268. 太空伊什塔尔",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100900"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11009000.png",
+                    "option": [
+                        "助战信息-1100900",
+                        "宝具等级"
+                    ]
+                },
+                {
                     "name": "1100700",
-                    "label": "织田信长",
+                    "label": "250. 织田信长",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -310,8 +246,72 @@
                     ]
                 },
                 {
+                    "name": "1100600",
+                    "label": "204. 安东尼奥·萨列里",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100600"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11006000.png",
+                    "option": [
+                        "助战信息-1100600",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1100500",
+                    "label": "158. 黑森·罗伯",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100500"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11005000.png",
+                    "option": [
+                        "助战信息-1100500",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1100400",
+                    "label": "147. 戈耳工",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100400"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11004000.png",
+                    "option": [
+                        "助战信息-1100400",
+                        "宝具等级"
+                    ]
+                },
+                {
+                    "name": "1100100",
+                    "label": "107. 安哥拉曼纽",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "servant": "1100100"
+                            }
+                        }
+                    },
+                    "icon": "resource/base/image/servant_face/f_11001000.png",
+                    "option": [
+                        "助战信息-1100100",
+                        "宝具等级"
+                    ]
+                },
+                {
                     "name": "1100300",
-                    "label": "贞德〔Alter〕",
+                    "label": "106. 贞德〔Alter〕",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
@@ -326,18 +326,18 @@
                     ]
                 },
                 {
-                    "name": "1101100",
-                    "label": "迦摩",
+                    "name": "1100200",
+                    "label": "96. 岩窟王",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
-                                "servant": "1101100"
+                                "servant": "1100200"
                             }
                         }
                     },
-                    "icon": "resource/base/image/servant_face/f_11011000.png",
+                    "icon": "resource/base/image/servant_face/f_11002000.png",
                     "option": [
-                        "助战信息-1101100",
+                        "助战信息-1100200",
                         "宝具等级"
                     ]
                 }

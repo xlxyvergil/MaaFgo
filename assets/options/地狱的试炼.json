@@ -1,0 +1,60 @@
+{
+  "option": {
+    "地狱的试炼-队伍方案": {
+      "type": "input",
+      "label": "编队与逐回合方案",
+      "description": "默认名称可直接加载本期内置示例，另有「地狱的试炼_202610_补贯通.json」。示例可修改后另存到 config/Battle；本地同名方案优先，不会被内置示例覆盖。也可选择编辑器保存的其他 JSON，或填写 Chaldea 分享链接。方案中明确的技能、宝具和面卡顺序优先执行；isAuto 空位与未抽到的面卡交给补牌策略。",
+      "inputs": [
+        {
+          "name": "chaldea_import_source",
+          "label": "本地方案 / Chaldea 分享",
+          "default": "地狱的试炼_202610_阿兹赖尔.json",
+          "verify": ".*",
+          "input_type": "file",
+          "file_dialog_dir": "config/Battle",
+          "file_dialog_filters": [
+            {
+              "name": "JSON",
+              "extensions": [
+                "json"
+              ]
+            }
+          ]
+        }
+      ],
+      "pipeline_override": {
+        "原生自动战斗入口": {
+          "action": {
+            "type": "Custom",
+            "param": {
+              "custom_action": "auto_battle",
+              "custom_action_param": {
+                "chaldea_import_source": "{chaldea_import_source}"
+              }
+            }
+          }
+        },
+        "执行自动编队": {
+          "attach": {
+            "chaldea_import_source": "{chaldea_import_source}"
+          }
+        },
+        "执行手动编队检查": {
+          "attach": {
+            "chaldea_import_source": "{chaldea_import_source}"
+          }
+        },
+        "执行羁绊补齐自动编队": {
+          "attach": {
+            "chaldea_import_source": "{chaldea_import_source}"
+          }
+        },
+        "Chaldea助战action": {
+          "attach": {
+            "chaldea_import_source": "{chaldea_import_source}"
+          }
+        }
+      }
+    }
+  }
+}
