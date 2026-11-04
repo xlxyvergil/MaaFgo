@@ -85,6 +85,24 @@ class PopupController(CustomController):
     click_key = input_text = key_down = key_up = reject_input
 
 
+class LatePopupController(PopupController):
+    """先显示无弹窗画面；第一次返回键点击后再出现 4399 弹窗。"""
+
+    def __init__(self, popup_image):
+        super().__init__(np.zeros((720, 1280, 3), dtype=np.uint8))
+        self.popup_image = popup_image
+        self.back_clicks = []
+        self.popup_clicks = []
+
+    def click(self, x, y):
+        if 100 <= x < 110 and 100 <= y < 110:
+            self.back_clicks.append((x, y))
+            self.image = self.popup_image
+        else:
+            self.popup_clicks.append((x, y))
+        return True
+
+
 class PopupReplayTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -126,6 +144,26 @@ class PopupReplayTests(unittest.TestCase):
                 "on_error": [],
                 "next": [f"TEST_ONLY_NODE_{key}", "TEST_END"],
             }
+        for key, feature in FEATURES.items():
+            home_node = json.loads(json.dumps(nodes[feature["node"]], ensure_ascii=False))
+            home_node.update(max_hit=1, next=["TEST_DONE"])
+            nodes[f"TEST_HOME_NODE_{key}"] = home_node
+        nodes["TEST_HOME"] = {
+            "timeout": 5000,
+            "rate_limit": 1,
+            "on_error": [],
+            "next": [f"TEST_HOME_NODE_{key}" for key in FEATURES] + ["TEST_BACK"],
+        }
+        nodes["TEST_BACK"] = {
+            "action": {"type": "Click", "param": {"target": [100, 100, 10, 10]}},
+            "pre_delay": 0,
+            "post_delay": 0,
+            "post_wait_freezes": 0,
+            "rate_limit": 1,
+            "on_error": [],
+            "next": ["TEST_HOME"],
+        }
+        nodes["TEST_DONE"] = {"rate_limit": 1, "on_error": []}
         (bundle / "pipeline/t.json").write_text(json.dumps(nodes, ensure_ascii=False), "utf-8")
         cls.resource = Resource()
         cls.resource.use_cpu()
@@ -135,8 +173,7 @@ class PopupReplayTests(unittest.TestCase):
     def tearDownClass(cls):
         cls.temp.cleanup()
 
-    def run_popup(self, image, disappear_after=None, entry="TEST_PARENT"):
-        controller = PopupController(image, disappear_after)
+    def run_controller(self, controller, entry="TEST_PARENT"):
         self.assertTrue(controller.post_connection().wait().succeeded)
         tasker = Tasker()
         self.assertTrue(tasker.bind(self.resource, controller))
@@ -149,6 +186,9 @@ class PopupReplayTests(unittest.TestCase):
             return job.status.succeeded, controller.clicks
         finally:
             tasker.post_stop().wait()
+
+    def run_popup(self, image, disappear_after=None, entry="TEST_PARENT"):
+        return self.run_controller(PopupController(image, disappear_after), entry)
 
     def assert_inside(self, clicks, target):
         x, y, w, h = target
@@ -184,6 +224,14 @@ class PopupReplayTests(unittest.TestCase):
         succeeded, clicks = self.run_popup(np.zeros((720, 1280, 3), dtype=np.uint8))
         self.assertTrue(succeeded)
         self.assertEqual(clicks, [])
+
+    def test_late_popup_after_home_check_is_closed(self):
+        controller = LatePopupController(read_image(FIXTURES / "test_4.png"))
+        succeeded, _ = self.run_controller(controller, entry="TEST_HOME")
+        self.assertTrue(succeeded)
+        self.assertEqual(len(controller.back_clicks), 1)
+        self.assertGreaterEqual(len(controller.popup_clicks), 1)
+        self.assert_inside(controller.popup_clicks, FEATURES["small"]["target"])
 
     def test_persistent_feature_is_bounded_by_max_hit(self):
         succeeded, clicks = self.run_popup(read_image(FIXTURES / "test_4.png"))

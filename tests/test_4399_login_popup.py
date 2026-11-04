@@ -58,6 +58,11 @@ DEDICATED = {
 }
 ALL = {**SHARED, **DEDICATED}
 RECHECK = "4399-关闭弹窗-关闭公告-复查"
+HOME_FALLBACK = [
+    "主界面判断-main-ui",
+    "回主界面的指引",
+    "[JumpBack]主界面判断-返回",
+]
 OTHER_LOGIN_ENTRIES = (
     "关闭观看", "可能已经完成登录", "处理完成，等待动画", "开始更新",
     "开始游戏", "打开游戏", "更新", "特殊情况1", "登录", "阶段判断循环",
@@ -90,6 +95,15 @@ class LoginPopupWiringTests(unittest.TestCase):
         self.assertIs(POPUP[RECHECK]["enabled"], False)
         self.assertEqual(POPUP[RECHECK]["next"], list(DEDICATED) + ["关闭公告后异常处理添加"])
         self.assertEqual(LOGIN["关闭公告后异常处理添加"]["next"], ["特殊情况1", "回主界面"])
+
+    def test_4399_option_checks_popups_at_home_branch(self):
+        case = next(c for c in OPTIONS["option"]["包名"]["cases"] if c["name"] == "4399服")
+        self.assertEqual(case["pipeline_override"]["回主界面"]["next"],
+                         list(SHARED) + HOME_FALLBACK)
+        for other in OPTIONS["option"]["包名"]["cases"]:
+            if other["name"] == "4399服":
+                continue
+            self.assertNotIn("回主界面", other["pipeline_override"])
 
     def test_other_login_stages_keep_shared_nodes(self):
         for entry in OTHER_LOGIN_ENTRIES:
