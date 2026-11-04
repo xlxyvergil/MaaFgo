@@ -127,6 +127,48 @@ class GuardTests(unittest.TestCase):
         action.read_bond_page.assert_not_called()
         ctx.run_task.assert_not_called()
 
+    def test_new_callback_gets_its_own_controller_once(self):
+        first = Context(frames=[frame(2), frame(3)])
+        previous_controller = Mock(post_screencap=Mock(side_effect=first.capture))
+        with patch.object(action, "read_any_bond_max", return_value=False):
+            self.assertIsNone(action.inspect_bond_stop(first, frame(1), controller=previous_controller))
+            previous_controller.post_screencap.side_effect = OSError("expired callback controller")
+
+            second = Context(frames=[frame(5), frame(6)])
+            current_controller = Mock(post_screencap=Mock(side_effect=second.capture))
+            reads = []
+
+            class CurrentTasker:
+                stopping = False
+
+                @property
+                def controller(self):
+                    reads.append(True)
+                    if len(reads) > 1:
+                        raise AssertionError("controller acquired twice in one callback")
+                    return current_controller
+
+            second.tasker = CurrentTasker()
+            self.assertIsNone(action.inspect_bond_stop(second, frame(4)))
+        self.assertEqual(len(reads), 1)
+        self.assertGreater(current_controller.post_screencap.call_count, 0)
+
+    def test_explicit_controller_is_reused_without_reacquiring(self):
+        ctx = Context()
+        controller = Mock(post_screencap=Mock(side_effect=ctx.capture))
+
+        class CurrentTasker:
+            stopping = False
+
+            @property
+            def controller(self):
+                raise AssertionError("must reuse the controller supplied by this callback")
+
+        ctx.tasker = CurrentTasker()
+        with patch.object(action, "read_any_bond_max", return_value=False):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(), controller=controller))
+        self.assertGreater(controller.post_screencap.call_count, 0)
+
     def multiselect(self, targets, *, support=4, frames=None):
         ctx = Context(mode="slots", frames=frames)
         ctx.nodes[action.CONFIG_NODE]["attach"].update({

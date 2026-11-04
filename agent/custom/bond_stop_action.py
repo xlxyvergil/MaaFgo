@@ -183,12 +183,10 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         if stopped:
             return stopped
         guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
-        if controller is not None:
-            bond_stops.set_controller(root, controller)
-        controller = bond_stops.controller(root)
+        # 胜利立即交接时复用调用方的同回调代理；Pipeline 后续回调须自行
+        # 获取一次，不能从根任务状态复用已失效的 Agent 控制器句柄。
         if controller is None:
             controller = context.tasker.controller
-            bond_stops.set_controller(root, controller)
         # 升级展示可能很快覆盖羁绊栏；先逐帧捕获明确MAX，负结果才等待冻结。
         fast_node, fast_attempts, fast_timeout = _poll_config(guard, "positive")
         fast_deadline = time.monotonic() + fast_timeout / 1000

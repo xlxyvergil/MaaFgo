@@ -42,7 +42,6 @@ class _Run:
     stopped: BondStop | None = None
     another_battle_planned: bool = False
     deferred: BondStop | None = None
-    controller: Any = field(default=None, repr=False)
 
 
 class BondStopStates:
@@ -91,16 +90,6 @@ class BondStopStates:
         with self._lock:
             run = self._runs.get(root)
             return run.battle if run else 1
-
-    def set_controller(self, root: int, controller) -> None:
-        with self._lock:
-            self.ensure(root)
-            self._runs[root].controller = controller
-
-    def controller(self, root: int):
-        with self._lock:
-            run = self._runs.get(root)
-            return run.controller if run else None
 
     def set_formation(self, root: int, slots) -> None:
         """只保留槽位证据，不保留姓名、身份模板或动态前排位置。"""
