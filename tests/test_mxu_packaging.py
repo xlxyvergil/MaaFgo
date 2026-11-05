@@ -38,6 +38,7 @@ class MxuPackagingTests(unittest.TestCase):
             "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
             "agent/battle_editor/share_image.py",
             "agent/battle_editor/chaldea_image.py",
+            "agent/battle_editor/common_teams.py",
             "agent/battle_editor/bbc_import.py", "agent/chaldea/bbc_importer.py", "agent/chaldea/bbc_special_skills.py", "agent/chaldea/servant_types.py",
             "agent/custom/battle_editor_action.py", "agent/custom/bond_matcher.py",
             "agent/chaldea/servant_aliases.py", "agent/battle/card_composer.py",
@@ -47,7 +48,8 @@ class MxuPackagingTests(unittest.TestCase):
             self.write(relative, "fixture")
         for relative in ("agent/custom/servant_list.json", "agent/custom/equip_list.json",
                          "agent/chaldea/bbc_servant_ids.json", "agent/utils/Chaldea/equip_names_CN.json",
-                         "agent/custom/bond_completion_costs.json", "agent/battle_editor/data/catalog.json"):
+                         "agent/custom/bond_completion_costs.json", "agent/battle_editor/data/catalog.json",
+                         "agent/battle_editor/data/grand_quests.json"):
             self.document(relative, {})
         self.document("assets/interface.json", {"version": "source-version", "agent": {}})
         self.document("assets/tasks/编队与战斗编辑器.json", {"task": []})
@@ -103,6 +105,8 @@ class MxuPackagingTests(unittest.TestCase):
         self.assertTrue((self.output / "打开编队编辑器.cmd").is_file())
         self.assertTrue((self.output / "tasks/编队与战斗编辑器.json").is_file())
         self.assertTrue((self.output / "options/编队与战斗编辑器.json").is_file())
+        self.assertTrue((self.output / "agent/battle_editor/common_teams.py").is_file())
+        self.assertTrue((self.output / "agent/battle_editor/data/grand_quests.json").is_file())
         self.assertFalse(any(path.name in {"__pycache__", ".pytest_cache"} or path.suffix in {".pyc", ".pyo"}
                              for path in (self.output / "agent").rglob("*")))
         for relative in ("config", "node_modules", "web/battle-editor/src"):
@@ -135,6 +139,7 @@ class MxuPackagingTests(unittest.TestCase):
                          "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
                          "agent/battle_editor/share_image.py",
                          "agent/battle_editor/chaldea_image.py",
+                         "agent/battle_editor/common_teams.py", "agent/battle_editor/data/grand_quests.json",
                          "agent/battle_editor/bbc_import.py", "agent/chaldea/bbc_importer.py", "agent/chaldea/bbc_special_skills.py",
                          "agent/chaldea/servant_types.py", "agent/chaldea/bbc_servant_ids.json",
                          "agent/utils/Chaldea/equip_names_CN.json"):
