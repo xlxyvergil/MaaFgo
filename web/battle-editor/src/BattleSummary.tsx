@@ -23,7 +23,7 @@ function SummaryPortrait({src,label}:{src?:string|null;label:string}) {
 const validFront=(slot:unknown):slot is number=>Number.isInteger(slot)&&Number(slot)>=0&&Number(slot)<3;
 function SummaryMember({roster,slot,catalog,backup=false,memberOverride}:{roster:any[];slot:unknown;catalog:Catalog;backup?:boolean;memberOverride?:Json|null}) {
  const valid=backup?Number.isInteger(slot)&&Number(slot)>=3&&Number(slot)<6:validFront(slot);
- const member=memberOverride===undefined?(valid?roster[Number(slot)]:undefined):memberOverride,servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+ const member=memberOverride===undefined?(valid?roster[Number(slot)]:undefined):memberOverride,servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
  const position=valid?`${backup?'候补':'前排'} ${Number(slot)-(backup?3:0)+1}`:`无效${backup?'候补':'前排'} ${String(slot??'未指定')}`;
  const name=memberLabel(member,catalog);
  return <span className={`summary-person ${!hasServantIdentity(member)?'summary-unresolved':''}`} title={`${position} · ${name}`}>
@@ -49,7 +49,7 @@ function SummaryEntry({entry,data,catalog,region,config}:{entry:Entry;data:Json;
      {i>0&&<ArrowRight size={14} className="summary-arrow" aria-label="然后"/>}
      <span className="summary-card-item summary-muted"><Swords size={18} aria-hidden="true"/><span className="summary-card-label">默认普通卡</span></span>
     </span>;
-    const member=validFront(card?.svt)?actionMemberAt(data,entry.index,card):undefined,actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member.svtId):undefined;
+    const member=validFront(card?.svt)?actionMemberAt(data,entry.index,card):undefined,actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member.svtId,member):undefined;
     const np=card?.isTD?npAt(member,servant):undefined,color=card?.isTD?np?.cardType:card?.cardType;
     const npColor=artworkColor(color),label=!actorPresent?`未指定从者，无法安排${card?.isTD?'宝具':'指定普通卡'}`:card?.isTD?(npColor?`宝具 · ${npColor[0].toUpperCase()+npColor.slice(1)}`:np?.name??'宝具资料未知'):colorName(color);
     return <span className="summary-card-step" key={i}>
@@ -69,7 +69,7 @@ function SummaryEntry({entry,data,catalog,region,config}:{entry:Entry;data:Json;
  }
  if(raw?.type!=='skill')return <div className="summary-action summary-unresolved"><FileQuestion size={16} aria-hidden="true"/>{actionTitle(entry,data,catalog)}</div>;
  const mystic=catalog.mysticCodes.find(m=>m.id===data.team?.mysticCode?.mysticCodeId),master=raw.svt==null;
- const member=validFront(raw.svt)?actionMemberAt(data,entry.index,raw):undefined,actorPresent=master||hasServantIdentity(member),servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+ const member=validFront(raw.svt)?actionMemberAt(data,entry.index,raw):undefined,actorPresent=master||hasServantIdentity(member),servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
  const validSkill=Number.isInteger(raw.skill)&&raw.skill>=0&&raw.skill<3;
  const meta=validSkill&&actorPresent?(master?mystic?.skills?.find(skill=>skill.num===raw.skill+1)??mystic?.skills?.find((skill,i)=>skill.num==null&&i===raw.skill):skillAt(member??undefined,servant,raw.skill)):undefined;
  const swap=isSwap(data,raw),name=swap?'换人':!actorPresent?'未指定从者，无法安排技能':meta?.name??(validSkill?`技能 ${raw.skill+1}`:`未支持技能 ${String(raw.skill)}`);

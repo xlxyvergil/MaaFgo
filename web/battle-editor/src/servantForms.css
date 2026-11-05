@@ -1,0 +1,24 @@
+.servant-form-picker{padding:16px 24px;overflow-y:auto;max-height:calc(90vh - 100px)}
+.servant-form-picker>.hint{margin:0 0 12px;padding:0}
+.servant-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.servant-form-card{display:flex;flex-direction:column;gap:8px;padding:10px;border:1px solid var(--line);border-radius:6px;background:var(--surface-2);color:var(--text);text-align:left;cursor:pointer;min-width:0}
+.servant-form-card:hover,.servant-form-card:focus-visible{border-color:var(--purple);box-shadow:0 0 0 2px var(--purple-bg)}
+.servant-form-card.selected{border:2px solid var(--purple);padding:9px;box-shadow:inset 3px 0 var(--gold)}
+.servant-form-heading{display:flex;align-items:center;gap:10px;min-height:48px}
+.servant-form-heading>img{width:40px;height:48px;object-fit:cover;border-radius:3px}
+.servant-form-heading>span{display:flex;flex-direction:column;gap:2px;min-width:0}
+.servant-form-heading strong{font-size:15px;line-height:1.4}
+.servant-form-heading>small{margin-left:auto;align-self:flex-start;color:var(--purple)}
+.servant-form-rarity{color:#bd8317;font-size:12px;letter-spacing:1px}
+.servant-form-cost{font-size:12px;font-variant-numeric:tabular-nums;color:var(--muted)}
+.servant-form-skills{display:flex;flex-direction:column;gap:4px}
+.servant-form-skills>span{display:flex;align-items:center;gap:7px;font-size:12px;line-height:1.4}
+.servant-form-skills .skill-icon{width:22px;height:22px;flex:0 0 22px}
+.servant-form-np{display:flex;align-items:baseline;gap:6px;padding-top:7px;margin-top:auto;border-top:1px solid var(--line);font-size:12px;line-height:1.5}
+.servant-form-np>b{white-space:nowrap;color:var(--muted);font-size:12px}
+.catalog-form-rarity{color:#bd8317;white-space:nowrap;font-size:12px}
+.servant-form-picker>.modal-bottom{margin-top:14px;padding-top:12px}
+.member-form-control{display:flex;flex-wrap:wrap;align-items:center;gap:10px;padding:12px;background:var(--surface-2);border:1px solid var(--line);border-radius:5px}
+.member-form-control>span{flex:1;font-size:13px;min-width:120px}
+@media(max-width:850px){.servant-form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.servant-form-grid{grid-template-columns:1fr}.servant-form-picker{padding:16px}}

@@ -1,3 +1,4 @@
+import {projectServantForm} from './servantForms';
 import {members,servantFor,skillAt,turnsOf,isSwap,hasServantIdentity,isUnspecifiedSupport} from './model';
 import type {Catalog,Json,Mystic,Servant} from './model';
 import {advanceActionRoster,isRetire,resolveActionActor} from './actionRoster';
@@ -64,8 +65,8 @@ const initialSkill=(skill:Json|undefined,index:number,level:unknown,hasActor:boo
 
 export function npAt(member:Json|undefined|null,servant:Servant|undefined):Json|undefined {
   if(!hasServantIdentity(member))return undefined;
-  const chosen=member?.tdId;
-  if(chosen!=null)return servant?.npVariants?.find(np=>np.id===chosen)
+  const chosen=member?.tdId;servant=projectServantForm(servant,member);
+  if(chosen!=null&&!(servant?.forms?.length&&chosen===0))return servant?.npVariants?.find(np=>np.id===chosen)
     ??(servant?.np?.id===chosen?servant?.np:undefined)
     ??{id:chosen,name:`宝具 #${chosen}`};
   return servant?.np??undefined;
@@ -107,7 +108,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
   const turns=turnsOf(data);
   const selected=Math.max(0,Math.min(Math.max(0,turns.length-1),Number.isInteger(turnIndex)?turnIndex:0));
   const roster:PreviewMember[]=members(data).map((member,initialSlot)=>{
-    const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId):undefined;
+    const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId,member):undefined;
     return {key:`initial:${initialSlot}`,initialSlot,slot:initialSlot,member,servant,retired:false,
       skills:[0,1,2].map(index=>initialSkill(actorPresent?skillAt(member??undefined,servant,index):undefined,index,member?.skillLvs?.[index],actorPresent))};
   });

@@ -31,7 +31,7 @@ export function readBBCImportResult(value:any):BBCImportResult {
 
 export function bbcPreview(data:Json,catalog:Catalog) {
  const roster=members(data).map((member,index)=>{
-  const servant=member?.svtId?servantFor(catalog,member.svtId):undefined;
+  const servant=member?.svtId?servantFor(catalog,member.svtId,member):undefined;
   const equips=['equip1','equip2','equip3'].flatMap((key,equipIndex)=>{
    if(member?.grandSvt===true&&key==='equip2')return [];
    const candidates=equipCandidatesForDisplay(member,key),label=member?.grandSvt?['普通礼装','羁绊礼装','报酬礼装'][equipIndex]:`礼装 ${equipIndex+1}`;

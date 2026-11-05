@@ -29,7 +29,7 @@ const front=(value:unknown):value is number=>typeof value==='number'&&Number.isI
 const validSlot=(value:unknown):value is number=>typeof value==='number'&&Number.isInteger(value)&&value>=0&&value<6;
 const level=(value:unknown):string=>typeof value==='number'&&Number.isInteger(value)&&value>0?String(value):'—';
 function person(member:Json|null,slot:number|null,catalog:Catalog):SharePerson {
- const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+ const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
  const support=member?.supportType==='friend'?'好友助战':member?.supportType==='npc'?'NPC 助战':member?.supportType==='fixed'?'固定助战':'';
  return {slot,name:member?memberLabel(member,catalog):'不要求此位置',position:slot==null?'御主':`${slot<3?'前排':'候补'} ${slot+1}`,image:servant?.image,classIcon:servant?.classIcon,support,identified:hasServantIdentity(member)};
 }
@@ -75,7 +75,7 @@ export function shareImageModel(data:Json,catalog:Catalog,options:{region?:strin
     const card=recorded[cardIndex];
     if(card==null||isAutoAttackCard(card))return {label:'默认普通卡',name:'按当前策略补齐',color:null,image:null,automatic:true,deckLabel:''};
     const member=front(card.svt)?actionMemberAt(data,entry.index,card):undefined;
-    const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+    const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
     const np=card.isTD?npAt(member,servant):undefined,color=card.isTD?np?.cardType:card.cardType;
     const normalized=artworkColor(color),request=cardArtworkRequest({member,np,color,kind:card.isTD?'np':'face',region:selectedRegion,config:options.cardPreviewConfig});
     if(!hasServantIdentity(member))notices.add('存在未指定从者的技能或出卡，请先检查执行条件。');
@@ -89,7 +89,7 @@ export function shareImageModel(data:Json,catalog:Catalog,options:{region?:strin
    return {kind:'unknown',actor:{slot:null,name:'保留动作',position:'未支持动作',support:'',identified:false},name:typeof action?.type==='string'?action.type:'未知动作',number:'?',level:'',enemy:'',detail:'请在编辑器中检查这条动作。'};
   }
   const isMaster=action.svt==null,member=front(action.svt)?actionMemberAt(data,entry.index,action):undefined;
-  const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+  const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
   const validSkill=Number.isInteger(action.skill)&&action.skill>=0&&action.skill<3;
   const skill=validSkill?(isMaster?mystic?.skills?.find(item=>item.num===action.skill+1)??mystic?.skills?.find((item,i)=>item.num==null&&i===action.skill):skillAt(member??undefined,servant,action.skill)):undefined;
   const swap=isSwap(data,action),pair=entry.replacement;
@@ -111,7 +111,7 @@ export function shareImageModel(data:Json,catalog:Catalog,options:{region?:strin
  const model:ShareImageModel={
   title:typeof data.team?.name==='string'&&data.team.name.trim()?data.team.name.trim():'MaaFGO 编队方案',
   members:initial.map((member,slot)=>{
-   const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId):undefined;
+   const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
    const grand=member?.grandSvt===true;
    const equips=['equip1','equip2','equip3'].flatMap<ShareEquip>((key,index)=>{
     if(grand&&key==='equip2')return [{kind:'bond-effect',label:'羁绊礼装',name:'羁绊礼装',details:grandBondEffectLabel(member)}];

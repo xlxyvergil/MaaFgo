@@ -1,3 +1,5 @@
+import {projectServantForm} from './servantForms';
+import type {ServantForm} from './servantForms';
 import {isAutoAttackCard,setAttackCard} from './attackCards';
 import {defaultAdvancedStrategy} from './advancedStrategy';
 import {setEquipCandidate} from './equipRequirements';
@@ -13,7 +15,7 @@ export type Json = Record<string, any>;
 export interface ServantBond {tags?:string[]|null;tags_by_ascension?:Record<string,string[]>|null;tags_by_costume?:string[]|Record<string,string[]>|null;alignment?:string|null;attribute?:string|null;gender?:string|null;sub_attribute?:string|null;[key:string]:unknown}
 export interface NPFilterVariant {treasureDeviceId?:number;name_jp?:string;type?:string;card?:string;conditions_jp?:string[];[key:string]:unknown}
 export interface ServantNPFilter {types?:string[];cards?:string[];variants?:NPFilterVariant[]}
-export interface Servant { id:number; name:string; nameJp?:string; collectionNo?:number; classKey?:string; className?:string; rarity?:number;cost?:number|null; image?:string|null; portrait?:string|null; statusImage?:string|null; classIcon?:string|null; cards?:number[]; aliases?:(string|number)[]; searchAliases?:string[]; skills?:{id:number;num?:number;name:string;icon?:string;target?:string;targets?:string[];coolDown?:number[]}[]; skillVariants?:Json[]; appendSkills?:Json[]; np?:Json; npVariants?:Json[];bond?:ServantBond|null;npFilter?:ServantNPFilter|null }
+export interface Servant { forms?:ServantForm[];defaultFormKey?:string;formLabel?:string; id:number; name:string; nameJp?:string; collectionNo?:number; classKey?:string; className?:string; rarity?:number;cost?:number|null; image?:string|null; portrait?:string|null; statusImage?:string|null; classIcon?:string|null; cards?:number[]; aliases?:(string|number)[]; searchAliases?:string[]; skills?:{id:number;num?:number;name:string;icon?:string;target?:string;targets?:string[];coolDown?:number[]}[]; skillVariants?:Json[]; appendSkills?:Json[]; np?:Json; npVariants?:Json[];bond?:ServantBond|null;npFilter?:ServantNPFilter|null }
 export interface Equip {id:number;name:string;nameJp?:string;collectionNo?:number;rarity?:number;cost?:number|null;image?:string|null;imageWidth?:number;imageHeight?:number;recognizable?:boolean;supportRecognition?:{limitBreak:boolean;nonLimitBreak:boolean};common?:boolean;commonSources?:string[];filters?:EquipFilterMetadata}
 export interface Mystic {id:number;name:string;image?:string|null;skills?:Json[];orderChange?:boolean}
 export interface Catalog {servants:Servant[];equips:Equip[];mysticCodes:Mystic[];uiAssets?:{classes?:Record<string,string>;support?:string|null;background?:string|null;npFrames?:{arts?:string;buster?:string;quick?:string};masterSkill?:string|null;masterFrame?:string|null;masterEquipFrame?:string|null};inventory?:{servants?:number[];equips?:number[];[key:string]:any};version?:string|Json;specialSkillChoices?:SpecialSkillChoiceCatalog;equipFilters?:EquipFilterCatalog}
@@ -30,7 +32,7 @@ export function isUnspecifiedSupport(member:Json|null|undefined):boolean {
 }
 export function memberLabel(member:Json|null|undefined,catalog:Catalog):string {
  if(isUnspecifiedSupport(member))return '助战（仅要求礼装）';
- if(hasServantIdentity(member))return servantFor(catalog,member!.svtId)?.name??`从者 #${member!.svtId}`;
+ if(hasServantIdentity(member)){const servant=servantFor(catalog,member!.svtId,member);return servant?`${servant.name}${servant.formLabel?`【${servant.formLabel}】`:''}`:`从者 #${member!.svtId}`;}
  return '未配置从者';
 }
 /** Explicitly remove identity requirements, retaining CE and unrelated imported fields. */
@@ -178,7 +180,7 @@ export function filterCatalog(type:'servant'|'equip'|'mystic',catalog:Catalog,fi
  return list.filter(item=>{
   const s=item as Servant,bondOwner=type==='equip'?(item as Equip).filters?.bondOwner:undefined,owner=query&&bondOwner?servantFor(catalog,bondOwner):undefined;
   const searchText=`${item.name} ${s.nameJp??''} ${item.id} ${s.collectionNo??''} ${s.searchAliases?.join(' ')??''} ${bondOwner??''} ${owner?.name??''} ${owner?.nameJp??''} ${owner?.id??''} ${owner?.aliases?.join(' ')??''} ${owner?.searchAliases?.join(' ')??''}`;
-  return (!query||searchText.toLowerCase().includes(query))&&(!filters.classKey||s.classKey===filters.classKey)&&(!filters.rarity||String(s.rarity)===filters.rarity)&&(!filters.common||type!=='equip'||(item as Equip).common===true)&&(!filters.owned||ownIds?.includes(item.id)||s.aliases?.some(alias=>ownIds?.includes(Number(alias))))&&(type!=='servant'||!filters.advanced||matchServantAdvanced(s,filters.advanced).matches);
+  return (!query||searchText.toLowerCase().includes(query))&&(!filters.classKey||s.classKey===filters.classKey)&&(!filters.rarity||String(s.rarity)===filters.rarity||type==='servant'&&!!s.forms?.some(form=>String(form.rarity)===filters.rarity))&&(!filters.common||type!=='equip'||(item as Equip).common===true)&&(!filters.owned||ownIds?.includes(item.id)||s.aliases?.some(alias=>ownIds?.includes(Number(alias))))&&(type!=='servant'||!filters.advanced||matchServantAdvanced(s,filters.advanced).matches);
  });
 }
 export const canChange = (data:Json):boolean => [20,210,440].includes(data.team?.mysticCode?.mysticCodeId);
@@ -253,7 +255,7 @@ export const titleOf=(data:Json)=>String(data.team?.name||'未命名方案');
 export const colorOf=(value:any):number => ({arts:1,buster:2,quick:3} as any)[String(value).toLowerCase()]??Number(value);
 export const colorName=(value:any):string => ({1:'Arts · 蓝卡',2:'Buster · 红卡',3:'Quick · 绿卡'} as any)[colorOf(value)]||`未知色种 ${String(value)}`;
 export const colorClass=(value:any):string => ({1:'arts',2:'buster',3:'quick'} as any)[colorOf(value)]||'';
-export const servantFor=(catalog:Catalog,id:any):Servant|undefined=>catalog.servants.find(s=>s.id===id||s.aliases?.some(alias=>Number(alias)===Number(id)));
+export const servantFor=(catalog:Catalog,id:any,member?:Json|null):Servant|undefined=>{const servant=catalog.servants.find(s=>s.id===id||s.aliases?.some(alias=>Number(alias)===Number(id)));return member?projectServantForm(servant,member):servant;};
 export function replaceServant(old:Json|null,id:number,catalog:Catalog,defaults:Json=newServantDefaults()):Json {
  const next=old===null?clone(defaults):isUnspecifiedSupport(old)?{...clone(defaults),...clone(old)}:clone(old);
  if(old&&(servantFor(catalog,old.svtId)?.id??old.svtId)!==id)for(const key of ['skillIds','tdId','limitCount','transformVal'])delete next[key];
@@ -269,8 +271,8 @@ export function fillMissingTaskSkillDefaults(member:Json):void {
  for(const key of keys){member[key]??=[];for(let i=0;i<defaults[key].length;i++)if(member[key][i]==null)member[key][i]=defaults[key][i];}
 }
 export function skillAt(member:Json|undefined,servant:Servant|undefined,index:number):Json|undefined {
- const chosen=member?.skillIds?.[index];
- if(chosen!=null)return servant?.skillVariants?.find(s=>s.id===chosen)??servant?.skills?.find(s=>s.id===chosen)??{id:chosen,name:`技能 #${chosen}`,target:'unknown'};
+ const chosen=member?.skillIds?.[index];servant=projectServantForm(servant,member);
+ if(chosen!=null&&!(servant?.forms?.length&&chosen===0))return servant?.skillVariants?.find(s=>s.id===chosen)??servant?.skills?.find(s=>s.id===chosen)??{id:chosen,name:`技能 #${chosen}`,target:'unknown'};
  return servant?.skills?.[index];
 }
 export function appendSkillAt(servant:Servant|undefined,index:number):Json|undefined {
@@ -280,7 +282,7 @@ export function appendSkillAt(servant:Servant|undefined,index:number):Json|undef
 export function makeCard(svt:number,type:number|'np',roster:any[],catalog:Catalog,used:Json[]=[],explicitIndex?:number):Json {
  if(!Number.isInteger(svt)||svt<0||svt>=3||!hasServantIdentity(roster[svt]))throw new Error('请先为这个前排位置选择从者。');
  if(type==='np'){if(used.some(c=>c?.svt===svt&&c?.isTD))throw new Error('同一回合不能重复指定同一位从者的宝具。');return {svt,isTD:true,card:-1};}
- const cards=servantFor(catalog,roster[svt]?.svtId)?.cards;
+ const cards=servantFor(catalog,roster[svt]?.svtId,roster[svt])?.cards;
  if(explicitIndex!==undefined){
   if(!cards||cards.length!==5)throw new Error('缺少该从者的完整五张牌组元数据，无法指定牌组卡。');
   if(!Number.isInteger(explicitIndex)||explicitIndex<0||explicitIndex>4)throw new Error('指定牌组卡必须是该从者的第 1～5 张牌（合法索引 0～4）。');

@@ -45,7 +45,7 @@ export function readImageImportResult(value:any):ImageImportResult {
 }
 export function shareImagePreview(data:Json,catalog:Catalog) {
  const roster=members(data).map((member,slot)=>{
-  const servant=member?.svtId?servantFor(catalog,member.svtId):undefined;
+  const servant=member?.svtId?servantFor(catalog,member.svtId,member):undefined;
   const supportType=member?.supportType;
   const supportLabel=supportType==='friend'?'好友助战':supportType==='npc'?'NPC 助战':supportType==='fixed'?'固定助战':'';
   const equips=['equip1','equip2','equip3'].flatMap((key,equipIndex)=>{

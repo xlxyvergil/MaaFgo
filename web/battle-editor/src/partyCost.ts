@@ -1,3 +1,4 @@
+import {projectServantForm} from './servantForms';
 import {members} from './model';
 import type {Catalog,Json,Servant} from './model';
 import {equipForDisplay} from './equipRequirements';
@@ -109,7 +110,7 @@ export function partyCost(data:Json,catalog:Catalog):PartyCost {
    continue;
   }
   if(positiveId(id)){
-   const servant=catalog.servants.find(item=>item.id===id)??catalog.servants.find(item=>matchesServant(item,id));
+   const servant=projectServantForm(catalog.servants.find(item=>item.id===id)??catalog.servants.find(item=>matchesServant(item,id)),member);
    if(!servant)issue(slot,`图鉴缺少从者 #${id}，无法确定从者 COST。`);
    else if(!validCost(servant.cost))issue(slot,`${servant.name} 缺少有效的从者 COST。`);
    else knownTotal+=servant.cost;

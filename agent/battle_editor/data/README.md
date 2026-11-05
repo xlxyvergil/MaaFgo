@@ -24,6 +24,12 @@ python tools/build_battle_editor_catalog.py --refresh
 
 默认 `np` 优先从包含非空实际函数记录的 Nice 宝具中选择，再按 `priority/id` 排序；所有候选都没有函数时沿旧规则回退。`npVariants` 完整保留，明确指定的 `tdId` 仍优先准确匹配。仅离线修正默认项可运行 `python tools/build_battle_editor_catalog.py --np-defaults-only`，只读取 JP/CN Nice 缓存并更新 `catalog.json` 的默认字段，不改版本、variants、媒体和来源文件；无变化不重写。当前服务进程的内存目录需由维护者安排重启后重新读取，单独刷新网页不会清空服务缓存。
 
+玛修始终只有 `svtId=800100` 一个从者身份。该记录的 `forms` 单独提供初期三星、第一部四星、奥特瑙斯初期／黑枪强化／修复后、帕拉丁五星六组配置，默认组为 `normal`。每组绑定真实的星级、COST、三个技能 ID 与宝具 ID；帕拉丁为五星、COST 16，其余组 COST 0。形态选择写入 Chaldea 已有的 `limitCount`、`skillIds`、`tdId`，不生成新的从者 ID；导入记录的明确 ID 继续原样保留。历史奥特瑙斯共享同一灵衣编号，依靠明确的技能及宝具 ID 区分强化阶段；只有修复后组作为缺省技能资料。
+
+形态分组对应 Chaldea 的 `svtLimitHides`，兼容旧文件中的小号灵衣编号和选择界面使用的 `battleCharaId`；普通初期为 `limitCount=0/1/2`，第一部完成使用 `4`，奥特瑙斯代表值 `800140`，帕拉丁代表值 `800190`。帕拉丁同时识别隐藏外观和常夏水着 Ver.03（`800200/800210`）；后者的五星、COST 16 与宝具所属组由 Atlas 的重写资料及宝具释放条件核对。来源版本及哈希记录于 `sources.json.incrementalUpdates`。形态头像只复用工程现有的识别头像；全身图从 UI manifest 的 `servants["800100"].formPortraits` 按形态键精确解析，必须先登记到 UI 媒体白名单。没有对应全身展示图时使用该形态头像，不借用其他形态的全身图；图名不写入源目录 `forms`，避免资料增量重建覆盖 UI 媒体维护结果。
+
+仅更新形态资料可运行 `python tools/build_battle_editor_catalog.py --mash-forms-only`。命令只读既有 JP Nice 缓存，只修改已有玛修行的 `forms/defaultFormKey`，保留其他角色、礼装、技能、宝具与版本字段；缺少所需真实资料时会报错，不填造数据，无变化不重写。全量离线构建也会生成同一组形态资料。
+
 未知牌组返回空数组；缺图返回 `null`；不使用虚构索引、远程热链或代用人物图。Atlas 的 CardType 为 Arts=1、Buster=2、Quick=3，与 Chaldea 正式整数保持一致。
 
 从者高级筛选另从既有 `agent/custom/servant_list.json` 投影 `bond` 和 `npFilter`，不覆盖这里的 Atlas `np/npVariants`。这些羁绊、宝具类型与色卡记录已和用户 `servant_list.csv` 核对，运行时不依赖外部 CSV；更新资料前先比较精确 ID 和原始字段。类型与色卡须由同一条宝具记录满足，灵基/灵衣条件独立保留，不做无依据的全局并集。具体规则、来源哈希及维护回归见 `docs/HTML编队与战斗编辑器维护说明.md`。
