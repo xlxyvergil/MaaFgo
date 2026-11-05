@@ -16,10 +16,11 @@ class MapOcclusionFrameworkTests(FrameworkResources, unittest.TestCase):
     def test_actual_animation_phases_and_empty_map(self):
         resource = self.resource('cn')
         resource.register_custom_recognition('main_story_next', MainStoryNext())
-        for filename, hit in (
-            ('cn_tiamat_map_phase2.png', True),
-            ('cn_tiamat_map_phase8.png', True),
-            ('cn_tiamat_map_absent.png', False),
+        for filename, hit, click_bounds in (
+            ('cn_tiamat_map_phase2.png', True, (1020,480,1040,530)),
+            ('cn_tiamat_map_phase8.png', True, (1020,480,1040,530)),
+            ('cn_tiamat_map_absent.png', False, None),
+            ('cn_tiamat_map_moved.png', True, (610,300,670,370)),
         ):
             with self.subTest(filename=filename):
                 path = ROOT / 'tests/fixtures/main_story' / filename
@@ -48,7 +49,7 @@ class MapOcclusionFrameworkTests(FrameworkResources, unittest.TestCase):
                     self.assertEqual(results, {'normal': False, 'icon': hit})
                     self.assertEqual(len(controller.clicks), int(hit))
                     for x, y in controller.clicks:
-                        self.assertTrue(1020 <= x <= 1040 and 480 <= y <= 530)
+                        self.assertTrue(click_bounds[0] <= x <= click_bounds[2] and click_bounds[1] <= y <= click_bounds[3])
                     self.assertEqual(controller.swipes, [])
                 finally:
                     tasker.post_stop().wait()
