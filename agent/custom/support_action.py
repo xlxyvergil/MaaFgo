@@ -610,13 +610,17 @@ class SupportAction(CustomAction):
 
     @staticmethod
     def _ocr_level_text(roi):
-        """OCR 识别等级区域, 返回当前等级 int; OCR 不可用/无匹配返回 None"""
+        """返回当前等级；没有等级或无法解析时返回 None，并保留 OCR 原文。"""
         import cv2
         g = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)[2:22, :]   # 去掉上下横线
         if g.size == 0:
             return None
         t = SupportAction._ocr_run(g, 3)
         if not t:
+            return None
+        # 排序可能让头像上方显示其他属性，不能把攻击力/生命值当作等级。
+        if re.match(r"^(?:攻击|攻撃|生命|ATK|HP)", t.strip(), re.IGNORECASE):
+            mfaalog.debug(f"[SupportAction] 从者等级区域显示其他属性，原文={t!r}")
             return None
         m = re.search(r"(\d{1,3})/(\d{1,3})", t)
         if m:
@@ -626,6 +630,7 @@ class SupportAction(CustomAction):
             cur, mx = int(m.group(1)), int(m.group(2))
             if 1 <= cur <= 130 and 1 <= mx <= 130:
                 return cur
+        mfaalog.debug(f"[SupportAction] 从者等级区域 OCR 无法解析，原文={t!r}")
         return None
 
     @staticmethod
@@ -675,9 +680,13 @@ class SupportAction(CustomAction):
         if expect <= 0:
             return True
         roi = _roi(img, bx, by, LEVEL_ROI[0], LEVEL_ROI[1], LEVEL_ROI[2], LEVEL_ROI[3])
-        if roi is None:
-            return False
-        got = SupportAction._ocr_level_text(roi)
+        got = SupportAction._ocr_level_text(roi) if roi is not None else None
+        if got is None and not getattr(self, "_level_recognition_failed", False):
+            self._level_recognition_failed = True
+            mfaalog.warning(
+                f"[SupportAction] 助战从者等级识别失败（要求至少{expect}级），当前条目无法确认等级，正在继续查找。"
+                "请检查游戏“助战选择”界面是否已开启从者等级显示，确认头像上方显示“90/90”这类等级。"
+            )
         ok = got is not None and got >= expect
         mfaalog.info(f"[SupportAction] 英灵等级 期望>={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
         return ok
@@ -786,6 +795,17 @@ class SupportAction(CustomAction):
         return CustomAction.RunResult(success=True)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        # 每次助战查找独立记录；实时提醒只输出一次，避免滑动刷新时刷屏。
+        self._level_recognition_failed = False
+        result = self._run_search(context, argv)
+        if not result.success and self._level_recognition_failed and not context.tasker.stopping:
+            mfaalog.warning(
+                "[SupportAction] 本次助战任务失败，查找过程中曾出现从者等级识别失败。"
+                "请检查游戏“助战选择”界面是否已开启从者等级显示，确认头像上方显示“90/90”这类等级后重试。"
+            )
+        return result
+
+    def _run_search(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         try:
             param = {}
             if argv.custom_action_param:
