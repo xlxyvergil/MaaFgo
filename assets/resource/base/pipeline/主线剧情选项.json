@@ -1,0 +1,20 @@
+{
+  "主线-剧情选择-不赞同魁札尔": {
+    "doc": "国服第七特异点第12节强制选项现场：SKIP为灰色，普通剧情跳过不能推进。仅在选项边框及上下两条赞同／不赞同魁札尔·科亚特尔文字同时命中时选择下项；不把一般黑色弹窗或任意对话框作为可点击选项。2026-11-06国服MaaMCP实测已选中下项并进入助战、编队与战斗；可参考“跳过剧情-点击跳过”与“跳过剧情-确认跳过”，但该灰色SKIP现场不能沿用跳过确认链。引用main_story/剧情选项边框.png；主线脚本在跳过等待窗口之前优先处理，单个任务至多点击3次。当前只覆盖此明确选项，不宣称任意剧情选择已适配。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"recognition": {"type": "TemplateMatch", "param": {"template": "main_story/剧情选项边框.png", "roi": [150, 160, 110, 240], "threshold": 0.95}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-不赞同魁札尔/OCR1", "recognition": {"type": "OCR", "param": {"roi": [270, 170, 800, 90], "expected": ["^赞同魁[札扎]尔[·・.\\s]*科亚特尔[。.]?$"], "threshold": 0.85}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-不赞同魁札尔/OCR2", "recognition": {"type": "OCR", "param": {"roi": [270, 290, 800, 90], "expected": ["^不赞同魁[札扎]尔[·・.\\s]*科亚特尔[。.]?$"], "threshold": 0.85}}}
+        ],
+        "box_index": 2
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  }
+}

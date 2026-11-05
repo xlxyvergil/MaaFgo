@@ -16,6 +16,8 @@
       "battle_mode": "native",
       "auto_handle_restrictions": true,
       "use_spirit_stone": false,
+      "retry_without_spirit_stone": false,
+      "defeat_retry_limit": 3,
       "transition_timeout": 120
     }
   },

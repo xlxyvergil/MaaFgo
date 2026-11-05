@@ -9,3 +9,6 @@
 !teapot/*.png
 # Anonymous servant level / attack-value crops for support filtering regressions.
 !support_level/*.png
+# Anonymous CN confirmation UI and explicitly synthetic retreat-question sample.
+!main_story/cn_spirit_confirmation_retreat_negative.png
+!main_story/cn_retreat_confirmation_synthetic.png
