@@ -408,9 +408,13 @@ class StoryRunner:
                 self.pause(1)
                 continue
             if self.on_map(image):
-                result = self.reco("主线-地图NEXT", image)
+                map_node = "主线-地图NEXT"
+                result = self.reco(map_node, image)
+                if not result:
+                    map_node = "主线-地图提亚马特"
+                    result = self.reco(map_node, image)
                 if result:
-                    self.open_panel(result)
+                    self.open_panel(result, map_node)
                     continue
                 name = next(swipes, None)
                 if name is None:
@@ -437,9 +441,9 @@ class StoryRunner:
             if not self.panel(image):
                 raise StoryStopped("查找主线关卡时离开了副本列表")
 
-    def open_panel(self, result):
+    def open_panel(self, result, node="主线-地图NEXT"):
         for _ in range(3):
-            self.action("主线-地图NEXT", result)
+            self.action(node, result)
             until = self.clock() + 5
             while self.clock() < until:
                 self.pause()
@@ -450,7 +454,7 @@ class StoryRunner:
             image = self.frame()
             if not self.on_map(image):
                 break
-            result = self.reco("主线-地图NEXT", image)
+            result = self.reco(node, image)
             if not result:
                 break
         raise StoryStopped("点击主线节点后未打开副本列表")
