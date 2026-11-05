@@ -1,0 +1,56 @@
+{
+  "主线-剧情选择-不赞同魁札尔": {
+    "doc": "国服第七特异点第12节强制选项现场：SKIP为灰色，普通剧情跳过不能推进。仅在选项边框及上下两条赞同／不赞同魁札尔·科亚特尔文字同时命中时选择下项；不把一般黑色弹窗或任意对话框作为可点击选项。2026-11-06国服MaaMCP实测已选中下项并进入助战、编队与战斗；可参考“跳过剧情-点击跳过”与“跳过剧情-确认跳过”，但该灰色SKIP现场不能沿用跳过确认链。引用main_story/剧情选项边框.png；主线脚本在跳过等待窗口之前优先处理，每关至多点击3次，推进成功后重置计数。当前只覆盖此明确选项，不宣称任意剧情选择已适配。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"recognition": {"type": "TemplateMatch", "param": {"template": "main_story/剧情选项边框.png", "roi": [150, 160, 110, 240], "threshold": 0.95}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-不赞同魁札尔/OCR1", "recognition": {"type": "OCR", "param": {"roi": [270, 170, 800, 90], "expected": ["^赞同魁[札扎]尔[·・.\\s]*科亚特尔[。.]?$"], "threshold": 0.85}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-不赞同魁札尔/OCR2", "recognition": {"type": "OCR", "param": {"roi": [270, 290, 800, 90], "expected": ["^不赞同魁[札扎]尔[·・.\\s]*科亚特尔[。.]?$"], "threshold": 0.85}}}
+        ],
+        "box_index": 2
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  },
+  "主线-剧情选择-埃列什基伽勒": {
+    "doc": "国服第七特异点第14节冥界之门强制选项：编队确认后出现伊什塔尔／埃列什基伽勒二选一，SKIP灰显。2026-11-06MaaMCP已验证短名称选择进入战斗；MaaMCP也已验证下一门“ 不用想也知道是伊什塔尔小姐／经过深思熟虑决定是埃列什基伽勒”的实际长句选择并进入战斗，故允许有限长度的前后缀，但上条必须只含伊什塔尔、下条必须只含埃列什基伽勒，混有另一女神名字则拒绝。复用“主线-剧情选择-不赞同魁札尔”的边框、双行交叉确认和下项OCR框点击；不盲选其他对话。每关同节点至多点击3次，推进成功后重置计数。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"recognition": {"type": "TemplateMatch", "param": {"template": "main_story/剧情选项边框.png", "roi": [150, 160, 110, 240], "threshold": 0.95}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒/OCR1", "recognition": {"type": "OCR", "param": {"roi": [270, 170, 800, 90], "expected": ["^(?!.*埃列什基伽勒).{0,32}伊什塔尔.{0,16}$"], "threshold": 0.85}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒/OCR2", "recognition": {"type": "OCR", "param": {"roi": [270, 290, 800, 90], "expected": ["^(?!.*伊什塔尔).{0,32}埃列什基伽勒.{0,16}$"], "threshold": 0.85}}}
+        ],
+        "box_index": 2
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  },
+  "主线-剧情选择-埃列什基伽勒没有错": {
+    "doc": "国服第七特异点第14节最后进度实拍：上项“埃列什基伽勒没有错。”，下项“我没兴趣。那是，你该尽的职责”，SKIP灰显。复用“主线-剧情选择-不赞同魁札尔”的边框和上下双行完整文字交叉确认，但本组选上项，box_index指向上项OCR框；不能复用另外两组选择下项的落点。2026-11-06MaaMCP已实际选择上项并进入埃列什基伽勒战斗。每关同节点至多点击3次，推进后重置，不匹配其他剧情选项。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"recognition": {"type": "TemplateMatch", "param": {"template": "main_story/剧情选项边框.png", "roi": [150, 160, 110, 240], "threshold": 0.95}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒没有错/OCR1", "recognition": {"type": "OCR", "param": {"roi": [270, 170, 800, 90], "expected": ["^埃列什基伽勒没有错[。.]?$"], "threshold": 0.85}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒没有错/OCR2", "recognition": {"type": "OCR", "param": {"roi": [270, 290, 800, 90], "expected": ["^我没兴趣[。.]?\\s*那是[，,]?\\s*你该尽的职责[。.]?$"], "threshold": 0.85}}}
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
+  }
+}

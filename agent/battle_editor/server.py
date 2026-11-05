@@ -14,7 +14,7 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from . import DEFAULT_PORT, PROTOCOL_VERSION, SERVICE_NAME
 from .storage import BattleStorage, EditorError, MAX_JSON_BYTES, battle_name, decode_json, project_identity, utc_now, within
@@ -103,6 +103,25 @@ class EditorHTTPServer(ThreadingHTTPServer):
     def bond_settings(self):
         from .bond_optimizer import BondPlanner
         return BondPlanner(self.root, self.catalog()).settings()
+
+    def common_team_catalog(self):
+        from .common_teams import common_team_catalog
+        return common_team_catalog()
+
+    def common_teams(self, query: str):
+        from .common_teams import search_common_teams
+        try:
+            values = parse_qs(query, keep_blank_values=True, max_num_fields=8)
+        except ValueError as exc:
+            raise EditorError("common_teams_query", "队伍筛选条件过多，无法查询对应副本。请重新选择副本后重试。") from exc
+        if set(values) - {"quest", "sort", "offset"} or any(len(items) != 1 for items in values.values()):
+            raise EditorError("common_teams_query", "队伍筛选条件无法读取，无法查询对应副本。请重新选择副本和排序后重试。")
+        quest = values.get("quest", [""])[0]
+        sort = values.get("sort", ["upvotes"])[0]
+        offset = values.get("offset", ["0"])[0]
+        if not re.fullmatch(r"[0-9]{1,6}", offset):
+            raise EditorError("common_teams_offset", "加载更多的位置无法读取，无法继续查询。请重新选择副本后重试。")
+        return search_common_teams(quest, sort=sort, offset=int(offset))
 
     def optimize_bond(self, data, options):
         # An isolated, bounded worker keeps CPU-heavy all-catalog planning from
@@ -444,6 +463,10 @@ class EditorHandler(BaseHTTPRequestHandler):
                 self._json(200, self.server.capabilities())
             elif method == "GET" and path == "/api/catalog":
                 self._json(200, self.server.catalog())
+            elif method == "GET" and path == "/api/common-teams/catalog":
+                self._json(200, self.server.common_team_catalog())
+            elif method == "GET" and path == "/api/common-teams":
+                self._json(200, self.server.common_teams(urlsplit(self.path).query))
             elif method == 'GET' and path == '/api/bond/settings':
                 self._json(200, self.server.bond_settings())
             elif method == 'POST' and path == '/api/bond/optimize':

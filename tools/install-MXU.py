@@ -85,6 +85,7 @@ def validate_editor_bundle(root, *, packaged=False):
         "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
         "agent/battle_editor/share_image.py",
         "agent/battle_editor/chaldea_image.py",
+        "agent/battle_editor/common_teams.py",
         "agent/battle_editor/bbc_import.py", "agent/chaldea/bbc_importer.py", "agent/chaldea/bbc_special_skills.py", "agent/chaldea/servant_types.py",
         "agent/custom/battle_editor_action.py", "agent/custom/bond_matcher.py",
         "agent/chaldea/servant_aliases.py", "agent/battle/card_composer.py",
@@ -97,6 +98,7 @@ def validate_editor_bundle(root, *, packaged=False):
                      "agent/custom/bond_completion_costs.json"):
         document(root / relative)
     document(data / "catalog.json")
+    document(data / "grand_quests.json")
     filter_path = data / "equip_filters.json"
     filters = document(filter_path)
     filter_sources = document(data / "equip_filters_sources.json")

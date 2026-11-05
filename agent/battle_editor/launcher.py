@@ -240,6 +240,24 @@ def _open_browser(url: str) -> bool:
         return False
 
 
+def _started_by_launcher(child: subprocess.Popen, pid: int) -> bool:
+    if pid == child.pid:
+        return True
+    if os.name != "nt" or child.poll() is not None:
+        return False
+    # Windows venv python.exe remains as a redirector while its child runs the
+    # backend. A different PID alone does not mean another launcher won the port.
+    try:
+        import psutil
+    except ImportError:
+        return False
+    try:
+        descendant = any(parent.pid == child.pid for parent in psutil.Process(pid).parents())
+        return descendant and child.poll() is None
+    except (psutil.Error, OSError):
+        return False
+
+
 def _open_editor_locked(
     project_root: str | Path | None = None,
     *,
@@ -299,7 +317,7 @@ def _open_editor_locked(
                 last_error = exc
                 health = None
             if health is not None:
-                reused = int(health["pid"]) != child.pid
+                reused = not _started_by_launcher(child, int(health["pid"]))
                 break
             if child.poll() is not None:
                 # Another simultaneous launcher might have won the bind race.
