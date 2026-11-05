@@ -47,4 +47,21 @@ class DialogueChoicesTests(unittest.TestCase):
         self.assertEqual(r.completed,2)
         self.assertEqual(len(c.actions),6)
 
+    def test_eresh_patterns_reject_mixed_or_reversed_identity(self):
+        import json,re
+        from pathlib import Path
+        node=json.loads((Path(__file__).resolve().parents[1]/'assets/resource/base/pipeline/主线剧情选项.json').read_text(encoding='utf-8'))['主线-剧情选择-埃列什基伽勒']
+        rows=node['recognition']['param']['all_of']
+        upper=rows[1]['recognition']['param']['expected'][0]
+        lower=rows[2]['recognition']['param']['expected'][0]
+        for text in ('伊什塔尔。','不用想也知道是伊什塔尔小姐……！'):
+            self.assertIsNotNone(re.fullmatch(upper,text))
+            self.assertIsNone(re.fullmatch(lower,text))
+        for text in ('埃列什基伽勒。','经过深思熟虑决定是埃列什基伽勒……！'):
+            self.assertIsNotNone(re.fullmatch(lower,text))
+            self.assertIsNone(re.fullmatch(upper,text))
+        for text in ('伊什塔尔和埃列什基伽勒','与两位女神都无关的其他选项'):
+            self.assertIsNone(re.fullmatch(upper,text))
+            self.assertIsNone(re.fullmatch(lower,text))
+
 if __name__=='__main__':unittest.main()

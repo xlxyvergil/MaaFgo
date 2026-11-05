@@ -17,6 +17,7 @@ class DialogueFrameworkTests(FrameworkResources, unittest.TestCase):
         cases = (
             ('cn_quetzal_choice.png', '主线-剧情选择-不赞同魁札尔'),
             ('cn_eresh_choice.png', '主线-剧情选择-埃列什基伽勒'),
+            ('cn_eresh_choice_long.png', '主线-剧情选择-埃列什基伽勒'),
         )
         for filename, expected in cases:
             with self.subTest(filename=filename):
