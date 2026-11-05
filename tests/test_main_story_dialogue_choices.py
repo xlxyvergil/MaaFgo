@@ -25,4 +25,26 @@ class DialogueChoicesTests(unittest.TestCase):
             r.interrupt({CHOICE})
         self.assertEqual(len(c.actions),3)
 
+    def test_eresh_choice_precedes_skip_confirmation(self):
+        r,c=runner()
+        node='主线-剧情选择-埃列什基伽勒'
+        r.skip_confirm_until=20
+        self.assertTrue(r.interrupt({node,'跳过剧情-点击跳过'}))
+        self.assertEqual([name for name,_ in c.actions],[node])
+        self.assertEqual(r.skip_confirm_until,0)
+
+    def test_choice_budget_resets_after_completed_quest(self):
+        r,c=runner()
+        node='主线-剧情选择-埃列什基伽勒'
+        r.limit=2
+        r.locate=lambda: object()
+        def enter(target):
+            for _ in range(3):
+                self.assertTrue(r.interrupt({node}))
+            return 'story'
+        r.enter=enter
+        r.run()
+        self.assertEqual(r.completed,2)
+        self.assertEqual(len(c.actions),6)
+
 if __name__=='__main__':unittest.main()

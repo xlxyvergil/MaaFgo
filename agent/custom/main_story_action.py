@@ -326,9 +326,13 @@ class StoryRunner:
             if self._handle_restricted_formation(image):
                 return True
         # 强制剧情选项会使 SKIP 灰显，必须在跳过确认的等待窗口之前处理。
-        choice_node = "主线-剧情选择-不赞同魁札尔"
-        choice = self.reco(choice_node, image)
-        if choice:
+        for choice_node, label in (
+            ("主线-剧情选择-不赞同魁札尔", "不赞同魁札尔·科亚特尔"),
+            ("主线-剧情选择-埃列什基伽勒", "埃列什基伽勒"),
+        ):
+            choice = self.reco(choice_node, image)
+            if not choice:
+                continue
             count = self._dialogue_choices.get(choice_node, 0)
             if count >= 3:
                 raise StoryStopped("剧情选项点击3次后仍未离开，已保留现场。请手动选择当前对话选项后重试。")
@@ -336,7 +340,7 @@ class StoryRunner:
             self._dialogue_choices[choice_node] = count + 1
             self.skip_confirm_until = 0
             self.skip_settle_until = self.clock() + 1
-            mfaalog.info("[自动推主线] 已选择剧情选项：不赞同魁札尔·科亚特尔")
+            mfaalog.info(f"[自动推主线] 已选择剧情选项：{label}")
             return True
         if entering and self.reco("全局-战前吃体力", image):
             entry = self.ctx.get_node_data("全局-战前吃体力") or {}
@@ -694,6 +698,7 @@ class StoryRunner:
                 self.battles += 1
             self.completed += 1
             self._defeat_retries = 0
+            self._dialogue_choices.clear()
             mfaalog.info(f"[自动推主线] 已推进 {self.completed}/{self.limit} 关，战斗 {self.battles} 场")
         return f"达到推进上限：已推进 {self.completed} 关，完成战斗 {self.battles} 场"
 
