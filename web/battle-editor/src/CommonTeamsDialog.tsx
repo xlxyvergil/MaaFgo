@@ -1,9 +1,9 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {AlertTriangle,ArrowDownWideNarrow,CalendarDays,CloudDownload,Globe,LoaderCircle,RefreshCw,Shield,Sparkles,ThumbsUp,Upload,UserRound,Users} from 'lucide-react';
+import {AlertTriangle,ArrowDownWideNarrow,CalendarDays,CloudDownload,Globe,Heart,LoaderCircle,RefreshCw,Shield,Sparkles,ThumbsUp,Upload,UserRound,Users} from 'lucide-react';
 import {api} from './api';
 import {Modal} from './EditorModal';
 import type {Catalog,Equip,Servant} from './model';
-import {appendCommonTeams,commonTeamDate,commonTeamQuery,GRAND_CLASS_ICONS,readCommonTeamCatalog,readCommonTeamPage} from './commonTeamsModel';
+import {appendCommonTeams,commonTeamDate,commonTeamEquipId,commonTeamQuery,GRAND_CLASS_ICONS,readCommonTeamCatalog,readCommonTeamPage} from './commonTeamsModel';
 import type {CommonTeam,CommonTeamCatalog,CommonTeamMember,CommonTeamPage,CommonTeamRequest,CommonTeamSort} from './commonTeamsModel';
 import './commonTeams.css';
 
@@ -14,21 +14,35 @@ function Portrait({src,label,kind='servant'}:{src?:string|null;label:string;kind
  return <span className={`common-team-image ${kind}`} title={label}>{src&&!failed?<img src={src} alt={label} loading="lazy" draggable={false} onError={()=>setFailed(true)}/>:kind==='class'?<Shield size={27} aria-label={label}/>:<span className="common-team-image-fallback" aria-label={label}>{kind==='equip'?'◇':label==='空位'?'—':'?'}</span>}</span>;
 }
 
-function RosterSlot({member,position,servants,equips}:{member:CommonTeamMember|null;position:number;servants:Map<number,Servant>;equips:Map<number,Equip>}){
- const servant=member?servants.get(member.svtId):undefined,equip=member?equips.get(member.equipId):undefined;
+function RosterSlot({member,position,servants,equips,bondOwners,grandRows}:{member:CommonTeamMember|null;position:number;servants:Map<number,Servant>;equips:Map<number,Equip>;bondOwners:Map<number,number>;grandRows:boolean}){
+ const servant=member?servants.get(member.svtId):undefined;
  const name=member?(servant?.name||(member.svtId?`从者 #${member.svtId}`:member.support?'仅礼装助战':'未指定从者')):'空位';
- const equipName=member?.equipId?(equip?.name??`礼装 #${member.equipId}`):'未配置礼装';
- return <li className={`common-team-slot ${member?'':'empty'}`} aria-label={`位置 ${position}：${name}，${equipName}${member?.support?'，助战':''}`}>
+ const effect=member?.bondEffect==='np50'?'NP50%':member?.bondEffect==='original'?'原始效果':'效果不限';
+ return <li className={`common-team-slot ${member?'':'empty'}`} aria-label={`位置 ${position}：${name}${member?.support?'，助战':''}`}>
   <div className="common-team-face"><Portrait src={servant?.image} label={name}/>{member?.support&&<span className="common-team-support">助战</span>}{member?.grandSvt&&<span className="common-team-grand" title="冠位从者" aria-label="冠位从者">冠</span>}</div>
   <span className="common-team-servant-name" title={name}>{name}</span>
-  {member?.equipId?<Portrait kind="equip" src={equip?.image} label={equipName}/>:<span className="common-team-no-equip" title={equipName}>—</span>}
+  <div className="common-team-equip-stack">{([0,...(grandRows?[1,2]:[])] as (0|1|2)[]).map(index=>{
+   const active=index===0||member?.grandSvt===true,record=member?.equips[index];
+   const id=member?commonTeamEquipId(member,index,bondOwners,servant?.id??member.svtId):0,equip=equips.get(id);
+   const role=['主礼装','羁绊礼装','追加礼装'][index],bond=index===1&&member?.grandSvt===true;
+   const equipName=id?(equip?.name??`礼装 #${id}`):bond?'羁绊礼装':'未指定礼装';
+   const label=`${role}：${equipName}${bond?` · ${effect}`:''}${record?.lv?` · Lv.${record.lv}`:''}${record?.limitBreak===true?' · 满破':record?.limitBreak===false?' · 未满破':''}`;
+   return <div key={index} className={`common-team-equip-slot ${active?'':'inactive'} ${bond?'bond':''}`} aria-hidden={!active||undefined} title={label} aria-label={active?label:undefined}>
+    {id?<Portrait kind="equip" src={equip?.image} label={equipName}/>:bond?<span className="common-team-bond-placeholder"><Heart size={13}/><span>羁绊礼装</span></span>:<span className="common-team-no-equip">—</span>}
+    {grandRows&&active&&<span className="common-team-equip-role" aria-hidden="true">{index+1}</span>}
+    {record?.limitBreak===true&&<span className="common-team-equip-mlb" aria-label="满破">◆</span>}
+    {bond&&<span className={`common-team-bond-effect ${member?.bondEffect==='np50'?'np50':''}`}>{effect}</span>}
+   </div>;
+  })}</div>
  </li>;
 }
 
-function TeamCard({team,servants,equips,importing,blocked,onImport}:{team:CommonTeam;servants:Map<number,Servant>;equips:Map<number,Equip>;importing:boolean;blocked:boolean;onImport:()=>void}){
+function TeamCard({team,servants,equips,bondOwners,importing,blocked,onImport}:{team:CommonTeam;servants:Map<number,Servant>;equips:Map<number,Equip>;bondOwners:Map<number,number>;importing:boolean;blocked:boolean;onImport:()=>void}){
+ const grandRows=team.servants.some(member=>member?.grandSvt);
  return <li className={`common-team-card ${importing?'importing':''}`}>
   <div className="common-team-card-heading"><div><h3 title={team.name}>{team.name}</h3><span className="common-team-author"><UserRound size={12} aria-hidden="true"/><span title={team.author}>{team.author}</span><code>#{team.id}</code></span></div><span className="common-team-votes" title={`${team.upvotes} 个赞，${team.downvotes} 个踩`}><ThumbsUp size={14} aria-hidden="true"/>{team.upvotes}</span></div>
-  <ol className="common-team-roster">{team.servants.map((member,index)=><RosterSlot key={index} member={member} position={index+1} servants={servants} equips={equips}/>)}</ol>
+  <ol className="common-team-roster">{team.servants.map((member,index)=><RosterSlot key={index} member={member} position={index+1} servants={servants} equips={equips} bondOwners={bondOwners} grandRows={grandRows}/>)}</ol>
+  {grandRows&&<p className="common-team-equip-legend">礼装 1 主礼装 · 2 羁绊 · 3 追加</p>}
   <div className="common-team-card-footer"><div className="common-team-metadata"><span><Sparkles size={13} aria-hidden="true"/>{team.turnCount===null?'回合未记录':`${team.turnCount} 回合`}</span><span><CalendarDays size={13} aria-hidden="true"/>{commonTeamDate(team.createdAt)}</span></div><button type="button" className="button primary common-team-import" disabled={blocked} aria-label={`导入 ${team.name}，Chaldea 队伍 ${team.id}`} onClick={onImport}>{importing?<LoaderCircle size={15} className="common-teams-spinner"/>:<Upload size={15}/>}<span>{importing?'正在导入…':'导入'}</span></button></div>
  </li>;
 }
@@ -40,6 +54,7 @@ export function CommonTeamsDialog({catalog,onClose,onImport}:Props){
  const mounted=useRef(false),generation=useRef(0),request=useRef<AbortController|null>(null),pending=useRef(false),importPending=useRef(false);
  const servants=useMemo(()=>new Map(catalog.servants.flatMap(item=>[[item.id,item] as const,...(item.aliases??[]).map(alias=>[Number(alias),item] as const)])),[catalog.servants]);
  const equips=useMemo(()=>new Map(catalog.equips.map(item=>[item.id,item])),[catalog.equips]);
+ const bondOwners=useMemo(()=>new Map(catalog.equips.filter(equip=>equip.filters?.bondOwner).map(equip=>[equip.filters!.bondOwner!,equip.id])),[catalog.equips]);
  const quests=directory?.quests.filter(item=>item.classId===classId)??[],selectedQuest=quests.find(item=>item.id===questId);
 
  useEffect(()=>{mounted.current=true;return()=>{mounted.current=false;generation.current++;request.current?.abort();};},[]);
@@ -102,7 +117,7 @@ export function CommonTeamsDialog({catalog,onClose,onImport}:Props){
     <div className="common-teams-results-heading"><span>{selectedQuest?.label??'请选择副本'}</span><small role="status" aria-live="polite">{locked?'正在导入方案…':loading&&!page?'正在联网查询…':page?`已展示 ${teams.length} / ${page.total} 个队伍`:'按点赞数或发布时间查询'}</small></div>
     <div className="common-teams-results">
      {importError&&<div className="common-teams-error" role="alert"><AlertTriangle size={17} aria-hidden="true"/><span>{importError}</span></div>}
-     {teams.length>0&&<ul className="common-teams-list">{teams.map(team=><TeamCard key={team.id} team={team} servants={servants} equips={equips} importing={importing===team.id} blocked={blocked} onImport={()=>void importTeam(team.id)}/>)}</ul>}
+     {teams.length>0&&<ul className="common-teams-list">{teams.map(team=><TeamCard key={team.id} team={team} servants={servants} equips={equips} bondOwners={bondOwners} importing={importing===team.id} blocked={blocked} onImport={()=>void importTeam(team.id)}/>)}</ul>}
      {listError&&<div className="common-teams-error" role="alert"><AlertTriangle size={17} aria-hidden="true"/><span>{listError}</span><button type="button" className="button" disabled={blocked} onClick={retryList}><RefreshCw size={14}/>重试</button></div>}
      {loading&&!page&&<div className="common-teams-state"><LoaderCircle className="common-teams-spinner" size={30}/><strong>正在获取 Chaldea 队伍…</strong><p>每次最多获取 12 个队伍</p></div>}
      {!loading&&!listError&&page&&teams.length===0&&<div className="common-teams-state"><Users size={34} aria-hidden="true"/><strong>{page.hasMore?'这一页没有可展示的队伍':page.total?'暂时没有可展示的队伍':'这个副本暂时没有共享队伍'}</strong><p>{page.hasMore?'可以点击下方“加载更多队伍”，继续读取下一页。':'可以选择其他副本，或稍后再试。'}</p>{!page.hasMore&&<button type="button" className="button" disabled={locked} onClick={()=>setAttempt(value=>value+1)}><RefreshCw size={15}/>重新查询</button>}</div>}

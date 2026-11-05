@@ -2,7 +2,8 @@ export type CommonTeamSort='upvotes'|'created';
 export type GrandTeamClass={id:string;label:string};
 export type GrandTeamQuest={id:string;classId:string;label:string;difficulty:string;phase:number;questIds:number[]};
 export type CommonTeamCatalog={classes:GrandTeamClass[];quests:GrandTeamQuest[]};
-export type CommonTeamMember={svtId:number;support:boolean;equipId:number;grandSvt:boolean};
+export type CommonTeamEquip={id:number;lv:number|null;limitBreak:boolean|null};
+export type CommonTeamMember={svtId:number;support:boolean;equipId:number;grandSvt:boolean;equips:[CommonTeamEquip|null,CommonTeamEquip|null,CommonTeamEquip|null];bondEffect:'np50'|'original'|'any'};
 export type CommonTeam={id:number;name:string;author:string;createdAt:number|null;upvotes:number;downvotes:number;turnCount:number|null;servants:(CommonTeamMember|null)[]};
 export type CommonTeamPage={questId:string;phase:number;sort:CommonTeamSort;offset:number;pageSize:number;total:number;hasMore:boolean;nextOffset:number|null;teams:CommonTeam[]};
 export type CommonTeamRequest={questId:string;sort:CommonTeamSort;offset:number};
@@ -34,9 +35,27 @@ function readTeam(value:unknown):CommonTeam {
  const servants=value.servants.map(item=>{
   if(item===null)return null;
   if(!object(item)||!integer(item.svtId)||!integer(item.equipId)||typeof item.support!=='boolean'||typeof item.grandSvt!=='boolean')throw responseError();
-  return {svtId:item.svtId,equipId:item.equipId,support:item.support,grandSvt:item.grandSvt};
+  // Older running services may still send the original primary-CE-only summary.
+  const raw=item.equips===undefined?[item.equipId?{id:item.equipId,lv:null,limitBreak:null}:null,null,null]:item.equips;
+  if(!Array.isArray(raw)||raw.length!==3)throw responseError();
+  const equips=raw.map(equip=>{
+   if(equip===null)return null;
+   if(!object(equip)||!integer(equip.id)||(equip.lv!==null&&!integer(equip.lv,1))||(equip.limitBreak!==null&&typeof equip.limitBreak!=='boolean'))throw responseError();
+   return {id:equip.id,lv:equip.lv as number|null,limitBreak:equip.limitBreak as boolean|null};
+  }) as CommonTeamMember['equips'];
+  const bondEffect=item.bondEffect??'any';
+  if(!['np50','original','any'].includes(bondEffect as string))throw responseError();
+  if(!item.grandSvt){equips[1]=null;equips[2]=null;}
+  return {svtId:item.svtId,equipId:item.equipId,support:item.support,grandSvt:item.grandSvt,equips,bondEffect:(item.grandSvt?bondEffect:'any') as CommonTeamMember['bondEffect']};
  });
  return {id:value.id,name:text(value.name)||`Chaldea 队伍 #${value.id}`,author:text(value.author,100)||'未署名',createdAt:integer(value.createdAt,1)?value.createdAt:null,upvotes:value.upvotes,downvotes:value.downvotes,turnCount:integer(value.turnCount)?value.turnCount:null,servants};
+}
+
+/** The unique bond CE can be pictured without adding a CE requirement to the plan. */
+export function commonTeamEquipId(member:CommonTeamMember,index:0|1|2,bondOwners:ReadonlyMap<number,number>,canonicalServantId=member.svtId):number {
+ if(index!==0&&!member.grandSvt)return 0;
+ const configured=member.equips[index]?.id??0;
+ return configured||(index===1&&member.grandSvt?bondOwners.get(canonicalServantId)??0:0);
 }
 
 /** Validate pagination identity before replacing or appending a visible list. */

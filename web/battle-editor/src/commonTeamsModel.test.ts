@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {appendCommonTeams,commonTeamDate,commonTeamQuery,readCommonTeamCatalog,readCommonTeamPage} from './commonTeamsModel';
+import {appendCommonTeams,commonTeamDate,commonTeamEquipId,commonTeamQuery,readCommonTeamCatalog,readCommonTeamPage} from './commonTeamsModel';
 
 const directory=()=>({classes:[{id:'saber',label:'剑'},{id:'ex1',label:'EX1'}],quests:[{id:'saber_7',classId:'saber',label:'冠位戴冠战 Ⅶ',difficulty:'100★★★',phase:1,questIds:[94150847,94150847]}]});
 const team=(id=1)=>({id,name:'队伍',author:'作者',createdAt:1762400000,upvotes:3,downvotes:0,turnCount:3,servants:[{svtId:100100,support:false,equipId:9400340,grandSvt:true},{svtId:0,support:true,equipId:9400400,grandSvt:false},null,null,null,null]});
@@ -23,7 +23,7 @@ test('catalog rejects unknown class references and duplicate selector keys rathe
 
 test('page preserves all six positions including CE-only support and grand flags',()=>{
  const result=readCommonTeamPage(page(),request);
- assert.deepEqual(result.teams[0].servants[1],{svtId:0,support:true,equipId:9400400,grandSvt:false});
+ assert.deepEqual(result.teams[0].servants[1],{svtId:0,support:true,equipId:9400400,grandSvt:false,equips:[{id:9400400,lv:null,limitBreak:null},null,null],bondEffect:'any'});
  assert.equal(result.teams[0].servants[0]?.grandSvt,true);
  assert.equal(result.teams[0].servants[2],null);
  assert.equal(result.nextOffset,12);
@@ -62,4 +62,43 @@ test('missing display text gets a stable fallback and unrecorded dates or turns 
 
 test('query builder sends only the local selector, sort, and cursor',()=>{
  assert.equal(commonTeamQuery({...request,offset:12}),'/common-teams?quest=saber_7&sort=upvotes&offset=12');
+});
+
+test('grand preview preserves three separate CE slots and NP50 metadata without rewriting source',()=>{
+ const member={...team().servants[0],equips:[{id:9400480,lv:100,limitBreak:true},{id:9300310,lv:80,limitBreak:true},{id:9407480,lv:100,limitBreak:false}],bondEffect:'np50'};
+ const value={...page(),teams:[{...team(),servants:[member,null,null,null,null,null]}]},before=structuredClone(value);
+ const result=readCommonTeamPage(value,request).teams[0].servants[0]!;
+ assert.deepEqual(result.equips,member.equips);assert.equal(result.bondEffect,'np50');assert.deepEqual(value,before);
+});
+
+test('bond effect distinguishes explicit original from unrestricted and supports effect-only grand slots',()=>{
+ for(const effect of ['original','any','np50'] as const){
+  const member={svtId:0,support:true,equipId:0,grandSvt:true,equips:[null,null,{id:9407480,lv:100,limitBreak:false}],bondEffect:effect};
+  const result=readCommonTeamPage({...page(),teams:[{...team(),servants:[member,null,null,null,null,null]}]},request).teams[0].servants[0]!;
+  assert.equal(result.equips[0],null);assert.equal(result.equips[2]?.id,9407480);assert.equal(result.bondEffect,effect);
+ }
+});
+
+test('ordinary preview never borrows grand-only CEs or a bond effect',()=>{
+ const member={...team().servants[1],equips:[{id:9400400,lv:100,limitBreak:false},{id:9300310,lv:80,limitBreak:true},{id:9407480,lv:100,limitBreak:true}],bondEffect:'np50'};
+ const result=readCommonTeamPage({...page(),teams:[{...team(),servants:[member,null,null,null,null,null]}]},request).teams[0].servants[0]!;
+ assert.equal(result.grandSvt,false);assert.deepEqual(result.equips,[member.equips[0],null,null]);assert.equal(result.bondEffect,'any');
+});
+
+test('old primary-only services remain readable and malformed CE metadata fails visibly',()=>{
+ const old=readCommonTeamPage(page(),request).teams[0].servants[0]!;
+ assert.equal(old.equips[0]?.id,9400340);assert.equal(old.equips[1],null);assert.equal(old.bondEffect,'any');
+ for(const change of [{equips:[]},{equips:[null,null]},{equips:[{id:true,lv:null,limitBreak:null},null,null]},{equips:[{id:1,lv:0,limitBreak:null},null,null]},{equips:[{id:1,lv:1,limitBreak:'false'},null,null]},{bondEffect:'invalid'}]){
+  assert.throws(()=>readCommonTeamPage({...page(),teams:[{...team(),servants:[{...team().servants[0],...change},null,null,null,null,null]}]},request));
+ }
+});
+
+test('missing bond CE artwork resolves only from its unique owner without adding a requirement',()=>{
+ const member=readCommonTeamPage(page(),request).teams[0].servants[0]!,before=structuredClone(member),owners=new Map([[200900,9300310]]);
+ assert.equal(commonTeamEquipId(member,1,owners,200900),9300310);
+ assert.equal(commonTeamEquipId(member,2,owners,200900),0);
+ assert.equal(commonTeamEquipId({...member,grandSvt:false},1,owners,200900),0);
+ assert.equal(commonTeamEquipId(member,1,owners,100100),0);
+ member.equips[1]={id:9307360,lv:1,limitBreak:null};assert.equal(commonTeamEquipId(member,1,owners,200900),9307360);
+ member.equips[1]=null;assert.deepEqual(member,before);
 });

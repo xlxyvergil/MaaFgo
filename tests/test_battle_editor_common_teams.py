@@ -140,9 +140,12 @@ class CommonTeamSearchTests(unittest.TestCase):
         self.assertEqual({k: team[k] for k in ("id", "name", "author", "createdAt", "upvotes", "downvotes", "turnCount")},
                          {"id": 23, "name": "弓冠队伍", "author": "示例作者", "createdAt": 1789324592, "upvotes": 21, "downvotes": 2, "turnCount": 2})
         self.assertEqual(team["servants"], [
-            {"svtId": 204300, "support": True, "equipId": 9403520, "grandSvt": True}, None,
-            {"svtId": 0, "support": True, "equipId": 9400400, "grandSvt": False},
-            {"svtId": 201800, "support": False, "equipId": 9400260, "grandSvt": False}, None, None,
+            {"svtId": 204300, "support": True, "equipId": 9403520, "grandSvt": True,
+             "equips": [{"id": 9403520, "lv": None, "limitBreak": None}, None, None], "bondEffect": "any"}, None,
+            {"svtId": 0, "support": True, "equipId": 9400400, "grandSvt": False,
+             "equips": [{"id": 9400400, "lv": None, "limitBreak": None}, None, None], "bondEffect": "any"},
+            {"svtId": 201800, "support": False, "equipId": 9400260, "grandSvt": False,
+             "equips": [{"id": 9400260, "lv": None, "limitBreak": None}, None, None], "bondEffect": "any"}, None, None,
         ])
         self.assertNotIn("data", team)
         self.assertNotIn("actions", team)
@@ -208,6 +211,85 @@ class CommonTeamSearchTests(unittest.TestCase):
         self.assertEqual(decoded["team"]["name"], "旧版")
         summary = common._summary(row(username="a" * 1000, data=packed({"team": {"name": "b" * 1000}})))
         self.assertEqual((len(summary["author"]), len(summary["name"])), (80, 160))
+
+
+class CommonTeamGrandEquipTests(unittest.TestCase):
+    def test_full_grand_equips_and_effect_preserve_imported_data(self):
+        # Shape observed in public Chaldea team 108073: three independent CEs,
+        # with NP50 stored on the class board rather than on equip2 itself.
+        member = {"svtId": 200900, "grandSvt": True, "supportType": "friend",
+                  "equip1": {"id": 9400480, "lv": 100, "limitBreak": True},
+                  "equip2": {"id": 9300310, "lv": 80, "limitBreak": True},
+                  "equip3": {"id": 9407480, "lv": 100, "limitBreak": True},
+                  "classBoardData": {"grandBondEquipSkillChange": True, "future": [None]},
+                  "unknown": {"keep": True}}
+        before = copy.deepcopy(member)
+        result = common._summary(row(data=packed({"team": {"onFieldSvts": [member]}})))
+        preview = result["servants"][0]
+        self.assertEqual(preview["equips"], [member["equip1"], member["equip2"], member["equip3"]])
+        self.assertEqual((preview["equipId"], preview["bondEffect"]), (9400480, "np50"))
+        self.assertEqual(member, before)
+
+    def test_unspecified_main_ce_does_not_hide_additional_or_bond_ce(self):
+        member = {"svtId": 200200, "grandSvt": True,
+                  "equip1": {"id": None, "limitBreak": True, "lv": 100},
+                  "equip2": {"id": 9307360, "lv": 1}, "equip3": {"id": 9408800},
+                  "classBoardData": {"grandBondEquipSkillChange": True}}
+        preview = common._slot(member)
+        self.assertEqual(preview["equipId"], 0)
+        self.assertEqual(preview["equips"], [
+            {"id": 0, "lv": 100, "limitBreak": True},
+            {"id": 9307360, "lv": 1, "limitBreak": None},
+            {"id": 9408800, "lv": None, "limitBreak": None}])
+
+    def test_grand_extra_only_and_effect_only_positions_remain_visible(self):
+        for key in ("equip2", "equip3"):
+            with self.subTest(key=key):
+                preview = common._slot({"grandSvt": True, key: {"id": 9408800}})
+                self.assertIsNotNone(preview)
+                self.assertEqual(preview["svtId"], 0)
+                self.assertEqual(preview["equips"][int(key[-1]) - 1]["id"], 9408800)
+        for effect, label in ((True, "np50"), (False, "original")):
+            with self.subTest(effect=effect):
+                preview = common._slot({"grandSvt": True, "supportType": "friend",
+                                        "classBoardData": {"grandBondEquipSkillChange": effect}})
+                self.assertEqual((preview["equips"], preview["bondEffect"], preview["support"]),
+                                 ([None, None, None], label, True))
+        self.assertIsNone(common._slot({"grandSvt": True}))
+
+    def test_bond_effect_uses_strict_booleans_and_unknown_stays_unspecified(self):
+        for board in (None, [], True, {"grandBondEquipSkillChange": None},
+                      {"grandBondEquipSkillChange": 0}, {"grandBondEquipSkillChange": 1},
+                      {"grandBondEquipSkillChange": "false"}, {}):
+            with self.subTest(board=board):
+                self.assertEqual(common._slot({"svtId": 200900, "grandSvt": True,
+                                               "classBoardData": board})["bondEffect"], "any")
+        self.assertEqual(common._slot({"svtId": 200900, "grandSvt": True,
+                                       "classBoardData": {"grandBondEquipSkillChange": False}})["bondEffect"], "original")
+
+    def test_legacy_ce_fields_fallback_and_modern_explicit_false_are_retained(self):
+        legacy = {"supportType": "friend", "ceId": 9400400, "ceLevel": 80, "ceLimitBreak": False}
+        self.assertEqual(common._slot(legacy)["equips"], [
+            {"id": 9400400, "lv": 80, "limitBreak": False}, None, None])
+        modern = dict(legacy, equip1={"id": 9400480, "lv": 100, "limitBreak": False}, ceLimitBreak=True)
+        self.assertEqual(common._slot(modern)["equips"][0],
+                         {"id": 9400480, "lv": 100, "limitBreak": False})
+        self.assertEqual(common._slot(dict(legacy, equip1={"id": None}))["equipId"], 9400400)
+
+    def test_normal_members_ignore_grand_only_data_and_malformed_metadata_is_unknown(self):
+        member = {"svtId": 200900, "equip2": {"id": 9300310}, "equip3": {"id": 9407480},
+                  "classBoardData": {"grandBondEquipSkillChange": True}}
+        self.assertEqual(common._slot(member)["equips"], [None, None, None])
+        self.assertEqual(common._slot(member)["bondEffect"], "any")
+        self.assertIsNone(common._slot({"equip3": {"id": 9407480}}))
+        for bad in (True, "100", -1, {}, []):
+            with self.subTest(bad=bad):
+                preview = common._slot({"svtId": 200900, "grandSvt": True,
+                                        "equip1": {"id": bad, "lv": bad, "limitBreak": bad},
+                                        "equip2": bad, "equip3": bad})
+                # A strict boolean is valid for the full-limit-break state only.
+                expected = [{"id": 0, "lv": None, "limitBreak": True}, None, None] if bad is True else [None] * 3
+                self.assertEqual(preview["equips"], expected)
 
 
 class CommonTeamNetworkTests(unittest.TestCase):

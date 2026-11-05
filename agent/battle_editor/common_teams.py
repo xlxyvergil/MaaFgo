@@ -165,20 +165,44 @@ def _battle_data(row: dict) -> dict | None:
         return None
 
 
+def _equip_preview(value: Any, *, legacy: dict | None = None) -> dict | None:
+    equip = value if isinstance(value, dict) else {}
+    legacy = legacy or {}
+    equip_id = _positive_int(equip.get("id")) or _positive_int(legacy.get("ceId")) or 0
+    level = _positive_int(equip.get("lv")) or _positive_int(legacy.get("ceLevel"))
+    limit_break = equip.get("limitBreak")
+    if type(limit_break) is not bool:
+        limit_break = legacy.get("ceLimitBreak")
+    if type(limit_break) is not bool:
+        limit_break = None
+    if not equip_id and level is None and limit_break is None:
+        return None
+    return {"id": equip_id, "lv": level, "limitBreak": limit_break}
+
+
 def _slot(slot: Any) -> dict | None:
     if not isinstance(slot, dict):
         return None
     svt_id = _positive_int(slot.get("svtId")) or 0
-    equip = slot.get("equip1")
-    equip_id = _positive_int(equip.get("id")) if isinstance(equip, dict) else None
-    equip_id = equip_id or _positive_int(slot.get("ceId")) or 0
-    if not svt_id and not equip_id:
+    grand = slot.get("grandSvt") is True
+    equips = [_equip_preview(slot.get("equip1"), legacy=slot), None, None]
+    bond_effect = "any"
+    if grand:
+        equips[1] = _equip_preview(slot.get("equip2"))
+        equips[2] = _equip_preview(slot.get("equip3"))
+        board = slot.get("classBoardData")
+        effect = board.get("grandBondEquipSkillChange") if isinstance(board, dict) else None
+        bond_effect = "np50" if effect is True else "original" if effect is False else "any"
+    equip_id = equips[0]["id"] if equips[0] else 0
+    if not svt_id and not any(equips) and bond_effect == "any":
         return None
     return {
         "svtId": svt_id,
         "support": slot.get("supportType") in ("friend", "fixed", "npc"),
         "equipId": equip_id,
-        "grandSvt": slot.get("grandSvt") is True,
+        "grandSvt": grand,
+        "equips": equips,
+        "bondEffect": bond_effect,
     }
 
 
