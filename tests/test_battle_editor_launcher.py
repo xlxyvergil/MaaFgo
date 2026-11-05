@@ -2,6 +2,7 @@
 from http.client import HTTPConnection
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import os
 from pathlib import Path
 import shutil
 import socket
@@ -11,7 +12,8 @@ import tempfile
 import threading
 import time
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
+import venv
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "agent"))
@@ -65,6 +67,25 @@ class LauncherTest(unittest.TestCase):
         spawn.assert_not_called()
         self.assertTrue(result.reused)
         self.assertEqual(result.pid, 123)
+
+    def test_another_process_winning_startup_is_still_reported_as_reused(self):
+        with tempfile.TemporaryDirectory(prefix="MaaFGO 启动竞争 ") as temporary:
+            root = Path(temporary)
+            child = Mock(pid=2 ** 31 - 1)
+            child.poll.return_value = None
+            health = {"pid": os.getpid(), "projectRoot": str(root), "mode": "standalone"}
+            with socket.socket() as listener:
+                listener.bind(("127.0.0.1", 0))
+                port = listener.getsockname()[1]
+            with patch("battle_editor.launcher._service_health", return_value=None), \
+                    patch("battle_editor.launcher._check_install", return_value=root / "main.py"), \
+                    patch("battle_editor.launcher.service_status", return_value=health), \
+                    patch("battle_editor.launcher.subprocess.Popen", return_value=child):
+                result = open_editor(root, port=port, open_browser=False)
+            self.assertTrue(result.reused)
+            self.assertEqual(result.pid, os.getpid())
+            child.terminate.assert_not_called()
+            child.kill.assert_not_called()
 
     def test_same_port_restarts_after_real_http_requests(self):
         with tempfile.TemporaryDirectory(prefix="MaaFGO 服务重启 ") as temporary:
@@ -125,7 +146,15 @@ class LauncherTest(unittest.TestCase):
             with socket.socket() as listener:
                 listener.bind(("127.0.0.1", 0))
                 port = listener.getsockname()[1]
-            result = open_editor(root, port=port, open_browser=False, idle_timeout=60, timeout=10)
+            interpreter = sys.executable
+            if os.name == "nt":
+                # A Windows venv redirects to a child interpreter with another PID.
+                # Exercise this even when the test runner uses the base Python.
+                runtime = root / "测试虚拟环境"
+                venv.EnvBuilder(with_pip=False).create(runtime)
+                interpreter = str(runtime / "Scripts" / "python.exe")
+            with patch("battle_editor.launcher.sys.executable", interpreter):
+                result = open_editor(root, port=port, open_browser=False, idle_timeout=60, timeout=10)
             try:
                 self.assertFalse(result.reused)
                 self.assertEqual(service_status(root, port)["pid"], result.pid)
