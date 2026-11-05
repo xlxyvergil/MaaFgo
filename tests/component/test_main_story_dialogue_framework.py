@@ -12,14 +12,15 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class DialogueFrameworkTests(FrameworkResources, unittest.TestCase):
-    def test_exact_choices_reject_each_other_and_click_lower_option(self):
+    def test_exact_choices_reject_each_other_and_click_expected_option(self):
         resource = self.resource('cn')
         cases = (
-            ('cn_quetzal_choice.png', '主线-剧情选择-不赞同魁札尔'),
-            ('cn_eresh_choice.png', '主线-剧情选择-埃列什基伽勒'),
-            ('cn_eresh_choice_long.png', '主线-剧情选择-埃列什基伽勒'),
+            ('cn_quetzal_choice.png', '主线-剧情选择-不赞同魁札尔', (290, 380)),
+            ('cn_eresh_choice.png', '主线-剧情选择-埃列什基伽勒', (290, 380)),
+            ('cn_eresh_choice_long.png', '主线-剧情选择-埃列什基伽勒', (290, 380)),
+            ('cn_eresh_right_choice.png', '主线-剧情选择-埃列什基伽勒没有错', (170, 260)),
         )
-        for filename, expected in cases:
+        for filename, expected, expected_y in cases:
             with self.subTest(filename=filename):
                 image = cv2.imdecode(np.fromfile(str(ROOT / 'tests/fixtures/main_story' / filename), np.uint8), cv2.IMREAD_COLOR)
                 self.assertIsNotNone(image)
@@ -29,7 +30,7 @@ class DialogueFrameworkTests(FrameworkResources, unittest.TestCase):
 
                 class Probe(CustomAction):
                     def run(self, context, argv):
-                        for _, node in cases:
+                        for _, node, _ in cases:
                             detail = context.run_recognition(node, image)
                             results[node] = bool(detail and detail.hit)
                         results['handled'] = StoryRunner(context).interrupt(image)
@@ -42,11 +43,11 @@ class DialogueFrameworkTests(FrameworkResources, unittest.TestCase):
                     node = {'action': {'type': 'Custom', 'param': {'custom_action': 'probe_exact_choice'}}}
                     self.assertTrue(tasker.post_task('probe_exact_choice', {'probe_exact_choice': node}).wait().succeeded)
                     self.assertTrue(results['handled'])
-                    for _, name in cases:
+                    for _, name, _ in cases:
                         self.assertEqual(results[name], name == expected)
                     self.assertEqual(len(controller.clicks), 1)
                     x, y = controller.clicks[0]
-                    self.assertTrue(270 <= x <= 1070 and 290 <= y <= 380)
+                    self.assertTrue(270 <= x <= 1070 and expected_y[0] <= y <= expected_y[1])
                     self.assertEqual(controller.swipes, [])
                 finally:
                     tasker.post_stop().wait()

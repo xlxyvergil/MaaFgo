@@ -34,5 +34,23 @@
     "post_delay": 1000,
     "next": [],
     "on_error": []
+  },
+  "主线-剧情选择-埃列什基伽勒没有错": {
+    "doc": "国服第七特异点第14节最后进度实拍：上项“埃列什基伽勒没有错。”，下项“我没兴趣。那是，你该尽的职责”，SKIP灰显。复用“主线-剧情选择-不赞同魁札尔”的边框和上下双行完整文字交叉确认，但本组选上项，box_index指向上项OCR框；不能复用另外两组选择下项的落点。2026-11-06MaaMCP已实际选择上项并进入埃列什基伽勒战斗。每关同节点至多点击3次，推进后重置，不匹配其他剧情选项。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {"recognition": {"type": "TemplateMatch", "param": {"template": "main_story/剧情选项边框.png", "roi": [150, 160, 110, 240], "threshold": 0.95}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒没有错/OCR1", "recognition": {"type": "OCR", "param": {"roi": [270, 170, 800, 90], "expected": ["^埃列什基伽勒没有错[。.]?$"], "threshold": 0.85}}},
+          {"sub_name": "base/主线剧情选项/主线-剧情选择-埃列什基伽勒没有错/OCR2", "recognition": {"type": "OCR", "param": {"roi": [270, 290, 800, 90], "expected": ["^我没兴趣[。.]?\\s*那是[，,]?\\s*你该尽的职责[。.]?$"], "threshold": 0.85}}}
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {"type": "Click"},
+    "post_delay": 1000,
+    "next": [],
+    "on_error": []
   }
 }

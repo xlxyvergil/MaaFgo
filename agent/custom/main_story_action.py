@@ -329,6 +329,7 @@ class StoryRunner:
         for choice_node, label in (
             ("主线-剧情选择-不赞同魁札尔", "不赞同魁札尔·科亚特尔"),
             ("主线-剧情选择-埃列什基伽勒", "埃列什基伽勒"),
+            ("主线-剧情选择-埃列什基伽勒没有错", "埃列什基伽勒没有错"),
         ):
             choice = self.reco(choice_node, image)
             if not choice:

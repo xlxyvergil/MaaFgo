@@ -64,4 +64,10 @@ class DialogueChoicesTests(unittest.TestCase):
             self.assertIsNone(re.fullmatch(upper,text))
             self.assertIsNone(re.fullmatch(lower,text))
 
+    def test_eresh_right_choice_dispatches_specific_upper_option_node(self):
+        r,c=runner()
+        node='主线-剧情选择-埃列什基伽勒没有错'
+        self.assertTrue(r.interrupt({node,'跳过剧情-点击跳过'}))
+        self.assertEqual([name for name,_ in c.actions],[node])
+
 if __name__=='__main__':unittest.main()
