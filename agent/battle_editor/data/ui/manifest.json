@@ -19319,6 +19319,120 @@
         "input_mode": "RGB",
         "alpha": "discardBeforeResizePreserveRGB"
       }
+    },
+    "formation_800140_2303a95bcdba46c6.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "56623e33660cc5a1b8ac2c2d008a174e8320f70ca8b9d03004a186d36a01ef2a",
+      "source": {
+        "kind": "fgo-dump",
+        "path": "从者立绘/CharaGraph/800140/800140a.png",
+        "sha256": "08641053c0f60311583914cb146f9be0b7b4879bba0dbf3cfda70126725ff676",
+        "width": 1024,
+        "height": 1024,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/800140/800140a.png",
+        "costume": 800140,
+        "ownerServantId": 800100
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_800150_420dd0d47cddaede.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "47a227e58cf4471772d2274629ccf176e85d847f8441239e3ef3e58fa461ad65",
+      "source": {
+        "kind": "fgo-dump",
+        "path": "从者立绘/CharaGraph/800150/800150a.png",
+        "sha256": "84aa59db337670343019b82b3ef46a86993aba5f6225a08137c98ce8e52b0deb",
+        "width": 1024,
+        "height": 1024,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/800150/800150a.png",
+        "costume": 800150,
+        "ownerServantId": 800100
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_800190_15ae0d0c0bb0d693.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "4234e20ec45a037d5bfce50b05acb9dc6f678677e336e6f5022a1a5e863b0f21",
+      "source": {
+        "kind": "fgo-dump",
+        "path": "从者立绘/CharaGraph/800190/800190a.png",
+        "sha256": "3b3a9bae72208b5fa990bfa3e0f587cd63e56ff538bb85ba550dfb0fe54d8aa9",
+        "width": 1024,
+        "height": 1024,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/800190/800190a.png",
+        "costume": 800190,
+        "ownerServantId": 800100
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
     }
   },
   "servants": {
@@ -23744,7 +23858,15 @@
       ],
       "portraitAscension": 3,
       "formationPortrait": "formation_800100_1337e6be6d9978b1.webp",
-      "formationPortraitAscension": 3
+      "formationPortraitAscension": 3,
+      "formPortraits": {
+        "early": "formation_800100_1337e6be6d9978b1.webp",
+        "normal": "formation_800100_1337e6be6d9978b1.webp",
+        "ortenaus": "formation_800140_2303a95bcdba46c6.webp",
+        "black-barrel": "formation_800140_2303a95bcdba46c6.webp",
+        "ortenaus-restored": "formation_800150_420dd0d47cddaede.webp",
+        "paladin": "formation_800190_15ae0d0c0bb0d693.webp"
+      }
     },
     "600300": {
       "activeSkills": [
@@ -51012,7 +51134,9 @@
     "appendSkillMappings": 2355,
     "classes": 17,
     "classVariantMappings": 102,
-    "mediaFiles": 634,
-    "mediaBytes": 30419160
+    "mediaFiles": 637,
+    "mediaBytes": 30541486,
+    "formPortraitMappings": 6,
+    "formPortraitImages": 3
   }
 }

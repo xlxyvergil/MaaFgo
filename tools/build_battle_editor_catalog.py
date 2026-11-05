@@ -211,6 +211,69 @@ def update_np_defaults(catalog: dict, exports: dict) -> list[dict]:
     return changes
 
 
+def compile_mash_forms(record: dict) -> list[dict]:
+    """Keep Mash's progression presets under her one Chaldea servant identity.
+
+    Chaldea's svtLimitHides groups in chaldea-data/dist/constData.json choose
+    normal / Ortinax / Paladin skill and TD families by limitCount. Costume
+    selections use battleCharaId while older files may contain costume.id.
+    The two earlier Ortinax presets intentionally retain their historical
+    explicit IDs; only the restored preset supplies that family's default.
+    """
+    if record.get("id") != 800100:
+        return []
+    definitions = [
+        ("early", "初期 · 三星", 2, [0, 1, 2], [1000, 2000, 133000], 800101, True),
+        ("normal", "第一部 · 四星", 4, [3, 4, 11, 800130, 14, 800160, 15, 800170],
+         [236000, 2000, 133000], 800104, True),
+        ("ortenaus", "奥特瑙斯 · 初期", 800140, [12, 800140, 13, 800150, 18, 800151],
+         [459550, 460250, 457000], 800105, False),
+        ("black-barrel", "奥特瑙斯 · 黑枪强化", 800140, [12, 800140, 13, 800150, 18, 800151],
+         [744450, 460250, 457000], 800105, False),
+        ("ortenaus-restored", "奥特瑙斯 · 修复后", 800140, [12, 800140, 13, 800150, 18, 800151],
+         [744450, 460250, 2162350], 800106, True),
+        ("paladin", "帕拉丁 · 五星", 800190, [17, 800190, 19, 800200, 20, 800210],
+         [2476450, 2550, 133550], 800107, True),
+    ]
+    skills = {skill["id"]: skill for skill in record.get("skills", [])}
+    nps = {np["id"]: np for np in record.get("noblePhantasms", [])}
+    extra = record.get("ascensionAdd", {})
+    faces = record.get("extraAssets", {}).get("faces", {})
+    forms = []
+    for key, label, limit, aliases, skill_ids, td_id, default in definitions:
+        if any(skills.get(sid, {}).get("num") != index + 1 for index, sid in enumerate(skill_ids)) or td_id not in nps:
+            raise ValueError(f"Mash preset {key} is missing its exact skill or NP facts in the cached Atlas export")
+        if key == "paladin":
+            rarity = extra.get("overwriteRarity", {}).get("costume", {}).get("17")
+            cost = extra.get("overwriteCost", {}).get("costume", {}).get("17")
+        else:
+            rarity = extra.get("rarity", {}).get("ascension", {}).get(str(limit if limit < 10 else 4))
+            cost = record.get("cost")
+        if type(rarity) is not int or rarity not in range(6) or type(cost) is not int or not 0 <= cost <= 100:
+            raise ValueError(f"Mash preset {key} is missing confirmed rarity or COST facts")
+        face = (faces.get("costume", {}).get(str(limit)) if limit >= 10
+                else faces.get("ascension", {}).get(str(min(limit + 1, 4))))
+        forms.append({"key": key, "label": label, "limitCount": limit, "limitCounts": aliases,
+                      "rarity": rarity, "cost": cost, "skillIds": skill_ids, "tdId": td_id,
+                      "defaultForLimit": default,
+                      "image": Path(urllib.parse.urlsplit(face).path).name if face else None})
+    return forms
+
+
+def update_mash_forms(catalog: dict, exports: dict) -> bool:
+    """Patch only Mash's form metadata; never rebuild unrelated cached rows."""
+    record = next((item for item in exports["JP/nice_servant"] if item.get("id") == 800100), None)
+    if record is None:
+        raise ValueError("The JP Nice cache does not contain Mash (800100)")
+    target = next((item for item in catalog.get("servants", []) if item.get("id") == 800100), None)
+    if target is None:
+        raise ValueError("The existing editor catalog does not contain Mash (800100)")
+    forms = compile_mash_forms(record)
+    changed = target.get("forms") != forms or target.get("defaultFormKey") != "normal"
+    target.update({"forms": forms, "defaultFormKey": "normal"})
+    return changed
+
+
 def compile_catalog(exports: dict, local_servants: list[dict]) -> tuple[dict, dict[str, str]]:
     """Pure transformation used by tests as well as the maintenance command."""
     jp = {str(item["id"]): item for item in exports["JP/nice_servant"]}
@@ -249,6 +312,8 @@ def compile_catalog(exports: dict, local_servants: list[dict]) -> tuple[dict, di
             "np": select_default_np(raw_nps, cn_nps),
             "npVariants": nps,
         })
+        if int(sid) == 800100:
+            servants[-1].update({"forms": compile_mash_forms(record), "defaultFormKey": "normal"})
     equips = {}
     for region in ("JP", "CN"):
         for item in exports.get(f"{region}/basic_equip", []):
@@ -283,6 +348,7 @@ def main():
     parser.add_argument("--refresh", action="store_true", help="Download Atlas exports and missing images")
     parser.add_argument("--download-images", action="store_true", help="Keep cached exports and download missing images only")
     parser.add_argument("--np-defaults-only", action="store_true", help="Offline: update only existing catalog np defaults from cached JP/CN Nice data")
+    parser.add_argument("--mash-forms-only", action="store_true", help="Offline: update only Mash form metadata from the existing JP Nice cache")
     parser.add_argument("--image-workers", type=int, default=4, choices=range(1, 9), help="Concurrent small-image downloads (1-8)")
     parser.add_argument("--direct", action="store_true", help="Bypass proxy for this maintenance run only")
     parser.add_argument("--curl", action="store_true", help="Use native curl TLS for small images (optional)")
@@ -291,6 +357,8 @@ def main():
     args = parser.parse_args()
     if args.np_defaults_only and (args.refresh or args.download_images):
         parser.error("--np-defaults-only cannot download or refresh resources")
+    if args.mash_forms_only and (args.refresh or args.download_images or args.np_defaults_only):
+        parser.error("--mash-forms-only cannot combine with downloads or other partial updates")
     DIRECT_CONNECTION = args.direct
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -313,6 +381,17 @@ def main():
             path.write_bytes(raw)
         raw = path.read_bytes()
         return key, json.loads(raw), {"url": url, "sha256": hashlib.sha256(raw).hexdigest(), "bytes": len(raw)}
+
+    if args.mash_forms_only:
+        _, exports["JP/nice_servant"], _ = load("JP/nice_servant")
+        path = output / "catalog.json"
+        catalog = json.loads(path.read_text(encoding="utf-8"))
+        changed = update_mash_forms(catalog, exports)
+        if changed:
+            dump(path, catalog)
+        print(json.dumps({"updatedMashForms": changed, "offline": True,
+                          "otherFieldsPreserved": True}, ensure_ascii=False))
+        return
 
     if args.np_defaults_only:
         for key in ("JP/nice_servant", "CN/nice_servant"):

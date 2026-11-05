@@ -126,6 +126,37 @@ class BondPlanner:
                                         for base in roots for folder in alternatives for name in images)
                                    for alternatives in folders)
 
+    def _mash_form(self, sid, member=None, *, slot=None, default=False, allow_unknown=False):
+        """Project retained COST facts only; the exported member remains untouched."""
+        identity = self.canonical.get(sid, sid)
+        if identity != 800100:
+            return None
+        public = self.public.get(identity, {})
+        forms = public.get('forms')
+        if not isinstance(forms, list) or not forms:
+            if allow_unknown:
+                return None  # The user-supplied actual team COST already covers it.
+            raise EditorError('bond_form_data_missing', '玛修的形态资料尚未加载，无法准确计算COST。请点击页面底部“停止服务”，重新启动编队与战斗编辑器后再试。')
+        if default:
+            choices = [form for form in forms if isinstance(form, dict) and form.get('key') == public.get('defaultFormKey')]
+        else:
+            # Chaldea defaults omitted or null limitCount to ascension four.
+            limit = (member or {}).get('limitCount')
+            if limit is None:
+                limit = 4
+            choices = [form for form in forms if isinstance(form, dict) and type(limit) is int
+                       and limit in (form.get('limitCounts') or [])]
+        if not choices:
+            if allow_unknown:
+                return None
+            position = f'第{slot+1}槽' if slot is not None else ''
+            raise EditorError('bond_mash_form_unknown', f'{position}玛修的形态无法确认，无法准确计算COST。请在该槽的编队属性中点击“切换马修形态”，选择形态后再执行“自动羁绊最大化”。')
+        form = next((item for item in choices if item.get('defaultForLimit') is True), choices[0])
+        if (type(form.get('cost')) is not int or not 0 <= form['cost'] <= 100
+                or type(form.get('rarity')) is not int or not 0 <= form['rarity'] <= 5):
+            raise EditorError('bond_form_data_missing', '玛修的形态COST资料不完整，无法继续羁绊规划。请更新编队编辑器后重试。')
+        return form
+
     def optimize(self, data, supplied=None):
         if not isinstance(supplied, dict) or set(supplied) - set(DEFAULT_OPTIONS):
             raise EditorError('bond_option_invalid', '羁绊选项格式无效')
@@ -199,7 +230,8 @@ class BondPlanner:
             record = self.servants.get(sid) or self.servants.get(identity(sid))
             if record is None:
                 raise EditorError('bond_cost_unknown', f'槽位{slot+1}从者#{sid}缺少COST资料')
-            return {**record, 'slot':slot}
+            form = self._mash_form(sid, roster[slot], slot=slot, allow_unknown=has_grand)
+            return {**record, **({'cost':form['cost'], 'rarity':form['rarity']} if form else {}), 'slot':slot}
         def equip(eid, slot, stored):
             raw = self.equips.get(eid)
             if raw is None:
@@ -268,7 +300,7 @@ class BondPlanner:
         if current_cost < 0:
             raise EditorError('bond_cost_invalid', '填写的实际COST小于可释放礼装COST，请检查')
         if current_cost > options['costLimit']:
-            raise EditorError('bond_cost_exceeded', f'保留部分COST为{current_cost}，已超过上限{options["costLimit"]}')
+            raise EditorError('bond_cost_exceeded', f'保留编队COST为{current_cost}，已超过上限{options["costLimit"]}，无法继续补齐。请减少已选从者或礼装的COST，或提高弹窗内“队伍COST上限”后重试。')
 
         equip_candidates = [item for eid,item in sorted(self.equips.items())
                             if eid not in locked_equip_ids and matcher.equip_is_permanent_bond(item) and self._templates(item,'equip')
@@ -284,6 +316,10 @@ class BondPlanner:
                       and self._templates(s,'servant')
                       and (not options['ownedServantsOnly'] or any(self.canonical.get(i,i) == sid for i in self.owned_servants))
                       and sid not in {identity(i) for i in excluded}]
+        # A newly filled Mash uses one explicit, coherent first-part build, never
+        # the recognition database's canonical three-star / latest-skill mixture.
+        candidates = [{**row, 'cost':form['cost'], 'rarity':form['rarity'], '_editorForm':form}
+                      if (form := self._mash_form(int(row['id']), default=True)) else row for row in candidates]
         fill_slots = [i for i,m in enumerate(roster) if i != reserved and (not m or not m.get('svtId'))]
         added = 0
         for slot in fill_slots:
@@ -309,6 +345,9 @@ class BondPlanner:
             sid = int(chosen['id'])
             member = copy.deepcopy(roster[slot] or {})
             member.update({'svtId':sid,'supportType':'none','skillLvs':[10,10,10],'appendLvs':[0,0,0,0,0]})
+            if chosen.get('_editorForm'):
+                form = chosen['_editorForm']
+                member.update({'limitCount':form['limitCount'], 'skillIds':list(form['skillIds']), 'tdId':form['tdId']})
             roster[slot] = member
             own.append(chosen)
             used_ids.add(identity(sid))

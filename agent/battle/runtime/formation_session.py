@@ -11,7 +11,8 @@ from datetime import datetime, timezone
 from threading import RLock
 from uuid import uuid4
 
-from ..core.models import FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT, VERIFIED_FORMATION_SOURCE
+from ..core.models import (Confidence, FormationSlot, InitialFormation, REQUIRED_FRAME_COUNT,
+                           VERIFIED_FORMATION_SOURCE, CONTINUOUS_FORMATION_SOURCE)
 from .bond_stop_state import bond_stops
 
 
@@ -22,6 +23,7 @@ TEAPOT_NODE = "原生战斗-校验茶壶"
 FALLBACK_GATE_NODE = "进本-助战兜底跳过编队"
 FALLBACK_TEAPOT_NODE = "原生战斗-兜底校验茶壶"
 START_NODE = "进本-实际点击队伍确认"
+CONTINUE_NODE = "连续出击-记录初始编队"
 
 
 @dataclass
@@ -36,6 +38,8 @@ class _Session:
     error: str = ""
     support_fallback: bool = False
     capture_seed: tuple[FormationSlot, ...] = ()
+    continuation: InitialFormation | None = None
+    continuation_battle: int = 0
 
 
 class FormationSessions:
@@ -83,6 +87,8 @@ class FormationSessions:
                 self._invalidate(session, "unfinished_capture")
             elif battle != session.battle and session.error == "formation_update_pending":
                 self._invalidate(session, "unfinished_formation_update")
+            if session.continuation is not None and battle != session.continuation_battle:
+                self._invalidate(session, "")
             session.battle = battle
 
     @staticmethod
@@ -92,7 +98,61 @@ class FormationSessions:
         session.collecting = False
         session.frames.clear()
         session.capture_seed = ()
+        session.continuation = None
+        session.continuation_battle = 0
         session.error = reason
+
+    def prepare_continuation(self, task_id: int, token: str) -> bool:
+        """仅在实际点击连续出击后保存初始编队；选择助战前不暴露旧快照。"""
+        with self._lock:
+            session = self._get(task_id, token)
+            snapshot = session.snapshot
+            eligible = (session.repeat and not session.error and not session.collecting
+                        and not session.support_fallback and snapshot is not None
+                        and snapshot.captured_battle == session.battle
+                        and snapshot.source in {"formation_confirmation", VERIFIED_FORMATION_SOURCE,
+                                                CONTINUOUS_FORMATION_SOURCE}
+                        and snapshot.calibration_id not in {"", "unverified"}
+                        and sum(s.is_support is True for s in snapshot.slots) == 1
+                        and all(type(s.is_support) is bool for s in snapshot.slots))
+            self._invalidate(session, session.error or ("unfinished_capture" if session.collecting else ""))
+            bond_stops.clear_formation(task_id)
+            if eligible:
+                session.continuation = snapshot
+                session.continuation_battle = session.battle + 1
+            return bool(eligible)
+
+    def support_selected(self, task_id: int, token: str, servant_id: str | None,
+                         *, confidence: Confidence = Confidence(0.0),
+                         matched_template: str = "") -> InitialFormation | None:
+        """使用本次头像匹配成功并实际点击的助战，不使用未验证的筛选条件补身份。"""
+        with self._lock:
+            session = self._get(task_id, token)
+            previous = session.continuation
+            can_reuse = (previous is not None and session.repeat and not session.error
+                         and not session.collecting and not session.support_fallback
+                         and session.continuation_battle == session.battle
+                         and isinstance(servant_id, str) and servant_id.isdecimal()
+                         and int(servant_id) > 0)
+            self._invalidate(session, session.error or ("unfinished_capture" if session.collecting else ""))
+            session.support_fallback = False
+            bond_stops.clear_formation(task_id)
+            if not can_reuse:
+                return None
+            # 相同从者可能同时出现在自有位和助战位，必须按唯一助战标记替换。
+            slots = tuple(FormationSlot(
+                s.slot, "identified", servant_id, is_support=True,
+                identity_confidence=confidence, matched_template=matched_template,
+                reason="continuous_support_selected", search_scope="support_selection",
+            ) if s.is_support else s for s in previous.slots)
+            snapshot = InitialFormation(
+                slots, task_id, token, session.revision,
+                datetime.now(timezone.utc).isoformat(), session.battle,
+                source=CONTINUOUS_FORMATION_SOURCE, calibration_id=previous.calibration_id,
+            )
+            session.snapshot = snapshot
+            bond_stops.set_formation(task_id, slots)
+            return snapshot
 
     def invalidate(self, task_id: int, token: str, reason: str) -> None:
         with self._lock:
@@ -259,9 +319,9 @@ def context_session(context) -> tuple[int, str]:
     return root, token if isinstance(token, str) else ""
 
 
-def session_override(token: str) -> dict:
+def session_override(token: str, context=None) -> dict:
     # 只传递令牌，不将可变快照放入会被复制/字典合并的 pipeline attach。
-    return {
+    override = {
         SESSION_NODE: {"attach": {"session_id": token}},
         # 仅原生会话在编队汇合后检查茶壶；BBC 和独立 Chaldea 编队保留原路径。
         # 助战兜底不采集身份，但茶壶仍须按用户设置核对后才允许实际开始。
@@ -270,3 +330,16 @@ def session_override(token: str) -> dict:
         FALLBACK_GATE_NODE: {"next": [FALLBACK_TEAPOT_NODE]},
         FALLBACK_TEAPOT_NODE: {"next": [START_NODE]},
     }
+    if context is not None:
+        # 独立编队任务/旧资源可能没有连续出击节点，不创建悬空引用。
+        # 保留当前任务已有的补体力等后继；重复安装会话时也只挂一次。
+        continuation = context.get_node_data("连续出击_继续") or {}
+        marker = context.get_node_data(CONTINUE_NODE) or {}
+        following = continuation.get("next")
+        if marker and isinstance(following, list):
+            jump_back = f"[JumpBack]{CONTINUE_NODE}"
+            override["连续出击_继续"] = {"next": [jump_back, *[
+                item for item in following if item != jump_back
+                and not (isinstance(item, dict) and item.get("name") == CONTINUE_NODE)
+            ]]}
+    return override

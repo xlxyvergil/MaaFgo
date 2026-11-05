@@ -776,6 +776,34 @@
         }
       ],
       "method": "incremental; existing servant, equip, mystic, and media records preserved"
+    },
+    {
+      "date": "2026-11-05",
+      "servantId": 800100,
+      "sourceFields": [
+        "forms",
+        "defaultFormKey"
+      ],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/export/JP/nice_servant.json",
+          "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697",
+          "bytes": 69257176
+        },
+        {
+          "url": "https://raw.githubusercontent.com/chaldea-center/chaldea-data/156e8e88609c7536faf4cf476ba613257e3e1206/dist/constData.json",
+          "sha256": "029021cf72520f9ce2a852bf792fa1b92458a0e7152877ddd96b5fa244c36d0a",
+          "bytes": 264800
+        }
+      ],
+      "chaldeaCommit": "7dbad7dbc8a5713439658ab648ea2263d4621c79",
+      "chaldeaDataCommit": "156e8e88609c7536faf4cf476ba613257e3e1206",
+      "method": "incremental offline Mash form facts; same svtId=800100; existing servant/CE/mystic/skill/NP fields unchanged",
+      "compatibilityNotes": [
+        "Chaldea writes costume battleCharaId to limitCount and retains explicit skillIds/tdId",
+        "Historical Ortinax skill/TD presets share one costume identity; restored preset is the group default",
+        "Costume 800210/20 shares Paladin facts: Atlas rarity/COST overwrite and NP800107 releaseCondition confirm the group"
+      ]
     }
   ]
 }

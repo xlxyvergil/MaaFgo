@@ -95,6 +95,13 @@ class SpecialSkillScopeTests(unittest.TestCase):
         self.assertEqual(runtime(partial)._special_skill_pipeline_override(), {})
         self.assertEqual(runtime(initial, battle=2)._special_skill_pipeline_override(), {})
 
+    def test_continuous_selection_source_keeps_full_special_skill_checks(self):
+        initial = replace(snapshot(), source="continuous_support_selection", captured_battle=2)
+        self.assertEqual(runtime(initial, battle=2)._special_skill_pipeline_override(), {})
+        self.assertEqual(runtime(initial, battle=3)._special_skill_pipeline_override(), {})
+        partial = replace(initial, slots=(*initial.slots[:5], FormationSlot(6, "unknown")))
+        self.assertEqual(runtime(partial, battle=2)._special_skill_pipeline_override(), {})
+
     def test_merged_roster_conflict_or_extra_member_does_not_prove_absence(self):
         for roster in ((None, "100500", "200100", None, None, None),
                        ("405900", "100500", "200100", "203300", None, None)):

@@ -35,6 +35,7 @@ class Confidence:
 # formation_action.IDENTITY_FRAME_NODES 与 formation_session 的 publish 校验共用此值。
 REQUIRED_FRAME_COUNT = 1
 VERIFIED_FORMATION_SOURCE = "chaldea_formation_verified"
+CONTINUOUS_FORMATION_SOURCE = "continuous_support_selection"
 
 
 @dataclass(frozen=True)

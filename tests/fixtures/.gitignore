@@ -7,3 +7,5 @@
 !free_quest_badge_1.png
 # Minimal tea/storm popup, bar and page-guard UI crops.
 !teapot/*.png
+# Anonymous servant level / attack-value crops for support filtering regressions.
+!support_level/*.png

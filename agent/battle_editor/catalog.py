@@ -334,6 +334,43 @@ def _np_filter(item: dict) -> dict:
     return {"types": types, "cards": cards, "variants": variants}
 
 
+def _servant_forms(root: Path, source: dict, skill_variants: dict, np_variants: dict,
+                   class_variants: dict, default_class, cache: dict,
+                   form_portraits: dict | None = None) -> list[dict]:
+    """Expose coherent form presets without creating additional servant IDs."""
+    raw = source.get("forms")
+    if not isinstance(raw, list):
+        return []
+    forms, keys = [], set()
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        key, label, limit, rarity, cost = (item.get(field) for field in
+                                           ("key", "label", "limitCount", "rarity", "cost"))
+        ids, aliases, td_id = item.get("skillIds"), item.get("limitCounts"), item.get("tdId")
+        if (not isinstance(key, str) or not key or key in keys or not isinstance(label, str) or not label
+                or type(limit) is not int or limit < 0 or type(rarity) is not int or rarity not in range(6)
+                or type(cost) is not int or not 0 <= cost <= 100
+                or not isinstance(aliases, list) or not aliases or limit not in aliases
+                or any(type(value) is not int or value < 0 for value in aliases)
+                or not isinstance(ids, list) or len(ids) != 3
+                or any(type(sid) is not int or skill_variants.get(sid, {}).get("num") != index + 1
+                       for index, sid in enumerate(ids))
+                or type(td_id) is not int or td_id not in np_variants):
+            continue
+        keys.add(key)
+        portrait = _image(root, "ui", [(form_portraits or {}).get(key)], cache)
+        portrait_width, portrait_height = _dimensions(root, portrait)
+        forms.append({"key": key, "label": label, "limitCount": limit, "limitCounts": list(aliases),
+                      "rarity": rarity, "cost": cost, "skillIds": list(ids), "tdId": td_id,
+                      "defaultForLimit": item.get("defaultForLimit") is True,
+                      "image": _image(root, "servant", [item.get("image")], cache),
+                      # Only the exact per-form UI mapping may supply full artwork.
+                      "portrait": portrait, "portraitWidth": portrait_width, "portraitHeight": portrait_height,
+                      "classIcon": _image(root, "ui", [class_variants.get(str(rarity)), default_class], cache)})
+    return forms
+
+
 def build_catalog(project_root: Path | str) -> dict:
     """Merge bundled facts, complete names, recognition assets and local inventory.
 
@@ -428,6 +465,13 @@ def build_catalog(project_root: Path | str) -> dict:
             "bond": copy.deepcopy(item.get("bond")),
             "npFilter": _np_filter(item),
         })
+        if "forms" in extra:
+            forms = _servant_forms(root, extra, skill_variants, np_variants, class_variants,
+                                   ui_classes.get(item.get("class")), media_cache,
+                                   appearance.get("formPortraits") if isinstance(appearance.get("formPortraits"), dict) else None)
+            default_key = extra.get("defaultFormKey")
+            servants[-1].update({"forms": forms,
+                                 "defaultFormKey": default_key if any(form["key"] == default_key for form in forms) else None})
     servants.sort(key=lambda item: (item["collectionNo"] or 0, item["id"]))
 
     recognized = {str(item["id"]): item for item in _read(custom / "equip_list.json", {}).get("equips", [])}

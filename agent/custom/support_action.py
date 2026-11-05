@@ -57,6 +57,8 @@ from chaldea import fetch_share_data
 from chaldea.servant_aliases import build_servant_lookup
 from chaldea.support_criteria import build_support_criteria
 from battle.runtime.formation_session import context_session, sessions
+from battle.core.models import Confidence
+from battle.data.servant_identity import canonical_servant_id
 
 # ---------------- 路径常量 ----------------
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -311,7 +313,7 @@ class SupportAction(CustomAction):
         )
 
     def _tap(self, controller, x, y):
-        controller.post_click(*self._point_to_screen(x, y)).wait()
+        return controller.post_click(*self._point_to_screen(x, y)).wait().succeeded
 
     def _swipe(self, controller, x1, y1, x2, y2, duration):
         controller.post_swipe(
@@ -404,6 +406,7 @@ class SupportAction(CustomAction):
             s = float(cv2.matchTemplate(tpl, cg, cv2.TM_CCOEFF_NORMED).max())
             mfaalog.info(f"[SupportAction] 英灵头像 {f}: score={s:.3f}")
             if s >= TH_FACE:
+                self._matched_face_evidence = (s, f)
                 return True
         return False
 
@@ -607,13 +610,17 @@ class SupportAction(CustomAction):
 
     @staticmethod
     def _ocr_level_text(roi):
-        """OCR 识别等级区域, 返回当前等级 int; OCR 不可用/无匹配返回 None"""
+        """返回当前等级；没有等级或无法解析时返回 None，并保留 OCR 原文。"""
         import cv2
         g = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)[2:22, :]   # 去掉上下横线
         if g.size == 0:
             return None
         t = SupportAction._ocr_run(g, 3)
         if not t:
+            return None
+        # 排序可能让头像上方显示其他属性，不能把攻击力/生命值当作等级。
+        if re.match(r"^(?:攻击|攻撃|生命|ATK|HP)", t.strip(), re.IGNORECASE):
+            mfaalog.debug(f"[SupportAction] 从者等级区域显示其他属性，原文={t!r}")
             return None
         m = re.search(r"(\d{1,3})/(\d{1,3})", t)
         if m:
@@ -623,6 +630,7 @@ class SupportAction(CustomAction):
             cur, mx = int(m.group(1)), int(m.group(2))
             if 1 <= cur <= 130 and 1 <= mx <= 130:
                 return cur
+        mfaalog.debug(f"[SupportAction] 从者等级区域 OCR 无法解析，原文={t!r}")
         return None
 
     @staticmethod
@@ -672,9 +680,13 @@ class SupportAction(CustomAction):
         if expect <= 0:
             return True
         roi = _roi(img, bx, by, LEVEL_ROI[0], LEVEL_ROI[1], LEVEL_ROI[2], LEVEL_ROI[3])
-        if roi is None:
-            return False
-        got = SupportAction._ocr_level_text(roi)
+        got = SupportAction._ocr_level_text(roi) if roi is not None else None
+        if got is None and not getattr(self, "_level_recognition_failed", False):
+            self._level_recognition_failed = True
+            mfaalog.warning(
+                f"[SupportAction] 助战从者等级识别失败（要求至少{expect}级），当前条目无法确认等级，正在继续查找。"
+                "请检查游戏“助战选择”界面是否已开启从者等级显示，确认头像上方显示“90/90”这类等级。"
+            )
         ok = got is not None and got >= expect
         mfaalog.info(f"[SupportAction] 英灵等级 期望>={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
         return ok
@@ -754,6 +766,19 @@ class SupportAction(CustomAction):
         return white >= WHITE_RATIO
 
     # ---------- 主流程 ----------
+    def _record_selected_support(self, root, token, servant_id):
+        if not token:
+            return
+        score, template = getattr(self, "_matched_face_evidence", (0.0, ""))
+        snapshot = sessions.support_selected(
+            root, token, canonical_servant_id(servant_id),
+            confidence=Confidence(score, "support_selection"), matched_template=template,
+        )
+        if snapshot is not None:
+            support = next(s for s in snapshot.slots if s.is_support)
+            mfaalog.info(f"[初始编队] 连续出击沿用自有编队，助战位={support.slot} "
+                         f"本次助战={support.servant_id} 头像匹配={score:.4f}")
+
     def _select_fallback(self, context, controller, root, token):
         """撤销职介筛选并复用首个助战入口，不在本子任务中执行编队。"""
         if context.tasker.stopping:
@@ -770,6 +795,17 @@ class SupportAction(CustomAction):
         return CustomAction.RunResult(success=True)
 
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        # 每次助战查找独立记录；实时提醒只输出一次，避免滑动刷新时刷屏。
+        self._level_recognition_failed = False
+        result = self._run_search(context, argv)
+        if not result.success and self._level_recognition_failed and not context.tasker.stopping:
+            mfaalog.warning(
+                "[SupportAction] 本次助战任务失败，查找过程中曾出现从者等级识别失败。"
+                "请检查游戏“助战选择”界面是否已开启从者等级显示，确认头像上方显示“90/90”这类等级后重试。"
+            )
+        return result
+
+    def _run_search(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         try:
             param = {}
             if argv.custom_action_param:
@@ -940,6 +976,7 @@ class SupportAction(CustomAction):
                     dx, dy = shift
                     bx, by, bx2, by2 = bx + dx, by + dy, bx2 + dx, by2 + dy
                     mfaalog.info(f"[SupportAction] 重定位后 框=({bx},{by})-({bx2},{by2})")
+                    self._matched_face_evidence = (0.0, "")
                     if not skip_servant and not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
                         continue
                     if not all(any(self._match_ce(img, ce_dir, bx, by, name, anc, sub)
@@ -956,9 +993,9 @@ class SupportAction(CustomAction):
                     # 主动/宝具/等级 均满足, 剩被动
                     if not passive_need:
                         cx, cy = (bx + bx2) // 2, (by + by2) // 2
-                        self._tap(controller, cx, cy)
-                        if token:
-                            sessions.set_support_fallback(root, token, False)
+                        if self._tap(controller, cx, cy) is False:
+                            raise ValueError("没有成功点击选中的助战，无法确认本次借用的从者。请检查模拟器连接后重新运行任务。")
+                        self._record_selected_support(root, token, servant_id if not skip_servant else None)
                         mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                         return True
 
@@ -978,10 +1015,24 @@ class SupportAction(CustomAction):
 
                     if not passive_ok:
                         continue
+                    # 切回主动页后重新定位和核对头像，不能把被动切换前的旧坐标
+                    # 当作本次实际选中的助战身份。只要求礼装的选择仍不补造身份。
+                    current = self._shot_base(controller)
+                    if current is None:
+                        return False
+                    shift = self._ref_shift(current, bx, by)
+                    if shift is None:
+                        continue
+                    dx, dy = shift
+                    bx, by, bx2, by2 = bx + dx, by + dy, bx2 + dx, by2 + dy
+                    self._matched_face_evidence = (0.0, "")
+                    if not skip_servant and not self._match_servant(
+                            current, face_dir, bx, by, srv["images"], support_type):
+                        continue
                     cx, cy = (bx + bx2) // 2, (by + by2) // 2
-                    self._tap(controller, cx, cy)
-                    if token:
-                        sessions.set_support_fallback(root, token, False)
+                    if self._tap(controller, cx, cy) is False:
+                        raise ValueError("没有成功点击选中的助战，无法确认本次借用的从者。请检查模拟器连接后重新运行任务。")
+                    self._record_selected_support(root, token, servant_id if not skip_servant else None)
                     mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                     return True
 

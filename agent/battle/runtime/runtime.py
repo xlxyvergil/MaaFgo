@@ -20,7 +20,8 @@ from .special_skills import SpecialSkillDispatcher
 from ..core.enums import PrimitiveKind, Scene
 from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, InitialFormation,
                            MasterSkillAction, OrderChangeAction, RetireAction,
-                           ServantSkillAction, VERIFIED_FORMATION_SOURCE, is_slot)
+                           ServantSkillAction, VERIFIED_FORMATION_SOURCE,
+                           CONTINUOUS_FORMATION_SOURCE, is_slot)
 from ..core.policy import BattlePolicy, Goal, StrategyProfile
 from ..core.validator import (
     skip_unusable_servant_skills,
@@ -93,7 +94,10 @@ class AutoBattleRuntime:
         # 这是初始编队证据，不参与当前回合 owner_slot 或换人/退场推断。
         self.initial_formation = initial_formation
         self.initial_formation_reused = (
-            initial_formation is not None and initial_formation.captured_battle != formation_battle
+            initial_formation is not None and (
+                initial_formation.captured_battle != formation_battle
+                or initial_formation.source == CONTINUOUS_FORMATION_SOURCE
+            )
         )
         if roster_servant_ids is None and initial_formation is not None:
             roster_servant_ids = tuple(
@@ -129,7 +133,8 @@ class AutoBattleRuntime:
             mfaalog.info(
                 f"[AutoBattle] initial_formation task={initial.task_id} session={initial.session_id} "
                 f"revision={initial.revision} captured_at={initial.captured_at} "
-                f"reused={self.initial_formation_reused}; 初始位置非当前前排，复用助战未重新确认"
+                f"reused={self.initial_formation_reused} source={initial.source}; "
+                "初始编队仅供身份候选，当前前排仍按本场画面识别"
             )
         else:
             mfaalog.info("[AutoBattle] initial_formation=none; 使用通用策略")
