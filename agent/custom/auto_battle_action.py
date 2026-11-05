@@ -31,6 +31,7 @@ from battle.core.advanced_strategy import (ADVANCED_STRATEGY_FIELD,
                                           validate_advanced_strategy)
 from battle.core.models import BattlePlan
 from battle.core.special_skills import SpecialSkillChoiceError
+from battle.core.models import CONTINUOUS_FORMATION_SOURCE
 from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
                                     _parse_native_card_strategy, _parse_plan,
                                     _parse_strategy_profile)
@@ -64,13 +65,25 @@ class BeginNativeFormationSession(CustomAction):
         if not sessions.valid(root, token, repeat=True):
             token = sessions.begin(root)
         try:
-            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+            if context.tasker.stopping or not context.override_pipeline(session_override(token, context)):
                 raise ValueError("cannot install native formation session")
             return CustomAction.RunResult(success=True)
         except Exception as exc:
             sessions.finish(root, token)
             mfaalog.error(f"[初始编队] 会话初始化失败: {exc}")
             return CustomAction.RunResult(success=False)
+
+
+@AgentServer.custom_action("remember_continuous_formation")
+class RememberContinuousFormation(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg):
+        root, token = context_session(context)
+        if context.tasker.stopping:
+            return CustomAction.RunResult(success=False)
+        if sessions.valid(root, token, repeat=True):
+            retained = sessions.prepare_continuation(root, token)
+            mfaalog.info(f"[初始编队] 连续出击初始编队已保留={retained}；等待本次助战选择")
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("auto_battle")
@@ -90,11 +103,15 @@ class AutoBattleAction(CustomAction):
         node_name = getattr(argv, "node_name", "")
         support_fallback = bool(token and sessions.support_fallback(root, token))
         formation_reset = param.get("native_battle_formation_reset") is True
+        continued_formation_reset = (formation_reset and initial_formation is not None
+                                     and getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE)
         if support_fallback or formation_reset:
             # 锁助战可能连带改变整队配置，不能读取旧攻略或旧编队身份。
             param = {}
-            if support_fallback:
+            if support_fallback or continued_formation_reset:
                 initial_formation = None
+                if continued_formation_reset and token:
+                    sessions.skip_capture(root, token)
             mfaalog.info("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
         plan = _parse_plan(param)
         chaldea_roster = None

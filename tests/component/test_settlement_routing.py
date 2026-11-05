@@ -103,6 +103,7 @@ class SettlementTests(unittest.TestCase):
     def test_defeat_enters_retreat_without_blind_clicks(self):
         seen = self.run_scenario("结束战斗_不回主界面", [
             {"战斗失败_不回主界面"}, {"失败2_不回主界面"}, {"战斗结束关闭_不回主界面"},
+            {"可能已经结束战斗_不回主界面"},
         ])
         self.assertIn("失败2_不回主界面", seen)
         self.assertNotIn("结算推进_点击右上角", seen)
@@ -110,6 +111,7 @@ class SettlementTests(unittest.TestCase):
     def test_final_friend_request_never_clicks_continue(self):
         seen = self.run_scenario("结束战斗_不回主界面", [
             {"好友申请界面_不回主界面"}, {"连续出击_继续", "战斗结束关闭_不回主界面"},
+            {"可能已经结束战斗_不回主界面"},
         ])
         self.assertNotIn("连续出击_继续", seen)
         self.assertIn("战斗结束关闭_不回主界面", seen)
@@ -154,6 +156,55 @@ class SettlementTests(unittest.TestCase):
         ], succeeds=False)
         self.assertEqual(seen.count("结算-活动报酬返回地图"), 1)
         self.assertNotIn("结算推进_点击右上角", seen)
+
+    def test_generic_close_waits_for_activity_rewards_and_map_before_completion(self):
+        for entry, friend, close in (
+            ("结束战斗_不回主界面", "好友申请界面_不回主界面", "战斗结束关闭_不回主界面"),
+            ("结束战斗_连续出击继续", "好友申请界面_连续出击继续", "战斗结束关闭_连续出击继续"),
+        ):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [
+                    {friend}, {close},
+                    {"结算-活动报酬返回地图"},
+                    {"可能已经结束战斗_不回主界面"},
+                ])
+                self.assertEqual(seen.count(close), 1)
+                self.assertEqual(seen.count("结算-活动报酬返回地图"), 1)
+                self.assertEqual(seen[-1], "全局空节点")
+                self.assertIn("可能已经结束战斗_不回主界面", seen)
+                self.assertNotIn("连续出击_继续", seen)
+                self.assertFalse(any(n.startswith("结算推进_") for n in seen))
+
+    def test_generic_close_without_return_confirmation_does_not_finish_battle(self):
+        seen = self.run_scenario("结束战斗_不回主界面", [
+            {"战斗结束关闭_不回主界面"},
+        ], succeeds=False)
+        self.assertEqual(seen.count("战斗结束关闭_不回主界面"), 1)
+        self.assertNotIn("全局空节点", seen)
+        self.assertFalse(any(n.startswith("结算推进_") for n in seen))
+
+    def test_continue_after_reward_popup_close_stays_in_settlement(self):
+        for entry in ("结束战斗_连续出击继续", "作战成功_结束战斗_继续",
+                      "好友申请界面_连续出击继续", "结算推进_点击右上角_继续"):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [
+                    {entry}, {"战斗结束关闭_连续出击继续"},
+                    {"连续出击_继续"},
+                ])
+                self.assertEqual(seen.count("连续出击_继续"), 1)
+                self.assertIn("结算-关闭后返回复核_继续", seen)
+                self.assertNotIn("战斗结束关闭_不回主界面", seen)
+
+    def test_final_closes_delayed_continue_then_activity_rewards(self):
+        seen = self.run_scenario("结束战斗_不回主界面", [
+            {"战斗结束关闭_不回主界面"},
+            {"结算-最终场连续出击关闭", "连续出击_继续"},
+            {"结算-活动报酬返回地图"},
+            {"可能已经结束战斗_不回主界面"},
+        ])
+        self.assertIn("结算-最终场连续出击关闭", seen)
+        self.assertNotIn("连续出击_继续", seen)
+        self.assertIn("可能已经结束战斗_不回主界面", seen)
 
     def test_bond_max_preempts_final_continuous_and_trial_advancement(self):
         for entry in ("结束战斗_不回主界面", "结束战斗_连续出击继续",

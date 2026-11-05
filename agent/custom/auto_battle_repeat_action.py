@@ -63,6 +63,7 @@ _DEFAULT_RESET_HIT_NODES = [
     "结算推进_点击右上角",
     "结算推进_点击右上角_继续",
     "点击关卡",
+    "连续出击-记录初始编队",
     # These bounded entry nodes must get a fresh budget for each battle.
     "特殊编队-编成条件未满足",
     "特殊编队-打开自动编队",
@@ -82,7 +83,7 @@ class AutoBattleRepeatAction(CustomAction):
         bond_stops.begin(root)
         token = sessions.begin(root, repeat=True)
         try:
-            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+            if context.tasker.stopping or not context.override_pipeline(session_override(token, context)):
                 raise ValueError("cannot install repeat formation session")
             return self._run_session(context, argv, root, token)
         except Exception as exc:
