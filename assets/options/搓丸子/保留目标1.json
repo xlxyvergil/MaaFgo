@@ -6416,7 +6416,9 @@
                 "target_1_id": "9400180"
               }
             }
-          }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_94001800.png",
+          "description": "龙脉 · ID 9400180\n\n<img src=\"resource/base/image/EquipFaces/team/f_94001800.png\" width=\"79\" alt=\"龙脉\" />"
         },
         {
           "name": "9400190",

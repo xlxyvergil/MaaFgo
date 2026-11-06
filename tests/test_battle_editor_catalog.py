@@ -815,7 +815,7 @@ class BundledCatalogTests(unittest.TestCase):
         self.assertEqual(sum(equip["common"] and equip["recognizable"]
                              for equip in catalog["equips"]), 47)
         recognized = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
-        self.assertEqual(len(recognized), 1157)
+        self.assertEqual(len(recognized), 1158)
         expected_equip_ids = {int(row["id"]) for row in recognized
                               if any(resolve_media(ROOT, "equip", image) for image in row.get("images", []))}
         self.assertEqual({equip["id"] for equip in catalog["equips"] if equip["recognizable"]}, expected_equip_ids)
@@ -871,6 +871,16 @@ class BundledCatalogTests(unittest.TestCase):
         record = next(row for row in local["equips"] if row["id"] == "9400360")
         self.assertEqual(record["important"], 1)
         self.assertEqual(record["bond"]["bonus_type"], "none")
+
+        dragon = next(item for item in catalog["equips"] if item["id"] == 9400180)
+        self.assertTrue(dragon["recognizable"])
+        self.assertFalse(dragon["common"])
+        self.assertEqual(dragon["cost"], 5)
+        self.assertEqual(dragon["image"], "/media/equip/f_94001800.png")
+        self.assertEqual(dragon["supportRecognition"], {"limitBreak": False, "nonLimitBreak": False})
+        record = next(row for row in local["equips"] if row["id"] == "9400180")
+        self.assertEqual(record["important"], 0)
+        self.assertEqual(record["images"], ["f_94001800.png"])
 
     def test_bundled_servants_have_official_decks_and_media_hashes_match(self):
         directory = ROOT / "agent/battle_editor/data"

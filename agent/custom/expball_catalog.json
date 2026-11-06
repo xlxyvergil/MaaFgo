@@ -10358,7 +10358,8 @@
       "name_jp": "龍脈",
       "rarity": 3,
       "images": [
-        "友情召唤/龙脉结果.png"
+        "EquipFaces/list/f_94001800.png",
+        "EquipFaces/team/f_94001800.png"
       ]
     },
     {
