@@ -84,7 +84,9 @@ FACE_POLY = [(27, 57), (27, 108), (140, 108), (140, 84), (166, 84), (166, 39), (
 TH_FACE = 0.75
 CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口)
 CE_ANCHOR_GRAND = [(179, 35), (179, 129)]   # 冠位助战 礼装1/礼装2 左上角(166x53 窗口)
-BOND_ROI = (180, 84, 29, 29)          # 冠位助战 羁绊区域: 中心(194,99) 29x29 (相对框, 实测图案中心对齐)
+# 日服现场图标左上角约为框内 (186,93)，旧 29x29 区域会截断图案。
+# 保留完整 24x24 模板的滑动空间，只搜索羁绊图标附近，避免扩大到相邻礼装。
+BOND_ROI = (180, 84, 40, 40)
 BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> 模板(带绿幕), 纯图案多服通用, 固定取 base 包 skill 目录
 TH_BOND = 0.40                     # 较高分须严格超过此值，才确认羁绊效果图标
 SKILL_ACTIVE = [(791, 154, 27, 22), (836, 154, 29, 22), (881, 154, 28, 22)]   # 主动技能 1-3 数字方框 (x,y,w,h)
@@ -524,8 +526,8 @@ class SupportAction(CustomAction):
 
     # ---------- 冠位羁绊判断 ----------
     def _match_bond(self, img, bx, by, bond_opt):
-        """羁绊区域(中心(194,99) 29x29)与 base/image/skill/{50np,羁绊}.png 匹配
-        模板带绿幕, 先抠掉绿幕背景再与截图区域灰度滑动匹配
+        """羁绊区域与 base/image/skill/{50np,羁绊}.png 做掩膜灰度匹配。
+        绿幕像素不参与相关系数计算，避免礼装背景影响效果分类。
         模板是纯图案(不含文字), 多服通用, 故固定取 base 包而非当前 pkg
         两张模板分别打分，较高分须严格大于 0.40 且两者不相等，才确认效果；
         低分或同分视为未识别到，跳过当前条目。不限效果时保持跳过检查。"""
@@ -541,14 +543,20 @@ class SupportAction(CustomAction):
             t_bgr = _imread(os.path.join(_image_dir("base", "skill"), name))
             if t_bgr is None:
                 return False
-            # 抠绿幕: 绿色像素置白(模板背景为绿幕, 截图区域为正常图案)
+            # 以绿幕生成掩膜；不能将绿幕涂白后当成有效特征参与匹配。
             b = t_bgr[:, :, 0].astype(int)
             g = t_bgr[:, :, 1].astype(int)
             r = t_bgr[:, :, 2].astype(int)
             green = (g > 100) & (g > b + 30) & (g > r + 30)
             t = cv2.cvtColor(t_bgr, cv2.COLOR_BGR2GRAY)
-            t[green] = 255
-            scores[opt] = float(cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED).max())
+            mask = (~green).astype(np.uint8) * 255
+            if (t.shape[0] > g_roi.shape[0] or t.shape[1] > g_roi.shape[1]
+                    or not np.any(mask)):
+                return False
+            result = cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED, mask=mask)
+            # 平坦背景上的局部方差可能为零，仅保留可计算的候选位置。
+            finite = result[np.isfinite(result)]
+            scores[opt] = float(finite.max()) if finite.size else float("nan")
         best = max(scores, key=scores.get)
         if (not all(np.isfinite(score) for score in scores.values())
                 or scores[best] <= TH_BOND
