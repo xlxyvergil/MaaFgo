@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import os
 import re
 import tempfile
@@ -13,6 +14,8 @@ from pathlib import Path
 from typing import Any
 
 MAX_JSON_BYTES = 4 * 1024 * 1024
+# Multiple HTTP handlers (and storage objects in this process) share one sidecar.
+_LIBRARY_LOCK = threading.RLock()
 
 
 class EditorError(Exception):
@@ -77,6 +80,17 @@ def battle_name(value: Any) -> str:
     return value
 
 
+def _birth_time(stat) -> str | None:
+    # st_ctime means metadata-change time on POSIX and must not be shown as birth.
+    value = getattr(stat, "st_birthtime", None)
+    if type(value) not in (int, float) or not math.isfinite(value) or value <= 0:
+        return None
+    try:
+        return datetime.fromtimestamp(value, timezone.utc).isoformat()
+    except (OverflowError, OSError, ValueError):
+        return None
+
+
 class BattleStorage:
     def __init__(self, root: str | Path):
         self.root = Path(root).resolve()
@@ -106,14 +120,105 @@ class BattleStorage:
             raw = self._read(path)
             return {"name": path.name, "data": decode_json(raw), "hash": digest(raw), "path": str(path)}
 
+    def _library_path(self) -> Path:
+        path = self.editor_dir / "library.json"
+        if path.is_symlink():
+            raise EditorError("library_metadata_path", "方案库收藏记录指向了其他位置，无法更新收藏。请将 config/BattleEditor/library.json 改名备份后，点击方案库“刷新”。", 500)
+        return within(path, self.editor_dir)
+
+    def _read_library(self) -> dict:
+        try:
+            path = self._library_path()
+            try:
+                path.stat()
+            except FileNotFoundError:
+                return {"version": 1, "files": {}}
+            data = decode_json(self._read(path))
+            if not isinstance(data, dict) or type(data.get("version")) is not int or data["version"] != 1 or not isinstance(data.get("files"), dict):
+                raise ValueError("unsupported library format")
+            for name, item in data["files"].items():
+                if battle_name(name) != name or not isinstance(item, dict) or type(item.get("favorite")) is not bool:
+                    raise ValueError("invalid library entry")
+                created = item.get("createdAt")
+                if not isinstance(created, str) or len(created) > 80 or datetime.fromisoformat(created).tzinfo is None:
+                    raise ValueError("invalid library creation time")
+                if item.get("createdAtSource") not in ("birthtime", "firstSeen"):
+                    raise ValueError("invalid library time source")
+            return data
+        except OSError as exc:
+            raise EditorError("library_metadata_read", "无法读取方案库收藏记录，已有方案仍可打开。请检查软件目录的读取权限后，点击方案库“刷新”。", 500) from exc
+        except (EditorError, ValueError, TypeError, OverflowError) as exc:
+            raise EditorError("library_metadata_invalid", "方案库收藏记录无法读取，已有方案仍可打开。请先备份并修复 config/BattleEditor/library.json，再点击方案库“刷新”；也可将该文件改名备份后重新收藏。", 500) from exc
+
+    def _write_library(self, library: dict) -> None:
+        try:
+            self._atomic(self._library_path(), encode_json(library))
+        except (EditorError, OSError) as exc:
+            raise EditorError("library_metadata_write", "方案库收藏记录尚未保存。请检查软件目录的写入权限、磁盘空间或文件占用后重试，方案文件未被修改。", 500) from exc
+
+    def _library_entry(self, name: str, stat, library: dict) -> tuple[dict, bool]:
+        key = os.path.normcase(name)
+        entry = library["files"].get(key)
+        if entry is not None:
+            return entry, False
+        birth = _birth_time(stat)
+        entry = {"favorite": False, "createdAt": birth or utc_now(),
+                 "createdAtSource": "birthtime" if birth else "firstSeen"}
+        library["files"][key] = entry
+        return entry, True
+
+    def _remember_creation(self, name: str, path: Path) -> None:
+        # An atomic overwrite may replace the filesystem birth time. Keep the
+        # original timestamp before that happens; metadata errors never block a save.
+        try:
+            with _LIBRARY_LOCK:
+                library = self._read_library()
+                _, changed = self._library_entry(name, path.stat(), library)
+                if changed:
+                    self._write_library(library)
+        except (EditorError, OSError):
+            pass
+
+    def set_favorite(self, name: str, favorite: bool) -> dict:
+        if type(favorite) is not bool:
+            raise EditorError("invalid_favorite", "收藏状态无法读取，未修改收藏。请重新点击方案旁的星标。")
+        name = battle_name(name)
+        with self.lock, _LIBRARY_LOCK:
+            path = self._path(name)
+            if not path.is_file():
+                raise EditorError("favorite_not_found", f"方案“{name}”已不存在，无法修改收藏。请点击方案库“刷新”后重新选择。", 404)
+            library = self._read_library()
+            entry, _ = self._library_entry(name, path.stat(), library)
+            entry["favorite"] = favorite
+            self._write_library(library)
+            return {"name": name, "favorite": favorite}
+
     def list_battles(self) -> dict:
         rows = []
-        with self.lock:
+        warning = None
+        with self.lock, _LIBRARY_LOCK:
+            try:
+                library = self._read_library()
+            except EditorError as exc:
+                library, warning = None, exc.message
+            changed = False
+            first_seen_rows = []
             for file in sorted(self.battle_dir.glob("*.json"), key=lambda p: p.name.casefold()):
-                row = {"name": file.name, "title": file.stem, "turnCount": 0, "servants": []}
+                row = {"name": file.name, "title": file.stem, "turnCount": 0, "servants": [],
+                       "favorite": False, "createdAt": None, "createdAtSource": "unknown"}
                 try:
                     path = self._path(file.name)
-                    row["modifiedAt"] = datetime.fromtimestamp(path.stat().st_mtime, timezone.utc).isoformat()
+                    stat = path.stat()
+                    row["modifiedAt"] = datetime.fromtimestamp(stat.st_mtime, timezone.utc).isoformat()
+                    if library is not None:
+                        entry, added = self._library_entry(file.name, stat, library)
+                        row.update({key: entry[key] for key in ("favorite", "createdAt", "createdAtSource")})
+                        changed |= added
+                        if added and entry["createdAtSource"] == "firstSeen":
+                            first_seen_rows.append(row)
+                    else:
+                        row["createdAt"] = _birth_time(stat)
+                        row["createdAtSource"] = "birthtime" if row["createdAt"] else "unknown"
                     item = self.read_battle(file.name)
                     row["hash"] = item["hash"]
                     data = item["data"]
@@ -140,7 +245,19 @@ class BattleStorage:
                 except (EditorError, OSError) as exc:
                     row["error"] = str(exc)
                 rows.append(row)
-        return {"battles": rows, "directory": str(self.battle_dir)}
+            if changed:
+                try:
+                    self._write_library(library)
+                except EditorError as exc:
+                    warning = exc.message
+                    # Without a persisted first-seen record, do not pretend it is
+                    # a stable creation timestamp on this filesystem.
+                    for row in first_seen_rows:
+                        row.update(createdAt=None, createdAtSource="unknown")
+        result = {"battles": rows, "directory": str(self.battle_dir)}
+        if warning:
+            result["libraryWarning"] = warning
+        return result
 
     def _atomic(self, path: Path, raw: bytes, *, create: bool = False) -> None:
         # Temp file is on the target filesystem; neither a crash nor disk full exposes half a JSON.
@@ -186,11 +303,14 @@ class BattleStorage:
                 current_hash = digest(old)
                 if current_hash != expected_hash:
                     raise EditorError("file_conflict", "该文件已被其他窗口或程序修改，请重新载入或另存", 409, {"currentHash": current_hash})
+                self._remember_creation(path.name, path)
                 backup = within(self.backup_dir / (path.stem + "_" + datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%S") + "_" + uuid.uuid4().hex[:8] + ".json"), self.backup_dir)
                 self._atomic(backup, old, create=True)
                 if digest(self._read(path)) != current_hash:
                     raise EditorError("file_conflict", "备份时原文件又发生变化，请重新载入或另存", 409, {"currentHash": digest(self._read(path))})
             self._atomic(path, raw, create=create)
+            if create:
+                self._remember_creation(path.name, path)
             return self.read_battle(path.name)
 
     def _draft_path(self, draft_id: str) -> Path:
