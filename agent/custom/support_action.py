@@ -12,7 +12,7 @@
   2. 对每个框判定(全屏坐标 = 框左上角 + 框内锚点):
      a. 英灵   : attach.servant(servantId) -> servant_list.json.images(f_xxx);
                  attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入;
-                 any=不要求英灵, 使用 ALL 列表并跳过英灵及其技能/宝具/等级要求
+                 any=不要求英灵, 保留当前职介页签并跳过英灵及其技能/宝具/等级要求
                  与框内(95,76)中心 60x60 头像窗口匹配, 任一模板满足即可
      b. 礼装   : 普通 ce / 冠位 ce_1+ce_2(lizhuang 模板; 0_空.png 跳过)
      c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 >= 期望
@@ -942,9 +942,11 @@ class SupportAction(CustomAction):
             controller = context.tasker.controller
             self._init_scale(controller)
 
-            # 执行所有助战选择前, 先点击对应职介的筛选 tab(全屏坐标); 间隔0.5s点击3次
-            if class_name:
-                if skip_servant or "all" in class_all:
+            # 不要求英灵时沿用游戏当前页签；指定英灵时才按职介筛选设置切换。
+            if skip_servant:
+                mfaalog.info("[SupportAction] 不要求英灵，保留当前职介页签")
+            elif class_name:
+                if "all" in class_all:
                     tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
                 else:
                     tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
