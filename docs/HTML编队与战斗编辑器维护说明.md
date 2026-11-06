@@ -171,16 +171,16 @@ python -X utf8 tools/build_battle_editor_ui_assets.py --source-root "F:\Game_AUT
 | `servants[].bond` | CSV 已归档的基础羁绊属性、灵基和灵衣条件，仅用于筛选 |
 | `servants[].npFilter.{types,cards,variants}` | CSV 宝具类型/色卡及准确配对记录，与 Atlas 战斗变体分开 |
 | `equips[].imageWidth/imageHeight` | 实际 PNG 比例，前端完整显示 |
-| `equips[].common/commonSources` | 是否在现有礼装识别模板范围，以及对应模板文件 |
-| `commonEquips.{count,unmatched,ambiguous}` | 常用礼装匹配统计与维护告警 |
+| `equips[].common/commonSources` | 是否由运行清单标记为重要礼装，以及来源标记 `["important"]` |
+| `commonEquips.{count,unmatched,ambiguous}` | 重要礼装数量；后两项保留为空数组以兼容原有客户端 |
 | `uiAssets.{classes,rarities,support,background}` | 筛选器职阶/星级、助战与背景等共享素材 |
 | `uiAssets.classVariants[classKey]["0".."5"]` | 每个职阶按星级的可用颜色图；前端通常直接使用成员 `classIcon` |
 | `uiAssets.npFrames.{arts,buster,quick}` | 宝具原生三色框，叠加当前准确宝具变体名称 |
 | `uiAssets.{masterSkill,masterSkillDisabled,masterMenu,masterFrame,masterEquipFrame}` | 已生成的少量御主原生界面资源，按实际页面需要使用 |
 
-常用礼装由 `assets/resource/base/image/lizhuang`（打包后兼容 `resource/base/image/lizhuang`）实际模板文件派生：遍历满破/非满破目录、排除 `0_空`，按 NFKC 标准化后的官方中文/日文全名精确匹配、合并相同 ID。禁止模糊匹配、子串匹配或遇到歧义取第一个。当前匹配 46 张，无歧义或未匹配；加模板后重启服务重新生成目录资料即可。
+编辑器显示的“常用礼装”等同工程的“重要礼装”：仅按 `agent/custom/equip_list.json` 中准确 ID 的 `important=1` 标记生成 `common`，不再通过名称或 `lizhuang` 模板推导，缺失或异常标记不纳入。`commonSources` 使用稳定标识 `["important"]`；`commonEquips.count` 统计该分类数量，`unmatched`、`ambiguous` 仅保留为空数组兼容原有客户端。高价值标记仍单独控制资源入库，不能替代重要标记。修改后重启编辑器服务重新读取目录。助战识别能力 `supportRecognition` 继续独立检查实际 `lizhuang` 或扩展助战模板，重要礼装没有对应模板时不得据此标记为可识别。
 
-“常用礼装”默认选中，与“仅持有”、星级、搜索条件取交集；取消常用条件才能查看完整礼装库。不能把识别模板范围当成所有可编辑礼装的限制。
+“常用礼装”默认选中，与“仅持有”、星级、搜索条件取交集；取消常用条件可以浏览所有同时有运行清单记录与本安装 team 模板的礼装。重要标记仅决定显示筛选，不改变编队或助战的真实识别能力。
 
 ## 构建与回归
 
@@ -406,7 +406,7 @@ CD 预览的每个原始槽位使用 `initial:0`～`initial:5` 身份，换人�
 
 ## 礼装资源收敛到工程识别模板：实施方案（2026-10-24）
 
-按用户最新要求，礼装图片只复用当前安装`resource/base/image/EquipFaces/team`（开发目录为`assets/resource/base/image/EquipFaces/team`），不再从FGO整包补缺礼装横图，也不使用编辑器独立礼装PNG作为替代。礼装选择器仅列出同时有工程`equip_list.json`记录及本安装team模板的礼装；“常用礼装”仍是这批可识别礼装与`lizhuang`的交集，“仅持有”继续独立取交集。取消常用限制时浏览的是工程保留的礼装，不是全游戏图鉴。羁绊规划新增礼装候选也遵循相同范围。
+按用户最新要求，礼装图片只复用当前安装`resource/base/image/EquipFaces/team`（开发目录为`assets/resource/base/image/EquipFaces/team`），不再从FGO整包补缺礼装横图，也不使用编辑器独立礼装PNG作为替代。礼装选择器仅列出同时有工程`equip_list.json`记录及本安装team模板的礼装；“常用礼装”按现行规则为这批可识别礼装与运行清单`important=1`标记的交集，“仅持有”继续独立取交集。取消常用限制时浏览的是工程保留的礼装，不是全游戏图鉴。羁绊规划新增礼装候选也遵循相同范围。
 
 保留完整礼装名称等轻量元数据用于读取旧方案；导入不支持的礼装时保留原ID、属性和未知字段，可显示名称与缺图占位，但不能从选择器新选入，不自动替换或清除旧要求。`recognizable`必须同时检查识别记录与实际模板，不能因整包图片或旧编辑器补图存在就标为可识别。媒体接口限制礼装目录到当前安装的team模板，去掉独立礼装目录回退。
 

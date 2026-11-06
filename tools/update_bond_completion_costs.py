@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """由本地从者/礼装归档增量生成羁绊补齐 COST 索引。
 
-FGO 的普通编成 COST 由稀有度固定决定；玛修与安哥拉曼纽是从者特例。
+FGO 的普通编成 COST 由稀有度固定决定；玛修、安哥拉曼纽与部分纪念礼装有特例。
 未知的 0 星/NPC 数据不会被猜测写入。已有 ID 的手工 COST 始终保留。
 """
 
@@ -15,6 +15,8 @@ from pathlib import Path
 SERVANT_COST_BY_RARITY = {1: 3, 2: 4, 3: 7, 4: 12, 5: 16}
 EQUIP_COST_BY_RARITY = {1: 1, 2: 3, 3: 5, 4: 9, 5: 12}
 SERVANT_SPECIAL_COST = {"800100": 0, "1100100": 4}
+# 英灵肖像：玛修·基列莱特虽为四星，实际 COST 为 5（普通四星礼装为 9）。
+EQUIP_SPECIAL_COST = {"9400970": 5}
 
 
 def load(path: Path) -> dict:
@@ -55,6 +57,9 @@ def main() -> int:
     for item in equips:
         eid = str(item.get("id") or "")
         if not eid or eid in equip_costs:
+            continue
+        if eid in EQUIP_SPECIAL_COST:
+            equip_costs[eid] = EQUIP_SPECIAL_COST[eid]
             continue
         cost = EQUIP_COST_BY_RARITY.get(item.get("rarity"))
         if cost is not None:

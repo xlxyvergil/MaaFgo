@@ -230,6 +230,31 @@ class ComposedCardTests(unittest.TestCase):
                                  (1, sid, expected_color))
                 self.assertIn(f':row{row}', result.template)
 
+    def test_paladin_mash_np_switch_keeps_native_identity_and_matches_both_regional_titles(self):
+        # A packaged native battle can omit the editor sidecar. The same
+        # recognizer must accept both NP states from the registered templates,
+        # without changing the roster identity or pinning its initial TD ID.
+        self.assertFalse((self.project / 'agent/battle_editor').exists())
+        for region, slot in (('JP', 2), ('CN', 3)):
+            recognizer = ComposedCardRecognizer(self.project, region=region)
+            roster = tuple('800100' if position == slot else None for position in (1, 2, 3))
+            for td_id, color, name_file, expected_color in (
+                    (800107, 'arts', 'card_servant_np4.png', CardColor.ARTS),
+                    (800108, 'buster', 'card_servant_np5.png', CardColor.BUSTER)):
+                with self.subTest(region=region, slot=slot, td_id=td_id):
+                    image = canvas()
+                    place(image, self.compose('800100', color, kind='np', variant=17,
+                                              region=region, file=name_file), slot, 'np')
+                    results = recognizer.detect_np(image, roster)
+                    result = results[slot - 1]
+                    self.assertTrue(result.visual_present, result)
+                    self.assertTrue(result.authoritative, result)
+                    self.assertEqual((result.owner_slot, result.servant_id, result.color),
+                                     (slot, '800100', expected_color))
+                    self.assertIn(f'{region}/800100/', result.template)
+                    self.assertIn(name_file, result.template)
+                    self.assertEqual([item.ui_slot for item in results if item.visual_present], [slot])
+
     def live_frame(self, prefix):
         # Raw local emulator evidence stays out of the repository. CI without
         # these optional replay inputs still runs all portable asset contracts.

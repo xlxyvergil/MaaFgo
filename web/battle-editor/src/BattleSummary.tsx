@@ -3,7 +3,7 @@ import {ArrowLeftRight,ArrowRight,FileQuestion,Info,Shield,Swords,Target,UserRou
 import {actionTitle,colorName,isSwap,rosterAt,servantFor,skillAt,turnsOf,hasServantIdentity,memberLabel,isRetire,retirementInfoAt,actionMemberAt} from './model';
 import type {Catalog,Entry,Json} from './model';
 import {isAutoAttackCard} from './attackCards';
-import {npAt} from './battlePreview';
+import {npAtAction} from './battlePreview';
 import {SkillIcon} from './PartyCard';
 import {CardArtwork} from './NPCardPreview';
 import {cardPreviewRegion,artworkColor} from './npCardRequest';
@@ -49,8 +49,8 @@ function SummaryEntry({entry,data,catalog,region,config}:{entry:Entry;data:Json;
      {i>0&&<ArrowRight size={14} className="summary-arrow" aria-label="然后"/>}
      <span className="summary-card-item summary-muted"><Swords size={18} aria-hidden="true"/><span className="summary-card-label">默认普通卡</span></span>
     </span>;
-    const member=validFront(card?.svt)?actionMemberAt(data,entry.index,card):undefined,actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member.svtId,member):undefined;
-    const np=card?.isTD?npAt(member,servant):undefined,color=card?.isTD?np?.cardType:card?.cardType;
+    const member=validFront(card?.svt)?actionMemberAt(data,entry.index,card):undefined,actorPresent=hasServantIdentity(member);
+    const np=card?.isTD?npAtAction(data,catalog,entry.index,card.svt,card):undefined,color=card?.isTD?np?.cardType:card?.cardType;
     const npColor=artworkColor(color),label=!actorPresent?`未指定从者，无法安排${card?.isTD?'宝具':'指定普通卡'}`:card?.isTD?(npColor?`宝具 · ${npColor[0].toUpperCase()+npColor.slice(1)}`:np?.name??'宝具资料未知'):colorName(color);
     return <span className="summary-card-step" key={i}>
      {i>0&&<ArrowRight size={14} className="summary-arrow" aria-label="然后"/>}

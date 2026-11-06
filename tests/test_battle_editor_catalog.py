@@ -379,24 +379,49 @@ class EditorCatalogTests(unittest.TestCase):
         self.assertEqual(result["mysticCodes"], [])
         self.assertFalse(result["version"]["supplementAvailable"])
 
-    def test_common_equips_match_both_template_forms_and_width_equivalent_names_only(self):
-        self.write("agent/utils/Chaldea/equip_names_CN.json", {"900": "限制/零毁", "901": "未收录"})
-        for path in ("满破/限制／零毁.png", "非满破/限制／零毁.png", "满破/未收.png", "满破/0_空.png"):
-            self.image("assets/resource/base/image/lizhuang/" + path)
+    def test_important_equip_is_common_without_support_templates(self):
+        self.write("agent/custom/equip_list.json", {"equips": [
+            {"id": "900", "name": "识别礼装", "important": 1, "images": ["f_9000.png"]}]})
         result = build_catalog(self.root)
         equips = {item["id"]: item for item in result["equips"]}
         self.assertTrue(equips[900]["common"])
-        self.assertEqual(len(equips[900]["commonSources"]), 2)
+        self.assertEqual(equips[900]["commonSources"], ["important"])
+        self.assertTrue(equips[900]["recognizable"])
+        self.assertEqual(equips[900]["supportRecognition"], {"limitBreak": False, "nonLimitBreak": False})
         self.assertFalse(equips[901]["common"])
-        self.assertEqual(result["commonEquips"]["count"], 1)
-        self.assertEqual(result["commonEquips"]["unmatched"], ["assets/resource/base/image/lizhuang/满破/未收.png"])
+        self.assertEqual(result["commonEquips"], {"count": 1, "unmatched": [], "ambiguous": []})
 
-    def test_ambiguous_common_names_are_never_assigned_to_a_first_candidate(self):
+    def test_support_templates_do_not_make_unimportant_equips_common(self):
+        self.write("agent/custom/equip_list.json", {"equips": [
+            {"id": "900", "name": "识别礼装", "important": 0, "images": ["f_9000.png"]}]})
+        for state in ("满破", "非满破"):
+            self.image(f"assets/resource/base/image/lizhuang/{state}/礼装.png")
+        equip = next(item for item in build_catalog(self.root)["equips"] if item["id"] == 900)
+        self.assertFalse(equip["common"])
+        self.assertEqual(equip["commonSources"], [])
+        self.assertEqual(equip["supportRecognition"], {"limitBreak": True, "nonLimitBreak": True})
+
+    def test_common_category_rejects_malformed_or_supplement_only_important_flags(self):
+        source = json.loads((self.root / "agent/battle_editor/data/catalog.json").read_text(encoding="utf-8"))
+        source["equips"][0]["important"] = 1
+        self.write("agent/battle_editor/data/catalog.json", source)
+        for flag in (None, False, True, 0, 2, -1, 1.0, "true", "", [], {}):
+            with self.subTest(flag=flag):
+                self.write("agent/custom/equip_list.json", {"equips": [
+                    {"id": "900", "name": "识别礼装", "important": flag, "images": ["f_9000.png"]}]})
+                result = build_catalog(self.root)
+                self.assertFalse(any(item["common"] for item in result["equips"]))
+                self.assertEqual(result["commonEquips"]["count"], 0)
+
+    def test_common_category_uses_important_ids_even_when_names_match(self):
         self.write("agent/utils/Chaldea/equip_names_CN.json", {"900": "同名", "901": "同名"})
+        self.write("agent/custom/equip_list.json", {"equips": [
+            {"id": "900", "name": "同名", "important": "1", "images": ["f_9000.png"]},
+            {"id": "901", "name": "同名", "important": 0}]})
         self.image("resource/base/image/lizhuang/满破/同名.png")
         result = build_catalog(self.root)
-        self.assertFalse(any(item["common"] for item in result["equips"]))
-        self.assertEqual(result["commonEquips"]["ambiguous"][0]["ids"], [900, 901])
+        self.assertEqual([item["id"] for item in result["equips"] if item["common"]], [900])
+        self.assertEqual(result["commonEquips"], {"count": 1, "unmatched": [], "ambiguous": []})
 
     def test_support_recognition_is_independent_of_team_image_and_display_name(self):
         equip = next(e for e in build_catalog(self.root)["equips"] if e["id"] == 900)
@@ -813,7 +838,7 @@ class BundledCatalogTests(unittest.TestCase):
         self.assertTrue(all(equip["image"] for equip in catalog["equips"]
                             if equip["common"] and equip["recognizable"]))
         self.assertEqual(sum(equip["common"] and equip["recognizable"]
-                             for equip in catalog["equips"]), 47)
+                             for equip in catalog["equips"]), 48)
         recognized = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
         self.assertEqual(len(recognized), 1158)
         expected_equip_ids = {int(row["id"]) for row in recognized
@@ -862,7 +887,13 @@ class BundledCatalogTests(unittest.TestCase):
                 record = next(row for row in local["equips"] if int(row["id"]) == item["id"])
                 self.assertEqual(record["important"], 0)
                 self.assertIsNotNone(resolve_media(ROOT, "equip", f"f_{item['id']}0.png"))
-        self.assertEqual(catalog["commonEquips"]["count"], 47)
+        self.assertEqual(catalog["commonEquips"]["count"], 48)
+        self.assertEqual({item["id"] for item in catalog["equips"] if item["common"]},
+                         {int(row["id"]) for row in local["equips"] if row.get("important") == 1})
+        mash_portrait = next(item for item in catalog["equips"] if item["id"] == 9400970)
+        self.assertTrue(mash_portrait["recognizable"] and mash_portrait["common"])
+        self.assertEqual(mash_portrait["cost"], 5)
+        self.assertEqual(mash_portrait["supportRecognition"], {"limitBreak": False, "nonLimitBreak": False})
         journey = next(item for item in catalog["equips"] if item["id"] == 9400360)
         # 旅途的开始是四星特例，不能按普通四星礼装误计为9 COST。
         self.assertEqual(journey["cost"], 3)

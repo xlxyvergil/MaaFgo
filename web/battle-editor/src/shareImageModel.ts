@@ -4,7 +4,7 @@ import type {Catalog,Json} from './model';
 import {equipCandidatesForDisplay} from './equipRequirements';
 import {grandBondEffectLabel} from './grandBondEffect';
 import {isAutoAttackCard} from './attackCards';
-import {npAt} from './battlePreview';
+import {npAtAction} from './battlePreview';
 import {artworkColor,cardArtworkRequest,cardPreviewRegion} from './npCardRequest';
 import type {CardPreviewConfig} from './npCardRequest';
 import {partyCost} from './partyCost';
@@ -75,8 +75,7 @@ export function shareImageModel(data:Json,catalog:Catalog,options:{region?:strin
     const card=recorded[cardIndex];
     if(card==null||isAutoAttackCard(card))return {label:'默认普通卡',name:'按当前策略补齐',color:null,image:null,automatic:true,deckLabel:''};
     const member=front(card.svt)?actionMemberAt(data,entry.index,card):undefined;
-    const servant=hasServantIdentity(member)?servantFor(catalog,member.svtId,member):undefined;
-    const np=card.isTD?npAt(member,servant):undefined,color=card.isTD?np?.cardType:card.cardType;
+    const np=card.isTD?npAtAction(data,catalog,entry.index,card.svt,card):undefined,color=card.isTD?np?.cardType:card.cardType;
     const normalized=artworkColor(color),request=cardArtworkRequest({member,np,color,kind:card.isTD?'np':'face',region:selectedRegion,config:options.cardPreviewConfig});
     if(!hasServantIdentity(member))notices.add('存在未指定从者的技能或出卡，请先检查执行条件。');
     const issue=resolveActionActor(actionRosterAt(data,entry.index),card).issue;if(issue)notices.add(issue.message);
