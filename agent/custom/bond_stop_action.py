@@ -107,28 +107,23 @@ def _slot_mapping(context, target):
 
 
 def _inspect_upgrade(context, token, image, mode, target, *, evidence_image=None):
-    """Only an explicitly recognized bond upgrade can defer a selected slot.
-
-    The popup does not prove MAX. Keep any-mode conservative and never turn a
-    missing mapping or an ordinary recognition failure into permission to play.
-    """
+    """明确升级遮挡可按已有剩余场次延后；不能把升级或识别失败当作未满。"""
     if not read_bond_upgrade(context, image):
         return False, None
     root = _root(context)
     evidence = image if evidence_image is None else evidence_image
     if mode in {"slot", "slots"}:
         _slot_mapping(context, target)
-        if bond_stops.can_defer(root):
-            deferred = bond_stops.defer(root, token,
-                message=(f"第{bond_stops.battle_number(root)}场羁绊升级展示遮挡，"
-                         "所选号位是否MAX尚未确认；按原剩余次数在下一场结算复核"),
-                image=evidence, latest_image=image if evidence_image is not None else None)
-            if deferred:
-                _save_evidence(context, deferred)
-            return True, None
-        message = "羁绊升级展示遮挡目标号位，当前没有已声明的剩余战斗次数，未额外开战"
-    else:
-        message = "羁绊升级展示遮挡，尚未捕获明确MAX；升级等级不能证明达到当前上限"
+    if bond_stops.can_defer(root):
+        existing = bond_stops.deferred(root)
+        deferred = bond_stops.defer(root, token,
+            message=(f"第{bond_stops.battle_number(root)}场羁绊升级展示遮挡，"
+                     "待检查从者是否MAX尚未确认；按原剩余次数在下一场结算复核"),
+            image=evidence, latest_image=image if evidence_image is not None else None)
+        if deferred and existing is None:
+            _save_evidence(context, deferred)
+        return True, None
+    message = "羁绊升级展示遮挡，当前没有已声明的剩余战斗次数，无法在下一场复核；已停止，未额外开战"
     return True, _latch_error(context, token, evidence, message,
                              latest_image=image if evidence_image is not None else None)
 
@@ -156,12 +151,14 @@ def _poll_wait(context, token, node):
 
 
 def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
-    """同帧MAX先锁存；指定号位的升级遮挡可按原剩余次数延后。"""
+    """同帧MAX先锁存；明确升级遮挡可按原剩余次数延后。"""
     root = _root(context)
     existing = bond_stops.get(root)
     if existing:
         return existing
     if context.tasker.stopping:
+        return None
+    if bond_stops.deferred(root) is not None:
         return None
     token = bond_stops.ensure(root)
     evidence_image, current_image = image, None
@@ -181,6 +178,10 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         maxima = _read_maxima(context, evidence_image, mode)
         stopped = _positive(context, token, evidence_image, mode, maxima, order, target_column)
         if stopped:
+            return stopped
+        recognized, stopped = _inspect_upgrade(context, token, image, mode, target,
+                                               evidence_image=evidence_image)
+        if recognized:
             return stopped
         guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
         # 胜利立即交接时复用调用方的同回调代理；Pipeline 后续回调须自行
@@ -311,17 +312,14 @@ def check_settlement_bond_stop(context, image, *, controller=None) -> None:
         raise BondStopReached(result)
 
 
-def _advance_victory_loot(context, image) -> bool:
-    recognized = context.run_recognition("战斗_战利品弹窗", image)
-    if context.tasker.stopping or not recognized or not recognized.hit:
-        return False
-    mfaalog.info("[羁绊检查] 战利品弹窗位于羁绊页之前，单次点击下一步后继续检查")
-    detail = context.run_task("结算-战利品弹窗下一步")
-    if context.tasker.stopping:
-        return False
-    if detail is None or not detail.status.succeeded:
-        raise ValueError("战利品弹窗未能推进，无法进入羁绊检查。请保留当前截图反馈，并在游戏中确认“下一步”（日服“次へ”）按钮的状态。")
-    return True
+def _reject_missed_bond_page(context, image) -> None:
+    # 正常顺序是羁绊 → 经验 → 战利品。到达后两页不能再靠点击补查羁绊。
+    for name, label in (("战斗_经验结算页", "经验结算页"), ("战斗_战利品弹窗", "战利品页")):
+        recognized = context.run_recognition(name, image)
+        if context.tasker.stopping:
+            return
+        if recognized and recognized.hit:
+            raise ValueError(f"已进入{label}，之前的羁绊页未完成检查，无法确认是否满羁绊，本场无法补查。请保留当前截图和日志反馈；已停止，不会继续点击或开始下一场。")
 
 
 def inspect_victory_settlement(context, battle_result, controller) -> BondStop | None:
@@ -337,6 +335,8 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         return None
     root = _root(context)
     token = bond_stops.ensure(root)
+    if bond_stops.deferred(root) is not None:
+        return None
     evidence_image, image = None, None
     try:
         if settings_error is not None:
@@ -350,7 +350,7 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         else:
             guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
             wait_node, attempts, timeout = _poll_config(guard, "page_wait")
-            loot_advanced = _advance_victory_loot(context, image)
+            _reject_missed_bond_page(context, image)
             if context.tasker.stopping:
                 return None
             deadline = time.monotonic() + timeout / 1000
@@ -368,9 +368,7 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
                     found_page = True
                     result = inspect_bond_stop(context, image, controller=controller)
                     break
-                if not loot_advanced and _advance_victory_loot(context, image):
-                    loot_advanced = True
-                    deadline = time.monotonic() + timeout / 1000
+                _reject_missed_bond_page(context, image)
             if not found_page:
                 raise ValueError("已识别战斗结束，但未在配置时限内捕获羁绊结算页或羁绊升级展示。无法确认是否满羁绊，已停止；请保留当前截图反馈。")
     except Exception as exc:
@@ -386,6 +384,20 @@ class NativeBondMax(CustomRecognition):
         result = inspect_bond_stop(context, argv.image)
         if result:
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"reason": result.reason})
+        return None
+
+
+@AgentServer.custom_recognition("native_bond_upgrade_continue")
+class NativeBondUpgradeContinue(CustomRecognition):
+    def analyze(self, context, argv):
+        if context.tasker.stopping:
+            return None
+        mode, _ = _settings(context)
+        root = _root(context)
+        if bond_stops.get(root) is not None:
+            return None
+        if mode == "off" or bond_stops.deferred(root) is not None:
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"bond_upgrade_continue": True})
         return None
 
 

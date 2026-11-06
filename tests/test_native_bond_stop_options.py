@@ -36,7 +36,7 @@ class NativeBondOptionTests(unittest.TestCase):
             victory = overrides["战斗_胜利"]["recognition"]
             if enabled:
                 self.assertEqual(victory["type"], "Or")
-                self.assertEqual(victory["param"]["any_of"], ["战斗_战后RESULT", "战斗_战利品弹窗"])
+                self.assertEqual(victory["param"]["any_of"], ["战斗_战后RESULT", "羁绊结算-页面", "羁绊结算-升级展示", "战斗_战利品弹窗"])
             else:
                 self.assertEqual(victory["type"], "TemplateMatch")
                 self.assertEqual(victory["param"]["template"], "battle/下一步.png")
@@ -72,6 +72,7 @@ class NativeBondOptionTests(unittest.TestCase):
                      "结算推进_点击右上角", "结算推进_点击右上角_继续"):
             with self.subTest(name=name):
                 self.assertEqual(nodes[name]["next"][0], GUARD)
+                self.assertEqual(nodes[name]["next"][1], "[JumpBack]结算-羁绊升级继续")
         trial = read("assets/resource/base/pipeline/地狱的试炼.json")
         self.assertEqual(trial["地狱的试炼-结算调度"]["next"][0], GUARD)
         guard = nodes[GUARD]

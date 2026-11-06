@@ -70,7 +70,9 @@ class BondResultImageTests(unittest.TestCase):
                     read_any_bond_max(context, overlay)
                 with test.assertRaisesRegex(ValueError, "page_not_visible"):
                     read_bond_max(context, overlay)
-                for image, expected in ((positive, True), (overlay, False)):
+                fading_header = positive.copy()
+                fading_header[0:120, 450:850] = 0
+                for image, expected in ((positive, True), (overlay, True), (fading_header, True)):
                     detail = context.run_recognition("战斗_胜利", image)
                     test.assertIsNotNone(detail)
                     test.assertEqual(detail.hit, expected)

@@ -36,21 +36,24 @@ class LootSettlementTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def test_loot_requires_both_features_and_single_click_still_checks_max(self):
+    def test_bond_max_stops_before_experience_or_loot(self):
+        self.check_handoff(stage="bond")
+
+    def test_experience_page_after_missed_bond_stops_without_click(self):
+        self.check_handoff(stage="experience")
+
+    def test_loot_page_after_missed_bond_stops_without_click(self):
+        self.check_handoff(stage="loot")
+
+    def check_handoff(self, *, stage):
         loot = image("jp_loot_header_and_next.png")
+        experience = image("jp_experience_result.png")
         maximum = image("jp_bond_slot5_max.png")
         self.assertEqual(loot.shape, (720, 1280, 3))
         report = {}
         test = self
 
-        class Pages(MemoryController):
-            def click(self, x, y):
-                self.inputs += 1
-                report["click"] = (x, y)
-                self.image = maximum
-                return True
-
-        controller = Pages(loot)
+        controller = MemoryController({"bond": maximum, "experience": experience, "loot": loot}[stage])
 
         class Probe(CustomAction):
             def run(self, context, argv):
@@ -71,13 +74,25 @@ class LootSettlementTests(unittest.TestCase):
                     test.assertEqual(bool(victory and victory.hit), expected)
                 test.assertEqual(detect_scene(context, loot, check_order_change=False), Scene.VICTORY)
                 test.assertFalse(context.run_recognition("战斗_战后RESULT", loot).hit)
+                for index in range(4):
+                    frame = experience.copy()
+                    if index == 1: frame[165:245, 640:940] = 0
+                    if index == 2: frame[610:690, 350:930] = 0
+                    if index == 3: frame[0:120, 450:850] = 0
+                    recognized = context.run_recognition("战斗_经验结算页", frame)
+                    test.assertEqual(bool(recognized and recognized.hit), index == 0,
+                        {name: str(context.run_recognition(name, frame)) for name in (
+                            "战斗_战后RESULT", "战斗_经验结算标题", "战斗_经验结算触屏提示")})
+                test.assertEqual(detect_scene(context, experience, check_order_change=False), Scene.VICTORY)
+                test.assertFalse(bond.read_bond_page(context, experience))
                 with patch.object(bond, "save_bond_stop"):
                     stopped = bond.inspect_victory_settlement(context, NS(ok=True, reason="victory"), context.tasker.controller)
                 test.assertIsNotNone(stopped)
-                test.assertEqual(stopped.reason, "bond_max")
-                test.assertEqual(controller.inputs, 1)
-                x, y = report["click"]
-                test.assertTrue(950 <= x < 1275 and 600 <= y < 685)
+                expected = "bond_max" if stage == "bond" else "bond_check_unconfirmed"
+                test.assertEqual(stopped.reason, expected)
+                if stage != "bond":
+                    test.assertIn("本场无法补查", stopped.message)
+                test.assertEqual(controller.inputs, 0)
                 report["reason"] = stopped.reason
                 report["passed"] = True
                 return True
