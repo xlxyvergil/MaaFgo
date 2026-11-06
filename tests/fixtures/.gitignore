@@ -11,6 +11,8 @@
 !support_level/*.png
 # Anonymous JP bond-effect icon crops (original / NP50) for masked matching.
 !support_bond/*.png
+# Anonymous two-card JP servant-list last row, including the selected-card overlay.
+!servant_list/*.png
 # Anonymous CN confirmation UI and explicitly synthetic retreat-question sample.
 !main_story/cn_spirit_confirmation_retreat_negative.png
 !main_story/cn_retreat_confirmation_synthetic.png

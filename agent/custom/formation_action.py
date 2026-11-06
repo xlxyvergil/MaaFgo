@@ -237,11 +237,23 @@ def _visible_servant_list_features(image, sx=1.0, sy=1.0):
         base_image = cv2.resize(image, (BASE_W, BASE_H))
 
     # 从卡片底部黄色 Servant 条带反推每行头像原点。滑动落点会略有漂移，
-    # 不能把 y 固定为 206/406；fallback 只处理条带暂时识别不到的稳定页面。
+    # 不能把 y 固定为 206/406。逐列计算条带占比，末行只有一两张卡时也能
+    # 定位；不能按整屏黄色占比筛行，否则会漏掉完整显示的稀疏末行。
     hsv = cv2.cvtColor(base_image, cv2.COLOR_BGR2HSV)
     yellow = cv2.inRange(hsv, (18, 100, 100), (40, 255, 255))
-    row_ratio = np.mean(yellow[:, 70:1230] > 0, axis=1)
-    rows = np.where(row_ratio > 0.25)[0]
+    column_ratios = np.stack([
+        np.mean(yellow[:, x:x + SERVANT_LIST_FACE_SIZE] > 0, axis=1)
+        for x in SERVANT_LIST_FACE_X
+    ])
+    # 同一列至少连续 8px 形成宽条带，避免将不同卡面的零散黄色拼成一行。
+    stripe_rows = np.zeros(BASE_H, dtype=bool)
+    for ratio in column_ratios:
+        starts = np.flatnonzero(np.diff(np.r_[False, ratio > 0.7, False].astype(int)) == 1)
+        ends = np.flatnonzero(np.diff(np.r_[False, ratio > 0.7, False].astype(int)) == -1)
+        for start, end in zip(starts, ends):
+            if end - start >= 8:
+                stripe_rows[start:end] = True
+    rows = np.flatnonzero(stripe_rows)
     runs = []
     for row in rows:
         row = int(row)
@@ -252,7 +264,7 @@ def _visible_servant_list_features(image, sx=1.0, sy=1.0):
 
     y_origins = []
     for run in runs:
-        if len(run) < 8 or float(row_ratio[run].max()) < 0.35:
+        if len(run) < 8:
             continue
         origin = run[0] - SERVANT_LIST_FACE_SIZE
         if 165 <= origin and origin + SERVANT_LIST_FACE_SIZE <= BASE_H:
