@@ -26,3 +26,7 @@ npm run build
 羁绊礼装（`equip2`）与报酬提升礼装（`equip3`）免费，助战整槽免费。
 规则依据：[FGO 官方冠位编队说明](https://news.fate-go.jp/2025/grand_graph_system/)。
 回归样本 `tests/fixtures/battle_editor/chaldea_94255.json` 的初始 COST 为40。
+
+导入新草稿时，若 `delegate.actWeightSelections` 仅包含 `-1`，会移除这条
+“跳过随机效果”的模拟记录；实际技能选择、宝具类型、换人及未知字段保持原样。
+打开已有方案、恢复草稿或编辑原始 JSON 时不自动清理；外部源文件也不会改写。
