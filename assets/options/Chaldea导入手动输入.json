@@ -37,7 +37,7 @@
         "Chaldea导入手动输入": {
             "type": "input",
             "label": "编辑器/chaldea方案导入",
-            "description": "本地文件：config/Battle 下的队伍文件名。\n\n[启动编队与战斗编辑器](./打开编队编辑器.cmd) · [打开已启动的编辑器](http://127.0.0.1:18765/)",
+            "description": "本地文件：config/Battle 下的队伍文件名。",
             "inputs": [
                 {
                     "name": "chaldea_import_source",
