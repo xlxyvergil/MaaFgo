@@ -34,9 +34,10 @@ def read_max(context, image):
     return phase == "guard" and scenario == "late_max" and report["reads"][phase] >= 2
 
 
-# 只模拟页面与 MAX 识别，截图、嵌套 Pipeline 等待及冻结均由真实框架执行。
+# 明确模拟正常羁绊页、MAX与无升级遮挡；截图、嵌套等待及冻结由真实框架执行。
 bond.read_bond_page = lambda context, image: True
 bond.read_any_bond_max = read_max
+bond.read_bond_upgrade = lambda context, image: False
 
 
 @AgentServer.custom_action("victory_handoff")

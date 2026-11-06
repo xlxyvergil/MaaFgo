@@ -179,7 +179,12 @@ class BundledEquipFilterTests(unittest.TestCase):
         curated = json.loads(curated_path.read_text(encoding="utf-8"))["equips"]
         self.assertEqual(set(index["equips"]), {row["id"] for row in curated})
         self.assertEqual(len(index["equips"]), 1158)
-        self.assertEqual(index["version"]["curatedSha256"], hashlib.sha256(curated_path.read_bytes()).hexdigest())
+        self.assertEqual(
+            index["version"]["curatedSha256"], hashlib.sha256(curated_path.read_bytes()).hexdigest(),
+            "礼装清单已变更，筛选索引仍记录旧的来源。请运行 "
+            "python tools/build_battle_editor_equip_filters.py，并一同提交 "
+            "equip_filters.json 和 equip_filters_sources.json；仅修改 important 等展示字段也需重建。",
+        )
         manifest = json.loads((ROOT / "agent/battle_editor/data/equip_filters_sources.json").read_text(encoding="utf-8"))
         self.assertNotIn(b"\r\n", curated_path.read_bytes())
         self.assertEqual(manifest["version"], index["version"])

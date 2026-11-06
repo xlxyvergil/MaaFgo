@@ -1,0 +1,563 @@
+{
+  "team": {
+    "name": "地狱的试炼第四期_天魔轰临_冠位妖兰＋冠位莉莉丝（实机6T，需发牌）",
+    "mysticCode": {
+      "mysticCodeId": 440,
+      "level": 6
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 304800,
+        "supportType": "none",
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480,
+          "lv": 100,
+          "limitBreak": true
+        },
+        "classBoardData": {
+          "grandClassBoardSquares": [
+            12,
+            16
+          ],
+          "grandBondEquipSkillChange": true
+        },
+        "lv": 120,
+        "tdLv": 5,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "equip2": {
+          "id": 9305580,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9401970,
+          "lv": 100
+        }
+      },
+      {
+        "svtId": 1000200,
+        "supportType": "friend",
+        "lv": 100,
+        "tdLv": 1,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "tdId": 1000202,
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": false
+        },
+        "equip3": {
+          "id": 9406010
+        }
+      },
+      {
+        "svtId": 4000100,
+        "supportType": "none",
+        "lv": 120,
+        "tdLv": 5,
+        "limitCount": 4,
+        "tdId": 4000101,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          2512650,
+          2513450,
+          2514650
+        ],
+        "equip1": {
+          "id": 9400180,
+          "limitBreak": true
+        }
+      }
+    ],
+    "backupSvts": [
+      {
+        "svtId": 504500,
+        "supportType": "none",
+        "lv": 100,
+        "tdLv": 3,
+        "tdId": 504501,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          761450,
+          762550,
+          763650
+        ],
+        "equip1": {
+          "id": 9400180,
+          "limitBreak": true
+        }
+      },
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 1,
+          "card": 1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      },
+      "options": {
+        "playerTarget": 2
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      },
+      "options": {
+        "playerTarget": 2
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        }
+      ]
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 2
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 2,
+          "card": 4,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 1,
+          "card": 2,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 1,
+          "card": 2,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": [
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  "maaAdvancedStrategy": {
+    "preset": "balanced",
+    "openingHand": {
+      "enabled": false,
+      "servantId": null,
+      "servantSlot": null,
+      "requiredColors": [
+        "B",
+        "Q"
+      ],
+      "maxWaitTurns": 2
+    },
+    "nativeStrategyOverrides": {
+      "np_colors_by_servant_id": {
+        "304800": "B",
+        "1000200": "Q",
+        "4000100": "A",
+        "504500": "A"
+      }
+    },
+    "autoServantSkills": false,
+    "maxTurns": 40
+  },
+  "_guideNotes": {
+    "status": "2026-11-07日服MaaMCP第二场实战6T全员存活，已完成并领取本期全部15项；活动页显示30/30、本期14/14及总任务领取済。此文件按实际六个分段源合并，整合后未再实机整场重跑。",
+    "cost": 70,
+    "support": "实战借用セツ的冠位莉莉丝Lv100宝1，三技能均强化且Lv10；主礼装黑杯、羁绊原始效果、追加礼装狼的故事。好友礼装等级与满破状态未展开确认，均未臆填。",
+    "formation": [
+      "首发妖兰／好友莉莉丝／第三战斗形态所长，后排术呆；第五、第六位为空。妖兰须真正放入可生效的冠位编成位，再调整到前排1，不能仅勾选JSON冠位。",
+      "妖兰实机Lv120宝5、技能10/10/10；黑杯Lv100满破，羁绊极光Lv80且启用NP50，追加迦勒底午餐时光Lv100。冠位枪盘第12格前置解除防御强化、第16格御主技能冷却缩短已现场核验。",
+      "妖兰须以第一／第二形态进入战斗，T1技能3切换红色全体宝具并充能；若以第三形态直接入场，该技能不再提供同样的启动充能。",
+      "所长固定第三战斗形态，T1技能2充能后须达到100NP才能用技能3全队弱化无效，随后技能1。所长、术呆的龙脉均满破；礼装等级未记录。",
+      "普通迦勒底制服440的实机等级为6。T2将前排3所长与后排第一位术呆换人；以后术呆的actor始终绑定初始第4位，不随换人重编号。",
+      "冠位从者礼装和冠位盘不会由自动编队代替玩家调整，开战前在游戏核对。附加技能等级本次未完整转录，未臆填；实际NP就绪与否由战斗卡面守卫检查。"
+    ],
+    "turns": [
+      "T1弓：所长2→3→1，妖兰1→2→3；妖兰红宝具→莉莉丝红→妖兰蓝。妖兰实际破第一条，红宝具与红面卡累计两次红攻击；冠位枪盘在伤害前清三防。",
+      "T2杀：御主3换所长与术呆，术呆1；术呆宝具→术呆蓝→妖兰蓝，累计两次蓝攻击并为后续准备NP。辅助宝具本身不算攻击。",
+      "T3杀：莉莉丝1→2→3，术呆2给自己、术呆3给自己；莉莉丝绿宝具→妖兰红→莉莉丝绿，实际由莉莉丝破第二条。T1–T3连续使用宝具。",
+      "T4骑：无技能；术呆绿→莉莉丝绿宝具→莉莉丝绿，形成三绿链并由莉莉丝破条；实际日志确认三次绿攻击。",
+      "T5术：御主2给术呆；妖兰红宝具→术呆红→术呆蓝，作为末条预备回合累计第二次全体宝具、削血并准备术呆宝具。此回合三张牌均明确固定，不用自动补位。",
+      "T6术：妖兰2→3，御主1给莉莉丝；术呆宝具→莉莉丝绿宝具→莉莉丝蓝。术呆先清焦热，实机莉莉丝宝具完成击杀、全员存活。"
+    ],
+    "boundaries": [
+      "这是一次实机6T记录，不保证任何随机发牌都能原样6T通关。面卡按从者与颜色匹配，不把五张牌的屏幕位置写进方案。",
+      "仅在地狱的试炼任务中且本方案maaTrialStrategy.enabled=true时启用专用补牌；高级策略选择“使用编辑器/chaldea配置”。其他任务不调用本期专用策略。",
+      "第5方案回合明确标记为末条预备；须已确认第四条血，且妖兰宝具、术呆红和术呆蓝均可靠可用，否则保留现场停止，不能自动换其他牌。",
+      "其他回合固定宝具缺失、职阶阶段不连续或归属不明时停止；普通牌缺失时，非预备回合仍可由专用候选补位，但可能改变回收和伤害，不能据此保证剩余计划。",
+      "固定卡位置优先。本文件T3按实场保留妖兰红在莉莉丝绿之前；将普通牌改成自动空位后，专用补牌会优先把合法破条职阶的面卡放在其他职阶面卡之前，降低抢破条风险，不预测HP或暴击伤害。",
+      "方案回合仍按actions顺序推进，敌人职阶用于验证真实血条；伤害或发牌让流程偏移时应停止核对。中途启动必须裁剪已执行动作、按当前队伍重建actor绑定，并重新编号finalBarPreparationTurns；仅改phase不能跳过技能回合。"
+    ],
+    "evidenceSources": [
+      "attempt2_melt_actual_source.json",
+      "attempt2_t2_actual_source.json",
+      "attempt2_t3_actual_source.json",
+      "attempt2_t4_actual_source.json",
+      "attempt2_t5_actual_source.json",
+      "attempt2_t6_actual_source.json",
+      "trial4_all_missions_claimed.png",
+      "progress.md：T4实际选卡日志05:12:12.657，最后一张为莉莉丝绿卡，替代当时未发到的蓝卡。"
+    ]
+  },
+  "maaTrialStrategy": {
+    "enabled": true,
+    "phase": 1,
+    "remainingColorAttacks": 2,
+    "requireCleanseBeforeFinish": true,
+    "finalBarPreparationTurns": [
+      5
+    ],
+    "npMetadata": [
+      {
+        "servantId": "304800",
+        "color": "B",
+        "role": "lancer_finisher",
+        "damaging": true
+      },
+      {
+        "servantId": "1000200",
+        "color": "Q",
+        "role": "alterego_finisher",
+        "damaging": true
+      }
+    ]
+  }
+}

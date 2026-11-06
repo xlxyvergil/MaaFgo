@@ -2,6 +2,7 @@ import {projectServantForm} from './servantForms';
 import {members,servantFor,skillAt,turnsOf,isSwap,hasServantIdentity,isUnspecifiedSupport} from './model';
 import type {Catalog,Json,Mystic,Servant} from './model';
 import {advanceActionRoster,isRetire,resolveActionActor} from './actionRoster';
+import {isAutoAttackCard} from './attackCards';
 
 /** Display-only cooldown information. This module never edits BattleShareData. */
 export interface CooldownBounds {
@@ -23,6 +24,8 @@ export interface PreviewMember {
   slot:number;
   member:Json|null;
   servant:Servant|undefined;
+  np:Json|undefined;
+  npState?:{kind:'mash-sword-loaded';remainingTurns:number};
   skills:PreviewSkill[];
   retired:boolean;
 }
@@ -72,6 +75,51 @@ export function npAt(member:Json|undefined|null,servant:Servant|undefined):Json|
   return servant?.np??undefined;
 }
 
+/** Planned NP state immediately before this attack; never changes the saved tdId. */
+export function npAtAction(data:Json,catalog:Catalog,actionIndex:number,slot:number,card?:Json):Json|undefined {
+  if(!Number.isInteger(slot)||slot<0||slot>2||data.actions?.[actionIndex]?.type!=='attack')return undefined;
+  const turnIndex=turnsOf(data).findIndex(turn=>turn.entries.some(entry=>entry.index===actionIndex));
+  if(turnIndex<0)return undefined;
+  const preview=previewTurn(data,catalog,turnIndex);
+  if(card){
+    if(card.svt!==slot)return undefined;
+    const resolved=resolveActionActor(preview.roster,card);
+    if(resolved.issue){
+      // Invalid recorded actions still show their original owner, never the
+      // replacement at this slot. Validation separately blocks their execution.
+      const original=resolved.actor as PreviewMember|undefined;
+      return original&&original.member?.svtId===card.actor?.svtId?original.np:undefined;
+    }
+  }
+  return preview.front[slot]?.np;
+}
+
+function updateLoadedNP(actor:PreviewMember) {
+  const initial=npAt(actor.member,actor.servant);
+  actor.np=actor.npState?.remainingTurns
+    ?actor.servant?.npVariants?.find(np=>np.id===800108)??{id:800108,name:'圣剑装填宝具（资料待补充）',cardType:2}
+    :initial;
+}
+
+/** Atlas buff 5825 lasts three on-field turns; only NP 800107 grants it. */
+function advanceNPState(roster:PreviewMember[],attack:Json) {
+  const used=new Set<string>();
+  for(const card of (Array.isArray(attack.attacks)?attack.attacks:[]).slice(0,3)){
+    if(isAutoAttackCard(card)||card?.isTD!==true)continue;
+    const resolved=resolveActionActor(roster,card),actor=resolved.actor as PreviewMember|undefined;
+    if(resolved.issue||!actor||actor.retired||used.has(actor.key))continue;
+    used.add(actor.key);
+    if(actor.member?.svtId===800100&&actor.np?.id===800107){
+      actor.npState={kind:'mash-sword-loaded',remainingTurns:3};
+    }
+  }
+  // Like Chaldea's active-player buff clock, backup members retain their state.
+  for(const actor of roster.slice(0,3)){
+    if(actor.npState&&--actor.npState.remainingTurns<=0)delete actor.npState;
+    updateLoadedNP(actor);
+  }
+}
+
 export function skillTargetMode(skill:Json|undefined):'ally'|'none'|'unknown' {
   return skill?.target==='ally'?'ally':skill?.target==='none'?'none':'unknown';
 }
@@ -109,7 +157,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
   const selected=Math.max(0,Math.min(Math.max(0,turns.length-1),Number.isInteger(turnIndex)?turnIndex:0));
   const roster:PreviewMember[]=members(data).map((member,initialSlot)=>{
     const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId,member):undefined;
-    return {key:`initial:${initialSlot}`,initialSlot,slot:initialSlot,member,servant,retired:false,
+    return {key:`initial:${initialSlot}`,initialSlot,slot:initialSlot,member,servant,np:npAt(member,servant),retired:false,
       skills:[0,1,2].map(index=>initialSkill(actorPresent?skillAt(member??undefined,servant,index):undefined,index,member?.skillLvs?.[index],actorPresent))};
   });
   const mystic=catalog.mysticCodes.find(code=>code.id===data.team?.mysticCode?.mysticCodeId);
@@ -123,6 +171,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
       const action=entry.raw;
       if(action?.type==='attack'){
         if(ti===selected){beforeAttackIndex=entry.index;break;}
+        advanceNPState(roster,action);
         for(const actor of roster.slice(0,3))if(hasServantIdentity(actor.member))decrease(actor.skills);
         decrease(master.skills);
         for(const actor of roster)for(const state of actor.skills)state.usedThisTurn=false;

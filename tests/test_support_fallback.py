@@ -8,7 +8,7 @@ from unittest.mock import Mock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from formation_test_support import ROOT, battle_action as battle
-from support_action import SupportAction
+from support_action import SupportAction, _max_swipes_before_refresh
 from battle.core.models import FormationSlot, REQUIRED_FRAME_COUNT
 from battle.runtime.formation_session import sessions
 
@@ -45,6 +45,20 @@ class Context:
         if entry == "助战刷新":
             self.refreshes += 1
         return NS(status=NS(succeeded=entry != self.fail_entry))
+
+
+class SupportSwipeBudgetTests(unittest.TestCase):
+    def test_default_and_explicit_bounds(self):
+        self.assertEqual(_max_swipes_before_refresh({}), 12)
+        for value in (1, 60, 80):
+            with self.subTest(value=value):
+                self.assertEqual(_max_swipes_before_refresh({"max_swipes_before_refresh": value}), value)
+
+    def test_invalid_budget_is_not_silently_used(self):
+        for value in (0, -1, 81, True, False, None, "60", 1.5, [], {}):
+            with self.subTest(value=value):
+                with self.assertRaisesRegex(ValueError, "1～80.*请更新资源包"):
+                    _max_swipes_before_refresh({"max_swipes_before_refresh": value})
 
 
 class SupportFallbackTests(unittest.TestCase):
@@ -88,6 +102,52 @@ class SupportFallbackTests(unittest.TestCase):
     def chaldea_share(self, grand=False):
         filename = "太女尼_78119_94149837.json" if grand else "雨暗阿_21086_94061640.json"
         return json.loads((ROOT / "tests/fixtures/chaldea" / filename).read_text("utf-8"))
+
+    def test_missing_budget_keeps_twelve_swipes_before_refresh(self):
+        ctx = Context(enabled=False)
+        ctx.fail_entry = "助战刷新"
+        with patch("support_action.MAX_SWIPE_BEFORE_REFRESH", 12):
+            result, action = self.search(ctx)
+        self.assertFalse(result.success)
+        self.assertEqual(ctx.refreshes, 1)
+        self.assertEqual(action._swipe.call_count, 12)
+        self.assertEqual(action._match_servant.call_count, 13)
+
+    def test_chaldea_extended_budget_can_match_below_the_old_refresh_limit(self):
+        ctx = self.chaldea_context(enabled=False)
+        ctx.attach["max_swipes_before_refresh"] = 60
+        matches = 0
+
+        def match(*args):
+            nonlocal matches
+            matches += 1
+            return matches >= 45
+
+        with patch("support_action.fetch_share_data", return_value=(self.chaldea_share(), None, None)), \
+             patch("support_action.os.path.isfile", return_value=True):
+            result, action = self.search(ctx, match, chaldea=True)
+        self.assertTrue(result.success)
+        self.assertEqual(ctx.refreshes, 0)
+        self.assertEqual(action._swipe.call_count, 44)
+
+    def test_configured_budget_restarts_after_each_refresh(self):
+        ctx = Context(enabled=False)
+        ctx.attach["max_swipes_before_refresh"] = 3
+        result, action = self.search(ctx, lambda *args: ctx.refreshes == 2)
+        self.assertTrue(result.success)
+        self.assertEqual(ctx.refreshes, 2)
+        self.assertEqual(action._swipe.call_count, 6)
+        # 每轮三次滑动，初始列表及两轮刷新后均另查顶部。
+        self.assertEqual(action._match_servant.call_count, 9)
+
+    def test_invalid_budget_stops_before_device_access(self):
+        ctx = Context(enabled=False)
+        ctx.attach["max_swipes_before_refresh"] = 0
+        result, action = self.search(ctx)
+        self.assertFalse(result.success)
+        action._get_detector.assert_not_called()
+        action._swipe.assert_not_called()
+        self.assertEqual(ctx.entries, [])
 
     def test_chaldea_normal_and_grand_ten_refreshes_then_fallback(self):
         for grand in (False, True):

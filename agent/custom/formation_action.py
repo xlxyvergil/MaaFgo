@@ -237,11 +237,23 @@ def _visible_servant_list_features(image, sx=1.0, sy=1.0):
         base_image = cv2.resize(image, (BASE_W, BASE_H))
 
     # 从卡片底部黄色 Servant 条带反推每行头像原点。滑动落点会略有漂移，
-    # 不能把 y 固定为 206/406；fallback 只处理条带暂时识别不到的稳定页面。
+    # 不能把 y 固定为 206/406。逐列计算条带占比，末行只有一两张卡时也能
+    # 定位；不能按整屏黄色占比筛行，否则会漏掉完整显示的稀疏末行。
     hsv = cv2.cvtColor(base_image, cv2.COLOR_BGR2HSV)
     yellow = cv2.inRange(hsv, (18, 100, 100), (40, 255, 255))
-    row_ratio = np.mean(yellow[:, 70:1230] > 0, axis=1)
-    rows = np.where(row_ratio > 0.25)[0]
+    column_ratios = np.stack([
+        np.mean(yellow[:, x:x + SERVANT_LIST_FACE_SIZE] > 0, axis=1)
+        for x in SERVANT_LIST_FACE_X
+    ])
+    # 同一列至少连续 8px 形成宽条带，避免将不同卡面的零散黄色拼成一行。
+    stripe_rows = np.zeros(BASE_H, dtype=bool)
+    for ratio in column_ratios:
+        starts = np.flatnonzero(np.diff(np.r_[False, ratio > 0.7, False].astype(int)) == 1)
+        ends = np.flatnonzero(np.diff(np.r_[False, ratio > 0.7, False].astype(int)) == -1)
+        for start, end in zip(starts, ends):
+            if end - start >= 8:
+                stripe_rows[start:end] = True
+    rows = np.flatnonzero(stripe_rows)
     runs = []
     for row in rows:
         row = int(row)
@@ -252,7 +264,7 @@ def _visible_servant_list_features(image, sx=1.0, sy=1.0):
 
     y_origins = []
     for run in runs:
-        if len(run) < 8 or float(row_ratio[run].max()) < 0.35:
+        if len(run) < 8:
             continue
         origin = run[0] - SERVANT_LIST_FACE_SIZE
         if 165 <= origin and origin + SERVANT_LIST_FACE_SIZE <= BASE_H:
@@ -321,6 +333,11 @@ class AutoFormationFromChaldea(CustomAction):
             self.direct_formation_mode = False
             node = context.get_node_data(argv.node_name) or {}
             attach = node.get("attach") or {}
+            # 仅试炼任务显式启用；其他任务保留原来的编队/冠位行为。
+            self.trial_grand_slot_repair_enabled = (
+                attach.get("native_battle_trial_profile") == "hellish_202611"
+                and attach.get("trial_grand_slot_repair") is True
+            )
             # 单一输入框: 链接/ID/本地文件路径合用 chaldea_import_source,
             # 兼容旧版分离字段的 chaldea_import_source_file
             source = str(
@@ -435,6 +452,8 @@ class AutoFormationFromChaldea(CustomAction):
             if not self._reorder_existing():
                 return CustomAction.RunResult(success=False)
             if not self._replace_local_servants():
+                return CustomAction.RunResult(success=False)
+            if not self._repair_trial_grand_slot():
                 return CustomAction.RunResult(success=False)
 
             current = self._detect_slots_stable()
@@ -1325,6 +1344,79 @@ class AutoFormationFromChaldea(CustomAction):
         source_x, source_y = self._slot_center(source_index)
         target_x, target_y = self._slot_center(target_index)
         self.controller.post_swipe(source_x, source_y, target_x, target_y, SWAP_DRAG_DURATION).wait()
+
+    def _trial_empty_grand_state(self):
+        """True=唯一空冠位格，False=未出现，None=截图/识别无法确认。"""
+        image = self._shot()
+        if image is None:
+            return None
+        detail = self.context.run_recognition("自动编队-试炼空冠位格", image)
+        if detail is None:
+            return None
+        if not detail.hit:
+            return False
+        results = getattr(detail, "filtered_results", None) or [getattr(detail, "best_result", None)]
+        return True if len(results) == 1 and getattr(results[0], "score", 0) >= .90 else None
+
+    def _repair_trial_grand_slot(self):
+        """Select the own Grand via an observed empty Trial slot, then reorder.
+
+        On 2026-11-07 MaaMCP verified that selecting an already deployed servant
+        through GRAND SELECTABLE transfers them into that slot, and the normal
+        member drag preserves the activated Grand mode. No empty slot means no
+        repair and no inference about an already occupied slot's Grand status.
+        """
+        if not getattr(self, "trial_grand_slot_repair_enabled", False):
+            return True
+        own_grands = [item for item in self.expected
+                      if item["kind"] == "LOCAL" and item.get("grand_svt") is True]
+        if not own_grands:
+            return True
+        empty = self._trial_empty_grand_state()
+        if empty is None:
+            return self._fail("无法可靠确认本关的空冠位编队格，不能安全配置冠位效果。请保持编队编辑页面，确认无遮挡后重试。")
+        if not empty:
+            mfaalog.info("[自动编队] 试炼未出现空GRAND SELECTABLE格，跳过补正；不推测已有冠位模式")
+            return True
+        if len(own_grands) != 1:
+            return self._fail(f"方案标记了{len(own_grands)}位自有冠位从者，但本关只有一个空冠位编队格，无法确定应放谁。请在编队编辑器中仅给本次要使用冠位效果的一位自有从者勾选“冠位”，重新保存并导入。")
+        expected = own_grands[0]
+        servant = self._get_servant_info(expected["svt_id"])
+        if servant is None:
+            return self._fail(f"方案中的冠位从者{expected['svt_id']}不在本地从者资料中，无法筛选。请更新从者资源并重新导入方案。")
+        mfaalog.info(f"[自动编队] 试炼空冠位格补正：{servant['name']}({servant['id']})，最终回到方案槽位{expected['slot'] + 1}")
+        if not self._run_pipeline("自动编队-试炼打开空冠位格"):
+            return self._fail("未能打开已识别的空冠位编队格，不能激活该从者的冠位效果。请保持编队编辑页面并重试。")
+        if not self._wait_for(self._in_servant_select, SELECT_PAGE_ENTER_TIMEOUT_SECONDS):
+            return self._fail("点击空冠位编队格后没有确认进入从者列表，已停止。请检查当前页面，返回编队编辑后重试。")
+        # Reuse the real rarity/class reset chain, including the residual Beast
+        # filter reset. Identity, PARTY overlays, ambiguity and return-to-party
+        # checks retain their existing thresholds and bounded retries.
+        if not self._filter_servant_list(servant):
+            return self._fail("冠位编队格的从者筛选没有完成，无法安全选人。请在游戏中清除残留筛选，返回编队编辑后重试。")
+        if not self._find_and_select_servant(servant):
+            if self._last_servant_selection_error:
+                return False
+            return self._fail(f"没有在冠位编队格的从者列表中找到{servant['name']}，无法激活冠位效果。请确认该从者已完成冠位并符合本关限制，再重试。")
+        current = self._detect_slots_stable()
+        if current is None:
+            return False
+        matches = [item for item in current if item["kind"] == "LOCAL"
+                   and item.get("svt_id") == expected["svt_id"]]
+        if len(matches) != 1:
+            return self._fail(f"选入冠位格后识别到{len(matches)}位目标从者，无法确认移动结果。请核对游戏编队后重试。")
+        if not self._reorder_existing():
+            return False
+
+        def repaired():
+            layout = self._detect_slots_stable()
+            return (layout is not None and self._first_mismatch(layout) is None
+                    and self._trial_empty_grand_state() is False)
+
+        if not self._wait_for(repaired, SLOT_LAYOUT_VERIFY_TIMEOUT_SECONDS):
+            return self._fail("冠位选人后，目标阵容或空冠位格消失状态未通过复核，不能确认补正成功。请在编队编辑中手动把目标从者放入GRAND SELECTABLE格，再调整回方案位置后重试。")
+        mfaalog.info("[自动编队] 试炼冠位空格补正完成：目标阵容已复核，空GRAND SELECTABLE格已消失")
+        return True
 
     # ---------- 从者选择、筛选、替换 ----------
 

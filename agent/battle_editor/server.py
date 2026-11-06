@@ -507,6 +507,8 @@ class EditorHandler(BaseHTTPRequestHandler):
                 self._json(200, self.server.optimize_bond(body.get('data'), body.get('options')))
             elif method == "GET" and path == "/api/battles":
                 self._json(200, storage.list_battles())
+            elif method == "PUT" and path == "/api/library/favorite":
+                self._json(200, storage.set_favorite(body.get("name"), body.get("favorite")))
             elif method == "GET" and path.startswith("/api/battles/"):
                 self._json(200, storage.read_battle(path[len("/api/battles/"):]))
             elif method == "POST" and path == "/api/validate":

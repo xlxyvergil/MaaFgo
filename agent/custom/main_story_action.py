@@ -654,8 +654,9 @@ class StoryRunner:
             self.failure(image)
             # 弹窗先处理，避免误认弹窗后透出的地图。
             handled = False
-            for name in ("作战成功_结束战斗", "好友申请界面_不回主界面",
-                         "战斗结束关闭_不回主界面"):
+            upgrade = ("结算-羁绊升级继续",) if self.mode == "native" else ()
+            for name in upgrade + ("作战成功_结束战斗", "好友申请界面_不回主界面",
+                                  "战斗结束关闭_不回主界面"):
                 result = self.reco(name, image)
                 if result:
                     self.action(name, result)

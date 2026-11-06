@@ -53,6 +53,47 @@ class ServantListFeatureTests(unittest.TestCase):
         match = f._match_servant_list_cards(page, [("f_1036300.png", self.grand)])
         self.assertTrue(match is None or match[1] != (551, 159))
 
+    def test_sparse_last_row_is_found_below_a_full_row(self):
+        for count in (1, 2):
+            with self.subTest(last_row_cards=count):
+                page = self.page_with_target(origin=(472, 317))
+                page[317:475, 472:630] = self.normal
+                page[517:675, 97:255] = self.grand
+                for x in f.SERVANT_LIST_FACE_X[:count]:
+                    page[675:693, x:x + 158] = (0, 210, 255)
+                match = f._match_servant_list_cards(page, [("target", self.grand)])
+                self.assertTrue(f.AutoFormationFromChaldea._servant_list_match_accepted(match))
+                self.assertEqual(match[1], (176, 596))
+
+    def test_jp_halloween_elizabeth_in_two_card_last_row(self):
+        page = self.page_with_target(origin=(472, 317))
+        crop = read_image(ROOT / "tests/fixtures/servant_list/jp_last_two_cards.png")
+        self.assertIsNotNone(crop)
+        page[508:698, 90:450] = crop
+        face_dir = ROOT / "assets/resource/base/image/servant_face"
+        templates = [(f"f_502600{i}.png", read_image(face_dir / f"f_502600{i}.png"))
+                     for i in range(5)]
+        for image, scale in ((page, 1.0), (cv2.resize(page, (2560, 1440)), 2.0)):
+            with self.subTest(scale=scale):
+                match = f._match_servant_list_cards(image, templates, scale, scale)
+                self.assertTrue(f.AutoFormationFromChaldea._servant_list_match_accepted(match))
+                self.assertGreater(match[0], 0.95)
+                self.assertEqual(match[1], (int(363 * scale), int(596 * scale)))
+                self.assertEqual(match[2], "f_5026003.png")
+
+    def test_bottom_clipped_last_row_is_not_a_click_target(self):
+        page = self.page_with_target(origin=(472, 317))
+        page[617:720, 97:255] = self.grand[:103]
+        _, centers = f._visible_servant_list_features(page)
+        self.assertNotIn((176, 696), centers)
+
+    def test_yellow_fragments_in_different_columns_do_not_form_a_row(self):
+        page = self.page_with_target(origin=(472, 317))
+        for index, x in enumerate(f.SERVANT_LIST_FACE_X):
+            page[675 + index:677 + index, x:x + 158] = (0, 210, 255)
+        _, centers = f._visible_servant_list_features(page)
+        self.assertNotIn((176, 596), centers)
+
     def test_two_matching_card_positions_report_duplicate_candidates(self):
         page = self.page_with_target()
         page[202:360, 97:255] = self.grand

@@ -26,8 +26,9 @@ class CardSubmissionTests(unittest.TestCase):
         runtime._handle_post_attack_story = Mock(return_value=None)
         return runtime
 
-    def wait(self, frames, *, run=False, stop_on_frame=None):
+    def wait(self, frames, *, run=False, stop_on_frame=None, bond_guard=False):
         runtime = self.runtime()
+        runtime.ctx.get_node_data = lambda name: {"enabled": bond_guard} if name == "结算-羁绊满停止" else {}
         clock = [0.0]
         pending = iter(frames)
         current = [frames[-1]]
@@ -56,6 +57,13 @@ class CardSubmissionTests(unittest.TestCase):
              patch('battle.runtime.runtime.time.sleep', side_effect=sleep):
             result = runtime.run() if run else runtime._wait_turn_settled()
         return result, runtime, clock[0], observations[0]
+
+    def test_bond_guard_preserves_unknown_result_transition_without_blind_input(self):
+        for enabled in (False, True):
+            with self.subTest(bond_guard=enabled):
+                ok, runtime, _, _ = self.wait([(Scene.UNKNOWN, 0), (Scene.VICTORY, 0)], bond_guard=enabled)
+                self.assertTrue(ok)
+                self.assertEqual(runtime.executor.tap_top_right_close.call_count, 0 if enabled else 1)
 
     def test_stable_selection_fails_quickly_without_touching_existing_choices(self):
         ok, runtime, elapsed, observations = self.wait([(Scene.COMMAND_SELECTION, 0)])

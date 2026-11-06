@@ -1,4 +1,4 @@
-"""Run the existing victory TemplateMatch with enabled/off option overrides."""
+"""Run the victory recognizers with enabled/off option overrides."""
 import json
 import os
 from pathlib import Path
@@ -35,7 +35,7 @@ class BondResultEntryTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def test_enabled_header_and_switch_off_keep_one_existing_matcher(self):
+    def test_enabled_early_result_and_switch_off_restore_next_button_search(self):
         cases = read("assets/options/原生自动战斗羁绊满停止.json")["option"]["原生自动战斗羁绊满停止"]["cases"]
         overrides = {case["name"]: case["pipeline_override"]["战斗_胜利"] for case in cases}
         definitions = read("assets/options/原生自动战斗羁绊满停止.json")["option"]
@@ -56,7 +56,7 @@ class BondResultEntryTests(unittest.TestCase):
                 for mode, expected in (("Yes", False), ("No", True), ("Yes", False), ("No", True)):
                     self_outer.assertTrue(context.override_pipeline({"战斗_胜利": overrides[mode]}))
                     node = context.get_node_data("战斗_胜利")
-                    self_outer.assertEqual(node["recognition"]["type"], "TemplateMatch")
+                    self_outer.assertEqual(node["recognition"]["type"], "Or" if mode == "Yes" else "TemplateMatch")
                     result = context.run_recognition("战斗_胜利", old_frame)
                     report.setdefault("switches", []).append((mode, bool(result and result.hit)))
                     self_outer.assertEqual(bool(result and result.hit), expected)
@@ -86,9 +86,13 @@ class BondResultEntryTests(unittest.TestCase):
             nodes = {CONFIG_NODE: read("assets/resource/base/pipeline/原生自动战斗.json")[CONFIG_NODE],
                      "结算-羁绊满停止": {}, "战斗_胜利": original, "probe": {"action": {
                 "type": "Custom", "param": {"custom_action": "probe"}}}}
+            perception = read("assets/resource/base/pipeline/自动战斗_感知.json")
+            nodes.update({name: perception[name] for name in (
+                "战斗_战后RESULT", "战斗_战利品弹窗", "战斗_战利品标题", "战斗_战利品下一步")})
             (temp / "pipeline/test.json").write_text(json.dumps(nodes, ensure_ascii=False), encoding="utf-8")
             resource = Resource()
             resource.use_cpu()
+            self.assertTrue(resource.post_bundle(ROOT / "assets/resource/base").wait().succeeded)
             self.assertTrue(resource.post_bundle(temp).wait().succeeded)
             resource.register_custom_action("probe", Probe())
             controller = MemoryController(old_frame)

@@ -21,9 +21,16 @@
         "原生自动战斗高级策略"
       ],
       "pipeline_override": {
+        "执行自动编队": {
+          "attach": {
+            "native_battle_trial_profile": "hellish_202611",
+            "trial_grand_slot_repair": true
+          }
+        },
         "原生自动战斗入口": {
           "attach": {
-            "native_battle_config_node": "原生自动战斗-高级策略配置"
+            "native_battle_config_node": "原生自动战斗-高级策略配置",
+            "native_battle_trial_profile": "hellish_202611"
           },
           "on_error": [
             "地狱的试炼-运行失败判分"
@@ -32,7 +39,8 @@
         "Chaldea助战action": {
           "attach": {
             "chaldea_enabled": true,
-            "fallback_after_refresh": false
+            "fallback_after_refresh": false,
+            "max_swipes_before_refresh": 60
           }
         },
         "原生自动战斗调度": {

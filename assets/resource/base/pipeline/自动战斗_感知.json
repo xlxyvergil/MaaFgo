@@ -691,6 +691,48 @@
             }
         }
     },
+    "战斗_战后RESULT": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "battle/bond/战后结果标题.png",
+            "roi": [450, 0, 400, 120], "threshold": 0.8
+        }}
+    },
+    "战斗_战利品弹窗": {
+        "doc": "正常结算顺序为羁绊→经验→战利品。仅标题和下一步同时命中才确认已到战利品页；胜利交接若尚未检查羁绊应保留现场停止，不得推进后等待已过去的羁绊页。",
+        "recognition": {"type": "And", "param": {
+            "all_of": ["战斗_战利品标题", "战斗_战利品下一步"], "box_index": 1
+        }}
+    },
+    "战斗_战利品标题": {
+        "recognition": {"type": "OCR", "param": {
+            "roi": [90, 20, 390, 65],
+            "expected": ["获得.*战利品", "獲得した戦利品"], "threshold": 0.8
+        }}
+    },
+    "战斗_战利品下一步": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "battle/下一步.png", "roi": [900, 570, 380, 150], "threshold": 0.8
+        }}
+    },
+    "战斗_经验结算页": {
+        "doc": "RESULT不代表当前仍在羁绊页。正常羁绊页在经验页之前；同时确认RESULT、获得EXP标题和触屏提示时，若未完成羁绊检查，应保留现场停止，不点击尝试补查。魔术礼装的LEVEL MAX不能当作羁绊MAX。",
+        "recognition": {"type": "And", "param": {
+            "all_of": ["战斗_战后RESULT", "战斗_经验结算标题", "战斗_经验结算触屏提示"]
+        }}
+    },
+    "战斗_经验结算标题": {
+        "recognition": {"type": "OCR", "param": {
+            "roi": [640, 165, 300, 80],
+            "expected": ["獲得EXP", "获得EXP", "获得经验"], "threshold": 0.8
+        }}
+    },
+    "战斗_经验结算触屏提示": {
+        "doc": "发光日文在现场OCR中可能将画面识别为画面面、タ识别为ダ；仅容忍这些提示词形差异，仍须与RESULT和EXP标题同时成立，仅定位漏检终点，不驱动点击。",
+        "recognition": {"type": "OCR", "param": {
+            "roi": [350, 610, 580, 80],
+            "expected": ["画面.*[タダ]ッチしてください", "点击.*画面", "点击.*屏幕", "触摸.*画面"], "threshold": 0.8
+        }}
+    },
     "战斗_选卡场景": {
         "recognition": {
             "type": "TemplateMatch",

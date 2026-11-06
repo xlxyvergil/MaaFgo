@@ -67,6 +67,7 @@ class BondStopFrameworkTests(unittest.TestCase):
                 self.assertTrue(tasker.bind(resource, controller))
                 with patch.object(action, "read_bond_page", return_value=True), \
                      patch.object(action, "read_any_bond_max", return_value=is_max), \
+                     patch.object(action, "read_bond_upgrade", return_value=False), \
                      patch.object(action, "Path", side_effect=lambda value: Path(temp) / value):
                     job = tasker.post_task("root")
                     deadline = time.monotonic() + 5

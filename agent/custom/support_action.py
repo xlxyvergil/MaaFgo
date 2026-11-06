@@ -84,7 +84,9 @@ FACE_POLY = [(27, 57), (27, 108), (140, 108), (140, 84), (166, 84), (166, 39), (
 TH_FACE = 0.75
 CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口)
 CE_ANCHOR_GRAND = [(179, 35), (179, 129)]   # 冠位助战 礼装1/礼装2 左上角(166x53 窗口)
-BOND_ROI = (180, 84, 29, 29)          # 冠位助战 羁绊区域: 中心(194,99) 29x29 (相对框, 实测图案中心对齐)
+# 日服现场图标左上角约为框内 (186,93)，旧 29x29 区域会截断图案。
+# 保留完整 24x24 模板的滑动空间，只搜索羁绊图标附近，避免扩大到相邻礼装。
+BOND_ROI = (180, 84, 40, 40)
 BOND_TEMPLATES = {"50np": "50np.png", "original": "羁绊.png"}   # 羁绊选项 -> 模板(带绿幕), 纯图案多服通用, 固定取 base 包 skill 目录
 TH_BOND = 0.40                     # 较高分须严格超过此值，才确认羁绊效果图标
 SKILL_ACTIVE = [(791, 154, 27, 22), (836, 154, 29, 22), (881, 154, 28, 22)]   # 主动技能 1-3 数字方框 (x,y,w,h)
@@ -157,10 +159,11 @@ VIEW_SWITCH_POS = (846, 127)
 
 # 未匹配时滑动+刷新循环
 SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到终点
-SWIPE_END = (559, 349)           # 滑动终点(全屏): 垂直向上滑动 320px（较原 400px 缩小 20%）
+SWIPE_END = (559, 389)           # 滑动终点(全屏): 垂直向上滑动 280px
 SWIPE_DURATION = 500            # 滑动持续时间(ms)
 SWIPE_SETTLE = 1              # 滑动结束后等待列表稳定再识别(秒), 避免惯性滚动导致识别不准
-MAX_SWIPE_BEFORE_REFRESH = 12    # 连续滑动12次未匹配 -> 执行"助战刷新"流水线
+MAX_SWIPE_BEFORE_REFRESH = 12    # 未设置查找范围时，连续滑动12次未匹配后刷新
+MAX_SWIPE_BUDGET = 80           # 单轮列表查找范围上限，避免错误配置导致长时间无法刷新
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
 FALLBACK_REFRESH_LIMIT = 10
 CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
@@ -173,6 +176,17 @@ EMPTY_CE = ("0_空.png", "空.png")
 
 
 # ---------------- 通用工具 ----------------
+def _max_swipes_before_refresh(attach):
+    """允许特定任务查找更长的助战列表，其余任务保留原来的刷新频率。"""
+    value = attach.get("max_swipes_before_refresh", MAX_SWIPE_BEFORE_REFRESH)
+    if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= MAX_SWIPE_BUDGET:
+        raise ValueError(
+            f"助战列表的查找范围必须是 1～{MAX_SWIPE_BUDGET} 次滑动，当前设置无法开始筛选。"
+            "请更新资源包后重试；也可先手动选好符合队伍要求的助战，再从编队界面启动。"
+        )
+    return value
+
+
 def _imread(path, gray=False):
     """支持中文路径读取图片; gray=True 返回灰度图"""
     import cv2
@@ -524,8 +538,8 @@ class SupportAction(CustomAction):
 
     # ---------- 冠位羁绊判断 ----------
     def _match_bond(self, img, bx, by, bond_opt):
-        """羁绊区域(中心(194,99) 29x29)与 base/image/skill/{50np,羁绊}.png 匹配
-        模板带绿幕, 先抠掉绿幕背景再与截图区域灰度滑动匹配
+        """羁绊区域与 base/image/skill/{50np,羁绊}.png 做掩膜灰度匹配。
+        绿幕像素不参与相关系数计算，避免礼装背景影响效果分类。
         模板是纯图案(不含文字), 多服通用, 故固定取 base 包而非当前 pkg
         两张模板分别打分，较高分须严格大于 0.40 且两者不相等，才确认效果；
         低分或同分视为未识别到，跳过当前条目。不限效果时保持跳过检查。"""
@@ -541,14 +555,20 @@ class SupportAction(CustomAction):
             t_bgr = _imread(os.path.join(_image_dir("base", "skill"), name))
             if t_bgr is None:
                 return False
-            # 抠绿幕: 绿色像素置白(模板背景为绿幕, 截图区域为正常图案)
+            # 以绿幕生成掩膜；不能将绿幕涂白后当成有效特征参与匹配。
             b = t_bgr[:, :, 0].astype(int)
             g = t_bgr[:, :, 1].astype(int)
             r = t_bgr[:, :, 2].astype(int)
             green = (g > 100) & (g > b + 30) & (g > r + 30)
             t = cv2.cvtColor(t_bgr, cv2.COLOR_BGR2GRAY)
-            t[green] = 255
-            scores[opt] = float(cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED).max())
+            mask = (~green).astype(np.uint8) * 255
+            if (t.shape[0] > g_roi.shape[0] or t.shape[1] > g_roi.shape[1]
+                    or not np.any(mask)):
+                return False
+            result = cv2.matchTemplate(g_roi, t, cv2.TM_CCOEFF_NORMED, mask=mask)
+            # 平坦背景上的局部方差可能为零，仅保留可计算的候选位置。
+            finite = result[np.isfinite(result)]
+            scores[opt] = float(finite.max()) if finite.size else float("nan")
         best = max(scores, key=scores.get)
         if (not all(np.isfinite(score) for score in scores.values())
                 or scores[best] <= TH_BOND
@@ -874,6 +894,7 @@ class SupportAction(CustomAction):
             source_mode = param.get("source_mode")
             node = context.get_node_data(argv.node_name)
             attach = node.get("attach") or {}
+            max_swipes_before_refresh = _max_swipes_before_refresh(attach)
             fallback_enabled = attach.get("fallback_after_refresh") is True
             root, token = None, ""
             try:
@@ -967,7 +988,7 @@ class SupportAction(CustomAction):
             mfaalog.info(f"[SupportAction] 助战类型={support_type} 职介={class_name or '(未选)'} "
                          f"英灵={servant_id or ('(不要求)' if skip_servant else '(未选)')} "
                          f"礼装={'/'.join(ce_names) if ce_names else '(空)'} 主动={active} 被动={passive} "
-                         f"宝具={np_level} 等级={level}")
+                         f"宝具={np_level} 等级={level} 每轮最多滑动={max_swipes_before_refresh}")
 
             pkg = _resolve_resource_package(context)
             base_dir = _image_dir(pkg)
@@ -1131,11 +1152,11 @@ class SupportAction(CustomAction):
                 mfaalog.info(f"[SupportAction] 第 {swipe_count} 次滑动, 重新识别")
                 if try_match():
                     return CustomAction.RunResult(success=True)
-                if swipe_count >= MAX_SWIPE_BEFORE_REFRESH:
+                if swipe_count >= max_swipes_before_refresh:
                     swipe_count = 0
                     if fallback_enabled and refresh_count >= FALLBACK_REFRESH_LIMIT:
                         return self._select_fallback(context, controller, root, token)
-                    mfaalog.info(f"[SupportAction] 连续{MAX_SWIPE_BEFORE_REFRESH}次滑动未匹配, 执行{REFRESH_TASK}")
+                    mfaalog.info(f"[SupportAction] 连续{max_swipes_before_refresh}次滑动未匹配, 执行{REFRESH_TASK}")
                     detail = context.run_task(REFRESH_TASK)
                     if context.tasker.stopping or detail is None or not detail.status.succeeded:
                         mfaalog.error("[SupportAction] 助战刷新失败，停止查找")

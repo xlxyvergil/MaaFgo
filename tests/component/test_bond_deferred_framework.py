@@ -107,7 +107,8 @@ class BondDeferredFrameworkTests(unittest.TestCase):
                     self.assertEqual(observed["root"], job.job_id)
                     stopped = bond_stops.get(job.job_id)
                     deferred = bond_stops.deferred(job.job_id)
-                    allowed = mode in {"slot", "slots"} and planned and not bad_mapping and not recognition_error
+                    allowed = (mode in {"all", "slot", "slots"} and planned and not recognition_error
+                               and (mode == "all" or not bad_mapping))
                     self.assertEqual(bool(stopped), not allowed)
                     self.assertEqual(bool(deferred), allowed)
                     self.assertEqual(observed["seen"], ["settled", "parent_tail"] if allowed else [])
@@ -137,8 +138,14 @@ class BondDeferredFrameworkTests(unittest.TestCase):
     def test_multiple_slots_on_last_battle_stop(self):
         self.scenario(mode="slots", targets=(1, 6), planned=False)
 
-    def test_all_mode_stays_unconfirmed_even_with_another_battle_planned(self):
+    def test_all_mode_with_remaining_battle_returns_through_jumpback(self):
         self.scenario(mode="all", planned=True)
+
+    def test_all_mode_on_last_battle_stops_without_parent_tail(self):
+        self.scenario(mode="all", planned=False)
+
+    def test_all_mode_deferral_does_not_require_per_slot_mapping(self):
+        self.scenario(mode="all", planned=True, bad_mapping=True)
 
     def test_mapping_failure_cannot_use_upgrade_deferral(self):
         self.scenario(mode="slot", planned=True, bad_mapping=True)

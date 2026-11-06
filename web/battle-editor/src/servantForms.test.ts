@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {selectedServantForm,projectServantForm,setServantForm} from './servantForms';
 import {clone,filterCatalog,memberLabel,newBattle,replaceServant,servantFor,skillAt} from './model';
 import type {Catalog,Json,Servant} from './model';
-import {npAt,previewTurn} from './battlePreview';
+import {npAt,npAtAction,previewTurn} from './battlePreview';
 import {partyCost} from './partyCost';
 import {shareImageModel} from './shareImageModel';
 
@@ -12,6 +12,85 @@ const bundled=JSON.parse(readFileSync(new URL('../../../agent/battle_editor/data
 const mash:Servant={...bundled.servants.find((item:Json)=>item.id===800100),name:'玛修·基列莱特'};
 const catalog:Catalog={servants:[mash,{id:100100,name:'阿尔托莉雅',cost:16,rarity:5}],equips:[{id:9400010,name:'测试礼装',cost:12}],mysticCodes:[]};
 const owned=():Json=>({svtId:800100,supportType:'none',skillLvs:[10,9,8],lv:80,equip1:{id:9400010,limitBreak:true},future:{nested:[null,false,5]}});
+
+const paladin=():Json=>{const member=owned();setServantForm(member,mash,'paladin');return member;};
+const npAttack=(svt?:number):Json=>({type:'attack',attacks:svt==null?[]:[{svt,isTD:true,card:-1}]});
+const mashPlan=():Json=>({team:{onFieldSvts:[paladin(),{...paladin(),supportType:'friend'},null],backupSvts:[{svtId:100100},null,null],mysticCode:{mysticCodeId:20,level:10}},actions:[]});
+
+test('Paladin shield grants three on-field turns of sword NP without changing saved Chaldea data',()=>{
+ const data=mashPlan();data.actions=[npAttack(0),npAttack(0),npAttack(0),npAttack(0),npAttack()];
+ const before=clone(data),metadata=clone(catalog);
+ assert.deepEqual([0,1,2,3,4].map(turn=>previewTurn(data,catalog,turn).front[0].np?.id),[800107,800108,800108,800107,800108]);
+ assert.deepEqual([0,1,2,3,4].map(turn=>previewTurn(data,catalog,turn).front[0].npState?.remainingTurns),[undefined,2,1,undefined,2]);
+ assert.deepEqual([0,1,2,3,4].map(index=>npAtAction(data,catalog,index,0)?.cardType),[1,2,2,1,2]);
+ assert.equal(npAtAction(data,catalog,1,0)?.name,'印证希望的人理之剑');
+ assert.deepEqual(data,before);assert.deepEqual(catalog,metadata);
+ assert.equal(data.team.onFieldSvts[0].tdId,800107);assert.equal(data.delegate,undefined);
+});
+
+test('loaded sword expires without another NP and earlier action edits recompute the state',()=>{
+ const data=mashPlan();data.actions=[npAttack(0),npAttack(),npAttack(),npAttack()];
+ assert.equal(npAtAction(data,catalog,2,0)?.id,800108);
+ assert.equal(npAtAction(data,catalog,3,0)?.id,800107);
+ data.actions[0].attacks=[];
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800107);
+ data.actions[1].attacks=[{isAuto:true},{svt:0,isTD:true,card:-1}];
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800107);
+ assert.equal(npAtAction(data,catalog,2,0)?.id,800108);
+});
+
+test('support and own Mash copies keep independent NP states',()=>{
+ const data=mashPlan();data.actions=[npAttack(0),npAttack(1),npAttack()];
+ let view=previewTurn(data,catalog,1);
+ assert.deepEqual(view.front.slice(0,2).map(actor=>actor.np?.id),[800108,800107]);
+ view=previewTurn(data,catalog,2);
+ assert.deepEqual(view.front.slice(0,2).map(actor=>actor.npState?.remainingTurns),[1,2]);
+});
+
+test('Order Change moves loaded state with its member and pauses its duration in backup',()=>{
+ const data=mashPlan();const swap={type:'skill',svt:null,skill:2};
+ data.actions=[npAttack(0),clone(swap),npAttack(),npAttack(),clone(swap),npAttack(),npAttack(),npAttack()];
+ data.delegate={replaceMemberIndexes:[[0,0],[0,0]]};
+ const waiting=previewTurn(data,catalog,2);
+ assert.equal(waiting.roster[3].initialSlot,0);assert.equal(waiting.roster[3].npState?.remainingTurns,2);
+ const returned=previewTurn(data,catalog,3);
+ assert.equal(returned.front[0].initialSlot,0);assert.equal(returned.front[0].np?.id,800108);assert.equal(returned.front[0].npState?.remainingTurns,2);
+ assert.equal(previewTurn(data,catalog,4).front[0].npState?.remainingTurns,1);
+ assert.equal(previewTurn(data,catalog,5).front[0].np?.id,800107);
+});
+
+test('retirement and actor guards cannot transfer or fabricate a loaded NP',()=>{
+ const data=mashPlan();data.actions=[npAttack(0),{type:'retire',svt:0},npAttack()];
+ const view=previewTurn(data,catalog,1);
+ assert.equal(view.front[0].member?.svtId,100100);assert.equal(view.front[0].npState,undefined);
+ assert.equal(view.front[1].np?.id,800107);
+ data.actions=[{type:'attack',attacks:[{svt:0,isTD:true,card:-1,actor:{initialSlot:1,svtId:800100}}]},npAttack()];
+ assert.equal(npAtAction(data,catalog,0,0,data.actions[0].attacks[0])?.id,800107);
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800107);
+ assert.equal(npAtAction(data,catalog,1,1)?.id,800107);
+ const mismatched=data.actions[0].attacks[0];data.actions=[npAttack(0),{type:'attack',attacks:[mismatched]}];
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800108);
+ assert.equal(npAtAction(data,catalog,1,0,mismatched)?.id,800107);
+});
+
+test('only Paladin NP800107 grants loading; other forms and explicit NP variants stay intact',()=>{
+ for(const form of mash.forms!.filter(form=>form.key!=='paladin')){
+  const data=mashPlan();setServantForm(data.team.onFieldSvts[0],mash,form.key);data.actions=[npAttack(0),npAttack()];
+  assert.equal(npAtAction(data,catalog,1,0)?.id,form.tdId);
+  assert.equal(previewTurn(data,catalog,1).front[0].npState,undefined);
+ }
+ for(const tdId of [800197,800108,999999]){
+  const data=mashPlan();data.team.onFieldSvts[0].tdId=tdId;data.actions=Array.from({length:5},()=>npAttack(0));
+  assert.equal(npAtAction(data,catalog,4,0)?.id,tdId);
+  assert.equal(previewTurn(data,catalog,4).front[0].npState,undefined);
+ }
+ const data=mashPlan();data.actions=[{type:'attack',attacks:[{isAuto:true,svt:0,isTD:true}]},npAttack()];
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800107);
+ assert.equal(npAtAction(data,catalog,1,3),undefined);assert.equal(npAtAction(data,catalog,99,0),undefined);
+ // Chaldea follows the explicit NP's effects even if the costume is unknown.
+ data.team.onFieldSvts[0].limitCount=999999;data.actions=[npAttack(0),npAttack()];
+ assert.equal(npAtAction(data,catalog,1,0)?.id,800108);
+});
 
 test('all six Mash builds save coherent standard Chaldea IDs without altering member requirements',()=>{
  assert.equal(mash.forms?.length,6);

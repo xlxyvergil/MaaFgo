@@ -1097,8 +1097,13 @@ class AutoBattleRuntime:
         self._post_attack_returned_to_map = False
         self._post_attack_failure_reason = "stuck_after_attack"
         mfaalog.info(f"[AutoBattle] _wait_turn_settled() timeout={_ANIMATION_TIMEOUT_S}s")
+        getter = getattr(self.ctx, "get_node_data", None)
+        guard = getter("结算-羁绊满停止") if getter else None
+        preserve_bond_page = isinstance(guard, dict) and guard.get("enabled") is True
+        # 羁绊守卫开启时，UNKNOWN可能正处于结算淡入；盲点会在识别前跳过羁绊页。
+        # 明确的剧情仍由剧情分支处理，战后页面在羁绊检查完成后交回结算流水线。
         result = self._wait_until(_TERMINAL_OR_MAIN, _ANIMATION_TIMEOUT_S,
-                                  tap_close=True, handle_story=True,
+                                  tap_close=not preserve_bond_page, handle_story=True,
                                   command_selection_timeout_s=3.0)
         mfaalog.info(f"[AutoBattle] _wait_turn_settled() result={result}")
         return result

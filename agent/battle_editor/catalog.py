@@ -12,7 +12,6 @@ import json
 from pathlib import Path
 import re
 import struct
-import unicodedata
 from urllib.parse import quote
 
 from .special_choices import special_skill_catalog
@@ -228,41 +227,18 @@ def _dimensions(root: Path, url: str | None) -> tuple[int | None, int | None]:
     return None, None
 
 
-def _common_equips(root: Path, equips: list[dict], raw_records: list[dict]) -> tuple[dict[int, list[str]], dict]:
-    """Map actual support CE templates by exact, width-normalized official name.
+def _common_equips(equips: list[dict], runtime_records: list[dict]) -> tuple[dict[int, list[str]], dict]:
+    """Use explicit important flags for the editor's common CE display category.
 
-    Fullwidth punctuation (for example 限制／零毁) is Unicode NFKC-equivalent
-    to its database spelling. No substring, fuzzy or first-candidate matching is
-    allowed: ambiguous and absent names remain reported and unselected.
+    The flag belongs to the runtime CE list and is matched by ID. Support
+    recognition still requires actual templates and is checked independently.
     """
-    index: dict[str, set[int]] = {}
     known_ids = {item["id"] for item in equips}
-    for item in equips + raw_records:
-        eid = _int(item.get("id"))
-        if eid not in known_ids:
-            continue
-        for field in ("name", "nameJp", "name_jp"):
-            value = item.get(field)
-            if isinstance(value, str) and value.strip():
-                index.setdefault(unicodedata.normalize("NFKC", value.strip()), set()).add(eid)
-    mapped: dict[int, list[str]] = {}
-    unmatched, ambiguous = [], []
-    for base in _resource_roots(root):
-        directory = base / "lizhuang"
-        if not directory.is_dir() or not directory.resolve().is_relative_to(root):
-            continue
-        for path in sorted(directory.rglob("*.png")):
-            if not path.resolve().is_relative_to(directory.resolve()) or path.stem == "0_空":
-                continue
-            relative = path.relative_to(root).as_posix()
-            ids = index.get(unicodedata.normalize("NFKC", path.stem.strip()), set())
-            if len(ids) == 1:
-                mapped.setdefault(next(iter(ids)), []).append(relative)
-            elif ids:
-                ambiguous.append({"source": relative, "ids": sorted(ids)})
-            else:
-                unmatched.append(relative)
-    return mapped, {"count": len(mapped), "unmatched": unmatched, "ambiguous": ambiguous}
+    mapped = {_int(item.get("id")): ["important"] for item in runtime_records
+              if _int(item.get("id")) in known_ids and _int(item.get("important")) == 1}
+    # Keep the response shape consumed by existing clients; ID flags have no
+    # template-name matches to report as unmatched or ambiguous.
+    return mapped, {"count": len(mapped), "unmatched": [], "ambiguous": []}
 
 
 def _support_equip_recognition(root: Path, name, equip_id=None) -> dict[str, bool]:
@@ -517,10 +493,7 @@ def build_catalog(project_root: Path | str) -> dict:
             "filters": equip_filter_facts(equip_filter_index, key) if key in recognized else None,
         })
     equips.sort(key=lambda item: (item["collectionNo"] or 0, item["id"]))
-    raw_names = ([{"id": key, "name": value} for key, value in cn_names.items()]
-                 + [{"id": key, "nameJp": value} for key, value in jp_names.items()]
-                 + list(recognized.values()) + list(equip_meta.values()))
-    common_equips, common_status = _common_equips(root, equips, raw_names)
+    common_equips, common_status = _common_equips(equips, list(recognized.values()))
     extension_ids = {entry["id"] for entry in installed}
     for equip in equips:
         equip["common"] = equip["id"] in common_equips
