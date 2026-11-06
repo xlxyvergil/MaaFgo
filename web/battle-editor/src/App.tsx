@@ -4,7 +4,8 @@ import type {ServantForm} from './servantForms';
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {Swords,Users,Layers,CheckCheck,Save,Undo2,Redo2,Plus,Search,ChevronDown,ChevronUp,ArrowLeft,ArrowRight,ArrowUp,ArrowDown,Copy,Trash2,X,Upload,Download,FileJson,Sun,Moon,ExternalLink,FolderOpen,AlertTriangle,CheckCircle2,ArrowLeftRight,GripVertical,Link as LinkIcon,RefreshCw,Settings2,Shield,Shirt,Target,Heart,Play,Power,Clipboard,Info,BookOpen,Image as ImageIcon} from 'lucide-react';
-import {api,session,ApiError} from './api';
+import {api,session,ApiError,apiSupportCE} from './api';
+import {SupportCEInstall} from './SupportCEInstall';
 import {clone,newBattle,assertEditable,members,setMember,turnsOf,writeTurns,rosterAt,canChange,isSwap,titleOf,colorName,colorClass,colorOf,makeCard,move,actionTitle,remapSlots,skillAt,servantFor,replaceServant,swapMembers,filterCatalog,appendSkillAt,appendSkillEntry,appendNPEntry,newServantAdvancedFilters,matchServantAdvanced,npFilterSummary,isRetire,retirementInfoAt,actionMemberAt,bindEntryActor,bindCardActor} from './model';
 import type {Json,Catalog,Servant,Equip,Mystic,Entry,Turn} from './model';
 import {actionRosterAt,resolveActionActor} from './actionRoster';
@@ -52,7 +53,7 @@ import {AdvancedEquipFilters} from './AdvancedEquipFilters';
 import {EquipCatalogCard,EquipDetails} from './EquipCatalogDetails';
 import {EQUIP_SORT_OPTIONS,equipAdvancedFilterCount,matchEquipAdvanced,normalizeEquipAdvancedFilters,newEquipAdvancedFilters,sortEquips} from './equipFilters';
 import type {EquipSortKey} from './equipFilters';
-import {matchesSupportEquip,supportEquipRequirement} from './supportEquipSelection';
+import {selectableEquips,supportEquipRequirement} from './supportEquipSelection';
 import type {SupportEquipRequirement} from './supportEquipSelection';
 
 const emptyCatalog:Catalog={servants:[],equips:[],mysticCodes:[]};
@@ -84,6 +85,19 @@ export default function App(){
  const [namingSource,setNamingSource]=useState<NamingSource>('local');
  const [preferredFileName,setPreferredFileName]=useState<string|null>(null),[pendingSave,setPendingSave]=useState<PreparedBattleSave|null>(null);
  const saving=useRef(false);
+ const [extensionInstalling,setExtensionInstalling]=useState(false),extensionPending=useRef(false);
+ const installSupportExtension=async(file:File)=>{
+  if(extensionPending.current)throw new Error('已有礼装扩展正在安装，请等待安装完成。');
+  if(status!=='ready')throw new Error('编队编辑器服务尚未连接，无法安装礼装扩展。请重新连接服务后重试。');
+  extensionPending.current=true;setExtensionInstalling(true);
+  try{
+   const result=await apiSupportCE(file);
+   let refreshed:Catalog;
+   try{refreshed=await api<Catalog>('/catalog');}catch{throw new Error(`已安装 ${result.installed} 种助战礼装，但列表刷新失败。请重新打开编队编辑器后查看，无需重复安装。`);}
+   setCatalog(refreshed);
+   const message=`已安装 ${result.installed} 种助战礼装，列表已刷新。`;setNotice(message);return message;
+  }finally{extensionPending.current=false;setExtensionInstalling(false);}
+ };
  const [newTeamFirstSupport,setNewTeamFirstSupport]=useState(true);
  const defaultSupportSlot=newTeamSupportSlot(data,newTeamFirstSupport);
  const [costLimit,setCostLimit]=useState(loadPartyCostLimit);
@@ -222,7 +236,7 @@ export default function App(){
   <footer className="app-footer"><span><span className={`status-dot ${status!=='ready'?'amber':''}`}/>{status==='ready'?'本地服务已连接':'服务未就绪'}<i>·</i>{cap.mode==='mxu'?'MXU 托管模式':cap.mode==='standalone'?'独立运行模式':cap.mode??'本地编辑'}</span><span className="footer-path" title={cap.projectRoot}>{cap.projectRoot??'所有编辑数据保存在当前 MaaFGO 实例'}</span><button className="text-button" onClick={async()=>{if(!window.confirm('停止本地编辑服务？当前已接收的草稿会先保存。重新打开请运行 CMD 或 Maa 启动任务。'))return;const synced=await flushDraft();if(!synced&&dirty){setError('草稿未保存成功，服务保持运行。请先重试或下载保真 JSON。');return;}try{await api('/shutdown','POST',{});setStatus('offline');setNotice('本地服务已停止。');}catch(e){setError((e as Error).message);}}}><Power size={13}/>停止服务</button></footer>
   {notice&&<div className="toast" role="status"><CheckCircle2 size={18}/>{notice}<button className="icon" aria-label="关闭通知" onClick={()=>setNotice('')}><X size={14}/></button></div>}
 
-  {selector&&<Selector type={selector.type} catalog={catalog} initialFormServant={selector.formFor?servantFor(catalog,selector.formFor):undefined} currentMember={members(data)[selector.slot??0]} supportRequirement={selector.type==='equip'?supportEquipRequirement(members(data)[selector.slot??0],selector.equip??'equip1',selector.candidate??0,defaultSupportSlot===(selector.slot??0)):null} excludedIds={selector.type==='equip'?equipCandidatesForDisplay(members(data)[selector.slot??0],selector.equip??'equip1').filter((_,index)=>index!==(selector.candidate??0)).map(ce=>ce.id):[]} onSelect={selectCatalogItem} onClose={()=>setSelector(null)}/>}
+  {selector&&<Selector type={selector.type} catalog={catalog} initialFormServant={selector.formFor?servantFor(catalog,selector.formFor):undefined} currentMember={members(data)[selector.slot??0]} supportRequirement={selector.type==='equip'?supportEquipRequirement(members(data)[selector.slot??0],selector.equip??'equip1',selector.candidate??0,defaultSupportSlot===(selector.slot??0)):null} excludedIds={selector.type==='equip'?equipCandidatesForDisplay(members(data)[selector.slot??0],selector.equip??'equip1').filter((_,index)=>index!==(selector.candidate??0)).map(ce=>ce.id):[]} onInstallSupportCE={installSupportExtension} extensionInstalling={extensionInstalling} extensionInstallDisabled={status!=='ready'} onSelect={selectCatalogItem} onClose={()=>setSelector(null)}/>}
   {modal==='common-teams'&&<CommonTeamsDialog catalog={catalog} onClose={()=>setModal(null)} onImport={async teamId=>{const r=await api('/import','POST',{source:`https://link.chaldea.center/laplace/share?id=${teamId}`});if(r.teamId!==teamId)throw new Error('Chaldea 返回的队伍与所选队伍不一致，已保留当前方案。请刷新队伍列表后重新导入。');if(!await install(r.data,null,undefined,'chaldea'))return false;setValidation(r.validation??null);setTab('team');setNotice(`Chaldea 队伍 #${teamId} 已导入草稿，请在“检查与保存”核对后保存方案。`);return true;}}/>}
   {modal==='cost'&&<PartyCostSettings summary={costSummary} limit={costLimit} onClose={()=>setModal(null)} onSave={limit=>{setCostLimit(limit);setModal(null);}}/>}
   {modal==='bond'&&<BondOptimizer data={data} catalog={catalog} preferredSupportSlot={defaultSupportSlot} initialCostLimit={costLimit} onCostLimitChange={setCostLimit} onClose={()=>setModal(null)} onApply={(response,snapshot)=>{const nextTeam=bondResultTeam(current.current,snapshot,response);apply(d=>{d.team=nextTeam;});setNotice('羁绊规划已应用到草稿，可用Ctrl+Z撤销。');}}/>}
@@ -238,7 +252,7 @@ export default function App(){
  </div>;
 }
 
-function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFormServant,currentMember,onSelect,onClose}:{type:'servant'|'equip'|'mystic';catalog:Catalog;supportRequirement?:SupportEquipRequirement|null;excludedIds?:number[];initialFormServant?:Servant;currentMember?:Json|null;onSelect:(item:Servant|Equip|Mystic,form?:ServantForm)=>void;onClose:()=>void}){
+function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFormServant,currentMember,onInstallSupportCE,extensionInstalling,extensionInstallDisabled,onSelect,onClose}:{type:'servant'|'equip'|'mystic';catalog:Catalog;supportRequirement?:SupportEquipRequirement|null;excludedIds?:number[];initialFormServant?:Servant;currentMember?:Json|null;onInstallSupportCE:(file:File)=>Promise<string>;extensionInstalling:boolean;extensionInstallDisabled:boolean;onSelect:(item:Servant|Equip|Mystic,form?:ServantForm)=>void;onClose:()=>void}){
  const [formServant,setFormServant]=useState<Servant|null>(()=>initialFormServant??null);
  const [remembered]=useState(()=>type==='servant'?loadServantSelectorPreferences(catalog.servants.length?catalog.servants.flatMap(s=>s.classKey?[s.classKey]:[]):undefined):defaultServantSelectorPreferences());
  const [equipRemembered]=useState(()=>type==='equip'?loadEquipSelectorPreferences(undefined,catalog):defaultEquipSelectorPreferences());
@@ -248,16 +262,15 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
  const [advanced,setAdvanced]=useState(newServantAdvancedFilters);
  const [supportOnly,setSupportOnly]=useState(true);
  const supportSelection=type==='equip'&&supportRequirement!==null;
- const visible=(item:Servant|Equip|Mystic)=>type!=='equip'||!excludedIds.includes(item.id)&&matchesSupportEquip(item as Equip,supportRequirement,supportOnly);
  const ownIds=type==='equip'?catalog.inventory?.equips:catalog.inventory?.servants;
  const inventoryStatus=type==='equip'?catalog.inventory?.equipsStatus:catalog.inventory?.servantsStatus;
  const hasInventory=Array.isArray(ownIds)&&(ownIds.length>0||(inventoryStatus?.available===true&&inventoryStatus?.scanComplete===true));
  const ownedActive=owned&&hasInventory;
  const inventorySummary=[inventoryStatus?.available!==true?'库存未扫描':inventoryStatus.scanComplete!==true?'库存部分扫描':'库存完整扫描',inventoryStatus?.generatedAt?`扫描时间 ${time(inventoryStatus.generatedAt)}`:null,inventoryStatus?.scanComplete!==true?'仅显示已记录项目，未出现不代表未持有':null,type==='equip'?'礼装满破状态未知':null].filter(Boolean).join(' · ');
  const searchFilters={query,classKey,rarity,owned:ownedActive,common,advanced,equipKind,equipSource,equipAdvanced:type==='equip'?equipAdvanced:undefined};
- const matches=filterCatalog(type,catalog,searchFilters).filter(visible);
+ const matches=type==='equip'?selectableEquips(catalog,searchFilters,supportRequirement,supportOnly,excludedIds):filterCatalog(type,catalog,searchFilters);
  const filtered=type==='servant'?sortServants(matches as Servant[],sortKey,direction):type==='equip'?sortEquips(matches as Equip[],equipSortKey,direction):matches;
- const withoutCommon=type==='equip'&&common?filterCatalog('equip',catalog,{...searchFilters,common:false}).filter(visible).length:0;
+ const withoutCommon=type==='equip'&&common?selectableEquips(catalog,{...searchFilters,common:false},supportRequirement,supportOnly,excludedIds).length:0;
  useEffect(()=>setPage(0),[query,classKey,rarity,owned,ownedActive,common,advanced,sortKey,direction,equipKind,equipSource,equipAdvanced,equipSortKey,supportOnly,supportRequirement]);
  useEffect(()=>{if(type==='servant')saveServantSelectorPreferences({version:1,classKey,rarity,sortKey,direction});},[type,classKey,rarity,sortKey,direction]);
  useEffect(()=>{if(type==='equip')saveEquipSelectorPreferences({version:2,rarity,common,owned,kind:equipKind,source:equipSource,advanced:equipAdvanced,sortKey:equipSortKey,direction});},[type,rarity,common,owned,equipKind,equipSource,equipAdvanced,equipSortKey,direction]);
@@ -299,6 +312,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
    {(common||ownedActive||rarity||equipKind||equipAdvancedFilterCount(equipAdvanced)>0)&&<div className="equip-active-filters" aria-label="当前礼装筛选限制"><span>当前限制</span>{common&&<button type="button" aria-label="取消常用礼装筛选" onClick={()=>setCommon(false)}>常用礼装<X size={12}/></button>}{ownedActive&&<button type="button" aria-label="取消仅持有筛选" onClick={()=>setOwned(false)}>仅持有<X size={12}/></button>}{rarity&&<button type="button" aria-label="取消礼装星级筛选" onClick={()=>setRarity('')}>★{rarity}<X size={12}/></button>}{equipKind&&<button type="button" aria-label="取消礼装类型筛选" onClick={()=>setEquipKind('')}>{catalog.equipFilters?.kinds.find(option=>option.id===equipKind)?.label??'礼装类型'}<X size={12}/></button>}{equipAdvancedFilterCount(equipAdvanced)>0&&<button type="button" aria-label="清除礼装效果与属性筛选" onClick={()=>setEquipAdvanced({...newEquipAdvancedFilters(),basis:equipAdvanced.basis})}>效果与属性 {equipAdvancedFilterCount(equipAdvanced)} 项<X size={12}/></button>}</div>}</div>
   </>}
   <div className="selector-description"><span>共 {filtered.length} 项 · {type==='equip'&&common?'常用礼装 · ':''}{type==='equip'?(supportSelection&&supportOnly?'助战可识别礼装':'编队可识别礼装'):'离线图鉴'}{type==='equip'&&common&&<small>来自本地 lizhuang 文件夹</small>}</span>{type!=="mystic"&&<span>{inventorySummary}</span>}</div>
+  {type==='equip'&&<SupportCEInstall busy={extensionInstalling} disabled={extensionInstallDisabled} common={common} onInstall={onInstallSupportCE}/>}
   <div className={`catalog-grid ${type==='servant'?'servant-catalog':''} ${type==='mystic'?'mystic-grid':''} ${type==='equip'?'equip-catalog':''}`}>{shown.map(item=>{if(type==='equip'){const equip=item as Equip;return <EquipCatalogCard key={equip.id} equip={equip} catalog={catalog} basis={equipAdvanced.basis} conditionalOnly={matchEquipAdvanced(equip,equipAdvanced).conditionalOnly} onSelect={()=>onSelect(equip)} onDetails={()=>setEquipDetail(equip)}/>;}const advancedMatch=type==='servant'?matchServantAdvanced(item as Servant,advanced):null;const npSummary=type==='servant'?npFilterSummary(item as Servant):'';return <button className="catalog-card" key={item.id} onClick={()=>type==='servant'&&(item as Servant).forms?.length?setFormServant(item as Servant):onSelect(item)}>
    {type==='mystic'?<Avatar item={item} size="catalog"/>:<div className="catalog-visual">
     <Avatar item={item} size="catalog"/>

@@ -20,6 +20,10 @@ from . import DEFAULT_PORT, PROTOCOL_VERSION, SERVICE_NAME
 from .storage import BattleStorage, EditorError, MAX_JSON_BYTES, battle_name, decode_json, project_identity, utc_now, within
 from .validation import DEFAULTS, validate_battle
 from .screenshot_import import IMAGE_TYPES, MAX_IMAGE_BYTES, ScreenshotWorker
+try:  # Both the packaged `battle_editor` and repository `agent.battle_editor` imports.
+    from support_ce import MAX_PACK_BYTES, SupportCEError, install_extension
+except ModuleNotFoundError:
+    from ..support_ce import MAX_PACK_BYTES, SupportCEError, install_extension
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +95,15 @@ class EditorHTTPServer(ThreadingHTTPServer):
                 from .catalog import build_catalog
                 self._catalog = build_catalog(self.root)
             return self._catalog
+
+    def install_support_ce(self, payload):
+        try:
+            result = install_extension(self.root, payload)
+        except SupportCEError as exc:
+            raise EditorError(exc.code, exc.message, exc.status) from exc
+        with self._catalog_lock:
+            self._catalog = None
+        return result
 
     def validate(self, data) -> dict:
         try:
@@ -405,6 +418,23 @@ class EditorHandler(BaseHTTPRequestHandler):
             self._body_read += len(chunk);chunks.append(chunk)
         return b''.join(chunks)
 
+    def _support_ce_body(self):
+        if self.headers.get_all("Transfer-Encoding", []):
+            raise EditorError("support_ce_body", "礼装扩展包传输方式无法读取，安装未开始。请刷新编队编辑器，再点击“安装礼装扩展”重新选择 ZIP。")
+        if self.headers.get("Content-Type", "").split(";")[0].strip().lower() != "application/zip":
+            raise EditorError("support_ce_format", "所选文件不是礼装扩展 ZIP，无法安装。请点击“安装礼装扩展”选择生成的 .zip 压缩包。", 415)
+        length = self._content_length()
+        if not 0 < length <= MAX_PACK_BYTES:
+            raise EditorError("support_ce_size", "礼装扩展包为空或超过 64 MiB，无法安装。请重新下载不超过 64 MiB 的礼装扩展 ZIP 后重试。", 413)
+        chunks = []
+        while self._body_read < length:
+            chunk = self.rfile.read1(min(length - self._body_read, 65536))
+            if not chunk:
+                raise EditorError("support_ce_body", "礼装扩展包没有完整接收，安装未开始。请点击“安装礼装扩展”重新选择 ZIP 后重试。")
+            self._body_read += len(chunk)
+            chunks.append(chunk)
+        return b"".join(chunks)
+
     def _file(self, path: Path):
         if not path.is_file():
             raise EditorError("not_found", "资源不存在，请确认静态页面已经构建并随包安装", 404)
@@ -451,7 +481,9 @@ class EditorHandler(BaseHTTPRequestHandler):
             if self.server._stopping.is_set():
                 raise EditorError("service_stopping", "编辑服务正在停止，请重新运行启动入口", 503)
             image_request = method == 'POST' and path == '/api/import-image'
-            body = self._image_body() if image_request else self._body() if method in ("POST", "PUT") else None
+            support_ce_request = method == 'POST' and path == '/api/support-ce/install'
+            body = (self._support_ce_body() if support_ce_request else self._image_body()
+                    if image_request else self._body() if method in ("POST", "PUT") else None)
             storage = self.server.storage
             if method == "GET" and path in ("/api/np-card", "/api/command-card"):
                 preview = self.server.card_preview(urlsplit(self.path).query, card_type="np" if path == "/api/np-card" else "face")
@@ -463,6 +495,8 @@ class EditorHandler(BaseHTTPRequestHandler):
                 self._json(200, self.server.capabilities())
             elif method == "GET" and path == "/api/catalog":
                 self._json(200, self.server.catalog())
+            elif support_ce_request:
+                self._json(200, self.server.install_support_ce(body))
             elif method == "GET" and path == "/api/common-teams/catalog":
                 self._json(200, self.server.common_team_catalog())
             elif method == "GET" and path == "/api/common-teams":

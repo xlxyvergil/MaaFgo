@@ -77,6 +77,7 @@ def validate_editor_bundle(root, *, packaged=False):
         "agent/battle_editor/__init__.py", "agent/battle_editor/main.py",
         "agent/battle_editor/launcher.py", "agent/battle_editor/server.py",
         "agent/battle_editor/catalog.py", "agent/battle_editor/storage.py",
+        "agent/support_ce.py",
         "agent/battle_editor/validation.py", "agent/battle_editor/bond_optimizer.py",
         "agent/battle_editor/special_choices.py", "agent/battle/core/special_skills.py",
         "agent/battle/core/advanced_strategy.py",

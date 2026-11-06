@@ -30,6 +30,7 @@ class MxuPackagingTests(unittest.TestCase):
             "agent/battle_editor/__init__.py", "agent/battle_editor/main.py",
             "agent/battle_editor/launcher.py", "agent/battle_editor/server.py",
             "agent/battle_editor/catalog.py", "agent/battle_editor/storage.py",
+            "agent/support_ce.py",
             "agent/battle_editor/validation.py", "agent/battle_editor/bond_optimizer.py",
             "agent/battle_editor/special_choices.py", "agent/battle/core/special_skills.py",
             "agent/battle/core/advanced_strategy.py",
@@ -135,6 +136,7 @@ class MxuPackagingTests(unittest.TestCase):
 
     def test_missing_offline_metadata_and_runtime_modules_are_rejected(self):
         for relative in ("agent/battle_editor/data/catalog.json", "agent/battle_editor/data/np_cards.json",
+                         "agent/support_ce.py",
                          "agent/battle/card_composer.py", "agent/custom/bond_matcher.py",
                          "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
                          "agent/battle_editor/share_image.py",

@@ -17,6 +17,10 @@ from urllib.parse import quote
 
 from .special_choices import special_skill_catalog
 from .equip_filters import catalog_filter_metadata, equip_filter_facts, read_equip_filters
+try:
+    from support_ce import extension_entries, resolve_external_templates
+except ModuleNotFoundError:
+    from ..support_ce import extension_entries, resolve_external_templates
 
 
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -102,9 +106,16 @@ def resolve_media(project_root: Path | str, kind: str, filename: str) -> Path | 
         "mystic": (),
         "ui": (),
         "status": (),
+        "supportce": (),
     }
     if kind not in subdirs:
         return None
+    if kind == "supportce":
+        match = re.fullmatch(r"support_([1-9][0-9]{0,9})_(normal|max)\.png", filename)
+        if match is None:
+            return None
+        eid, state = match.groups()
+        return next(iter(resolve_external_templates(root, "", "满破" if state == "max" else "非满破", int(eid))), None)
     directories = [base / sub for base in _resource_roots(root) for sub in subdirs[kind]]
     status_id = None
     if kind == "status":
@@ -254,13 +265,15 @@ def _common_equips(root: Path, equips: list[dict], raw_records: list[dict]) -> t
     return mapped, {"count": len(mapped), "unmatched": unmatched, "ambiguous": ambiguous}
 
 
-def _support_equip_recognition(root: Path, name) -> dict[str, bool]:
+def _support_equip_recognition(root: Path, name, equip_id=None) -> dict[str, bool]:
     """Mirror Chaldea's filename normalization, without importing its online clients.
 
     Team portraits and common/NFKC-name matches cannot prove support recognition.
     Directory priority mirrors SupportAction._image_dir('base', 'lizhuang').
     """
     result = {"limitBreak": False, "nonLimitBreak": False}
+    for key, state in (("limitBreak", "满破"), ("nonLimitBreak", "非满破")):
+        result[key] = bool(resolve_external_templates(root, "", state, equip_id)) if equip_id else False
     if not isinstance(name, str) or not name.strip():
         return result
     fullwidth_alnum = {code: code - 0xFEE0 for start, end in
@@ -479,8 +492,10 @@ def build_catalog(project_root: Path | str) -> dict:
     equip_filter_index = read_equip_filters(root)
     cn_names = _read(names_dir / "equip_names_CN.json", {})
     jp_names = _read(names_dir / "equip_names_JP.json", {})
+    installed = extension_entries(root)
+    extension_by_id = {str(entry["id"]): entry for entry in installed}
     equips = []
-    for key in sorted(set(recognized) | set(equip_meta) | set(cn_names) | set(jp_names), key=str):
+    for key in sorted(set(recognized) | set(equip_meta) | set(cn_names) | set(jp_names) | set(extension_by_id), key=str):
         eid = _int(key)
         if eid is None:
             continue
@@ -489,14 +504,16 @@ def build_catalog(project_root: Path | str) -> dict:
         # and complete metadata must not expand the executable selection set.
         image = _image(root, "equip", item.get("images", []), media_cache) if key in recognized else None
         image_width, image_height = _dimensions(root, image)
+        support_image = _image(root, "supportce", [f"support_{eid}_{state}.png" for state in ("normal", "max")], media_cache) if key in extension_by_id else None
         equips.append({
-            "id": eid, "name": item.get("name") or cn_names.get(key) or extra.get("name") or extra.get("nameJp") or jp_names.get(key) or f"礼装 {eid}",
+            "id": eid, "name": item.get("name") or cn_names.get(key) or extra.get("name") or extra.get("nameJp") or jp_names.get(key) or extension_by_id.get(key, {}).get("name") or f"礼装 {eid}",
             "nameJp": item.get("name_jp") or extra.get("nameJp") or jp_names.get(key, ""),
             "collectionNo": item.get("collection_no", extra.get("collectionNo")),
             "rarity": item.get("rarity", extra.get("rarity")), "cost": equip_costs.get(key),
             "recognizable": key in recognized and image is not None,
-            "supportRecognition": _support_equip_recognition(root, cn_names.get(key)),
+            "supportRecognition": _support_equip_recognition(root, cn_names.get(key), eid),
             "image": image, "imageWidth": image_width, "imageHeight": image_height,
+            "supportImage": support_image,
             "filters": equip_filter_facts(equip_filter_index, key) if key in recognized else None,
         })
     equips.sort(key=lambda item: (item["collectionNo"] or 0, item["id"]))
@@ -504,9 +521,11 @@ def build_catalog(project_root: Path | str) -> dict:
                  + [{"id": key, "nameJp": value} for key, value in jp_names.items()]
                  + list(recognized.values()) + list(equip_meta.values()))
     common_equips, common_status = _common_equips(root, equips, raw_names)
+    extension_ids = {entry["id"] for entry in installed}
     for equip in equips:
         equip["common"] = equip["id"] in common_equips
         equip["commonSources"] = common_equips.get(equip["id"], [])
+        equip["supportExtension"] = equip["id"] in extension_ids
     mystics = []
     for item in source.get("mysticCodes", []):
         code = copy.deepcopy(item)
@@ -522,6 +541,7 @@ def build_catalog(project_root: Path | str) -> dict:
         "inventory": {"servants": owned_servants, "equips": owned_equips,
                       "servantsStatus": servant_status, "equipsStatus": equip_status},
         "commonEquips": common_status,
+        "supportExtension": {"installed": len(installed)},
         "uiAssets": {
             "classes": {key: url for key, filename in ui_classes.items()
                         if (url := _image(root, "ui", [filename], media_cache))},

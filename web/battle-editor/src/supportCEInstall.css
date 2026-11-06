@@ -1,0 +1,7 @@
+.support-ce-install{display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin:-3px 0 13px;font-size:12px;line-height:1.7;color:var(--muted)}
+.support-ce-install .support-ce-install-button{display:inline-flex;align-items:center;gap:6px;padding:2px 0;white-space:nowrap;font-size:12px}
+.support-ce-install-button:disabled{cursor:wait;opacity:.65}
+.support-ce-install-error{color:var(--danger,#bd3b42)}
+.support-ce-install-spinner{animation:support-ce-install-spin 1s linear infinite}
+@keyframes support-ce-install-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.support-ce-install-spinner{animation:none}}
