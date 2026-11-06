@@ -34,10 +34,13 @@ class NativeBondOptionTests(unittest.TestCase):
             for i in range(1, 7):
                 self.assertIs(overrides[CONFIG]["attach"][f"native_bond_stop_slot_{i}"], False)
             victory = overrides["战斗_胜利"]["recognition"]
-            self.assertEqual(victory["type"], "TemplateMatch")
-            self.assertEqual(victory["param"]["template"],
-                             "battle/bond/战后结果标题.png" if enabled else "battle/下一步.png")
-            self.assertEqual(victory["param"]["roi"], [450, 0, 400, 120] if enabled else [0, 0, 0, 0])
+            if enabled:
+                self.assertEqual(victory["type"], "Or")
+                self.assertEqual(victory["param"]["any_of"], ["战斗_战后RESULT", "战斗_战利品弹窗"])
+            else:
+                self.assertEqual(victory["type"], "TemplateMatch")
+                self.assertEqual(victory["param"]["template"], "battle/下一步.png")
+                self.assertEqual(victory["param"]["roi"], [0, 0, 0, 0])
         for i, case in enumerate(selection["cases"], 1):
             self.assertEqual(case["pipeline_override"], {CONFIG: {"attach": {f"native_bond_stop_slot_{i}": True}}})
         native = read("assets/resource/base/pipeline/原生自动战斗.json")

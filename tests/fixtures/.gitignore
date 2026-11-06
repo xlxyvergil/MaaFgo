@@ -13,6 +13,8 @@
 !support_bond/*.png
 # Anonymous two-card JP servant-list last row, including the selected-card overlay.
 !servant_list/*.png
+# Retained JP loot header/button patches on a blank frame; no account values.
+!bond_stop/jp_loot_header_and_next.png
 # Anonymous CN confirmation UI and explicitly synthetic retreat-question sample.
 !main_story/cn_spirit_confirmation_retreat_negative.png
 !main_story/cn_retreat_confirmation_synthetic.png

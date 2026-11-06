@@ -65,17 +65,11 @@
               "enabled": true
             },
             "战斗_胜利": {
+              "doc": "开启羁绊守卫时提前识别RESULT，同时兼容先出现的战利品弹窗；后者必须同时命中标题与下一步，不能只凭通用下一步判定。战利品推进与有界羁绊等待见结算-战利品弹窗下一步。",
               "recognition": {
-                "type": "TemplateMatch",
+                "type": "Or",
                 "param": {
-                  "template": "battle/bond/战后结果标题.png",
-                  "roi": [
-                    450,
-                    0,
-                    400,
-                    120
-                  ],
-                  "threshold": 0.8
+                  "any_of": ["战斗_战后RESULT", "战斗_战利品弹窗"]
                 }
               }
             }

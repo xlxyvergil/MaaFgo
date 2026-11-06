@@ -487,6 +487,49 @@ class OuterLoopTests(unittest.TestCase):
         np.testing.assert_array_equal(result.latest_image, frame(9))
         ctx.wait_freezes.assert_not_called()
 
+    def test_loot_is_advanced_once_then_bond_max_still_stops(self):
+        ctx = Context(frames=[frame(1), frame(7)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(hit=name == "战斗_战利品弹窗")
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 7), \
+             patch.object(action, "read_any_bond_max", return_value=True), \
+             patch.object(action, "save_bond_stop"):
+            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+        self.assertEqual(result.reason, "bond_max")
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["结算-战利品弹窗下一步", "page_wait"])
+
+    def test_stuck_loot_does_not_click_repeatedly_or_skip_bond_check(self):
+        ctx = Context(frames=[frame(1), frame(9)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(hit=name == "战斗_战利品弹窗")
+        with patch.object(action, "read_bond_page", return_value=False), \
+             patch.object(action, "save_bond_stop"):
+            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["结算-战利品弹窗下一步", "page_wait", "page_wait"])
+
+    def test_loot_appearing_during_wait_is_advanced_before_bond_max(self):
+        ctx = Context(frames=[frame(1), frame(2), frame(7)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(
+            hit=name == "战斗_战利品弹窗" and int(image[0, 0, 0]) == 2)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 7), \
+             patch.object(action, "read_any_bond_max", return_value=True), \
+             patch.object(action, "save_bond_stop"):
+            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+        self.assertEqual(result.reason, "bond_max")
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["page_wait", "结算-战利品弹窗下一步", "page_wait"])
+
+    def test_loot_click_failure_stops_before_waiting_or_retrying(self):
+        ctx = Context(frames=[frame(1)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(hit=name == "战斗_战利品弹窗")
+        ctx.run_task.return_value = NS(status=NS(succeeded=False))
+        with patch.object(action, "read_bond_page", return_value=False), \
+             patch.object(action, "save_bond_stop"):
+            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        ctx.run_task.assert_called_once_with("结算-战利品弹窗下一步")
+
     def test_victory_handoff_recognizes_upgrade_before_bond_page_and_defers(self):
         ctx = Context(mode="slot", frames=[frame(1), frame(9)])
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)

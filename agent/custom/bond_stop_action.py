@@ -311,6 +311,19 @@ def check_settlement_bond_stop(context, image, *, controller=None) -> None:
         raise BondStopReached(result)
 
 
+def _advance_victory_loot(context, image) -> bool:
+    recognized = context.run_recognition("战斗_战利品弹窗", image)
+    if context.tasker.stopping or not recognized or not recognized.hit:
+        return False
+    mfaalog.info("[羁绊检查] 战利品弹窗位于羁绊页之前，单次点击下一步后继续检查")
+    detail = context.run_task("结算-战利品弹窗下一步")
+    if context.tasker.stopping:
+        return False
+    if detail is None or not detail.status.succeeded:
+        raise ValueError("战利品弹窗未能推进，无法进入羁绊检查。请保留当前截图反馈，并在游戏中确认“下一步”（日服“次へ”）按钮的状态。")
+    return True
+
+
 def inspect_victory_settlement(context, battle_result, controller) -> BondStop | None:
     """战斗已结束后的立即交接；关闭、战败和失败均不增加截图或识别。"""
     if not battle_result.ok or battle_result.reason != "victory" or context.tasker.stopping:
@@ -337,6 +350,9 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         else:
             guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
             wait_node, attempts, timeout = _poll_config(guard, "page_wait")
+            loot_advanced = _advance_victory_loot(context, image)
+            if context.tasker.stopping:
+                return None
             deadline = time.monotonic() + timeout / 1000
             result = None
             found_page = False
@@ -352,8 +368,11 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
                     found_page = True
                     result = inspect_bond_stop(context, image, controller=controller)
                     break
+                if not loot_advanced and _advance_victory_loot(context, image):
+                    loot_advanced = True
+                    deadline = time.monotonic() + timeout / 1000
             if not found_page:
-                raise ValueError("已确认战后RESULT，但未在配置时限内捕获羁绊结算页或羁绊升级展示")
+                raise ValueError("已识别战斗结束，但未在配置时限内捕获羁绊结算页或羁绊升级展示。无法确认是否满羁绊，已停止；请保留当前截图反馈。")
     except Exception as exc:
         result = _latch_error(context, token, evidence_image, exc, latest_image=image)
     if result:

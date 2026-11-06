@@ -691,6 +691,29 @@
             }
         }
     },
+    "战斗_战后RESULT": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "battle/bond/战后结果标题.png",
+            "roi": [450, 0, 400, 120], "threshold": 0.8
+        }}
+    },
+    "战斗_战利品弹窗": {
+        "doc": "2026-11-07日服冠位战先展示战利品弹窗，尚无RESULT标题。仅标题和下一步同时命中才确认；box_index指向下一步，供结算-战利品弹窗下一步复核后推进，不直接识别或推断羁绊。",
+        "recognition": {"type": "And", "param": {
+            "all_of": ["战斗_战利品标题", "战斗_战利品下一步"], "box_index": 1
+        }}
+    },
+    "战斗_战利品标题": {
+        "recognition": {"type": "OCR", "param": {
+            "roi": [90, 20, 390, 65],
+            "expected": ["获得.*战利品", "獲得した戦利品"], "threshold": 0.8
+        }}
+    },
+    "战斗_战利品下一步": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "battle/下一步.png", "roi": [900, 570, 380, 150], "threshold": 0.8
+        }}
+    },
     "战斗_选卡场景": {
         "recognition": {
             "type": "TemplateMatch",
