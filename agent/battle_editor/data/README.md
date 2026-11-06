@@ -40,3 +40,5 @@ python tools/build_battle_editor_catalog.py --refresh
 
 
 礼装筛选另使用 `equip_filters.json`（基础/满破效果、条件、类型/来源、属性与羁绊持有者）及 `equip_filters_sources.json`（官方来源版本与哈希）。维护运行 `python tools/build_battle_editor_equip_filters.py` 离线重建，`--refresh` 更新官方缓存；仅处理运行清单既有的礼装，不下载图片。原始整包缓存不随包发布，用户运行完全离线。470条旧羁绊分类的两字段修正通过 `agent/custom/equip_categories.json` 精确映射维护，源 CSV/Excel 本次未修改；完整规则见编辑器维护说明。
+
+修改 `agent/custom/equip_list.json` 的任何字段（包括仅用于显示分类的 `important`）后，都须运行上述离线命令，同步提交两个筛选索引；它们记录的是整个清单文件的 SHA256。提交前运行 `python -m unittest tests.test_battle_editor_equip_filters`，同时核对源清单、索引和来源清单的哈希链。
