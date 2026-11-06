@@ -1,5 +1,5 @@
 import {useEffect,useMemo,useRef,useState} from 'react';
-import {AlertTriangle,ArrowDownWideNarrow,CalendarDays,CloudDownload,Globe,Heart,LoaderCircle,RefreshCw,Shield,Sparkles,ThumbsUp,Upload,UserRound,Users} from 'lucide-react';
+import {AlertTriangle,ArrowDownWideNarrow,CalendarDays,CloudDownload,ExternalLink,Globe,Heart,LoaderCircle,RefreshCw,Shield,Sparkles,ThumbsUp,Upload,UserRound,Users} from 'lucide-react';
 import {api} from './api';
 import {Modal} from './EditorModal';
 import type {Catalog,Equip,Servant} from './model';
@@ -123,8 +123,11 @@ export function CommonTeamsDialog({catalog,onClose,onImport}:Props){
      {!loading&&!listError&&page&&teams.length===0&&<div className="common-teams-state"><Users size={34} aria-hidden="true"/><strong>{page.hasMore?'这一页没有可展示的队伍':page.total?'暂时没有可展示的队伍':'这个副本暂时没有共享队伍'}</strong><p>{page.hasMore?'可以点击下方“加载更多队伍”，继续读取下一页。':'可以选择其他副本，或稍后再试。'}</p>{!page.hasMore&&<button type="button" className="button" disabled={locked} onClick={()=>setAttempt(value=>value+1)}><RefreshCw size={15}/>重新查询</button>}</div>}
      {page&&(teams.length>0||page.hasMore)&&!listError&&<div className="common-teams-pagination">{page.hasMore?<button type="button" className="button common-teams-load-more" disabled={blocked} onClick={()=>void loadMore()}>{loading?<LoaderCircle size={16} className="common-teams-spinner"/>:<CloudDownload size={16}/>}<span>{loading?'正在加载更多…':'加载更多队伍'}</span><small>每次最多 12 个</small></button>:<span>已展示全部队伍</span>}</div>}
     </div>
-    <footer className="common-teams-footer"><Shield size={14} aria-hidden="true"/><p>导入后会进入编辑器草稿并检查方案；确认编队与行动后再保存。</p></footer>
    </>}
+   <footer className="common-teams-footer">
+    <p className="common-teams-footer-hint"><Shield size={14} aria-hidden="true"/><span>导入后会进入编辑器草稿并检查方案；确认编队与行动后再保存。</span></p>
+    <p className="common-teams-credit"><span>感谢</span><a href="https://chaldea.center/" target="_blank" rel="noopener noreferrer" aria-label="Chaldea 官网（新标签页）">Chaldea<ExternalLink size={12} aria-hidden="true"/></a><span>开发者与分享队伍的各位御主。</span></p>
+   </footer>
   </section>
  </Modal>;
 }
