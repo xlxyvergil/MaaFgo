@@ -28,10 +28,20 @@ class HellishTrialConfigTests(unittest.TestCase):
     def test_trial_points_to_shared_settings_and_keeps_its_error_exit(self):
         entry = TASK["pipeline_override"]["原生自动战斗入口"]
         self.assertEqual(entry["attach"]["native_battle_config_node"], CONFIG_NODE)
+        self.assertEqual(entry["attach"]["native_battle_trial_profile"], "hellish_202611")
         self.assertEqual(entry["on_error"], ["地狱的试炼-运行失败判分"])
         self.assertIn(entry["on_error"][0], PIPELINE)
         self.assertEqual(TASK["pipeline_override"]["执行战斗结束_不回主界面"]["next"],
                          ["地狱的试炼-结算调度"])
+
+    def test_only_trial_extends_the_chaldea_support_search(self):
+        support = TASK["pipeline_override"]["Chaldea助战action"]["attach"]
+        self.assertEqual(support["max_swipes_before_refresh"], 60)
+        self.assertFalse(support["fallback_after_refresh"])
+        for path in (ROOT / "assets/tasks").glob("*.json"):
+            if path.name == "地狱的试炼.json":
+                continue
+            self.assertNotIn("max_swipes_before_refresh", path.read_text("utf-8"), path.name)
 
     def test_trial_no_longer_installs_servant_specific_global_defaults(self):
         self.assertNotIn("地狱的试炼-战斗配置", PIPELINE)

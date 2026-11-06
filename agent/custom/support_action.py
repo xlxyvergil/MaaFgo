@@ -162,7 +162,8 @@ SWIPE_START = (559, 669)        # 滑动起点(全屏): 点击后单指移动到
 SWIPE_END = (559, 349)           # 滑动终点(全屏): 垂直向上滑动 320px（较原 400px 缩小 20%）
 SWIPE_DURATION = 500            # 滑动持续时间(ms)
 SWIPE_SETTLE = 1              # 滑动结束后等待列表稳定再识别(秒), 避免惯性滚动导致识别不准
-MAX_SWIPE_BEFORE_REFRESH = 12    # 连续滑动12次未匹配 -> 执行"助战刷新"流水线
+MAX_SWIPE_BEFORE_REFRESH = 12    # 未设置查找范围时，连续滑动12次未匹配后刷新
+MAX_SWIPE_BUDGET = 80           # 单轮列表查找范围上限，避免错误配置导致长时间无法刷新
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
 FALLBACK_REFRESH_LIMIT = 10
 CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
@@ -175,6 +176,17 @@ EMPTY_CE = ("0_空.png", "空.png")
 
 
 # ---------------- 通用工具 ----------------
+def _max_swipes_before_refresh(attach):
+    """允许特定任务查找更长的助战列表，其余任务保留原来的刷新频率。"""
+    value = attach.get("max_swipes_before_refresh", MAX_SWIPE_BEFORE_REFRESH)
+    if isinstance(value, bool) or not isinstance(value, int) or not 1 <= value <= MAX_SWIPE_BUDGET:
+        raise ValueError(
+            f"助战列表的查找范围必须是 1～{MAX_SWIPE_BUDGET} 次滑动，当前设置无法开始筛选。"
+            "请更新资源包后重试；也可先手动选好符合队伍要求的助战，再从编队界面启动。"
+        )
+    return value
+
+
 def _imread(path, gray=False):
     """支持中文路径读取图片; gray=True 返回灰度图"""
     import cv2
@@ -882,6 +894,7 @@ class SupportAction(CustomAction):
             source_mode = param.get("source_mode")
             node = context.get_node_data(argv.node_name)
             attach = node.get("attach") or {}
+            max_swipes_before_refresh = _max_swipes_before_refresh(attach)
             fallback_enabled = attach.get("fallback_after_refresh") is True
             root, token = None, ""
             try:
@@ -975,7 +988,7 @@ class SupportAction(CustomAction):
             mfaalog.info(f"[SupportAction] 助战类型={support_type} 职介={class_name or '(未选)'} "
                          f"英灵={servant_id or ('(不要求)' if skip_servant else '(未选)')} "
                          f"礼装={'/'.join(ce_names) if ce_names else '(空)'} 主动={active} 被动={passive} "
-                         f"宝具={np_level} 等级={level}")
+                         f"宝具={np_level} 等级={level} 每轮最多滑动={max_swipes_before_refresh}")
 
             pkg = _resolve_resource_package(context)
             base_dir = _image_dir(pkg)
@@ -1139,11 +1152,11 @@ class SupportAction(CustomAction):
                 mfaalog.info(f"[SupportAction] 第 {swipe_count} 次滑动, 重新识别")
                 if try_match():
                     return CustomAction.RunResult(success=True)
-                if swipe_count >= MAX_SWIPE_BEFORE_REFRESH:
+                if swipe_count >= max_swipes_before_refresh:
                     swipe_count = 0
                     if fallback_enabled and refresh_count >= FALLBACK_REFRESH_LIMIT:
                         return self._select_fallback(context, controller, root, token)
-                    mfaalog.info(f"[SupportAction] 连续{MAX_SWIPE_BEFORE_REFRESH}次滑动未匹配, 执行{REFRESH_TASK}")
+                    mfaalog.info(f"[SupportAction] 连续{max_swipes_before_refresh}次滑动未匹配, 执行{REFRESH_TASK}")
                     detail = context.run_task(REFRESH_TASK)
                     if context.tasker.stopping or detail is None or not detail.status.succeeded:
                         mfaalog.error("[SupportAction] 助战刷新失败，停止查找")

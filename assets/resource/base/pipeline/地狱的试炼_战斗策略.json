@@ -1,0 +1,13 @@
+{
+  "地狱的试炼-敌人职阶": {
+    "doc": "202611试炼专用血条证据，ARCHER=1、ASSASSIN=2、RIDER=3、CASTER=4；不按回合数猜血条。2026-11-07已用实机弓阶及视频原1280四阶段离线回放验证，活动页与助战页为负例。仅在任务标记hellish_202611且方案maaTrialStrategy.enabled=true时由专用运行时读取同一缓存截图；未知、倒退或跳阶段停止。",
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [240, 30, 140, 85],
+        "expected": ["ARCHER", "ASSASSIN", "RIDER", "CASTER"],
+        "threshold": 0.85
+      }
+    }
+  }
+}

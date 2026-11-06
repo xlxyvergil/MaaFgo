@@ -39,6 +39,8 @@ from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.data.servant_identity import canonical_servant_id
 from battle.runtime.runtime import AutoBattleRuntime
+from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRuntime,
+                                         trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
 from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
@@ -118,8 +120,12 @@ class AutoBattleAction(CustomAction):
         try:
             strategy_attach = _attached_strategy_settings(context, node_name)
             source_mode = strategy_attach.get("native_battle_strategy_source")
-            share = (_share_data_from_param(param) if plan is None or source_mode == "editor"
+            trial_node = (context.get_node_data(node_name) or {}) if node_name else {}
+            trial_requested = ((trial_node.get("attach") or {}).get("native_battle_trial_profile")
+                               == "hellish_202611" and not (support_fallback or formation_reset))
+            share = (_share_data_from_param(param) if plan is None or source_mode == "editor" or trial_requested
                      else None)
+            trial_config = trial_config_from_source(trial_node, share) if trial_requested else None
             if share is not None:
                 if plan is None:
                     plan = _build_plan_from_share(share)
@@ -149,6 +155,11 @@ class AutoBattleAction(CustomAction):
             return CustomAction.RunResult(success=False)
         roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
         decider = RuleDecider(battle_policy, plan=plan)
+        runtime_class = AutoBattleRuntime
+        if trial_config is not None:
+            decider = HellishTrialDecider(decider, trial_config)
+            runtime_class = HellishTrialRuntime
+            mfaalog.info("[试炼策略] 已由本任务标记与导入方案共同启用202611专用策略")
 
         # Agent 控制器代理仅在当前回调内复用；重复获取会使旧代理失效，
         # 回调结束后也不能交给后续结算回调，因此只获取一次并显式传递。
@@ -161,7 +172,7 @@ class AutoBattleAction(CustomAction):
             f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
         )
         try:
-            result = AutoBattleRuntime(
+            result = runtime_class(
                 context, controller, decider, profile, battle_policy,
                 initial_formation=initial_formation, formation_battle=formation_battle,
                 roster_servant_ids=roster_servant_ids,

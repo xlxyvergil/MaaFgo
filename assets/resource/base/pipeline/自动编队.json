@@ -906,6 +906,32 @@
         },
         "post_delay": 1000
     },
+    "自动编队-试炼空冠位格": {
+        "doc": "仅hellish_202611试炼显式开启空冠位格补正时读取。模板裁自2026-11-07实机attempt2_change_position.png的无遮挡GRAND SELECTABLE正文；普通SELECT、已选入冠位从者、助战及战斗画面为负例。只证明存在空冠位格，不推测已占用位置的冠位模式。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "battle/试炼空冠位编队格.png",
+                "roi": [35, 140, 1215, 478],
+                "threshold": 0.90
+            }
+        }
+    },
+    "自动编队-试炼打开空冠位格": {
+        "doc": "只点击当前实际命中的空GRAND SELECTABLE格，不使用固定第5槽。选择目标后由原有从者选择/星级职阶筛选/1200ms成员拖动复用；脚本再次确认阵容及空框消失。2026-11-07MaaMCP已验证普通1号妖兰经空冠位5号选入、再拖回1号时冠位模式随成员保留。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": ["自动编队-试炼空冠位格"],
+                "box_index": 0
+            }
+        },
+        "action": {"type": "Click", "param": {"target": true}},
+        "post_delay": 500,
+        "timeout": 5000,
+        "next": [],
+        "on_error": []
+    },
     "自动编队完成": {},
     "手动编队检查完成": {}
 }
