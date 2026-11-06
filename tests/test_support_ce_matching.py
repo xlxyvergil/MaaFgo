@@ -109,7 +109,7 @@ class SupportCEMatchingTests(unittest.TestCase):
                 result, action = self.run_chaldea_search(directory, "任意")
                 self.assertTrue(result.success)
                 action._get_detector.assert_called_once()
-                self.assertEqual(action._tap.call_count, 4)
+                self.assertEqual(action._tap.call_count, 1)  # 仅点击匹配的助战条目。
 
     def test_chaldea_preflight_rejects_missing_any_and_missing_explicit_state(self):
         with tempfile.TemporaryDirectory() as directory:

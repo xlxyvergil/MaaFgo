@@ -12,7 +12,7 @@
   2. 对每个框判定(全屏坐标 = 框左上角 + 框内锚点):
      a. 英灵   : attach.servant(servantId) -> servant_list.json.images(f_xxx);
                  attach.class_name(中文职介名) 由 英灵选择 职介 case 固定注入;
-                 any=不要求英灵, 使用 ALL 列表并跳过英灵及其技能/宝具/等级要求
+                 any=不要求英灵, 保留当前职介页签并跳过英灵及其技能/宝具/等级要求
                  与框内(95,76)中心 60x60 头像窗口匹配, 任一模板满足即可
      b. 礼装   : 普通 ce / 冠位 ce_1+ce_2(lizhuang 模板; 0_空.png 跳过)
      c. 主动技能: skill_active_1/2/3 独立键, 非0数字在锚点左下 ROI 拼接识别 >= 期望
@@ -39,6 +39,7 @@ import os
 import re
 import sys
 import time
+from functools import lru_cache
 
 import numpy as np
 
@@ -59,6 +60,7 @@ from chaldea.support_criteria import build_support_criteria
 from battle.runtime.formation_session import context_session, sessions
 from battle.core.models import Confidence
 from battle.data.servant_identity import canonical_servant_id
+from support_ce import extension_entries, resolve_external_templates
 
 # ---------------- 路径常量 ----------------
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -181,17 +183,53 @@ def _imread(path, gray=False):
     return img
 
 
-def _ce_template_paths(ce_dir, ce_name, status):
-    """任意满破状态共用已有两态模板，不引入独立资源目录。"""
+@lru_cache(maxsize=1)
+def _ce_builtin_names():
+    try:
+        with open(os.path.join(_AGENT_DIR, "utils", "Chaldea", "equip_names_CN.json"), encoding="utf-8-sig") as stream:
+            return json.load(stream)
+    except (OSError, ValueError):
+        return {}
+
+
+def _support_ce_name(equip_id):
+    name = _ce_builtin_names().get(str(equip_id))
+    if name:
+        return name
+    for entry in extension_entries(_ROOT_DIR):
+        if str(entry["id"]) == str(equip_id):
+            return entry["name"]
+    from chaldea.game_data import get_equip_name
+    return get_equip_name(equip_id)
+
+
+def _ce_template_paths(ce_dir, ce_name, status, equip_id=None):
+    """Each state uses its built-in template first, then the optional config pack."""
     statuses = CE_SUB_SWAP if status == "任意" else (status,)
-    return [os.path.join(ce_dir, sub, ce_name) if sub else os.path.join(ce_dir, ce_name)
-            for sub in statuses]
+    paths = []
+    if isinstance(ce_name, str) and ce_name.startswith("support-ce:"):
+        try:
+            equip_id = int(ce_name.split(":", 1)[1])
+        except ValueError:
+            return []
+        name = _ce_builtin_names().get(str(equip_id))
+        trans = {n: n - 0xFEE0 for a, b in ((0xFF10, 0xFF19), (0xFF21, 0xFF3A), (0xFF41, 0xFF5A)) for n in range(a, b + 1)}
+        ce_name = str(name).translate(trans).replace("/", "／").replace("\\", "＼") + ".png" if name else f"f_{equip_id}0.png"
+    # Chaldea retains stable IDs even when translated display names differ.
+    # Existing name-based custom settings remain compatible.
+    external = []
+    for sub in statuses:
+        if os.path.basename(ce_name) != ce_name or "\\" in ce_name or ":" in ce_name:
+            continue
+        paths.append(os.path.join(ce_dir, sub, ce_name) if sub else os.path.join(ce_dir, ce_name))
+        external.extend(str(path) for path in resolve_external_templates(_ROOT_DIR, ce_name, sub, equip_id))
+    return paths + external
 
 
 def _custom_ce_candidates(attach, key):
     """多选使用独立 attach 键，避免多个 case 的列表覆盖；兼容旧单选。"""
     if attach.get(f"{key}-多选") is True:
-        prefix = f"{key}-候选:"
+        prefix = f"{key}-扩展候选:" if attach.get(f"{key}-扩展包") is True else f"{key}-候选:"
         return [name[len(prefix):] for name, selected in attach.items()
                 if name.startswith(prefix) and selected is True] or [EMPTY_CE[0]]
     value = attach[key]
@@ -417,7 +455,8 @@ class SupportAction(CustomAction):
         if ce_name in EMPTY_CE:
             mfaalog.info("[SupportAction] 礼装为空(跳过匹配)")
             return True
-        tpl_paths = _ce_template_paths(ce_dir, ce_name, ce_sub)
+        equip_id = getattr(self, "_ce_ids", {}).get(ce_name)
+        tpl_paths = _ce_template_paths(ce_dir, ce_name, ce_sub, equip_id)
         tpl = next((image for path in tpl_paths
                     if (image := _imread(path, gray=True)) is not None), None)
         if tpl is None:
@@ -436,6 +475,14 @@ class SupportAction(CustomAction):
             return False
         _, score, _, (mx, my) = cv2.minMaxLoc(
             cv2.matchTemplate(roi_gray, tpl, cv2.TM_CCOEFF_NORMED))
+        if ce_sub == "任意":
+            # A star can dominate otherwise almost blank artwork. Either state
+            # is allowed, so identity matching must try both available templates.
+            for state in CE_SUB_SWAP:
+                alternate = next((image for path in _ce_template_paths(ce_dir, ce_name, state, equip_id)
+                                  if (image := _imread(path, gray=True)) is not None), None)
+                if alternate is not None and alternate.shape[0] <= roi_gray.shape[0] and alternate.shape[1] <= roi_gray.shape[1]:
+                    score = max(score, float(cv2.matchTemplate(roi_gray, alternate, cv2.TM_CCOEFF_NORMED).max()))
         if score < TH_CE:
             mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}(未过)")
             return False
@@ -451,17 +498,28 @@ class SupportAction(CustomAction):
         tpl_br = tpl[h - s2: h, w - s2: w]
         score_br = float(cv2.matchTemplate(card_br, tpl_br, cv2.TM_CCOEFF_NORMED).max())
         other_sub = CE_SUB_SWAP.get(ce_sub)
-        other = (_imread(os.path.join(ce_dir, other_sub, ce_name), gray=True)
-                 if other_sub else None)
+        other = next((image for path in _ce_template_paths(ce_dir, ce_name, other_sub, equip_id)
+                      if (image := _imread(path, gray=True)) is not None), None) if other_sub else None
         if other is not None:
             if (other.shape[1], other.shape[0]) != (w, h):
                 other = cv2.resize(other, (w, h), interpolation=cv2.INTER_AREA)
-            score_other = float(cv2.matchTemplate(card_br, other[h - s2: h, w - s2: w],
-                                                  cv2.TM_CCOEFF_NORMED).max())
+            other_br = other[h - s2: h, w - s2: w]
+            # The two full templates differ only on the star. Compare those
+            # pixels directly: NCC gives spurious 1.0 on a constant white patch.
+            mask = np.abs(tpl_br.astype(np.int16) - other_br.astype(np.int16)) > 3
+            if not np.any(mask):
+                mfaalog.warning(f"[SupportAction] 礼装 {ce_name} 的两种状态模板没有可区分的星标，无法确认满破状态")
+                return False
+            observed = card_br.astype(np.float32)
+            error_wanted = float(np.square(observed - tpl_br.astype(np.float32))[mask].mean())
+            error_other = float(np.square(observed - other_br.astype(np.float32))[mask].mean())
             mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} "
-                         f"{ce_sub}右下角={score_br:.3f} vs {other_sub}={score_other:.3f}")
-            return score_br > score_other
+                         f"{ce_sub}星标误差={error_wanted:.1f} vs {other_sub}={error_other:.1f}")
+            return error_wanted < error_other
         mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} 右下角={score_br:.3f}")
+        if float(tpl_br.std()) <= 1.0:
+            mfaalog.warning(f"[SupportAction] 礼装 {ce_name} 缺少另一状态图片，且右下角没有可区分特征，无法确认满破状态")
+            return False
         return score_br >= TH_CE_BR
 
     # ---------- 冠位羁绊判断 ----------
@@ -828,6 +886,7 @@ class SupportAction(CustomAction):
                 mfaalog.error("[SupportAction] 助战兜底需要有效的原生战斗会话")
                 return CustomAction.RunResult(success=False)
             skip_servant = False
+            self._ce_ids = {}
             if source_mode == "chaldea":
                 if attach.get("chaldea_enabled") is not True:
                     mfaalog.error(
@@ -845,7 +904,7 @@ class SupportAction(CustomAction):
                     return CustomAction.RunResult(success=False)
                 share_data, _, _ = fetch_share_data(source)
                 try:
-                    criteria = build_support_criteria(share_data, self._get_servant_map())
+                    criteria = build_support_criteria(share_data, self._get_servant_map(), resolve_name=_support_ce_name)
                 except ValueError as exc:
                     mfaalog.error(f"[SupportAction] Chaldea 助战配置无效: {exc}")
                     return CustomAction.RunResult(success=False)
@@ -859,8 +918,16 @@ class SupportAction(CustomAction):
                 if groups is None:
                     groups = [{"slot": spec["slot"], "candidates": [spec]}
                               for spec in criteria["ce_specs"]]
+                identities = {}
+                for group in groups:
+                    for spec in group["candidates"]:
+                        identities.setdefault(spec["name"], set()).add(spec.get("id"))
+                def ce_key(spec):
+                    return f"support-ce:{spec['id']}" if len(identities[spec["name"]]) > 1 and spec.get("id") else spec["name"]
+                self._ce_ids = {ce_key(spec): spec["id"] for group in groups
+                                for spec in group["candidates"] if spec.get("id")}
                 ce_targets = [
-                    ([(spec["name"], spec["status"]) for spec in group["candidates"]],
+                    ([(ce_key(spec), spec["status"]) for spec in group["candidates"]],
                      CE_ANCHOR_GRAND[group["slot"] - 1]
                      if support_type == "grand" else CE_ANCHOR_NORMAL)
                     for group in groups
@@ -907,17 +974,22 @@ class SupportAction(CustomAction):
             # 英灵头像/礼装固定放 base, 不用 pkg 区分
             face_dir = _image_dir("base", "servant_face")
             ce_dir = _image_dir("base", "lizhuang")
-            if source_mode == "chaldea":
-                for choices, _ in ce_targets:
-                    for ce_name, status in choices:
-                        if not any(os.path.isfile(path)
-                                   for path in _ce_template_paths(ce_dir, ce_name, status)):
-                            display_name = os.path.splitext(ce_name)[0]
-                            mfaalog.error(
-                                f"[SupportAction] 暂时没有 Chaldea 数据中礼装「{display_name}」的"
-                                f"{status}模板图。请联系 MaaFGO 开发者补充模板，或改用“自定义助战”继续任务。"
-                            )
-                            return CustomAction.RunResult(success=False)
+            for choices, _ in ce_targets:
+                for ce_name, status in choices:
+                    if ce_name in EMPTY_CE or (source_mode != "chaldea" and not ce_name.startswith("support-ce:")):
+                        continue
+                    if not any(os.path.isfile(path)
+                               for path in _ce_template_paths(ce_dir, ce_name, status, self._ce_ids.get(ce_name))):
+                        display_name = os.path.splitext(ce_name)[0]
+                        if ce_name.startswith("support-ce:"):
+                            eid = ce_name.split(":", 1)[1]
+                            display_name = f"{_ce_builtin_names().get(eid, '礼装')}（ID {eid}）"
+                        mfaalog.error(
+                            f"[SupportAction] 找不到礼装「{display_name}」的{status}助战图片，无法按此条件选择助战。"
+                            "请打开编队编辑器，在“选择概念礼装”中点击“安装礼装扩展”，"
+                            "选择包含该礼装的扩展包 ZIP，安装后重试；也可重新选择已有识别图片的礼装。"
+                        )
+                        return CustomAction.RunResult(success=False)
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
             skill_dir = os.path.join(base_dir, "skill")   # 视图判断模板(主动/被动), 按 pkg 动态选择
             mfaalog.info(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
@@ -942,9 +1014,11 @@ class SupportAction(CustomAction):
             controller = context.tasker.controller
             self._init_scale(controller)
 
-            # 执行所有助战选择前, 先点击对应职介的筛选 tab(全屏坐标); 间隔0.5s点击3次
-            if class_name:
-                if skip_servant or "all" in class_all:
+            # 不要求英灵时沿用游戏当前页签；指定英灵时才按职介筛选设置切换。
+            if skip_servant:
+                mfaalog.info("[SupportAction] 不要求英灵，保留当前职介页签")
+            elif class_name:
+                if "all" in class_all:
                     tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
                 else:
                     tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])

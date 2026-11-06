@@ -38,6 +38,18 @@ export async function apiImage(blob:Blob,mime:string,signal?:AbortSignal):Promis
  const body=await res.json();if(!res.ok)throw new ApiError(res.status,body);return body;
 }
 
+export type SupportCEInstallResult={installed:number;name:string;version:string};
+
+/** The local service chooses the installation directory; uploads contain no filesystem path. */
+export async function apiSupportCE(blob:Blob,signal?:AbortSignal):Promise<SupportCEInstallResult> {
+ const res=await fetch('/api/support-ce/install',{method:'POST',headers:{'Content-Type':'application/zip',...sessionHeaders()},body:blob,signal,credentials:'same-origin'});
+ let body:any;
+ try{body=await res.json();}catch{throw new Error('礼装扩展安装结果无法读取。请重新打开编队编辑器后检查礼装列表；如未安装，请再次点击“安装礼装扩展”。');}
+ if(!res.ok)throw new ApiError(res.status,body);
+ if(!body||!Number.isSafeInteger(body.installed)||body.installed<0||typeof body.name!=='string'||typeof body.version!=='string')throw new Error('礼装扩展安装结果无法确认。请重新打开编队编辑器后检查礼装列表；如未安装，请再次点击“安装礼装扩展”。');
+ return body;
+}
+
 /** Card artwork uses the same authenticated session as JSON, without putting its token in a URL. */
 export async function apiPNG(path:string,signal?:AbortSignal):Promise<{blob:Blob;portraitSource:string|null}> {
  if(!/^\/api\/(?!\/)/.test(path)||path.includes('\\'))throw new Error('卡图地址必须来自本地服务。');

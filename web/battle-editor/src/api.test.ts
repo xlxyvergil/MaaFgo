@@ -124,3 +124,37 @@ test('session handshake also works without a browser window global',async()=>{
   assert.equal((await api.session()).token,'node-test');
  });
 });
+
+test('support extension upload sends ZIP bytes to the bound authenticated installation',async()=>{
+ await withAPI(`?project=${firstProject}`,async api=>{
+  const archive=new Blob(['PK archive bytes'],{type:'application/octet-stream'}),controller=new AbortController();
+  globalThis.fetch=async(path,options)=>{
+   if(path==='/health')return json(health());
+   if(path==='/api/session')return json({token:'extension-token',projectId:firstProject});
+   assert.equal(path,'/api/support-ce/install');
+   assert.equal(options?.method,'POST');assert.equal(options?.credentials,'same-origin');
+   assert.equal(options?.body,archive);assert.equal(options?.signal,controller.signal);
+   assert.deepEqual(options?.headers,{'Content-Type':'application/zip','X-Editor-Project':firstProject,'X-Editor-Token':'extension-token'});
+   return json({installed:1110,name:'助战礼装扩展',version:'2026-11-06'});
+  };
+  await api.session();
+  assert.deepEqual(await api.apiSupportCE(archive,controller.signal),{installed:1110,name:'助战礼装扩展',version:'2026-11-06'});
+ });
+});
+
+test('support extension errors preserve the actionable backend message',async()=>{
+ await withAPI('',async api=>{
+  const message='压缩包中没有礼装清单，无法安装。请选择从 MaaFGO 下载的礼装扩展 ZIP 文件重试。';
+  globalThis.fetch=async()=>json({error:{code:'support_ce_manifest',message}},422);
+  await assert.rejects(api.apiSupportCE(new Blob(['invalid'])),error=>error instanceof api.ApiError&&error.code==='support_ce_manifest'&&error.message===message&&error.status===422);
+ });
+});
+
+test('support extension malformed responses cannot report an unconfirmed installation as success',async()=>{
+ await withAPI('',async api=>{
+  for(const response of [new Response('unreadable'),json({installed:-1,name:'扩展',version:'1'}),json({installed:1,name:'扩展'}),json(null)]){
+   globalThis.fetch=async()=>response;
+   await assert.rejects(api.apiSupportCE(new Blob(['zip'])),/重新打开编队编辑器/);
+  }
+ });
+});

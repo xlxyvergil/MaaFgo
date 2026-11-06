@@ -256,7 +256,7 @@ class ChaldeaCandidateExecutionTests(unittest.TestCase):
     def test_all_alternatives_miss_does_not_select_entry(self):
         self.assertFalse(self.run_search().success)
         self.assertEqual(self.action._match_ce.call_count, 3)
-        self.assertEqual(self.action._tap.call_count, 3)  # Only the initial class tab clicks.
+        self.action._tap.assert_not_called()
 
     def test_grand_each_cell_needs_its_own_or_match(self):
         self.item.update(grandSvt=True, equip3={'id': 404, 'candidates': [
@@ -276,7 +276,7 @@ class ChaldeaCandidateExecutionTests(unittest.TestCase):
         self.action._match_ce.side_effect = [True, False, False]
         self.assertFalse(self.run_search().success)
         self.action._match_bond.assert_not_called()
-        self.assertEqual(self.action._tap.call_count, 3)
+        self.action._tap.assert_not_called()
 
     def test_missing_template_is_reported_before_search_instead_of_ignoring_candidate(self):
         data = share(self.item)

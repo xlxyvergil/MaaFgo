@@ -103,12 +103,6 @@ export function partyCost(data:Json,catalog:Catalog):PartyCost {
    continue;
   }
   if(!positiveId(id))issue(slot,'从者 ID 无效，无法确定从者 COST。');
-  if(member.grandSvt===true){
-   // Grand discounts depend on game rules and equipped CE kind. Do not present
-   // the undiscounted servant/three-CE sum as an actual, reliable total.
-   issue(slot,'冠位从者及其礼装的折扣 COST 尚未确定，请以游戏内实际 COST 为准。');
-   continue;
-  }
   if(positiveId(id)){
    const servant=projectServantForm(catalog.servants.find(item=>item.id===id)??catalog.servants.find(item=>matchesServant(item,id)),member);
    if(!servant)issue(slot,`图鉴缺少从者 #${id}，无法确定从者 COST。`);
@@ -122,7 +116,8 @@ export function partyCost(data:Json,catalog:Catalog):PartyCost {
    else if(!validCost(essence.cost))issue(slot,`${essence.name} 缺少有效的礼装 COST。`);
    else knownTotal+=essence.cost;
   }
-  // Extra CE slots are inactive unless grandSvt is exactly true.
+  // Grand bond/reward slots (equip2/equip3) are free; only equip1 is charged.
+  // Outside a Grand slot these extra CE records are inactive.
  }
  return {knownTotal,complete:issues.length===0,issues};
 }

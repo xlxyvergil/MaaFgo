@@ -1,6 +1,25 @@
 {
   "equips": [
     {
+      "id": "9400180",
+      "collection_no": 18,
+      "name": "龙脉",
+      "rarity": 3,
+      "important": 0,
+      "images": [
+        "f_94001800.png"
+      ],
+      "name_jp": "龍脈",
+      "acquisition_category_jp": "通常（ストーリー/常駐ガチャ）",
+      "filter_tag": "通常",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      }
+    },
+    {
       "id": "9400210",
       "collection_no": 21,
       "name": "钢之锻炼",

@@ -197,6 +197,18 @@ class SpecialSkillValidationTests(unittest.TestCase):
         data["delegate"]["actWeightSelections"] = [0]
         self.assertIn("unsupported_delegate", [row["code"] for row in errors(data)])
 
+    def test_simulation_skips_do_not_block_game_execution_or_change_export(self):
+        data = battle([505300], [skill(0, 1)], {"actWeightSelections": [-1, -1]})
+        before = copy.deepcopy(data)
+        self.assertEqual(errors(data), [])
+        self.assertEqual(data, before)
+        report = validate_battle(data)
+        self.assertIn("simulation_random_skip", [row["code"] for row in report["issues"]])
+        for choices in ([0], [1], [-1, 1], [True], ["-1"], [-2]):
+            data["delegate"]["actWeightSelections"] = choices
+            with self.subTest(choices=choices):
+                self.assertIn("unsupported_delegate", [row["code"] for row in errors(data)])
+
     def test_existing_chaldea_and_bbc_fixtures_do_not_acquire_special_choices(self):
         catalog = json.loads((ROOT / "agent/battle_editor/data/catalog.json").read_text(encoding="utf-8"))
         for path in (ROOT / "tests/fixtures/chaldea").glob("*.json"):

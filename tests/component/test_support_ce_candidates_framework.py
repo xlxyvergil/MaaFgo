@@ -34,11 +34,13 @@ class CandidateOverrideFrameworkTests(unittest.TestCase):
                 for status in ("满破", "非满破")]
         baseline = {key: "旧单选.png" for key in keys}
         seen = []
+        seen_attach = []
 
         class Probe(CustomAction):
             def run(self, ctx, argv):
                 attach = ctx.get_node_data("助战action")["attach"]
                 seen.append({key: _custom_ce_candidates(attach, key) for key in keys})
+                seen_attach.append(dict(attach))
                 return True
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -62,6 +64,11 @@ class CandidateOverrideFrameworkTests(unittest.TestCase):
                 empty = []
                 single = []
                 expected = {}
+                extension = []
+                extension_empty = []
+                extension_reduced = []
+                extension_expected = {}
+                extension_reduced_expected = {}
                 for key in keys:
                     modes = options[f"{key}-选择方式"]["cases"]
                     single.append(modes[0]["pipeline_override"])
@@ -70,10 +77,35 @@ class CandidateOverrideFrameworkTests(unittest.TestCase):
                     cases = options[f"{key}-候选"]["cases"][:2]
                     multiple.extend(case["pipeline_override"] for case in cases)
                     expected[key] = [case["name"] for case in cases]
+                    self.assertEqual(modes[2]["option"], [f"{key}-扩展候选"])
+                    extended = options[f"{key}-扩展候选"]
+                    self.assertEqual(extended["type"], "checkbox")
+                    extended_cases = extended["cases"][:2]
+                    self.assertEqual(len(extended_cases), 2)
+                    extension.append(modes[2]["pipeline_override"])
+                    # In-task stale built-in selections cannot replace IDs from
+                    # the explicitly selected extension candidate source.
+                    extension.extend(case["pipeline_override"] for case in cases)
+                    extension.extend(case["pipeline_override"] for case in extended_cases)
+                    extension_empty.append(modes[2]["pipeline_override"])
+                    extension_reduced.extend([modes[2]["pipeline_override"], extended_cases[1]["pipeline_override"]])
+                    extension_expected[key] = [case["name"] for case in extended_cases]
+                    extension_reduced_expected[key] = [extended_cases[1]["name"]]
                 self.assertTrue(tasker.post_task("probe", multiple).wait().succeeded)
                 self.assertEqual(seen[-1], expected)
+                self.assertTrue(tasker.post_task("probe", extension).wait().succeeded)
+                self.assertEqual(seen[-1], extension_expected)
+                self.assertTrue(tasker.post_task("probe", extension_reduced).wait().succeeded)
+                self.assertEqual(seen[-1], extension_reduced_expected)
+                # A following task receives only its currently checked cases.
+                self.assertTrue(tasker.post_task("probe", multiple).wait().succeeded)
+                self.assertEqual(seen[-1], expected)
+                self.assertFalse(any("-扩展候选:" in name for name in seen_attach[-1]))
                 self.assertTrue(tasker.post_task("probe", single).wait().succeeded)
                 self.assertEqual(seen[-1], {key: ["旧单选.png"] for key in keys})
+                self.assertFalse(any("-扩展候选:" in name for name in seen_attach[-1]))
+                self.assertTrue(tasker.post_task("probe", extension_empty).wait().succeeded)
+                self.assertEqual(seen[-1], {key: ["0_空.png"] for key in keys})
                 self.assertTrue(tasker.post_task("probe", empty).wait().succeeded)
                 self.assertEqual(seen[-1], {key: ["0_空.png"] for key in keys})
                 self.assertEqual(resource.get_node_data("助战action")["attach"], baseline)

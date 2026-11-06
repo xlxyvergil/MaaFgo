@@ -39,6 +39,7 @@ class EditorTakeoverTests(unittest.TestCase):
         if portable:
             shutil.copytree(ROOT / 'agent/battle_editor', root / 'agent/battle_editor',
                             ignore=shutil.ignore_patterns('__pycache__', 'data'))
+            shutil.copy2(ROOT / 'agent/support_ce.py', root / 'agent/support_ce.py')
             (root / 'agent/chaldea').mkdir()
             shutil.copy2(ROOT / 'agent/chaldea/servant_aliases.py', root / 'agent/chaldea')
             (root / 'agent/battle/core').mkdir(parents=True)

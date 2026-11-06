@@ -146,8 +146,9 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
              patch.object(action, "_get_detector", side_effect=AssertionError("must not search")):
             self.assertFalse(action.run(context, argv).success)
             log_error.assert_called_with(
-                "[SupportAction] 暂时没有 Chaldea 数据中礼装「秘密任务」的满破模板图。"
-                "请联系 MaaFGO 开发者补充模板，或改用“自定义助战”继续任务。"
+                "[SupportAction] 找不到礼装「秘密任务」的满破助战图片，无法按此条件选择助战。"
+                "请打开编队编辑器，在“选择概念礼装”中点击“安装礼装扩展”，"
+                "选择包含该礼装的扩展包 ZIP，安装后重试；也可重新选择已有识别图片的礼装。"
             )
 
     def test_option_route_and_failure_propagation(self):

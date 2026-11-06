@@ -50,6 +50,7 @@ def main():
         root = Path(temporary)
         shutil.copytree(ROOT / "agent/battle_editor", root / "agent/battle_editor",
                         ignore=shutil.ignore_patterns("data", "__pycache__"))
+        shutil.copy2(ROOT / "agent/support_ce.py", root / "agent/support_ce.py")
         (root / "agent/chaldea").mkdir()
         shutil.copy2(ROOT / "agent/chaldea/servant_aliases.py", root / "agent/chaldea")
         # The offline editor shares the native strategy contract and reads the

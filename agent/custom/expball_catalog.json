@@ -10357,7 +10357,10 @@
       "name": "龙脉",
       "name_jp": "龍脈",
       "rarity": 3,
-      "images": []
+      "images": [
+        "EquipFaces/list/f_94001800.png",
+        "EquipFaces/team/f_94001800.png"
+      ]
     },
     {
       "id": "9400190",

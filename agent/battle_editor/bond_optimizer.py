@@ -214,9 +214,7 @@ class BondPlanner:
                 warnings.append(f'本地{name}库可能遗漏缺模板对象，优化范围限于已记录持有。')
         has_grand = any(m and m.get('grandSvt') for i,m in enumerate(roster) if i != reserved)
         if has_grand:
-            if options['currentCost'] is None:
-                raise EditorError('bond_grand_cost_required', '冠位三礼装保持不变，请填写已有编队实际COST后规划')
-            warnings.append('冠位从者及三礼装保持；COST从填写的实际值起算，冠位特殊羁绊效果未模拟。')
+            warnings.append('冠位从者及三礼装保持；COST只计从者和普通礼装，羁绊礼装与报酬提升礼装不计COST；冠位特殊羁绊效果未模拟。')
         elif options['currentCost'] is not None:
             raise EditorError('bond_option_invalid', '普通编队自动计算COST，不使用冠位实际COST覆盖')
 
@@ -230,15 +228,20 @@ class BondPlanner:
             record = self.servants.get(sid) or self.servants.get(identity(sid))
             if record is None:
                 raise EditorError('bond_cost_unknown', f'槽位{slot+1}从者#{sid}缺少COST资料')
-            form = self._mash_form(sid, roster[slot], slot=slot, allow_unknown=has_grand)
+            form = self._mash_form(sid, roster[slot], slot=slot, allow_unknown=has_grand and options['currentCost'] is not None)
             return {**record, **({'cost':form['cost'], 'rarity':form['rarity']} if form else {}), 'slot':slot}
-        def equip(eid, slot, stored):
+        def equip(eid, slot, stored, *, free=False):
             raw = self.equips.get(eid)
             if raw is None:
-                raise EditorError('bond_cost_unknown', f'槽位{slot+1}礼装#{eid}缺少COST资料')
+                if not free:
+                    raise EditorError('bond_cost_unknown', f'槽位{slot+1}礼装#{eid}缺少COST资料')
+                # Grand extra slots cost zero even without a catalog entry.
+                raw = {'id':str(eid), 'cost':0, 'bond':{'bonus_type':'none','bonus':0}, '_bond_unknown':True}
             item = copy.deepcopy(raw)
+            if free: item['cost'] = 0
             if item.get('_bond_unknown'):
-                warnings.append(f'槽位{slot+1}礼装#{eid}缺少常驻羁绊公式，计入COST并按零加成保守估算。')
+                cost_note = '该冠位额外礼装不计COST' if free else '计入COST'
+                warnings.append(f'槽位{slot+1}礼装#{eid}缺少常驻羁绊公式，{cost_note}并按零加成保守估算。')
             if matcher.equip_is_permanent_bond(item) and _requires_mlb(item) and stored.get('limitBreak') is not True:
                 base = [e for e in item['bond'].get('atlas_effects') or [] if isinstance(e, dict) and e.get('strength_status') == 1]
                 field = 'percent_bonus' if item['bond']['bonus_type'] == 'percent' else 'flat_bonus'
@@ -268,7 +271,7 @@ class BondPlanner:
                 if not eid and key == 'equip1':
                     eid = _id(member.get('ceId'))
                     if eid: stored = {'limitBreak':member.get('ceLimitBreak')}
-                existing = equip(eid,slot,stored) if eid else None
+                existing = equip(eid,slot,stored,free=key != 'equip1') if eid else None
                 if existing:
                     current_cost += existing['cost']
                     if matcher.equip_is_permanent_bond(existing): original_equips.append(existing)

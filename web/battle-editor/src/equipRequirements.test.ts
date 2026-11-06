@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import type {Equip,Json} from './model';
-import {matchesSupportEquip,supportEquipRequirement} from './supportEquipSelection';
+import type {Catalog,Equip,Json} from './model';
+import {matchesSupportEquip,selectableEquips,supportEquipRequirement} from './supportEquipSelection';
 import {clearEquipRequirement,equipForDisplay,hasStoredEquipRequirement,equipCandidatesForDisplay,supportsEquipCandidates,setEquipCandidate,updateEquipCandidate,removeEquipCandidate} from './equipRequirements';
 
 test('clearing slot one removes the complete object and all legacy fallback fields only',()=>{
@@ -160,4 +160,37 @@ test('support recognition is not inferred from common or team portraits and a to
  assert.equal(matchesSupportEquip(non,'any'),true);
  assert.equal(matchesSupportEquip(item(),'any',false),true);
  assert.equal(matchesSupportEquip(item(),null),true);
+});
+
+test('installed support-only pictures are selectable only in a support card-image context',()=>{
+ const extension:Equip={id:1,name:'扩展礼装',recognizable:false,image:null,supportImage:'/media/support-equip/1.png',supportExtension:true,supportRecognition:{limitBreak:true,nonLimitBreak:true}};
+ const team:Equip={id:2,name:'编队礼装',recognizable:true,image:'/media/equip/2.png',supportRecognition:{limitBreak:true,nonLimitBreak:true}};
+ const catalog:Catalog={servants:[],mysticCodes:[],equips:[extension,team,
+  {id:3,name:'元数据图片',recognizable:false,image:null,supportImage:'/media/support-equip/3.png'},
+  {id:4,name:'缺少图片',recognizable:false,image:null,supportRecognition:{limitBreak:true,nonLimitBreak:true}}]};
+ const before=structuredClone(catalog);
+ const support=selectableEquips(catalog,{},'any');
+ assert.deepEqual(support.map(e=>e.id),[1,2]);
+ assert.equal(support[0].image,extension.supportImage);assert.equal(support[0].recognizable,false);
+ assert.equal(support[0].imageWidth,158);assert.equal(support[0].imageHeight,44);
+ assert.equal(support[1],team,'existing team previews should remain unchanged');
+ assert.deepEqual(selectableEquips(catalog,{},null).map(e=>e.id),[2]);
+ assert.deepEqual(selectableEquips(catalog,{},null,false).map(e=>e.id),[2]);
+ const grand={supportType:'friend',grandSvt:true,equip1:{id:1},equip2:{id:1},equip3:{id:1}};
+ assert.deepEqual(selectableEquips(catalog,{},supportEquipRequirement(grand,'equip2')).map(e=>e.id),[2]);
+ assert.deepEqual(catalog,before,'support preview projection must not grant formation recognition');
+});
+
+test('support-only selection retains candidate state, ID exclusion and other filters',()=>{
+ const item=(id:number,limitBreak:boolean,nonLimitBreak:boolean,extra:Partial<Equip>={}):Equip=>({id,name:`扩展${id}`,rarity:5,recognizable:false,image:null,supportImage:`/media/support-equip/${id}.png`,supportRecognition:{limitBreak,nonLimitBreak},...extra});
+ const catalog:Catalog={servants:[],mysticCodes:[],equips:[item(1,true,false,{common:true}),item(2,false,true,{common:true}),item(3,true,true)],inventory:{equips:[1,2]}};
+ const member={supportType:'friend',equip1:{id:1,limitBreak:true,candidates:[{id:2,limitBreak:false}]}};
+ const before=structuredClone({catalog,member});
+ assert.deepEqual(selectableEquips(catalog,{},supportEquipRequirement(member,'equip1',0)).map(e=>e.id),[1,3]);
+ assert.deepEqual(selectableEquips(catalog,{},supportEquipRequirement(member,'equip1',1)).map(e=>e.id),[2,3]);
+ assert.deepEqual(selectableEquips(catalog,{},'any',true,[1,2]).map(e=>e.id),[3]);
+ assert.deepEqual(selectableEquips(catalog,{common:true,owned:true,rarity:'5',query:'扩展2'},'any').map(e=>e.id),[2]);
+ assert.deepEqual(selectableEquips(catalog,{common:true,rarity:'4'},'any'),[]);
+ assert.deepEqual(selectableEquips(catalog,{},'limitBreak',false,[3]).map(e=>e.id),[1,2]);
+ assert.deepEqual({catalog,member},before);
 });

@@ -134,6 +134,62 @@ class ComposerTests(unittest.TestCase):
         b = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_row=1)
         self.assertFalse(np.array_equal(a.bgra, b.bgra))
 
+    def test_explicit_default_np_file_reuses_default_cache(self):
+        a = self.composer.compose(100, 'arts', card_type='np', region='JP')
+        with patch.object(self.composer, '_read', side_effect=AssertionError('cache miss')):
+            b = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file='card_servant_np.png')
+        np.testing.assert_array_equal(a.bgra, b.bgra)
+        self.assertEqual(self.composer.cache_info()['entries'], 1)
+
+    def test_named_np_files_and_rows_have_independent_cache_keys(self):
+        default = self.composer.compose(100, 'arts', card_type='np', region='JP')
+        for filename in ('505310.png', 'card_servant_np_304802.png', 'card_servant_np4.png'):
+            names = solid((256, 256), (240, 60, 40, 255))
+            names[128:, :, :3] = (20, 140, 210)
+            write_image(self.root / '_composition/np/100' / filename, names)
+            top = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file=filename)
+            bottom = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file=filename, np_name_row=1)
+            self.assertFalse(np.array_equal(default.bgra, top.bgra))
+            self.assertFalse(np.array_equal(top.bgra, bottom.bgra))
+            with patch.object(self.composer, '_read', side_effect=AssertionError('cache miss')):
+                cached = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file=filename)
+            np.testing.assert_array_equal(cached.bgra, top.bgra)
+        self.assertEqual(self.composer.cache_info()['entries'], 7)
+
+    def test_named_np_file_preserves_portrait_and_color_selection(self):
+        write_image(self.root / '_composition/np/100/extra.png', solid((256, 256), (100, 210, 40, 255)))
+        for color in ('arts', 'buster', 'quick'):
+            first = self.composer.compose(100, color, card_type='np', region='JP', np_name_file='extra.png')
+            second = self.composer.compose(100, color, portrait_variant=11, card_type='np', region='JP', np_name_file='extra.png')
+            self.assertFalse(np.array_equal(first.bgra, second.bgra))
+
+    def test_named_np_missing_or_empty_never_substitutes_default(self):
+        with self.assertRaisesRegex(FileNotFoundError, 'missing.png'):
+            self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file='missing.png')
+        write_image(self.root / '_composition/np/100/empty.png', solid((256, 256), (0, 0, 0, 0)))
+        with self.assertRaisesRegex(ValueError, 'empty.png'):
+            self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file='empty.png')
+
+    def test_named_np_regions_are_isolated_without_jp_fallback(self):
+        relative = '_composition/np/100/extra.png'
+        write_image(self.root / relative, solid((256, 256), (100, 210, 40, 255)))
+        with self.assertRaisesRegex(FileNotFoundError, 'region=CN'):
+            self.composer.compose(100, 'arts', card_type='np', region='CN', np_name_file='extra.png')
+        write_image(self.cn_root / relative, solid((256, 256), (210, 40, 100, 255)))
+        jp = self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file='extra.png')
+        cn = self.composer.compose(100, 'arts', card_type='np', region='CN', np_name_file='extra.png')
+        self.assertFalse(np.array_equal(jp.bgra, cn.bgra))
+
+    def test_np_filename_validation_before_any_reads(self):
+        invalid = ('', '../extra.png', '..\\extra.png', '/extra.png', 'C:\\extra.png',
+                   'https://example.com/extra.png', 'extra', 'extra.jpg', 'x\x00.png', True, 123)
+        with patch.object(self.composer, '_read', side_effect=AssertionError('unexpected read')):
+            for filename in invalid:
+                with self.subTest(filename=filename), self.assertRaisesRegex(ValueError, 'np_name_file'):
+                    self.composer.compose(100, 'arts', card_type='np', region='JP', np_name_file=filename)
+            with self.assertRaisesRegex(ValueError, 'only valid for NP'):
+                self.composer.compose(100, 'arts', np_name_file='card_servant_np.png')
+
     def test_missing_variant_does_not_choose_first_portrait(self):
         with self.assertRaises(FileNotFoundError):
             self.composer.compose(100, 'buster', portrait_variant=2)
@@ -206,6 +262,19 @@ class ComposerTests(unittest.TestCase):
         self.assertNotEqual(completed.returncode, 0)
         self.assertEqual(output.read_bytes(), before)
 
+    def test_cli_named_np_export_uses_same_runtime_module(self):
+        write_image(self.root / '_composition/np/100/extra.png', solid((256, 256), (240, 60, 40, 255)))
+        output = self.root.parent / 'named-np.png'
+        cmd = [sys.executable, '-X', 'utf8', str(ROOT / 'tools/compose_command_card.py'),
+               '--servant-id', '100', '--color', 'buster', '--card-type', 'np', '--region', 'JP',
+               '--np-name-file', 'extra.png', '--np-name-row', '1', '--asset-root', str(self.root),
+               '--output', str(output), '--rgba']
+        completed = subprocess.run(cmd, capture_output=True, text=True)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        actual = cv2.imdecode(np.fromfile(output, np.uint8), cv2.IMREAD_UNCHANGED)
+        expected = self.composer.compose(100, 'buster', card_type='np', region='JP', np_name_file='extra.png', np_name_row=1)
+        np.testing.assert_array_equal(actual, expected.bgra)
+
     def test_cli_rejects_resource_destination(self):
         cmd = [sys.executable, '-X', 'utf8', str(ROOT / 'tools/compose_command_card.py'), '--servant-id', '100', '--color', 'quick', '--asset-root', str(self.root), '--output', str(self.root / 'new.png'), '--rgba']
         completed = subprocess.run(cmd, capture_output=True, text=True)
@@ -261,7 +330,10 @@ class CompositionResourceTests(unittest.TestCase):
             self.assertGreater(composer.compose(100100, color, region='CN').mask.size, 0)
         for region in ('JP', 'CN'):
             for sid, color in [(202200, 'quick'), (303800, 'arts')]:
-                self.assertGreater(composer.compose(sid, color, card_type='np', region=region).mask.size, 0)
+                default = composer.compose(sid, color, card_type='np', region=region)
+                self.assertGreater(default.mask.size, 0)
+                explicit = composer.compose(sid, color, card_type='np', region=region, np_name_file='card_servant_np.png')
+                np.testing.assert_array_equal(default.bgra, explicit.bgra)
 
     def test_new_name_images_are_not_in_legacy_portrait_directories(self):
         root = ROOT / 'assets/resource/base/image/CommandCards'

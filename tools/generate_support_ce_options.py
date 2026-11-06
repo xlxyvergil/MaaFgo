@@ -8,9 +8,19 @@ SLOTS = ("普通助战-礼装", "冠位助战-1号礼装", "冠位助战-2号礼
 STATUSES = ("满破", "非满破")
 
 
+def extension_candidates(assets):
+    """Small metadata-only lists; icons reuse team portraits already shipped."""
+    catalog = assets.parent / "agent/custom/equip_list.json"
+    if not catalog.is_file():
+        return []
+    entries = json.loads(catalog.read_text(encoding="utf-8"))["equips"]
+    return sorted(entries, key=lambda row: (row.get("collection_no", 0), int(row["id"])))
+
+
 def build_options(slot, assets):
     path = assets / "options/support" / f"{slot}.json"
     original = json.loads(path.read_text(encoding="utf-8"))["option"]
+    extended = extension_candidates(assets)
     options = {}
     for status in STATUSES:
         key = f"{slot}-{status}"
@@ -24,9 +34,22 @@ def build_options(slot, assets):
             "cases": [{
                 "name": mode, "label": mode,
                 "option": [key if mode == "单选" else candidates_key],
-                "pipeline_override": {"助战action": {"attach": {f"{key}-多选": mode == "多选"}}},
+                "pipeline_override": {"助战action": {"attach": {f"{key}-多选": mode == "多选", f"{key}-扩展包": False}}},
             } for mode in ("单选", "多选")],
         }
+        if extended:
+            options[mode_key]["cases"].append({
+                "name": "扩展礼装", "label": "扩展礼装（可多选）", "option": [f"{key}-扩展候选"],
+                "pipeline_override": {"助战action": {"attach": {f"{key}-多选": True, f"{key}-扩展包": True}}},
+            })
+            options[f"{key}-扩展候选"] = {
+                "type": "checkbox", "label": f"{label}扩展候选（可多选）", "default_case": [],
+                "description": "请先在编队编辑器的礼装选择窗口点击“安装礼装扩展”安装 ZIP。此处列出当前版本礼装目录，未安装的礼装无法识别；勾选一个为单选，多个为候选，不勾选表示不限。",
+                "cases": [{
+                    "name": f"support-ce:{row['id']}", "label": row["name"],
+                    "pipeline_override": {"助战action": {"attach": {f"{key}-扩展候选:support-ce:{row['id']}": True}}},
+                } for row in extended],
+            }
         folder = assets / "resource/base/image/lizhuang" / status
         files = sorted((p for p in folder.glob("*.png") if p.is_file() and p.name not in ("0_空.png", "空.png")),
                        key=lambda p: p.name)
