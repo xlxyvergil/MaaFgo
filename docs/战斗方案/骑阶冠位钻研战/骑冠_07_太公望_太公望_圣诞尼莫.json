@@ -1,0 +1,297 @@
+{
+  "team": {
+    "name": "骑冠_07_太公望_太公望_圣诞尼莫",
+    "mysticCode": {
+      "mysticCodeId": 210,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 404300,
+        "supportType": "none",
+        "lv": 100,
+        "tdLv": 2,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2012551,
+          2013450,
+          2014650
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9403990,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9306260,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9408220,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": false
+        },
+        "tdId": 404301
+      },
+      {
+        "svtId": 404300,
+        "supportType": "friend",
+        "lv": 100,
+        "tdLv": 2,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2012551,
+          2013450,
+          2014650
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9403520,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9306260,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9408220,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": false
+        },
+        "tdId": 404301
+      },
+      {
+        "svtId": 405300,
+        "supportType": "none",
+        "lv": 80,
+        "tdLv": 5,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2305550,
+          2306451,
+          2307650
+        ],
+        "tdId": 405301
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 405300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 405300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 405300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 0
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 404300
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 404300
+          }
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": []
+  },
+  "_guideNotes": {
+    "source": "用户提供的「骑阶冠位钻研战 配队13」截图",
+    "sourceImage": "codex-clipboard-fd16d165-8070-46d9-a0c8-bd73bf444b95.png",
+    "sourceSha256": "52b1fa61ee7a9b38673ca967924c9cdb182fb140af525f08d3e257b6a04463da",
+    "status": "根据攻略截图转写；已做离线格式、助战资源及原生战斗转换检查，未实机验证伤害或通关。",
+    "executor": "原生自动战斗；导入方式选择 Chaldea 队伍，助战选择使用编辑器/Chaldea 配置。",
+    "formation": "保留原图前排次序；后三槽不要求，使用前请确保无额外候补影响 Cost 或战斗。",
+    "support": "按原图红色助战标记，将第二槽太公望设置为助战。",
+    "requirements": [
+      "双太公望均为冠位、魔力装填Lv10（20% NP）、至少宝具2；ATK配置尽量高。",
+      "两人的羁绊均采用初始效果（保留全体宝具增伤），不用NP50替换；20附加+自身50+另一个太公望20+圣诞尼莫10可达100。",
+      "主御主服采用图示决战服，1技能全体加攻与宝具威力；不使用换人技能。"
+    ],
+    "adaptations": [
+      "原图未区分两个太公望的宝具先后，按自有第一、助战第二施放。",
+      "第三张设置默认普通卡，原生高级策略Q权重100、其余与额外连携权重0；识别到可攻击绿卡时优先任意从者绿卡，无绿卡用其他普通卡。",
+      "图中圣诞尼莫替换为其他船长的建议未展开为额外脚本，避免为不同充能技能套用同一序列。"
+    ],
+    "manualSetup": [
+      "从者、宝具、主动技能强化及附加技能必须在游戏中已达到所列条件，JSON 不会自动升级。",
+      "冠位从者的礼装当前不会由自动编队调整；须在游戏中手动装备普通/羁绊/追加三槽，并核对羁绊 NP50 或初始效果。",
+      "骑阶普通树、冠位树的具体节点和御主技能强化需手动核对；classBoardData 中只记录可读取的羁绊效果，未虚构树节点字段。",
+      "御主礼装按 Lv10 记录；图中未给出等级，低等级或缺少冠位御主强化时伤害可能不足。"
+    ],
+    "turn1": "自有太公望1、2、3；助战太公望1、2、3；圣诞尼莫1、2、3；决战服1；自有太公望宝具→助战太公望宝具→优先任意从者绿卡，无绿卡则普通卡补齐。",
+    "afterScript": "仅配置 T1；未击杀时，固定回合结束后交回原生通用战斗逻辑，不能视为攻略保证一回合击杀。",
+    "dataReferences": [
+      "https://api.atlasacademy.io/nice/JP/servant/404300",
+      "https://api.atlasacademy.io/nice/JP/servant/404300",
+      "https://api.atlasacademy.io/nice/JP/servant/405300"
+    ]
+  },
+  "maaAdvancedStrategy": {
+    "preset": "balanced",
+    "openingHand": {
+      "enabled": false
+    },
+    "nativeStrategyOverrides": {
+      "enabled": true,
+      "prefer_brave_chain": false,
+      "brave_chain_weight": 0,
+      "mighty_chain_weight": 0,
+      "same_color_chain_weight": 0,
+      "servant_priority_weight": 0,
+      "color_weights": {
+        "B": 0,
+        "A": 0,
+        "Q": 100
+      },
+      "np_colors_by_servant_id": {
+        "404300": "Q"
+      }
+    }
+  }
+}

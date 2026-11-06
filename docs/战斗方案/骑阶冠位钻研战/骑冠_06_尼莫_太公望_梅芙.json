@@ -1,0 +1,288 @@
+{
+  "team": {
+    "name": "骑冠_06_尼莫_太公望_梅芙",
+    "mysticCode": {
+      "mysticCodeId": 110,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 403700,
+        "supportType": "none",
+        "lv": 90,
+        "tdLv": 1,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2555550,
+          760466,
+          806352
+        ],
+        "tdId": 403701
+      },
+      {
+        "svtId": 404300,
+        "supportType": "friend",
+        "lv": 100,
+        "tdLv": 2,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2012551,
+          2013450,
+          2014650
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9408220,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9306260,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9408800,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": false
+        },
+        "tdId": 404301
+      },
+      {
+        "svtId": 401300,
+        "supportType": "none",
+        "lv": 100,
+        "tdLv": 1,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          867551,
+          293550,
+          528350
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9408220,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9300930,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9408800,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": true
+        },
+        "tdId": 401302
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 403700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 403700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 403700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 401300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 401300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 401300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 2
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 403700
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 404300
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 2,
+            "svtId": 401300
+          }
+        }
+      ],
+      "options": {
+        "enemyTarget": 2
+      }
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": []
+  },
+  "_guideNotes": {
+    "source": "用户提供的「骑阶冠位钻研战 配队08」截图",
+    "sourceImage": "codex-clipboard-0fa6a2ff-0fab-4a0c-8229-9b067e86089d.png",
+    "sourceSha256": "9e71629df1e8c650efd27502699f1d519031040f782af7a3f8edc58fe03da1ad",
+    "status": "根据攻略截图转写；已做离线格式、助战资源及原生战斗转换检查，未实机验证伤害或通关。",
+    "executor": "原生自动战斗；导入方式选择 Chaldea 队伍，助战选择使用编辑器/Chaldea 配置。",
+    "formation": "保留原图前排次序；后三槽不要求，使用前请确保无额外候补影响 Cost 或战斗。",
+    "support": "按原图红色助战标记，将第二槽太公望设置为助战。",
+    "requirements": [
+      "三人魔力装填均 Lv10（20% NP）；梅芙必须点出冠位初始10% NP。",
+      "太公望与梅芙普通骑阶树点满；冠位树至少点出对应魔放和三色连携；ATK尽量堆高。",
+      "梅芙羁绊效果必须选 NP50，否则20附加+20太公望群充+10冠位只有50，无法开宝具。",
+      "太公望使用原始羁绊效果以保留宝具增伤；20附加+50自身与群充+梅芙30群充可达100。",
+      "尼莫、梅芙需已完成相关技能与宝具强化；梅芙3的降防有失败可能，不保证击杀。"
+    ],
+    "adaptations": [
+      "原图未写出羁绊效果开关：按开局充能推导为太公望初始效果、梅芙NP50，未把二者统一设成同一种。",
+      "enemyTarget=2是Chaldea从右向左的编号，原生转换为屏幕左侧敌人1。请核对本关该槽确为左上约70万血的马，未实现按HP自动找敌。"
+    ],
+    "manualSetup": [
+      "从者、宝具、主动技能强化及附加技能必须在游戏中已达到所列条件，JSON 不会自动升级。",
+      "冠位从者的礼装当前不会由自动编队调整；须在游戏中手动装备普通/羁绊/追加三槽，并核对羁绊 NP50 或初始效果。",
+      "骑阶普通树、冠位树的具体节点和御主技能强化需手动核对；classBoardData 中只记录可读取的羁绊效果，未虚构树节点字段。",
+      "御主礼装按 Lv10 记录；图中未给出等级，低等级或缺少冠位御主强化时伤害可能不足。"
+    ],
+    "turn1": "尼莫1、2、3；太公望1、2、3；梅芙1、2、3；极地服2给梅芙；选左侧敌方（原图左上约70万血的马）；尼莫宝具→太公望宝具→梅芙宝具。",
+    "afterScript": "仅配置 T1；未击杀时，固定回合结束后交回原生通用战斗逻辑，不能视为攻略保证一回合击杀。",
+    "dataReferences": [
+      "https://api.atlasacademy.io/nice/JP/servant/403700",
+      "https://api.atlasacademy.io/nice/JP/servant/404300",
+      "https://api.atlasacademy.io/nice/JP/servant/401300"
+    ]
+  }
+}

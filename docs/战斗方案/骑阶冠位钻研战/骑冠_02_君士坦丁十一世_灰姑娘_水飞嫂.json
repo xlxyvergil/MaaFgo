@@ -1,0 +1,242 @@
+{
+  "team": {
+    "name": "骑冠_02_君士坦丁十一世_灰姑娘_水飞嫂",
+    "mysticCode": {
+      "mysticCodeId": 110,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 404700,
+        "supportType": "none",
+        "lv": 100,
+        "tdLv": 1,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          2052349,
+          2053650,
+          2054350
+        ],
+        "grandSvt": true,
+        "equip2": {
+          "id": 9306400,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": true
+        },
+        "tdId": 404702
+      },
+      {
+        "svtId": 404600,
+        "supportType": "friend",
+        "lv": 100,
+        "tdLv": 5,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          951450,
+          952550,
+          953650
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9306200,
+          "limitBreak": true,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9408220,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": true
+        },
+        "tdId": 404601
+      },
+      {
+        "svtId": 402700,
+        "supportType": "none",
+        "lv": 80,
+        "tdLv": 1,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "skillIds": [
+          390550,
+          391551,
+          2697650
+        ],
+        "tdId": 402701
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 404700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 404700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404600
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 404600
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      },
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 402700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 402700
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 404700
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 404600
+          }
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": []
+  },
+  "_guideNotes": {
+    "source": "用户提供的「骑阶冠位钻研战 配队03」截图",
+    "sourceImage": "codex-clipboard-80dfc5a5-0205-46a1-866a-1aef0ca77743.png",
+    "sourceSha256": "564dcfdb77e7d41fb44d10b959a33ccb20d48f9a159cbc5e7ca0fcbe0e2f3512",
+    "status": "根据攻略截图转写；已做离线格式、助战资源及原生战斗转换检查，未实机验证伤害或通关。",
+    "executor": "原生自动战斗；导入方式选择 Chaldea 队伍，助战选择使用编辑器/Chaldea 配置。",
+    "formation": "保留原图前排次序；后三槽不要求，使用前请确保无额外候补影响 Cost 或战斗。",
+    "support": "原图未标注助战，生成时将主输出设为第二槽助战；可在编辑器改选其他槽位，必须保证恰好一个助战。",
+    "requirements": [
+      "君十一、灰姑娘魔力装填 Lv10（20% NP），两人的冠位羁绊效果均选择 NP50。",
+      "骑阶普通树点满；灰姑娘冠位树需要 Buster 魔放与御主技能强化；君十一强化宝具，水飞嫂3技能需强化。"
+    ],
+    "adaptations": [
+      "图中没有注明水飞嫂2技能的单体目标，此处设为灰姑娘。",
+      "水飞嫂可换羽蛇神、诺亚、大帝等为攻略文字中的替换建议，本批仅生成原图阵容，不自动替换从者或动作。"
+    ],
+    "manualSetup": [
+      "从者、宝具、主动技能强化及附加技能必须在游戏中已达到所列条件，JSON 不会自动升级。",
+      "冠位从者的礼装当前不会由自动编队调整；须在游戏中手动装备普通/羁绊/追加三槽，并核对羁绊 NP50 或初始效果。",
+      "骑阶普通树、冠位树的具体节点和御主技能强化需手动核对；classBoardData 中只记录可读取的羁绊效果，未虚构树节点字段。",
+      "御主礼装按 Lv10 记录；图中未给出等级，低等级或缺少冠位御主强化时伤害可能不足。"
+    ],
+    "turn1": "君十一2、3；灰姑娘2、3；水飞嫂2给灰姑娘、3；极地服2给灰姑娘；君十一宝具→灰姑娘宝具→默认普通卡。",
+    "afterScript": "仅配置 T1；未击杀时，固定回合结束后交回原生通用战斗逻辑，不能视为攻略保证一回合击杀。",
+    "dataReferences": [
+      "https://api.atlasacademy.io/nice/JP/servant/404700",
+      "https://api.atlasacademy.io/nice/JP/servant/404600",
+      "https://api.atlasacademy.io/nice/JP/servant/402700"
+    ]
+  }
+}

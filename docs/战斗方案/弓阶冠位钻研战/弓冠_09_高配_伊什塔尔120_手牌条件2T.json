@@ -1,0 +1,430 @@
+{
+  "quest": {
+    "id": 94150847,
+    "phase": 1,
+    "enemyHash": "1_0118_ac5cc1d"
+  },
+  "team": {
+    "name": "弓冠_09_高配_伊什塔尔120_手牌条件2T",
+    "mysticCode": {
+      "mysticCodeId": 50,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 202000,
+        "limitCount": 4,
+        "skillIds": [
+          305450,
+          306550,
+          2520550
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          0,
+          0,
+          10,
+          0
+        ],
+        "tdId": 202002,
+        "tdLv": 5,
+        "lv": 120,
+        "atkFou": 2000,
+        "hpFou": 1000,
+        "ceId": 9401970,
+        "ceLimitBreak": true,
+        "ceLv": 15,
+        "equip1": {
+          "id": 9401970,
+          "limitBreak": true,
+          "lv": 15
+        },
+        "equip2": {
+          "id": 9301470,
+          "limitBreak": true,
+          "lv": 1
+        },
+        "equip3": {
+          "id": 9403520,
+          "limitBreak": true,
+          "lv": 15
+        },
+        "supportType": "none",
+        "cardStrengthens": [
+          0,
+          0,
+          0,
+          500,
+          500
+        ],
+        "commandCodeIds": [
+          null,
+          null,
+          null,
+          8400520,
+          8400420
+        ],
+        "grandSvt": true,
+        "classBoardData": {
+          "grandBondEquipSkillChange": false,
+          "classBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "grandClassBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "classStatistics": [
+            {
+              "classId": 2,
+              "type": 1,
+              "typeVal": 62
+            },
+            {
+              "classId": 2,
+              "type": 2,
+              "typeVal": 200
+            }
+          ]
+        }
+      },
+      {
+        "svtId": 205400,
+        "limitCount": 4,
+        "skillIds": [
+          2545450,
+          2546450,
+          2547450
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "tdId": 205401,
+        "tdLv": 1,
+        "lv": 90,
+        "atkFou": 1000,
+        "hpFou": 1000,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {
+          "id": null,
+          "limitBreak": false,
+          "lv": 0
+        },
+        "supportType": "friend",
+        "grandSvt": false
+      },
+      {
+        "svtId": 202200,
+        "limitCount": 4,
+        "skillIds": [
+          430550,
+          431450,
+          432650
+        ],
+        "skillLvs": [
+          10,
+          9,
+          4
+        ],
+        "tdId": 202201,
+        "tdLv": 5,
+        "lv": 80,
+        "atkFou": 1000,
+        "hpFou": 1000,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {
+          "id": null,
+          "limitBreak": false,
+          "lv": 0
+        },
+        "supportType": "none",
+        "grandSvt": false
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "delegate": {},
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 202000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1
+      },
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 202200
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 3,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 205400
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 202000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 202000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "options": {
+        "playerTarget": 0
+      },
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 202200
+      }
+    },
+    {
+      "type": "skill",
+      "skill": 1
+    },
+    {
+      "type": "skill",
+      "skill": 0,
+      "options": {
+        "playerTarget": 0
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 2,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 202000
+          }
+        },
+        {
+          "svt": 0,
+          "card": 3,
+          "isTD": false,
+          "critical": true,
+          "cardType": 2,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 202000
+          }
+        },
+        {
+          "svt": 0,
+          "card": 4,
+          "isTD": false,
+          "critical": true,
+          "cardType": 2,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 202000
+          }
+        }
+      ]
+    }
+  ],
+  "_guideNotes": {
+    "source": "https://link.chaldea.center/laplace/share?id=94073",
+    "sourceTeamId": 94073,
+    "sourceUsername": "moyou",
+    "retrievedAt": "2026-11-01",
+    "votes": {
+      "up": 15,
+      "down": 1
+    },
+    "rankingQuery": "https://api.chaldea.center/api/v1/teams/?questId=94150847&sort=upvotes&limit=100&offset=0",
+    "sourceSha256": "22391340351d7da97155863f6aea7f96592a5a739377f754b4c6d9fafcc6dd6d",
+    "quest": "冠位研鑽戦〔アーチャー〕Ⅶ，Lv100★★★，Quest 94150847 phase1，Gilgamesh HP2200189。",
+    "category": "高配/高练度",
+    "investment": "自有120级宝5伊什塔尔、两张红卡各强化500并刻指令纹章；借90级宝1泳装提亚马特；T2需两张伊什塔尔红卡并暴击。",
+    "turns": 2,
+    "status": "Chaldea原作配置2回合；已转换并检查数据和原生计划，未实测通关。依赖指定手牌和暴击，不是稳定全自动2T保证。",
+    "handRequirements": "需满足每回合原作指定的从者/卡色；critical只是原站模拟标记，原生无法保证暴击。",
+    "manualSetup": [
+      "保留原作等级、宝具、技能、附加、金芙芙、指令纹章、卡强化、冠位树与羁绊开关；JSON不会自动升级或复现模拟器伤害。",
+      "目前自动编队跳过冠位从者的礼装修改；必须先在游戏手动核对普通/羁绊/追加三槽。",
+      "助战选择使用编辑器/Chaldea配置，原生自动战斗调用本文件；自有冠位弓必须实际拥有。",
+      "指定卡不存在或宝具不可用时，执行器会用普通卡补齐，因此不能把未满足条件的两回合计划当作固定通关承诺。"
+    ],
+    "adaptations": [
+      "原作未设置助战；将初始第2槽幼体／提亚马特标为好友助战，未改变从者/技能/宝具/等级/礼装。",
+      "移除7处非单体选人技能的仿真playerTarget默认值，避免原生执行误点；只保留实际单体技能的选人目标。",
+      "移除动作中的仿真random/threshold，保留原始文件与SHA256；攻击颜色、critical标记、技能次序与换人次序保持原作。",
+      "Atlas关卡资料确认全程只有一个Boss；移除Laplace默认enemyTarget=1，使用游戏唯一敌方目标，避免被转换为不存在的原生敌人第2槽。",
+      "为技能及宝具/普通卡添加动态actor实例绑定，换人后仍绑定真实初始成员；双同名从者不会混为同一个实例。"
+    ],
+    "originalSimulation": {
+      "minBuild": 933,
+      "appBuild": 987,
+      "options": {
+        "mightyChain": true,
+        "disableEvent": false,
+        "pointBuffs": null,
+        "simulateAi": true,
+        "enemyRateUp": null
+      },
+      "isCritTeam": false
+    }
+  }
+}

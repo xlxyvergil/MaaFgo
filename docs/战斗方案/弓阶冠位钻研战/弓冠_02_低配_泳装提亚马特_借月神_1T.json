@@ -1,0 +1,372 @@
+{
+  "quest": {
+    "id": 94150847,
+    "phase": 1,
+    "enemyHash": "1_0118_ac5cc1d"
+  },
+  "team": {
+    "name": "弓冠_02_低配_泳装提亚马特_借月神_1T",
+    "mysticCode": {
+      "mysticCodeId": 110,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 205400,
+        "limitCount": 0,
+        "skillIds": [
+          2545450,
+          2546450,
+          2547450
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          0
+        ],
+        "tdId": 205401,
+        "tdLv": 1,
+        "lv": 100,
+        "atkFou": 2000,
+        "hpFou": 2000,
+        "ceLimitBreak": true,
+        "ceLv": 100,
+        "equip1": {
+          "id": null,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9310500,
+          "limitBreak": false,
+          "lv": 1
+        },
+        "supportType": "none",
+        "grandSvt": true,
+        "classBoardData": {
+          "grandBondEquipSkillChange": true,
+          "classBoardSquares": [],
+          "grandClassBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "classStatistics": [
+            {
+              "classId": 2,
+              "type": 1,
+              "typeVal": 62
+            },
+            {
+              "classId": 2,
+              "type": 2,
+              "typeVal": 200
+            }
+          ]
+        }
+      },
+      {
+        "svtId": 200900,
+        "limitCount": 4,
+        "skillIds": [
+          104650,
+          105551,
+          2613551
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "appendLvs": [
+          0,
+          10,
+          10,
+          0,
+          0
+        ],
+        "tdId": 200902,
+        "tdLv": 5,
+        "lv": 120,
+        "atkFou": 2000,
+        "hpFou": 1000,
+        "ceId": 9400480,
+        "ceLimitBreak": true,
+        "ceLv": 100,
+        "equip1": {
+          "id": 9400480,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9300310,
+          "limitBreak": false,
+          "lv": 1
+        },
+        "equip3": {
+          "id": 9401970,
+          "limitBreak": false,
+          "lv": 39
+        },
+        "supportType": "friend",
+        "grandSvt": true,
+        "classBoardData": {
+          "grandBondEquipSkillChange": true,
+          "classBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "grandClassBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "classStatistics": [
+            {
+              "classId": 2,
+              "type": 1,
+              "typeVal": 62
+            },
+            {
+              "classId": 2,
+              "type": 2,
+              "typeVal": 200
+            }
+          ]
+        }
+      },
+      null
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "delegate": {},
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 200900
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 200900
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 200900
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 205400
+      }
+    },
+    {
+      "type": "skill",
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 3,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 205400
+          }
+        },
+        {
+          "svt": 1,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 200900
+          }
+        }
+      ]
+    }
+  ],
+  "_guideNotes": {
+    "source": "https://link.chaldea.center/laplace/share?id=92274",
+    "sourceTeamId": 92274,
+    "sourceUsername": "biggold",
+    "retrievedAt": "2026-11-01",
+    "votes": {
+      "up": 3,
+      "down": 1
+    },
+    "rankingQuery": "https://api.chaldea.center/api/v1/teams/?questId=94150847&sort=upvotes&limit=100&offset=0",
+    "sourceSha256": "b2bd28d8775b81cfc4e4a0f0b0934d15a2ee98b9f1482ffb604e24307dbacef9",
+    "quest": "冠位研鑽戦〔アーチャー〕Ⅶ，Lv100★★★，Quest 94150847 phase1，Gilgamesh HP2200189。",
+    "category": "相对低配",
+    "investment": "自有100级宝1冠位泳装提亚马特，借120级宝5冠位月神；低配指自有配置，助战要求很高。",
+    "turns": 1,
+    "status": "Chaldea原作配置1回合；已转换并检查数据和原生计划，未实测通关。含普通卡时仍受发牌与伤害影响。",
+    "handRequirements": "原作指定出卡全为宝具；缺NP、封印、弱化失败、树节点或伤害不足仍会导致结果不同。",
+    "manualSetup": [
+      "保留原作等级、宝具、技能、附加、金芙芙、指令纹章、卡强化、冠位树与羁绊开关；JSON不会自动升级或复现模拟器伤害。",
+      "目前自动编队跳过冠位从者的礼装修改；必须先在游戏手动核对普通/羁绊/追加三槽。",
+      "助战选择使用编辑器/Chaldea配置，原生自动战斗调用本文件；自有冠位弓必须实际拥有。",
+      "指定卡不存在或宝具不可用时，执行器会用普通卡补齐，因此不能把未满足条件的两回合计划当作固定通关承诺。"
+    ],
+    "adaptations": [
+      "移除6处非单体选人技能的仿真playerTarget默认值，避免原生执行误点；只保留实际单体技能的选人目标。",
+      "移除动作中的仿真random/threshold，保留原始文件与SHA256；攻击颜色、critical标记、技能次序与换人次序保持原作。",
+      "Atlas关卡资料确认全程只有一个Boss；移除Laplace默认enemyTarget=1，使用游戏唯一敌方目标，避免被转换为不存在的原生敌人第2槽。",
+      "为技能及宝具/普通卡添加动态actor实例绑定，换人后仍绑定真实初始成员；双同名从者不会混为同一个实例。"
+    ],
+    "originalSimulation": {
+      "minBuild": 933,
+      "appBuild": 988,
+      "options": {
+        "mightyChain": true,
+        "disableEvent": false,
+        "pointBuffs": null,
+        "simulateAi": true,
+        "enemyRateUp": null
+      },
+      "isCritTeam": false
+    }
+  }
+}
