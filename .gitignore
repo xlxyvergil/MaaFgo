@@ -24,6 +24,11 @@ UPDATE_*.md
 /docs/B站更新公告编辑规范.md
 /docs/安卓使用指南_B站_20261018.html
 
+# 冠位钻研战个人方案与一图流，仅保留本地
+/docs/战斗方案/弓阶冠位钻研战/
+/docs/战斗方案/术阶冠位钻研战/
+/docs/战斗方案/骑阶冠位钻研战/
+
 # docs
 docs/node_modules
 docs/.vuepress/.temp
