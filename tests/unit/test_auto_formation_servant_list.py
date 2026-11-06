@@ -53,6 +53,22 @@ class ServantListFeatureTests(unittest.TestCase):
         match = f._match_servant_list_cards(page, [("f_1036300.png", self.grand)])
         self.assertTrue(match is None or match[1] != (551, 159))
 
+    def test_two_matching_card_positions_report_duplicate_candidates(self):
+        page = self.page_with_target()
+        page[202:360, 97:255] = self.grand
+        for image, scale in ((page, 1.0), (cv2.resize(page, (2560, 1440)), 2.0)):
+            with self.subTest(scale=scale):
+                match = f._match_servant_list_cards(
+                    image, [("f_1036300.png", self.grand)], scale, scale)
+                self.assertTrue(f.AutoFormationFromChaldea._servant_list_has_duplicate_candidates(match))
+
+    def test_multiple_templates_for_one_card_are_not_duplicate_candidates(self):
+        match = f._match_servant_list_cards(self.page_with_target(), [
+            ("first-variant.png", self.grand), ("same-card-variant.png", self.grand.copy()),
+        ])
+        self.assertTrue(f.AutoFormationFromChaldea._servant_list_match_accepted(match))
+        self.assertFalse(f.AutoFormationFromChaldea._servant_list_has_duplicate_candidates(match))
+
 
 if __name__ == "__main__":
     unittest.main()

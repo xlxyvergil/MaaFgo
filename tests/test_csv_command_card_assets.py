@@ -129,5 +129,21 @@ class CsvCommandAssetsTests(unittest.TestCase):
         self.assertEqual(report['atlas_not_in_csv'],['300'])
         self.assertFalse(any(job['id']=='300' for job in report['planned']))
 
+    def test_declared_transform_adds_own_portraits_without_csv_name_fallback(self):
+        self.nice['functions'] = [{'funcType': 'transformServant', 'svals': [{'Value': 300}]}]
+        original_fetch = self.fetch
+        form = {'id': 300, 'collectionNo': 0, 'extraAssets': {'commands': {'ascension': {'1': syncer.STATIC + '/JP/Servants/Commands/300/card_servant_1.png'}}},
+                'functions': [{'funcType': 'transformServant', 'svals': [{'Value': 100}]}]}
+        def fetch(url):
+            if url.endswith('/nice/JP/servant/300'):
+                return json.dumps(form).encode()
+            return original_fetch(url)
+        report = syncer.sync(self.project, self.csv, fetcher=fetch, write=True)
+        self.assertEqual(report['forms']['100'], ['300'])
+        manifest = json.loads((self.project / 'assets/resource/base/image/CommandCards/manifest').read_text('utf8'))
+        self.assertIn('300', manifest['servants'])
+        self.assertTrue((self.project / 'assets/resource/base/image/CommandCards/300/card_servant_1.png').exists())
+        self.assertEqual(manifest['servants']['300'][0]['quantization_profile'], 'libimagequant-256-alpha-classes-v1')
+
 
 if __name__=='__main__':unittest.main()
