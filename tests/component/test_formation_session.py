@@ -204,6 +204,42 @@ class EntryTests(unittest.TestCase):
         self.assertEqual([x[1] for x in snapshots], [1, 2, 3])
         self.assertTrue(all(x[0] is snapshots[0][0] for x in snapshots))
 
+    def test_trial_repeat_uses_full_entry_and_own_count_attach(self):
+        ctx = FakeContext()
+        ctx.nodes["地狱的试炼-入口"] = {"attach": {"battle_count": "3"}}
+        ctx.nodes["原生自动战斗_多次入口"] = {"attach": {"battle_count": "9"}}
+        ctx.run_task.return_value = NS(status=NS(succeeded=True, failed=False))
+        result = r.AutoBattleRepeatAction().run(ctx, NS(node_name="地狱的试炼-入口", custom_action_param={
+            "battle_entry_node": "地狱的试炼-单场入口", "reset_hit_nodes": ["试炼有界节点"],
+        }))
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["地狱的试炼-单场入口"] * 3)
+        self.assertTrue(all(call.kwargs["pipeline_override"] == {} for call in ctx.run_task.call_args_list))
+        self.assertEqual(ctx.clear_hit_count.call_count, 3)
+
+    def test_trial_repeat_stops_on_failed_round_without_starting_next(self):
+        ctx = FakeContext()
+        ctx.run_task.side_effect = [
+            NS(status=NS(succeeded=True, failed=False)),
+            NS(status=NS(succeeded=False, failed=True), entry="地狱的试炼-单场入口"),
+        ]
+        result = r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param={
+            "battle_count": 3, "battle_entry_node": "地狱的试炼-单场入口",
+        }))
+        self.assertFalse(result.success)
+        self.assertEqual(ctx.run_task.call_count, 2)
+        self.assertNotIn("连续出击", str(ctx.run_task.call_args_list))
+
+    def test_trial_repeat_one_still_calls_full_navigation_entry(self):
+        ctx = FakeContext()
+        ctx.run_task.return_value = NS(status=NS(succeeded=True, failed=False))
+        result = r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param={
+            "battle_count": 1, "battle_entry_node": "地狱的试炼-单场入口",
+        }))
+        self.assertTrue(result.success)
+        self.assertEqual(ctx.run_task.call_args.args[0], "地狱的试炼-单场入口")
+
     def test_task_end_and_stop_callback_invalidate_session(self):
         ctx = FakeContext()
         sink = a.FormationTaskLifecycle()

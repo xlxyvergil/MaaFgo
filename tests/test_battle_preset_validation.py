@@ -42,9 +42,12 @@ class BattlePresetValidationTests(unittest.TestCase):
         path.write_text(json.dumps(value), encoding="utf-8")
         return path
 
-    def test_two_actual_shipped_presets_pass_battle_contract(self):
+    def test_actual_shipped_presets_pass_battle_contract(self):
         paths = sorted((ROOT / "assets/resource/base/battle_presets").glob("*.json"))
-        self.assertEqual(len(paths), 2)
+        self.assertTrue(paths)
+        sys.path.insert(0, str(ROOT / "agent/custom"))
+        from agent.chaldea import _BUNDLED_BATTLE_PRESETS
+        self.assertEqual({path.name for path in paths}, _BUNDLED_BATTLE_PRESETS)
         for path in paths:
             with self.subTest(path=path.name):
                 self.assertTrue(self.check(path))
