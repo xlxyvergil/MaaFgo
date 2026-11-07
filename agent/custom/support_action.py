@@ -82,6 +82,7 @@ LEVEL_ROI = (62, 15, 118, 27)      # 英灵等级: x62-180 y15-42 -> (x,y,w,h)
 #   左上斜切(51,39)->(27,57) 让开左上角图标, 右下缺口 x140-166 y84-108 让开金星/星级
 FACE_POLY = [(27, 57), (27, 108), (140, 108), (140, 84), (166, 84), (166, 39), (51, 39)]
 TH_FACE = 0.75
+TH_UNRESTRICTED_FACE_MARGIN = 0.10   # 仅礼装助战补身份须排除相似的其他从者
 CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口)
 CE_ANCHOR_GRAND = [(179, 35), (179, 129)]   # 冠位助战 礼装1/礼装2 左上角(166x53 窗口)
 # 日服现场图标左上角约为框内 (186,93)，旧 29x29 区域会截断图案。
@@ -844,9 +845,62 @@ class SupportAction(CustomAction):
         return white >= WHITE_RATIO
 
     # ---------- 主流程 ----------
-    def _record_selected_support(self, root, token, servant_id):
+    def _identify_unrestricted_support(self, image, face_dir, bx, by):
+        """在已点击条目的留存帧上补识别身份；不改变礼装筛选或再次操作列表。"""
+        import cv2
+        xs, ys = zip(*FACE_POLY)
+        crop = image[int(by) + min(ys):int(by) + max(ys) + 1,
+                     int(bx) + min(xs):int(bx) + max(xs) + 1]
+        mask = self._get_face_mask() > 0
+        if crop.shape[:2] != mask.shape:
+            return None
+        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        gray[~mask] = int(round(float(gray[mask].mean())))
+        candidates = {}
+        for servant in self._get_servant_map().values():
+            sid = canonical_servant_id(servant.get("id"))
+            if sid:
+                candidates.setdefault(sid, set()).update(servant.get("images") or ())
+        ranked, scores = [], {}
+        for sid, filenames in candidates.items():
+            best = (-1.0, "")
+            for filename in sorted(filenames):
+                if filename not in scores:
+                    template = _imread(os.path.join(face_dir, filename), gray=True)
+                    score = (-1.0 if template is None or any(
+                        size > limit for size, limit in zip(gray.shape, template.shape)
+                    ) else float(cv2.matchTemplate(template, gray, cv2.TM_CCOEFF_NORMED).max()))
+                    scores[filename] = score if np.isfinite(score) else -1.0
+                if scores[filename] > best[0]:
+                    best = (scores[filename], filename)
+            if best[1]:
+                ranked.append((best[0], sid, best[1]))
+        ranked.sort(reverse=True)
+        if not ranked:
+            return None
+        score, sid, template = ranked[0]
+        second = ranked[1][0] if len(ranked) > 1 else 0.0
+        mfaalog.diagnostic(f"[SupportAction] 仅礼装助战身份复核：候选={sid} "
+                          f"score={score:.4f}/{TH_FACE:.2f} second={second:.4f} "
+                          f"margin={score - second:.4f}/{TH_UNRESTRICTED_FACE_MARGIN:.2f} "
+                          f"template={template}")
+        if score < TH_FACE or score - second < TH_UNRESTRICTED_FACE_MARGIN:
+            return None
+        self._matched_face_evidence = (score, template)
+        return sid
+
+    def _record_selected_support(self, root, token, servant_id, *, image=None,
+                                 face_dir=None, bx=0, by=0):
         if not token:
             return
+        if not servant_id and sessions.awaiting_continuous_support(root, token):
+            self._matched_face_evidence = (0.0, "")
+            try:
+                if image is not None and face_dir is not None:
+                    servant_id = self._identify_unrestricted_support(image, face_dir, bx, by)
+            except Exception as exc:
+                # 这是选择成功后的辅助识别；缺图或低分不能撤销自有从者的证据。
+                mfaalog.diagnostic(f"[SupportAction] 本次助战身份暂未确认：{exc}")
         score, template = getattr(self, "_matched_face_evidence", (0.0, ""))
         snapshot = sessions.support_selected(
             root, token, canonical_servant_id(servant_id),
@@ -855,7 +909,8 @@ class SupportAction(CustomAction):
         if snapshot is not None:
             support = next(s for s in snapshot.slots if s.is_support)
             mfaalog.info(f"[初始编队] 连续出击沿用自有编队，助战位={support.slot} "
-                         f"本次助战={support.servant_id} 头像匹配={score:.4f}")
+                         f"本次助战={support.servant_id or '未识别，仅保留自有从者身份'} "
+                         f"头像匹配={score:.4f}")
 
     def _select_fallback(self, context, controller, root, token):
         """撤销职介筛选并复用首个助战入口，不在本子任务中执行编队。"""
@@ -1090,7 +1145,8 @@ class SupportAction(CustomAction):
                         cx, cy = (bx + bx2) // 2, (by + by2) // 2
                         if self._tap(controller, cx, cy) is False:
                             raise ValueError("没有成功点击选中的助战，无法确认本次借用的从者。请检查模拟器连接后重新运行任务。")
-                        self._record_selected_support(root, token, servant_id if not skip_servant else None)
+                        self._record_selected_support(root, token, servant_id if not skip_servant else None,
+                                                      image=img, face_dir=face_dir, bx=bx, by=by)
                         mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                         return True
 
@@ -1127,7 +1183,8 @@ class SupportAction(CustomAction):
                     cx, cy = (bx + bx2) // 2, (by + by2) // 2
                     if self._tap(controller, cx, cy) is False:
                         raise ValueError("没有成功点击选中的助战，无法确认本次借用的从者。请检查模拟器连接后重新运行任务。")
-                    self._record_selected_support(root, token, servant_id if not skip_servant else None)
+                    self._record_selected_support(root, token, servant_id if not skip_servant else None,
+                                                  image=current, face_dir=face_dir, bx=bx, by=by)
                     mfaalog.info(f"[SupportAction] 点击条目 ({cx},{cy})")
                     return True
 

@@ -509,6 +509,11 @@ def _merge_rosters(
 
     merged: list[str | None] = []
     for index, (seen, planned) in enumerate(zip(visual, chaldea_roster), start=1):
+        if (getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE
+                and initial_formation.slots[index - 1].is_support and seen is None):
+            # 本场未识别的助战不能从旧攻略回填；其余自有成员照常合并。
+            merged.append(None)
+            continue
         if seen is not None and planned is not None and seen != planned:
             mfaalog.warning(
                 f"[auto_battle] roster conflict at slot {index}: "

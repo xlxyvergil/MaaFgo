@@ -93,6 +93,26 @@ class MergeRosterTests(unittest.TestCase):
                          ("505600", "1002000", None, None, None, None))
         self.warning.assert_not_called()
 
+    def test_unknown_continuous_support_does_not_reuse_planned_support_identity(self):
+        initial = snapshot("100100", "200100", "300100", None, None, None,
+                           statuses=["identified"] * 3 + ["unknown"] * 3)
+        initial.source = action.CONTINUOUS_FORMATION_SOURCE
+        for index, slot in enumerate(initial.slots):
+            slot.is_support = index == 3
+        self.assertEqual(action._merge_rosters(
+            initial, ("100100", "200100", "300100", "405900", "501900", None)),
+            ("100100", "200100", "300100", None, "501900", None))
+
+    def test_changed_continuous_support_keeps_existing_plan_conflict_guard(self):
+        initial = snapshot("100100", "200100", "300100", "405900", None, None)
+        initial.source = action.CONTINUOUS_FORMATION_SOURCE
+        for index, slot in enumerate(initial.slots):
+            slot.is_support = index == 3
+        self.assertEqual(action._merge_rosters(
+            initial, ("100100", "200100", "300100", "501900", None, None)),
+            ("100100", "200100", "300100", None, None, None))
+        self.warning.assert_called_once()
+
     def test_visual_alias_and_canonical_share_are_the_same_identity(self):
         initial = snapshot("505700", "1002100", None, None, None, None)
         planned = ("505600", "1002000", None, None, None, None)
