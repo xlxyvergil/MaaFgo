@@ -41,6 +41,14 @@ def _settings(context):
     return value
 
 
+def _trial_empty_items_allowed(context):
+    """Only this Trial's explicit task flags allow its rewardless party UI."""
+    node = context.get_node_data(CONFIG_NODE) or {}
+    attach = node.get("attach") or {}
+    return (attach.get("native_battle_trial_profile") == "hellish_202611"
+            and attach.get("trial_no_auto_items") is True)
+
+
 class TeapotRunner:
     """识别结果可通过 observe() 替换，流程不在 Python 中保存界面坐标。"""
 
@@ -108,6 +116,14 @@ class TeapotRunner:
             return TeapotFrame("entry")
         if self._hit("茶壶-识别风暴罐", image):
             return TeapotFrame("storm")
+        # Completed/rewardless Trial entries can retain the two info buttons
+        # while the entire automatic-item label/switch area is absent. Only an
+        # explicit Trial task and the positive full-empty-strip recognition may
+        # classify this as absent; _initial still requires eight clear samples.
+        # This is independent of whether a source enables maaTrialStrategy.
+        if (_trial_empty_items_allowed(self.context)
+                and self._hit("茶壶-试炼无自动道具栏", image)):
+            return TeapotFrame("absent")
         if self._hit("茶壶-识别交替过渡", image):
             return TeapotFrame("transition")
         if self._hit("茶壶-识别任意入口", image):

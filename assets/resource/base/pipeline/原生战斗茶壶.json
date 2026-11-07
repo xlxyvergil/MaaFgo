@@ -2,7 +2,9 @@
     "原生战斗-茶壶配置": {
         "doc": "仅原生战斗使用。默认关闭仍检查并关闭已开启的茶壶；无入口时提示后继续。",
         "attach": {
-            "use_teapot": false
+            "use_teapot": false,
+            "native_battle_trial_profile": "",
+            "trial_no_auto_items": false
         }
     },
     "原生战斗-校验茶壶": {
@@ -804,6 +806,30 @@
             }
         },
         "post_delay": 700,
+        "next": [],
+        "on_error": []
+    },
+    "茶壶-试炼无自动道具栏": {
+        "doc": "仅hellish_202611试炼任务且trial_no_auto_items=true时读取，不依赖方案是否启用战斗策略。已通关试炼可能只保留两个info按钮，整段自動使用文字、茶壶/风暴罐及开关均不存在；模板覆盖完整空道具栏，不能凭info或LIMITED单独放行。原popup、茶壶ON/OFF、风暴罐优先；本节点成立仍须连续8轮absent，才提示本关无法使用并无输入继续。2026-11-07实机np50_battle_run_after及np50_search_2为正例，原自动道具栏/渐变/弹窗/编辑/助战/活动为负例。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "茶壶-识别编队页",
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "template": "battle/teapot/trial_empty_auto_items.png",
+                                "roi": [750, 640, 185, 77],
+                                "threshold": 0.95
+                            }
+                        }
+                    }
+                ]
+            }
+        },
+        "action": {"type": "DoNothing"},
         "next": [],
         "on_error": []
     },

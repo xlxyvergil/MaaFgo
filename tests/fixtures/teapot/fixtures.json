@@ -184,6 +184,16 @@
         85
       ],
       "source": "D34571330CB8694FA3D1FE2914C0FEC5.png"
+    },
+    "trial_empty_auto_items": {
+      "image": "trial_empty_auto_items.png",
+      "roi": [
+        760,
+        644,
+        169,
+        65
+      ],
+      "source": "trial4_replay_20261107/np50_search_2.png; independent frame from production template"
     }
   },
   "popupCases": [

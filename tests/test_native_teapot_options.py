@@ -28,6 +28,19 @@ def pipeline_nodes():
 
 
 class NativeTeapotOptionTests(unittest.TestCase):
+    def test_only_trial_explicitly_allows_rewardless_empty_item_bar(self):
+        nodes = pipeline_nodes()
+        self.assertIs(nodes[CONFIG]["attach"]["trial_no_auto_items"], False)
+        self.assertEqual(nodes[CONFIG]["attach"]["native_battle_trial_profile"], "")
+        enabled = []
+        for path in (ROOT / "assets/tasks").glob("*.json"):
+            for task in json.loads(path.read_text(encoding="utf-8")).get("task", []):
+                attach = task.get("pipeline_override", {}).get(CONFIG, {}).get("attach", {})
+                if attach.get("trial_no_auto_items") is True:
+                    self.assertEqual(attach.get("native_battle_trial_profile"), "hellish_202611")
+                    enabled.append(task["name"])
+        self.assertEqual(enabled, ["地狱的试炼"])
+
     def test_default_off_changes_configuration_without_disabling_detection(self):
         option = read(f"assets/options/{OPTION}.json")["option"][OPTION]
         self.assertEqual(option["type"], "switch")
