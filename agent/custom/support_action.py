@@ -348,7 +348,7 @@ class SupportAction(CustomAction):
             self._screen_size = screen_size
             self.sx = width / BASE_W
             self.sy = height / BASE_H
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[SupportAction] screen={width}x{height}, "
                 f"scale={self.sx:.3f}x{self.sy:.3f}"
             )
@@ -424,13 +424,13 @@ class SupportAction(CustomAction):
         res = cv2.matchTemplate(cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY), tpl, cv2.TM_CCOEFF_NORMED)
         _, score, _, (mx, my) = cv2.minMaxLoc(res)
         if not np.isfinite(score) or score < TH_REF:
-            mfaalog.warning(
+            mfaalog.diagnostic(
                 f"[SupportAction] 参照物 {self._ref_name}: score={score:.3f}/{TH_REF:.2f} "
                 "定位不可信，跳过当前助战条目，不应用平移"
             )
             return None
         dx, dy = x0 + mx - ex, y0 + my - ey
-        mfaalog.info(f"[SupportAction] 参照物 {self._ref_name}: 实测=({x0 + mx},{y0 + my}) "
+        mfaalog.diagnostic(f"[SupportAction] 参照物 {self._ref_name}: 实测=({x0 + mx},{y0 + my}) "
                      f"期望=({ex},{ey}) score={score:.3f} -> 框顶点平移=({dx},{dy})")
         return dx, dy
 
@@ -456,7 +456,7 @@ class SupportAction(CustomAction):
             if tpl is None or cg.shape[0] > tpl.shape[0] or cg.shape[1] > tpl.shape[1]:
                 continue
             s = float(cv2.matchTemplate(tpl, cg, cv2.TM_CCOEFF_NORMED).max())
-            mfaalog.info(f"[SupportAction] 英灵头像 {f}: score={s:.3f}")
+            mfaalog.diagnostic(f"[SupportAction] 英灵头像 {f}: score={s:.3f}")
             if s >= TH_FACE:
                 self._matched_face_evidence = (s, f)
                 return True
@@ -467,7 +467,7 @@ class SupportAction(CustomAction):
         import cv2
         bx, by = int(bx), int(by)
         if ce_name in EMPTY_CE:
-            mfaalog.info("[SupportAction] 礼装为空(跳过匹配)")
+            mfaalog.diagnostic("[SupportAction] 礼装为空(跳过匹配)")
             return True
         equip_id = getattr(self, "_ce_ids", {}).get(ce_name)
         tpl_paths = _ce_template_paths(ce_dir, ce_name, ce_sub, equip_id)
@@ -498,10 +498,10 @@ class SupportAction(CustomAction):
                 if alternate is not None and alternate.shape[0] <= roi_gray.shape[0] and alternate.shape[1] <= roi_gray.shape[1]:
                     score = max(score, float(cv2.matchTemplate(roi_gray, alternate, cv2.TM_CCOEFF_NORMED).max()))
         if score < TH_CE:
-            mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}(未过)")
+            mfaalog.diagnostic(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}(未过)")
             return False
         if ce_sub == "任意":
-            mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}，不限制满破状态")
+            mfaalog.diagnostic(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f}，不限制满破状态")
             return True
         # 右下角形态校验: 满破/非满破等仅右下角不同的礼装整卡主体相同得分均高,
         # 在最佳匹配位置取卡面右下角约30x30区域与模板右下角匹配。
@@ -527,10 +527,10 @@ class SupportAction(CustomAction):
             observed = card_br.astype(np.float32)
             error_wanted = float(np.square(observed - tpl_br.astype(np.float32))[mask].mean())
             error_other = float(np.square(observed - other_br.astype(np.float32))[mask].mean())
-            mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} "
+            mfaalog.diagnostic(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} "
                          f"{ce_sub}星标误差={error_wanted:.1f} vs {other_sub}={error_other:.1f}")
             return error_wanted < error_other
-        mfaalog.info(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} 右下角={score_br:.3f}")
+        mfaalog.diagnostic(f"[SupportAction] 礼装 {ce_name}: 整卡={score:.3f} 右下角={score_br:.3f}")
         if float(tpl_br.std()) <= 1.0:
             mfaalog.warning(f"[SupportAction] 礼装 {ce_name} 缺少另一状态图片，且右下角没有可区分特征，无法确认满破状态")
             return False
@@ -573,13 +573,13 @@ class SupportAction(CustomAction):
         if (not all(np.isfinite(score) for score in scores.values())
                 or scores[best] <= TH_BOND
                 or scores["50np"] == scores["original"]):
-            mfaalog.info(
+            mfaalog.diagnostic(
                 "[SupportAction] 未能确认羁绊礼装效果图标：" +
                 " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
                 f"，需较高分大于 {TH_BOND:.2f} 且两者分数不同，跳过当前助战条目"
             )
             return False
-        mfaalog.info(f"[SupportAction] 羁绊: " +
+        mfaalog.diagnostic(f"[SupportAction] 羁绊: " +
                      " ".join(f"{k}={v:.3f}" for k, v in scores.items()) +
                      f" -> {best} (期望 {bond_opt})")
         return bond_opt == best
@@ -595,7 +595,7 @@ class SupportAction(CustomAction):
             return False
         got = SupportAction._ocr_skill_text(roi)
         ok = got is not None and int(got) >= expect
-        mfaalog.info(f"[SupportAction] 技能({box}) 期望>={expect} "
+        mfaalog.diagnostic(f"[SupportAction] 技能({box}) 期望>={expect} "
                      f"OCR识别={got or '(无数字)'} -> {'OK' if ok else 'NO'}")
         return ok
 
@@ -633,10 +633,10 @@ class SupportAction(CustomAction):
                 if score > best[0]:
                     best = (score, lv, f)
         if best[1] is None:
-            mfaalog.warning("[SupportAction] 宝具等级无命中")
+            mfaalog.diagnostic("[SupportAction] 宝具等级无命中")
             return False
         ok = best[1] >= expect
-        mfaalog.info(f"[SupportAction] 宝具 期望>={expect} 识别=lv{best[1]}({best[2]}) "
+        mfaalog.diagnostic(f"[SupportAction] 宝具 期望>={expect} 识别=lv{best[1]}({best[2]}) "
                      f"score={best[0]:.3f} -> {'OK' if ok else 'NO'}")
         return ok
 
@@ -655,7 +655,7 @@ class SupportAction(CustomAction):
             with open(OCR_REC_KEYS, "r", encoding="utf-8") as f:
                 keys = [ln.strip("\n") for ln in f.readlines()]
             SupportAction._ocr_sess, SupportAction._ocr_keys = sess, keys
-            mfaalog.info(f"[SupportAction] OCR rec.onnx 加载成功 ({len(keys)} 类)")
+            mfaalog.diagnostic(f"[SupportAction] OCR rec.onnx 加载成功 ({len(keys)} 类)")
         except Exception as e:
             mfaalog.warning(f"[SupportAction] OCR 加载失败, 退回模板识别: {e}")
             SupportAction._ocr_sess = False
@@ -698,7 +698,7 @@ class SupportAction(CustomAction):
             return None
         # 排序可能让头像上方显示其他属性，不能把攻击力/生命值当作等级。
         if re.match(r"^(?:攻击|攻撃|生命|ATK|HP)", t.strip(), re.IGNORECASE):
-            mfaalog.debug(f"[SupportAction] 从者等级区域显示其他属性，原文={t!r}")
+            mfaalog.diagnostic(f"[SupportAction] 从者等级区域显示其他属性，原文={t!r}")
             return None
         m = re.search(r"(\d{1,3})/(\d{1,3})", t)
         if m:
@@ -708,7 +708,7 @@ class SupportAction(CustomAction):
             cur, mx = int(m.group(1)), int(m.group(2))
             if 1 <= cur <= 130 and 1 <= mx <= 130:
                 return cur
-        mfaalog.debug(f"[SupportAction] 从者等级区域 OCR 无法解析，原文={t!r}")
+        mfaalog.diagnostic(f"[SupportAction] 从者等级区域 OCR 无法解析，原文={t!r}")
         return None
 
     @staticmethod
@@ -766,7 +766,7 @@ class SupportAction(CustomAction):
                 "请检查游戏“助战选择”界面是否已开启从者等级显示，确认头像上方显示“90/90”这类等级。"
             )
         ok = got is not None and got >= expect
-        mfaalog.info(f"[SupportAction] 英灵等级 期望>={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
+        mfaalog.diagnostic(f"[SupportAction] 英灵等级 期望>={expect} OCR识别={got if got is not None else '(无)'} -> {'OK' if ok else 'NO'}")
         return ok
 
     # ---------- 被动技能匹配(切换后视图) ----------
@@ -812,7 +812,7 @@ class SupportAction(CustomAction):
             return "passive"
         if "passive" not in scores:
             return "active"
-        mfaalog.info(f"[SupportAction] 视图判定 主动={scores['active']:.3f} 被动={scores['passive']:.3f}")
+        mfaalog.diagnostic(f"[SupportAction] 视图判定 主动={scores['active']:.3f} 被动={scores['passive']:.3f}")
         return "active" if scores["active"] >= scores["passive"] else "passive"
 
     # ---------- 主动视图综合判定(主动技能+宝具+英灵等级, 单帧) ----------
@@ -840,7 +840,7 @@ class SupportAction(CustomAction):
             return False
         gray = cv2.cvtColor(img[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY)
         white = float((gray >= TH_WHITE).mean())
-        mfaalog.info(f"[SupportAction] 刷新连接检测: 白像素占比={white:.2f}")
+        mfaalog.diagnostic(f"[SupportAction] 刷新连接检测: 白像素占比={white:.2f}")
         return white >= WHITE_RATIO
 
     # ---------- 主流程 ----------
@@ -1013,7 +1013,7 @@ class SupportAction(CustomAction):
                         return CustomAction.RunResult(success=False)
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
             skill_dir = os.path.join(base_dir, "skill")   # 视图判断模板(主动/被动), 按 pkg 动态选择
-            mfaalog.info(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
+            mfaalog.diagnostic(f"[SupportAction] 素材根: {base_dir} 宝具目录: {np_dir}")
             # 参照物: {资源包}/image/support/助战编入确认.png, 复用已有资源做框内坐标重新定位
             self._ref_dir = _image_dir(pkg, "support")
             self._ref_name = "助战编入确认.png"
@@ -1057,20 +1057,20 @@ class SupportAction(CustomAction):
                     mfaalog.error("[SupportAction] 截图失败")
                     return False
                 boxes = detector.detect(img)
-                mfaalog.info(f"[SupportAction] 检测到 {len(boxes)} 个助战条目")
+                mfaalog.diagnostic(f"[SupportAction] 检测到 {len(boxes)} 个助战条目")
                 if not boxes:
                     mfaalog.error("[SupportAction] 未检测到助战条目")
                     return False
 
                 for (bx, by, bx2, by2, conf) in boxes:
-                    mfaalog.info(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
+                    mfaalog.diagnostic(f"[SupportAction] === 判定条目 框=({bx},{by})-({bx2},{by2}) conf={conf:.2f} ===")
                     # 框内参照物重定位: 平移框顶点到标定坐标系, 消除 YOLO 框偏移
                     shift = self._ref_shift(img, bx, by)
                     if shift is None:
                         continue
                     dx, dy = shift
                     bx, by, bx2, by2 = bx + dx, by + dy, bx2 + dx, by2 + dy
-                    mfaalog.info(f"[SupportAction] 重定位后 框=({bx},{by})-({bx2},{by2})")
+                    mfaalog.diagnostic(f"[SupportAction] 重定位后 框=({bx},{by})-({bx2},{by2})")
                     self._matched_face_evidence = (0.0, "")
                     if not skip_servant and not self._match_servant(img, face_dir, bx, by, srv["images"], support_type):
                         continue

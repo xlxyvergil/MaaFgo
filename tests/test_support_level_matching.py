@@ -23,7 +23,7 @@ class SupportLevelMatchingTests(unittest.TestCase):
     fixtures = ROOT / "tests/fixtures/support_level"
 
     def setUp(self):
-        for name in ("info", "warning", "error", "debug"):
+        for name in ("info", "warning", "error", "debug", "diagnostic"):
             p = patch.object(support.mfaalog, name)
             p.start()
             self.addCleanup(p.stop)
@@ -66,7 +66,8 @@ class SupportLevelMatchingTests(unittest.TestCase):
     def test_unknown_ocr_keeps_raw_text_without_claiming_sorting_cause(self):
         with patch.object(support.SupportAction, "_ocr_run", return_value="级lOO?lOO"):
             self.assertIsNone(support.SupportAction._ocr_level_text(self.crop("cn_level_100.png")))
-        self.assertIn("级lOO?lOO", support.mfaalog.debug.call_args.args[0])
+        self.assertIn("级lOO?lOO", support.mfaalog.diagnostic.call_args.args[0])
+        support.mfaalog.debug.assert_not_called()
 
     def test_zero_requirement_does_not_read_attribute_display(self):
         with patch.object(support.SupportAction, "_ocr_level_text") as ocr:

@@ -1,25 +1,20 @@
 # -*- coding: utf-8 -*-
 """
-全局识别结果打印 —— 通过 context_sink 监听所有 pipeline 节点的识别事件。
+从事件自带的 JSON 保存识别细节，不查询完整识别结果或提取截图。
 
-打印内容：
-1. OCR 识别结果：命中打印 best 文本，未命中打印识别到的文本（最多 3 条）
-2. 识别超时（error）：pipeline 节点 next 循环识别超时时打印（真正的"识别错误"）
-3. TemplateMatch 普通识别结果：默认关闭（太吵），可用 _TEMPLATE_LOG_LEVEL 打开
-
-要关闭：注释掉 main.py 里的 `import ocr_logger` 即可。
+OCR 文字、模板分数写入 debug/recognition-<pid>.log；超时仍在客户端提示。
+_TEMPLATE_LOG_LEVEL 控制本地模板日志；关闭监听可移除 main.py 的 import ocr_logger。
 """
 
 from maa.agent.agent_server import AgentServer
 from maa.context import ContextEventSink
-from maa.event_sink import NotificationType
 
 import mfaalog
 
 _MAX_TEXTS = 3  # OCR 未命中时最多打印的文本条数
 _DEFAULT_THRESHOLD = 0.7  # TemplateMatch 节点未写 threshold 时的默认值
 
-# TemplateMatch 普通识别结果日志级别（默认只打命中）
+# TemplateMatch 本地详细日志级别（默认只打命中，不输出到客户端）
 #   "none" —— 不打普通识别结果
 #   "hit"  —— 只在命中时打（默认）
 #   "miss" —— 只在未命中时打
@@ -44,74 +39,54 @@ class OcrLogger(ContextEventSink):
             name = details.get("name", "")
             mfaalog.info(f"[超时] {name} 识别超时（next 列表未命中任何节点）")
 
-    def on_node_recognition(self, context, noti_type, detail):
-        # 只在识别结束（命中/未命中）时处理，跳过 Starting
-        if noti_type not in (NotificationType.Succeeded, NotificationType.Failed):
+        # 精确匹配，排除 RecognitionNode 和 Starting 事件。
+        if msg not in ("Node.Recognition.Succeeded", "Node.Recognition.Failed"):
             return
-
-        try:
-            reco = context.tasker.get_recognition_detail(detail.reco_id)
-        except Exception:
+        reco = details.get("reco_details")
+        if not isinstance(reco, dict):
+            # 不退回 get_recognition_detail：该接口会连带提取并复制图像。
             return
-        if reco is None:
+        raw = reco.get("detail")
+        if not isinstance(raw, dict):
             return
+        name = details.get("name", "")
+        hit = msg == "Node.Recognition.Succeeded"
+        if reco.get("algorithm") == "OCR":
+            self._log_ocr(name, raw, hit)
+        elif reco.get("algorithm") == "TemplateMatch":
+            self._log_template(context, name, raw, hit)
 
-        algo = str(reco.algorithm)
-        if algo == "OCR":
-            self._log_ocr(detail, reco, noti_type)
-        elif algo == "TemplateMatch":
-            self._log_template(context, detail, reco, noti_type)
-
-    # ---------- OCR ----------
-    def _log_ocr(self, detail, reco, noti_type):
-        # 收集识别到的文本（去空、去重、保序）
+    def _log_ocr(self, name, raw, hit):
         texts = []
-        for r in reco.all_results:
-            t = getattr(r, "text", None)
-            if t and t.strip() and t not in texts:
-                texts.append(t.strip())
-
-        if noti_type == NotificationType.Succeeded:
-            # 命中：打印匹配上的那条（best）
-            best = reco.best_result
-            best_text = getattr(best, "text", "") if best is not None else ""
-            mfaalog.info(f"[OCR] {detail.name} 命中: {best_text.strip()!r}")
-        else:
-            # 未命中：只在识别到了文本时打印（有诊断价值），完全没识别到则静默
-            if not texts:
-                return
+        for result in raw.get("all") or []:
+            text = result.get("text", "").strip()
+            if text and text not in texts:
+                texts.append(text)
+        if hit:
+            best_text = (raw.get("best") or {}).get("text", "").strip()
+            mfaalog.diagnostic(f"[OCR] {name} 命中: {best_text!r}")
+        elif texts:
             preview = " / ".join(texts[:_MAX_TEXTS])
             if len(texts) > _MAX_TEXTS:
                 preview += f" …共{len(texts)}条"
-            mfaalog.info(f"[OCR] {detail.name} 未命中，识别到: {preview}")
+            mfaalog.diagnostic(f"[OCR] {name} 未命中，识别到: {preview}")
 
-    # ---------- TemplateMatch ----------
-    def _log_template(self, context, detail, reco, noti_type):
-        hit = noti_type == NotificationType.Succeeded
+    def _log_template(self, context, name, raw, hit):
         if _TEMPLATE_LOG_LEVEL == "none":
             return
         if _TEMPLATE_LOG_LEVEL == "hit" and not hit:
             return
         if _TEMPLATE_LOG_LEVEL == "miss" and hit:
             return
-
-        threshold = self._threshold(context, detail.name)
-        scores = [r.score for r in reco.all_results if getattr(r, "score", None) is not None]
-
-        if hit:
-            # 命中：打印命中的 score / threshold
-            best = reco.best_result
-            score = getattr(best, "score", None) if best is not None else None
-            if score is None:
-                score = max(scores) if scores else None
-            if score is None:
-                return
-            mfaalog.info(f"[模板] {detail.name} 命中: {score:.4f}/{threshold}")
-        else:
-            # 未命中：打印最高 score / threshold（能看到离阈值差多少）
-            if not scores:
-                return
-            mfaalog.info(f"[模板] {detail.name} 未命中: 最高{max(scores):.4f}/{threshold}")
+        scores = [r["score"] for r in raw.get("all") or [] if r.get("score") is not None]
+        score = (raw.get("best") or {}).get("score") if hit else None
+        if score is None:
+            score = max(scores) if scores else None
+        if score is None:
+            return
+        threshold = self._threshold(context, name)
+        result = "命中: " if hit else "未命中: 最高"
+        mfaalog.diagnostic(f"[模板] {name} {result}{score:.4f}/{threshold}")
 
     @classmethod
     def _threshold(cls, context, name):

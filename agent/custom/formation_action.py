@@ -640,7 +640,7 @@ class AutoFormationFromChaldea(CustomAction):
                 if os.path.isdir(packaged_root) and packaged_root not in roots:
                     roots.append(packaged_root)
         self.image_roots = roots
-        mfaalog.info(f"[编队资源] 素材层={layer}，搜索目录={roots}")
+        mfaalog.diagnostic(f"[编队资源] 素材层={layer}，搜索目录={roots}")
         self.narrow_dirs = [os.path.join(root, "NarrowFigures") for root in roots]
         self.face_dirs = [os.path.join(root, "servant_face") for root in roots]
         self.equip_list_dirs = [os.path.join(root, "EquipFaces", "list") for root in roots]
@@ -653,7 +653,7 @@ class AutoFormationFromChaldea(CustomAction):
             height, width = screenshot.shape[:2]
             self.sx = width / BASE_W
             self.sy = height / BASE_H
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[自动编队] 实际分辨率 {width}x{height}，坐标缩放 {self.sx:.3f}x{self.sy:.3f}"
             )
 
@@ -1013,7 +1013,7 @@ class AutoFormationFromChaldea(CustomAction):
                 )
                 if signature == previous:
                     if attempts > 2:
-                        mfaalog.info(
+                        mfaalog.diagnostic(
                             f"[自动编队] 编队槽位布局经{attempts}次复核后稳定"
                         )
                     return latest
@@ -1476,7 +1476,7 @@ class AutoFormationFromChaldea(CustomAction):
                 consecutive += 1
                 if consecutive >= 2:
                     score = float(latest[index].get("score", 0.0))
-                    mfaalog.info(
+                    mfaalog.diagnostic(
                         f"[自动编队] 槽位{index + 1}换人连续复核通过："
                         f"{score:.4f}/{FACE_THRESHOLD:.2f}"
                     )
@@ -1565,7 +1565,7 @@ class AutoFormationFromChaldea(CustomAction):
             if self.context.tasker.stopping:
                 return False
             if match is not None:
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 查找 {servant['name']} 第{round_index + 1}轮，"
                     f"最高分={match[0]:.3f}/{SERVANT_LIST_FEATURE_THRESHOLD:.2f} "
                     f"卡位分差={match[3]:.3f}/{SERVANT_LIST_FEATURE_MARGIN:.2f} "
@@ -1641,7 +1641,7 @@ class AutoFormationFromChaldea(CustomAction):
                     and dy <= SERVANT_LIST_STABILITY_CENTER_DELTA_PX
                 ):
                     return second
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[自动编队] 从者 {servant_name} 第{round_index + 1}轮画面未稳定，"
                 f"第{check_index + 1}/{SERVANT_LIST_STABILITY_MAX_CHECKS}次等待"
             )
@@ -1880,14 +1880,14 @@ class AutoFormationFromChaldea(CustomAction):
             matched, match = self._equip_matches_slot_stable(index, equip_id)
             if matched:
                 correct_slots.add(index)
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 礼装起始校验：槽位{index + 1}已匹配 "
                     f"{equip['name']}({equip_id})，"
                     f"{match[0]:.4f}/{EQUIP_TEAM_THRESHOLD:.2f}"
                 )
                 continue
             score = match[0] if match is not None else 0.0
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[自动编队] 礼装起始校验：槽位{index + 1}待替换 "
                 f"{equip['name']}({equip_id})，{score:.4f}/{EQUIP_TEAM_THRESHOLD:.2f}"
             )
@@ -1909,7 +1909,7 @@ class AutoFormationFromChaldea(CustomAction):
             # 防止已经正确的礼装被重复编辑。
             matched, match = self._equip_matches_slot_stable(index, equip_id)
             if matched:
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 槽位{index + 1}礼装复查已匹配："
                     f"{equip['name']}({equip_id})，{match[0]:.4f}/{EQUIP_TEAM_THRESHOLD:.2f}"
                 )
@@ -1942,7 +1942,7 @@ class AutoFormationFromChaldea(CustomAction):
             if result == "selected":
                 verified, score = self._wait_for_equip_replace_verify(index, equip_id)
                 if verified:
-                    mfaalog.info(
+                    mfaalog.diagnostic(
                         f"[自动编队] 槽位{index + 1}礼装复核通过："
                         f"{score:.4f}/{EQUIP_TEAM_THRESHOLD:.2f}"
                     )
@@ -1976,7 +1976,7 @@ class AutoFormationFromChaldea(CustomAction):
                 if result == "selected":
                     verified, score = self._wait_for_equip_replace_verify(index, equip_id)
                     if verified:
-                        mfaalog.info(
+                        mfaalog.diagnostic(
                             f"[自动编队] 槽位{index + 1}礼装非满破兜底复核通过："
                             f"{score:.4f}/{EQUIP_TEAM_THRESHOLD:.2f}"
                         )
@@ -2155,14 +2155,14 @@ class AutoFormationFromChaldea(CustomAction):
             if result == "moving":
                 continue
             if result is not None:
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 查找礼装 {equip['name']} 第{round_index + 1}轮，"
                     f"最高分={result[0]:.3f} 模板={name}"
                 )
             if result is not None and result[0] >= EQUIP_LIST_THRESHOLD:
                 # 命中后立即停止该轮滑动；先选中当前卡片，再尝试一次且仅一次
                 # “礼装决定”。
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 礼装 {equip['name']} 静止命中，点击卡片中心="
                     f"{result[1]}，{result[0]:.4f}/{EQUIP_LIST_THRESHOLD:.2f}"
                 )
@@ -2179,7 +2179,7 @@ class AutoFormationFromChaldea(CustomAction):
                         "本轮不重复点击，继续查找"
                     )
                 else:
-                    mfaalog.info(
+                    mfaalog.diagnostic(
                         f"[自动编队] 礼装 {equip['name']} 命中后点击礼装决定："
                         f"{confirm[0]:.4f}/0.80"
                     )
@@ -2221,7 +2221,7 @@ class AutoFormationFromChaldea(CustomAction):
                 return second
             if not first_hit or not second_hit:
                 moving = True
-                mfaalog.info(
+                mfaalog.diagnostic(
                     f"[自动编队] 礼装 {equip_name} 第{round_index + 1}轮匹配画面未稳定，"
                     f"第{check_index + 1}/{EQUIP_MATCH_STABILITY_MAX_CHECKS}次等待"
                 )
@@ -2230,7 +2230,7 @@ class AutoFormationFromChaldea(CustomAction):
             delta = max(abs(first[1][0] - second[1][0]), abs(first[1][1] - second[1][1]))
             if delta <= EQUIP_MATCH_CENTER_DELTA_PX:
                 return second
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[自动编队] 礼装 {equip_name} 第{round_index + 1}轮仍在滚动，"
                 f"中心位移={delta}px，停止滑动并继续等待"
             )
@@ -2273,7 +2273,7 @@ class AutoFormationFromChaldea(CustomAction):
             if expected.get("svt_id") is None:
                 mfaalog.info(f"[自动编队] 助战最终复核通过：槽位{index + 1}助战标记符合，不限制英灵")
                 continue
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[自动编队] 助战最终复核通过：槽位{index + 1} "
                 f"svtId={actual.get('svt_id')}，"
                 f"identity_score={actual.get('identity_score', 0.0):.3f}"
@@ -2293,7 +2293,7 @@ class AutoFormationFromChaldea(CustomAction):
         if result is None:
             mfaalog.info("[自动编队] 编队决定后未出现二次确认弹窗")
             return
-        mfaalog.info(f"[自动编队] 命中编队二次确认决定，分数={result[0]:.3f}")
+        mfaalog.diagnostic(f"[自动编队] 命中编队二次确认决定，分数={result[0]:.3f}")
         self.controller.post_click(*result[1]).wait()
         time.sleep(FORMATION_CONFIRM_DELAY_SECONDS)
 
@@ -2302,11 +2302,11 @@ class AutoFormationFromChaldea(CustomAction):
             if item["kind"] in {"LOCAL", "SUPPORT"}:
                 return f"{item['kind']}({item.get('svt_id')})"
             return item["kind"]
-        mfaalog.info(
+        mfaalog.diagnostic(
             f"[自动编队] {title}："
             + ", ".join(describe(item) for item in current)
         )
-        mfaalog.info(
+        mfaalog.diagnostic(
             "[自动编队] 目标：" + ", ".join(describe(item) for item in self.expected)
         )
 
@@ -2731,7 +2731,7 @@ class FormationIdentityReader(AutoFormationFromChaldea):
             name: self._template_path(f"battle/{name}.png")
             for name in ("配置变更", "开始任务", "战斗开始")
         }
-        mfaalog.info(f"[初始编队] 页面模板路径={self.page_marker_paths}")
+        mfaalog.diagnostic(f"[初始编队] 页面模板路径={self.page_marker_paths}")
         self.config_marker = self._load_named_template("battle/配置变更.png")
         self.start_markers = [self._load_named_template(f"battle/{name}.png")
                               for name in ("开始任务", "战斗开始")]
@@ -2803,7 +2803,7 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 f"{row['slot']}:{row['scope']}/{row['candidates']}候选/{row['ms']:.0f}ms"
                 for row in self.last_match_stats["slots"]
             )
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[初始编队] 身份识别耗时={self.last_match_stats['total_ms']:.0f}ms "
                 f"粗筛={self.last_match_stats['coarse_ms']:.0f}ms 槽位=[{summary}]"
             )
@@ -2821,7 +2821,7 @@ class FormationIdentityReader(AutoFormationFromChaldea):
         if not confirm or confirm[0] < 0.8 or not any(s and s[0] >= 0.8 for s in starts):
             for name, match in zip(("配置变更", "开始任务", "战斗开始"), (confirm, *starts)):
                 score = f"{match[0]:.4f}" if match else "未取得匹配结果"
-                mfaalog.warning(
+                mfaalog.diagnostic(
                     f"[初始编队] 页面校验 {name}: score={score}/0.8，"
                     f"template={self.page_marker_paths[name]}"
                 )
@@ -3033,7 +3033,7 @@ class CaptureInitialFormation(CustomAction):
                 f":support={s.is_support}:reason={s.reason}"
                 for s in slots
             )
-            mfaalog.info(f"[初始编队] task={root} session={token} revision={snapshot.revision} "
+            mfaalog.diagnostic(f"[初始编队] task={root} session={token} revision={snapshot.revision} "
                          f"calibration={snapshot.calibration_id} {summary}")
             return CustomAction.RunResult(success=True)
         except Exception as exc:

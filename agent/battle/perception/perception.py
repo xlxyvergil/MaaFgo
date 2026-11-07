@@ -102,7 +102,7 @@ def build(
         for slot, detected in np_owners.items():
             if getattr(detected, "reason", "") == "np_glare_uncertain":
                 unknown.append(f"np[{slot}].presence:glare")
-                mfaalog.info(f"[NPGlare] slot={slot} score={detected.score:.4f} "
+                mfaalog.diagnostic(f"[NPGlare] slot={slot} score={detected.score:.4f} "
                              f"white_fraction={detected.glare_fraction:.4f} "
                              f"template={detected.matched_template}; 仅请求重拍，不确认为可用宝具")
         for c in cards:
@@ -273,7 +273,7 @@ def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None)
     recognizer = recognizer or FrontlineServantRecognizer.from_context(context)
     for identity in recognizer.detect(img, candidate_servant_ids):
         if identity.servant_id is None or getattr(identity, "visible_top", 35) != 35:
-            mfaalog.info(f"[HUDIdentity] slot={identity.slot} id={identity.servant_id or 'unknown'} "
+            mfaalog.diagnostic(f"[HUDIdentity] slot={identity.slot} id={identity.servant_id or 'unknown'} "
                          f"score={identity.confidence.value:.4f} margin={identity.margin:.4f} "
                          f"crop_top={getattr(identity, 'visible_top', 35)} template={identity.matched_template}")
         if identity.servant_id is None:
