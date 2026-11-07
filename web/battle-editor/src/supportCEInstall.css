@@ -1,5 +1,8 @@
-.support-ce-install{display:flex;align-items:baseline;gap:8px 14px;flex-wrap:wrap;margin:-3px 0 13px;font-size:12px;line-height:1.7;color:var(--muted)}
-.support-ce-install .support-ce-install-button{display:inline-flex;align-items:center;gap:6px;padding:2px 0;white-space:nowrap;font-size:12px}
+.selector-description-actions{display:flex;align-items:baseline;flex-wrap:wrap;gap:6px 12px;margin-top:3px}
+.selector-description-actions>small{font-size:10px;line-height:1.7;color:var(--muted)}
+.support-ce-install{display:inline-flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;min-width:0;max-width:100%;margin:0;font-size:inherit;line-height:1.7;color:var(--muted);overflow-wrap:anywhere}
+.support-ce-install .support-ce-install-button{display:inline-block;padding:0;white-space:nowrap;font-size:inherit;line-height:inherit}
+.support-ce-install-button>svg{display:inline-block;vertical-align:-2px;margin-right:6px}
 .support-ce-install-button:disabled{cursor:wait;opacity:.65}
 .support-ce-install-error{color:var(--danger,#bd3b42)}
 .support-ce-install-spinner{animation:support-ce-install-spin 1s linear infinite}

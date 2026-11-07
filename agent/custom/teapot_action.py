@@ -108,6 +108,12 @@ class TeapotRunner:
             return TeapotFrame("entry")
         if self._hit("茶壶-识别风暴罐", image):
             return TeapotFrame("storm")
+        # Rewardless quests may retain both info buttons without an automatic
+        # item bar. The shared node requires the known party layout, both info
+        # anchors and the full empty strip; info alone is still a transition.
+        # _initial requires eight consecutive absent samples for every task.
+        if self._hit("茶壶-识别无自动道具栏", image):
+            return TeapotFrame("absent")
         if self._hit("茶壶-识别交替过渡", image):
             return TeapotFrame("transition")
         if self._hit("茶壶-识别任意入口", image):
