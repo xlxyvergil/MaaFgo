@@ -41,7 +41,8 @@ def read_bond_page(context, image) -> bool:
 def read_bond_upgrade(context, image) -> bool:
     """Whether the bond-level-up presentation currently covers the results.
 
-    The Pipeline requires both the upgrade heading and its explanatory line.
+    The Pipeline matches the complete extracted explanatory text on the right,
+    separately from the normal bond-page text in the upper-left corner.
     This confirms only a presentation, never MAX, the current cap, or a member.
     """
     return _hit(context, BOND_UPGRADE_NODE, image)

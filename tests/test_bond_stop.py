@@ -256,7 +256,8 @@ class GuardTests(unittest.TestCase):
 
     def test_negative_then_popup_stops_unconfirmed_and_keeps_both_frames(self):
         ctx = Context(frames=[frame(9)])
-        with patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]):
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]):
             result = action.inspect_bond_stop(ctx, frame(4))
         self.assertEqual(result.reason, "bond_check_unconfirmed")
         np.testing.assert_array_equal(result.image, frame(4))
@@ -362,7 +363,8 @@ class GuardTests(unittest.TestCase):
         ctx = Context(mode="slot", frames=[frame(9)])
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
         bond_stops.set_formation(ctx.root, slots(support=4))
-        with patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
              patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9), \
              patch.object(action, "_save_evidence"):
             self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
@@ -370,6 +372,126 @@ class GuardTests(unittest.TestCase):
         np.testing.assert_array_equal(deferred.image, frame(4))
         np.testing.assert_array_equal(deferred.latest_image, frame(9))
         self.assertIsNone(bond_stops.get(ctx.root))
+
+    def test_initial_bond_page_waits_through_unlabelled_animation_until_upgrade_text(self):
+        ctx = Context(frames=[frame(7), frame(9)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+
+        def wait_without_permission(node):
+            self.assertIn(node, ("fast", "page_wait"))
+            self.assertIsNone(bond_stops.deferred(ctx.root))
+            return NS(status=NS(succeeded=True))
+
+        ctx.run_task.side_effect = wait_without_permission
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+             patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9), \
+             patch.object(action, "_save_evidence"):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        deferred = bond_stops.deferred(ctx.root)
+        self.assertIsNotNone(deferred)
+        np.testing.assert_array_equal(deferred.image, frame(4))
+        np.testing.assert_array_equal(deferred.latest_image, frame(9))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["fast", "page_wait"])
+        self.assertIsNone(bond_stops.get(ctx.root))
+
+    def test_unlabelled_upgrade_animation_stops_at_transition_attempt_limit(self):
+        ctx = Context(frames=[frame(7)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+             patch.object(action, "read_bond_upgrade", return_value=False):
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        self.assertIn("配置时限", result.message)
+        np.testing.assert_array_equal(result.image, frame(4))
+        np.testing.assert_array_equal(result.latest_image, frame(7))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["fast", "page_wait", "page_wait"])
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_transition_deadline_does_not_restart_for_an_unlabelled_frame(self):
+        ctx = Context()
+        token = bond_stops.ensure(ctx.root)
+        with patch.object(action, "read_bond_page", return_value=False), \
+             patch.object(action, "read_bond_upgrade", return_value=False), \
+             patch.object(action.time, "monotonic", side_effect=[0, 2]):
+            result = action._wait_upgrade_transition(ctx, token, frame(7), "all", 6,
+                controller=ctx.tasker.controller, evidence_image=frame(4), order=(), target_column=None)
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        ctx.run_task.assert_not_called()
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_upgrade_transition_rejects_experience_or_loot_before_clicking(self):
+        for late_node in ("战斗_经验结算页", "战斗_战利品弹窗"):
+            with self.subTest(late_node=late_node):
+                ctx = Context(frames=[frame(7), frame(8), frame(9)])
+                bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+                ctx.run_recognition.side_effect = lambda node, image: NS(
+                    hit=node == late_node and int(image[0, 0, 0]) == 8)
+                with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+                     patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+                     patch.object(action, "read_bond_upgrade", return_value=False):
+                    result = action.inspect_bond_stop(ctx, frame(4))
+                self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertIn("本场无法补查", result.message)
+                np.testing.assert_array_equal(result.image, frame(4))
+                np.testing.assert_array_equal(result.latest_image, frame(8))
+                self.assertEqual(len(ctx.frames), 1)
+                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["fast", "page_wait"])
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_upgrade_transition_cancellation_or_expired_root_does_not_defer(self):
+        for cancelled in (True, False):
+            with self.subTest(cancelled=cancelled):
+                ctx = Context(frames=[frame(7), frame(9)])
+                bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+
+                def interrupt_during_wait(node):
+                    if node == "page_wait":
+                        if cancelled:
+                            ctx.tasker.stopping = True
+                        else:
+                            bond_stops.finish(ctx.root)
+                    return NS(status=NS(succeeded=True))
+
+                ctx.run_task.side_effect = interrupt_during_wait
+                with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+                     patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+                     patch.object(action, "read_bond_upgrade", return_value=False):
+                    self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+                self.assertIsNone(bond_stops.get(ctx.root))
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+                self.assertEqual(len(ctx.frames), 1)
+                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["fast", "page_wait"])
+
+    def test_upgrade_transition_failed_capture_preserves_last_visible_frame(self):
+        ctx = Context(frames=[frame(7), None])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+             patch.object(action, "read_bond_upgrade", return_value=False):
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        self.assertIn("截图失败", result.message)
+        np.testing.assert_array_equal(result.image, frame(4))
+        np.testing.assert_array_equal(result.latest_image, frame(7))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_reappearing_bond_page_max_wins_before_upgrade_during_transition(self):
+        ctx = Context(frames=[frame(7), frame(5)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) in (4, 5)), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible"), True]), \
+             patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 5) as upgrade:
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_max")
+        np.testing.assert_array_equal(result.image, frame(5))
+        self.assertEqual([int(call.args[1][0, 0, 0]) for call in upgrade.call_args_list], [4, 7])
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["fast", "page_wait"])
+        self.assertIsNone(bond_stops.deferred(ctx.root))
 
     def test_upgrade_preventing_freeze_can_defer_but_other_errors_cannot(self):
         for upgrade in (True, False):
@@ -414,7 +536,8 @@ class GuardTests(unittest.TestCase):
         ctx = Context(mode="slot", frames=[frame(9)])
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
         bond_stops.set_formation(ctx.root, slots(support=4))
-        with patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
              patch.object(action, "read_bond_upgrade", return_value=False):
             result = action.inspect_bond_stop(ctx, frame(4))
         self.assertEqual(result.reason, "bond_check_unconfirmed")
