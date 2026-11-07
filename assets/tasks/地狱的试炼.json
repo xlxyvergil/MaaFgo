@@ -21,12 +21,6 @@
         "原生自动战斗高级策略"
       ],
       "pipeline_override": {
-        "原生战斗-茶壶配置": {
-          "attach": {
-            "native_battle_trial_profile": "hellish_202611",
-            "trial_no_auto_items": true
-          }
-        },
         "执行自动编队": {
           "attach": {
             "native_battle_trial_profile": "hellish_202611",

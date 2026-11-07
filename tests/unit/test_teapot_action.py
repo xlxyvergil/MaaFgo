@@ -72,39 +72,31 @@ class TeapotTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     t._settings(ctx)
 
-    def trial_runner(self, hits, *, desired=False, attach=None):
+    def recognition_runner(self, hits, *, desired=False, attach=None):
         ctx = context(desired)
-        ctx.get_node_data.return_value = {"attach": {
-            "use_teapot": desired, "native_battle_trial_profile": "hellish_202611",
-            "trial_no_auto_items": True, **(attach or {})}}
+        ctx.get_node_data.return_value = {"attach": {"use_teapot": desired, **(attach or {})}}
         runner = t.TeapotRunner(ctx)
         runner._capture = Mock(return_value=object())
         runner._hit = Mock(side_effect=lambda name, _: name in hits)
         return runner
 
-    def test_trial_empty_strip_requires_both_strict_task_flags(self):
-        for attach, allowed in (({}, False), ({"trial_no_auto_items": True}, False),
-                ({"native_battle_trial_profile": "hellish_202611"}, False),
-                ({"native_battle_trial_profile": "other", "trial_no_auto_items": True}, False),
-                ({"native_battle_trial_profile": "hellish_202611", "trial_no_auto_items": "true"}, False),
-                ({"native_battle_trial_profile": "hellish_202611", "trial_no_auto_items": True}, True)):
-            ctx = context()
-            ctx.get_node_data.return_value = {"attach": attach}
+    def test_empty_strip_needs_no_task_or_battle_source_flags(self):
+        hits = {"茶壶-识别编队页", "茶壶-识别交替过渡", "茶壶-识别无自动道具栏"}
+        for attach in ({}, {"native_battle_trial_profile": "other"},
+                       {"trial_no_auto_items": False},
+                       {"native_battle_trial_profile": "hellish_202611", "trial_no_auto_items": True}):
+            runner = self.recognition_runner(hits, attach=attach)
             with self.subTest(attach=attach):
-                self.assertIs(t._trial_empty_items_allowed(ctx), allowed)
+                self.assertEqual(runner.observe(), t.TeapotFrame("absent"))
 
-    def test_only_info_is_still_transition_without_trial_enable_or_empty_proof(self):
-        hits = {"茶壶-识别编队页", "茶壶-识别交替过渡", "茶壶-试炼无自动道具栏"}
-        for attach in ({"trial_no_auto_items": False}, {"native_battle_trial_profile": "other"}):
-            runner = self.trial_runner(hits, attach=attach)
-            self.assertEqual(runner.observe(), t.TeapotFrame("transition"))
-            self.assertNotIn("茶壶-试炼无自动道具栏", [call.args[0] for call in runner._hit.call_args_list])
-        runner = self.trial_runner(hits - {"茶壶-试炼无自动道具栏"})
+    def test_only_info_is_still_transition_without_full_empty_proof(self):
+        hits = {"茶壶-识别编队页", "茶壶-识别交替过渡"}
+        runner = self.recognition_runner(hits)
         self.assertFalse(runner.run())
         self.assertEqual(runner._capture.call_count, 8)
 
-    def test_trial_empty_strip_never_overrides_unknown_popup_bar_storm_or_conflict(self):
-        common = {"茶壶-识别编队页", "茶壶-试炼无自动道具栏", "茶壶-识别交替过渡"}
+    def test_empty_strip_never_overrides_unknown_popup_bar_storm_or_conflict(self):
+        common = {"茶壶-识别编队页", "茶壶-识别无自动道具栏", "茶壶-识别交替过渡"}
         cases = [(common - {"茶壶-识别编队页"}, t.TeapotFrame("unknown")),
                  (common | {"茶壶-识别弹窗", "茶壶-弹窗已开启"}, t.TeapotFrame("popup", True)),
                  (common | {"茶壶-直接已开启"}, t.TeapotFrame("bar", True)),
@@ -112,34 +104,50 @@ class TeapotTests(unittest.TestCase):
                  (common | {"茶壶-识别风暴罐"}, t.TeapotFrame("storm")),
                  (common | {"茶壶-直接已开启", "茶壶-直接已关闭"}, t.TeapotFrame("entry"))]
         for hits, expected in cases:
-            runner = self.trial_runner(hits)
+            runner = self.recognition_runner(hits)
             with self.subTest(expected=expected):
                 self.assertEqual(runner.observe(), expected)
-                self.assertNotIn("茶壶-试炼无自动道具栏", [call.args[0] for call in runner._hit.call_args_list])
+                self.assertNotIn("茶壶-识别无自动道具栏", [call.args[0] for call in runner._hit.call_args_list])
 
-    def test_trial_empty_full_strip_requires_all_eight_samples_and_makes_no_input(self):
-        hits = {"茶壶-识别编队页", "茶壶-试炼无自动道具栏", "茶壶-识别交替过渡"}
+    def test_empty_full_strip_requires_all_eight_samples_and_makes_no_input(self):
+        hits = {"茶壶-识别编队页", "茶壶-识别无自动道具栏", "茶壶-识别交替过渡"}
         for desired in (False, True):
-            runner = self.trial_runner(hits, desired=desired)
+            runner = self.recognition_runner(hits, desired=desired)
             with self.subTest(desired=desired):
                 self.assertTrue(runner.run())
                 self.assertEqual(runner._capture.call_count, 8)
-                self.assertEqual(sum(call.args[0] == "茶壶-试炼无自动道具栏"
+                self.assertEqual(sum(call.args[0] == "茶壶-识别无自动道具栏"
                                      for call in runner._hit.call_args_list), 8)
                 runner.context.run_task.assert_called_once_with(t.NOTICE_NODE)
                 self.assertIn("本关无法使用茶壶", runner.context.override_pipeline.call_args.args[0]
                               [t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"])
                 runner.context.get_node_data.assert_called_with(t.CONFIG_NODE)
 
-    def test_late_real_transition_interrupts_trial_absence_evidence(self):
+    def test_late_real_transition_interrupts_absence_evidence(self):
         hits = {"茶壶-识别编队页", "茶壶-识别交替过渡"}
-        runner = self.trial_runner(hits)
+        runner = self.recognition_runner(hits)
         runner._hit.side_effect = lambda name, _: (
-            name in hits or name == "茶壶-试炼无自动道具栏" and runner._capture.call_count < 8)
+            name in hits or name == "茶壶-识别无自动道具栏" and runner._capture.call_count < 8)
         self.assertFalse(runner.run())
         self.assertEqual(runner._capture.call_count, 8)
         self.assertIn("校验失败", runner.context.override_pipeline.call_args.args[0]
                       [t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"])
+
+    def test_eighth_non_absent_frame_cannot_confirm_empty_bar(self):
+        for frame in (t.TeapotFrame("unknown"), t.TeapotFrame("transition"),
+                      t.TeapotFrame("storm"), t.TeapotFrame("entry"),
+                      t.TeapotFrame("bar", False), t.TeapotFrame("popup", False)):
+            with self.subTest(frame=frame):
+                runner = ScriptedRunner([t.TeapotFrame("absent")] * 7 + [frame])
+                self.assertFalse(runner.run())
+                self.assertEqual(runner.observation_count, 8)
+                self.assertEqual(runner.actions, [])
+
+    def test_two_real_bar_readings_after_empty_frames_take_precedence(self):
+        runner = ScriptedRunner([t.TeapotFrame("absent")] * 6
+                                + [t.TeapotFrame("bar", False)] * 2)
+        self.assertEqual(runner._initial(), t.TeapotFrame("bar", False))
+        self.assertEqual(runner.observation_count, 8)
 
     def test_capture_uses_pipeline_wait_and_never_waits_for_screenshot_job_status(self):
         ctx = context()

@@ -28,18 +28,19 @@ def pipeline_nodes():
 
 
 class NativeTeapotOptionTests(unittest.TestCase):
-    def test_only_trial_explicitly_allows_rewardless_empty_item_bar(self):
+    def test_empty_item_bar_detection_is_shared_without_trial_switches(self):
         nodes = pipeline_nodes()
-        self.assertIs(nodes[CONFIG]["attach"]["trial_no_auto_items"], False)
-        self.assertEqual(nodes[CONFIG]["attach"]["native_battle_trial_profile"], "")
-        enabled = []
+        self.assertEqual(nodes[CONFIG]["attach"], {"use_teapot": False})
+        self.assertIn("茶壶-识别无自动道具栏", nodes)
         for path in (ROOT / "assets/tasks").glob("*.json"):
             for task in json.loads(path.read_text(encoding="utf-8")).get("task", []):
                 attach = task.get("pipeline_override", {}).get(CONFIG, {}).get("attach", {})
-                if attach.get("trial_no_auto_items") is True:
-                    self.assertEqual(attach.get("native_battle_trial_profile"), "hellish_202611")
-                    enabled.append(task["name"])
-        self.assertEqual(enabled, ["地狱的试炼"])
+                with self.subTest(task=task["name"]):
+                    self.assertNotIn("trial_no_auto_items", attach)
+                    self.assertNotIn("native_battle_trial_profile", attach)
+        trial = read("assets/tasks/地狱的试炼.json")["task"][0]["pipeline_override"]
+        self.assertEqual(trial["原生自动战斗入口"]["attach"]["native_battle_trial_profile"], "hellish_202611")
+        self.assertIs(trial["执行自动编队"]["attach"]["trial_grand_slot_repair"], True)
 
     def test_default_off_changes_configuration_without_disabling_detection(self):
         option = read(f"assets/options/{OPTION}.json")["option"][OPTION]
