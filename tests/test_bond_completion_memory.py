@@ -104,6 +104,41 @@ class BondCompletionMemoryTests(unittest.TestCase):
                 action._prepare_auto_memory()
                 self.assertNotEqual(before, action.memory_task_key)
 
+    def test_extra_class_groups_invalidate_only_legacy_extra_memory(self):
+        action = CompleteBondFormation()
+        vars(action).update(
+            auto_memory_enabled=True, expected=self.expected,
+            preferred_rarity=5, bond_base=1200, max_cost=114,
+            use_local_servant_inventory=True, use_local_equip_inventory=True,
+            modify_unspecified_servants=True, modify_unspecified_equips=True,
+            use_support_substitution=False, servant_database={}, equip_database={},
+        )
+        signature = formation_signature(["empty"] * 6, ["none"] * 6)
+        with tempfile.TemporaryDirectory() as directory, \
+                patch("bond_completion_action._BOND_MEMORY_PATH", str(Path(directory) / "memory.json")), \
+                patch("bond_completion_action.build_memory_task_key", wraps=build_task_key) as build:
+            for quest_type, grand_class, allowed in (
+                ("", "", None), ("grand", "saber", None),
+                ("grand", "ex1", {"ruler", "avenger", "moonCancer", "shielder"}),
+                ("grand", "ex2", {"alterEgo", "foreigner", "pretender", "beast"}),
+            ):
+                with self.subTest(grand_class=grand_class):
+                    action.quest_type, action.grand_class = quest_type, grand_class
+                    action._prepare_auto_memory()
+                    settings = dict(build.call_args.args[1])
+                    legacy = dict(settings)
+                    actual = legacy.pop("grand_candidate_classes", None)
+                    self.assertEqual(actual, sorted(allowed) if allowed else None)
+                    legacy_key = build_task_key(self.expected, legacy)
+                    action.memory_store.put(legacy_key, signature)
+                    action._prepare_auto_memory()
+                    if allowed:
+                        self.assertNotEqual(action.memory_task_key, legacy_key)
+                        self.assertIsNone(action.remembered_signature)
+                    else:
+                        self.assertEqual(action.memory_task_key, legacy_key)
+                        self.assertEqual(action.remembered_signature, signature)
+
     def test_option_defaults_to_enabled_and_pipeline_has_safe_default(self):
         options = json.loads(
             (ROOT / "assets/options/Chaldea羁绊补齐.json").read_text(
