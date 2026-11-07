@@ -148,32 +148,44 @@ class BondCompletionOptionTest(unittest.TestCase):
             for class_name in (
                 "saber",
                 "archer",
+                "lancer",
+                "rider",
+                "caster",
+                "assassin",
                 "berserker",
                 "ruler",
+                "avenger",
+                "moonCancer",
                 "alterEgo",
                 "foreigner",
+                "pretender",
+                "beast",
                 "shielder",
                 "unBeast",
+                "loreGrandCaster",
+                "unknown",
+                "",
             )
         }
 
         action.quest_type = "grand"
-        action.grand_class = "saber"
-        self.assertEqual(
-            {item["class"] for item in action._servant_candidates(5)},
-            {"saber"},
-        )
+        for regular_class in ("saber", "archer", "lancer", "rider", "caster", "assassin", "berserker"):
+            action.grand_class = regular_class
+            with self.subTest(regular_class=regular_class):
+                self.assertEqual({item["class"] for item in action._servant_candidates(5)}, {regular_class})
 
-        for extra_group in ("ex1", "ex2"):
+        for extra_group, expected in (
+            ("ex1", {"ruler", "avenger", "moonCancer", "shielder"}),
+            ("ex2", {"alterEgo", "foreigner", "pretender", "beast"}),
+        ):
             action.grand_class = extra_group
-            self.assertEqual(
-                {item["class"] for item in action._servant_candidates(5)},
-                {"ruler", "alterEgo", "foreigner", "shielder", "unBeast"},
-            )
+            with self.subTest(extra_group=extra_group):
+                self.assertEqual({item["class"] for item in action._servant_candidates(5)}, expected)
+                self.assertFalse(action._servant_matches_quest_class({"class": None}))
 
         action.quest_type = ""
         action.grand_class = ""
-        self.assertEqual(len(action._servant_candidates(5)), 8)
+        self.assertEqual(len(action._servant_candidates(5)), len(action.servant_database))
 
     def test_valid_local_inventory_document_returns_unique_ids(self):
         document = {
