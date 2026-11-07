@@ -1,61 +1,26 @@
 {
     "羁绊结算-页面": {
-        "doc": "日服模板已换为2026-11-01冬木XA实机羁绊页裁图，保留BBC 720p参考ROI；国服cn同名覆盖仍为BBC临时素材。页面与第5栏MAX已由MaaMCP确认（替换前0.9728/0.9732），可参考tests/fixtures/bond_stop/jp_bond_slot5_max.png与docs/verification/bond_stop_templates.json。固定左上ROI用于排除升级展示右侧同样出现的文字，不能扩大到全屏；升级弹窗负样本见jp_bond_level_up_overlay.png。",
+        "doc": "使用原包img_txt_servantbonds01完整文字，tools/generate_bond_text_templates.py按720p字号放大1.25倍并将背景制成纯绿遮罩；国服cn覆盖同名中文资源。日服普通页真实框架回放0.910。01文字也是升级说明02的前缀，必须限制左上，不能全屏搜索；MAX只在本节点命中后读取。参考羁绊结算-升级展示、test_bond_result_images.py及docs/verification/bond_stop_templates.json。",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "battle/bond/羁绊结算页.png",
-                "roi": [67, 150, 93, 83],
+                "template": "battle/bond/img_txt_servantbonds01.png",
+                "roi": [60, 150, 400, 90],
+                "method": 5,
+                "green_mask": true,
                 "threshold": 0.8
             }
         }
     },
     "羁绊结算-升级展示": {
-        "doc": "兼容旧详情展示及新横幅：详情须同时命中升级标题与说明；横幅须同时命中升级标题和完整羁绊升级文字。2026-11-07日服达芬奇升级横幅中旧说明被立绘挡住，仅0.394，横幅OCR0.966、标题0.989。只证明升级展示遮挡，不证明达到当前羁绊上限；后续复核与跳过见结算-羁绊升级继续。",
-        "recognition": {"type": "Or", "param": {
-            "any_of": ["羁绊结算-升级详情展示", "羁绊结算-升级横幅展示"]
-        }}
-    },
-    "羁绊结算-升级详情展示": {
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "羁绊结算-升级标题",
-                    "羁绊结算-升级说明"
-                ]
-            }
-        }
-    },
-    "羁绊结算-升级横幅展示": {
-        "recognition": {"type": "And", "param": {
-            "all_of": ["羁绊结算-升级标题", "羁绊结算-升级横幅文字"]
-        }}
-    },
-    "羁绊结算-升级横幅文字": {
-        "recognition": {"type": "OCR", "param": {
-            "roi": [480, 70, 795, 160],
-            "expected": ["絆レベルアップ", "羁绊等级提升", "羁绊等级升级"], "threshold": 0.8
-        }}
-    },
-    "羁绊结算-升级标题": {
-        "doc": "BBC jbup1顶部升级字区的720p参考ROI，日服改为本项目实拍裁图；仅与升级说明组合识别展示，不读羁绊等级。",
+        "doc": "只使用原包img_txt_servantbonds02右侧完整羁绊加深文字，按1.25倍字号及纯绿背景遮罩导出，国服cn覆盖同名中文资源。2026-11-07 MaaMCP实测日服龙娘5→6现有弹窗0.8863：以全选及重建第5/10场剩余预算登记下场复核，结算-羁绊升级继续单击后确认经验页。完整动画过渡仍由真实框架截图回放覆盖；旧详情0.888。早期大横幅尚无这段文字，应由羁绊守卫有界等待，不依赖动态顶部标题或卡片LEVEL UP。此节点只确认升级展示，不能判断MAX；延后复核及点击权限见结算-羁绊升级继续。",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "battle/bond/升级标题.png",
-                "roi": [1100, 67, 157, 167],
-                "threshold": 0.8
-            }
-        }
-    },
-    "羁绊结算-升级说明": {
-        "doc": "BBC jbup右侧羁绊说明字区的720p参考ROI，日服改为本项目实拍裁图。该文字片段也见于正常结果页，必须限定右侧并同时确认顶部升级标题。",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "battle/bond/升级说明.png",
-                "roi": [653, 267, 87, 133],
+                "template": "battle/bond/img_txt_servantbonds02.png",
+                "roi": [630, 295, 620, 100],
+                "method": 5,
+                "green_mask": true,
                 "threshold": 0.8
             }
         }

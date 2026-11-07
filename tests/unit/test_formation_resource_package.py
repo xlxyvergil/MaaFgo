@@ -65,10 +65,13 @@ class FormationResourceTests(unittest.TestCase):
 
     def test_failed_page_check_reports_exact_paths_scores_and_threshold(self):
         reader = self.fixture.reader()
-        with patch.object(f.mfaalog, "warning") as warning:
+        with patch.object(f.mfaalog, "diagnostic") as diagnostic, \
+                patch.object(f.mfaalog, "warning") as warning:
             with self.assertRaisesRegex(ValueError, "not_on_formation_confirmation"):
                 reader.read_frame(np.zeros_like(self.fixture.image))
-        messages = [call.args[0] for call in warning.call_args_list]
+        warning.assert_not_called()
+        messages = [call.args[0] for call in diagnostic.call_args_list
+                    if "页面校验" in call.args[0]]
         self.assertEqual(len(messages), 3)
         for name, message in zip(("配置变更", "开始任务", "战斗开始"), messages):
             self.assertIn(str(self.fixture.root / "battle" / f"{name}.png"), message)

@@ -150,6 +150,45 @@ def _poll_wait(context, token, node):
     return True
 
 
+def _wait_upgrade_transition(context, token, image, mode, target, *, controller,
+                             evidence_image, order, target_column):
+    """羁绊页消失后只观察过渡；完整升级说明出现前不登记延后。"""
+    current_image = image
+    try:
+        guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
+        wait_node, attempts, timeout = _poll_config(guard, "page_wait")
+        deadline = time.monotonic() + timeout / 1000
+        for attempt in range(attempts + 1):
+            if context.tasker.stopping or not bond_stops.valid(_root(context), token):
+                return None
+            # 过渡期间羁绊页可能重新可见，仍然先保留明确的MAX阳性。
+            if read_bond_page(context, current_image):
+                maxima = _read_maxima(context, current_image, mode)
+                stopped = _positive(context, token, current_image, mode, maxima, order, target_column)
+                if stopped:
+                    return stopped
+            recognized, stopped = _inspect_upgrade(context, token, current_image, mode, target,
+                                                   evidence_image=evidence_image)
+            if recognized:
+                return stopped
+            _reject_missed_bond_page(context, current_image)
+            if context.tasker.stopping or not bond_stops.valid(_root(context), token):
+                return None
+            if attempt == attempts or time.monotonic() >= deadline:
+                break
+            if not _poll_wait(context, token, wait_node):
+                return None
+            captured = controller.post_screencap().wait().get()
+            if captured is None:
+                raise ValueError("等待羁绊升级说明时截图失败，无法确认当前结算画面。请保留日志反馈后重试。")
+            current_image = captured
+        raise ValueError("羁绊结算页已被切换画面遮挡，但未在配置时限内确认羁绊升级说明，无法判断是否满羁绊。请保留当前截图和日志反馈后重试。")
+    except Exception as exc:
+        if context.tasker.stopping or not bond_stops.valid(_root(context), token):
+            return None
+        return _latch_error(context, token, evidence_image, exc, latest_image=current_image)
+
+
 def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
     """同帧MAX先锁存；明确升级遮挡可按原剩余次数延后。"""
     root = _root(context)
@@ -258,13 +297,9 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         return _latch_error(context, token, evidence_image, "羁绊结果动画未稳定", latest_image=current_image)
     except Exception as exc:
         if str(exc) == "bond_result_page_not_visible" and current_image is not None:
-            try:
-                recognized, stopped = _inspect_upgrade(context, token, current_image, mode, target,
-                                                       evidence_image=evidence_image)
-                if recognized:
-                    return stopped
-            except Exception as upgrade_error:
-                exc = upgrade_error
+            return _wait_upgrade_transition(context, token, current_image, mode, target,
+                controller=controller, evidence_image=evidence_image,
+                order=order, target_column=target_column)
         return _latch_error(context, token, evidence_image, exc, latest_image=current_image)
 
 

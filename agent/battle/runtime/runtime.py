@@ -309,14 +309,14 @@ class AutoBattleRuntime:
                     f"分差{card.owner_margin:.3f},{'可攻击' if card.can_attack else '封印/无法行动'})"
                     for card in state.cards
                 )
-                mfaalog.info(f"[英灵选卡] {cards_text}")
+                mfaalog.diagnostic(f"[英灵选卡] {cards_text}")
                 self._selection_np_cards = state.np_cards
-                mfaalog.info("[宝具选卡] " + " | ".join(
+                mfaalog.diagnostic("[宝具选卡] " + " | ".join(
                     f"宝具{card.servant_slot}:{servant_name(card.owner_servant_id)}"
                     f"({'可用' if card.available else card.blocked_reason},卡面={card.confidence.value:.3f})"
                     for card in state.np_cards
                 ))
-                mfaalog.info(f"[AutoBattle] State: {state}")
+                mfaalog.diagnostic(f"[AutoBattle] State: {state}")
                 action = waiting_action or self.decider.decide(state, turn_index=plan_turn)
                 mfaalog.info(f"[AutoBattle] Decided Action: {action}")
                 
@@ -421,11 +421,11 @@ class AutoBattleRuntime:
         return replace(action, rationale_tag="opening_hand:wait_without_skills_or_np")
 
     def _observe(self, *, settle_main: bool = False, enemy_slots=None):
-        mfaalog.info("[AutoBattle] _observe() -> post_screencap")
+        mfaalog.diagnostic("[AutoBattle] _observe() -> post_screencap")
         img = self.controller.post_screencap().wait().get()
         scene = perception.detect_scene(self.ctx, img) if settle_main else None
         if scene is Scene.MAIN_BATTLE:
-            mfaalog.info(
+            mfaalog.diagnostic(
                 f"[AutoBattle] MAIN_BATTLE detected; waiting {_MAIN_BATTLE_SETTLE_S}s "
                 "before skill CD recognition"
             )
@@ -459,7 +459,7 @@ class AutoBattleRuntime:
                 break
             if self.ctx.tasker.stopping:
                 raise RuntimeError("np_glare_retry_stopped")
-            mfaalog.info(f"[NPGlare] frame={frame_index}/{_NP_GLARE_MAX_FRAMES} "
+            mfaalog.diagnostic(f"[NPGlare] frame={frame_index}/{_NP_GLARE_MAX_FRAMES} "
                          f"uncertain={uncertain}; 保持0.80门槛，等待新相位后重拍")
             detail = self.ctx.run_task("战斗_宝具闪光重拍等待")
             if not (detail and detail.status.succeeded):
@@ -481,9 +481,9 @@ class AutoBattleRuntime:
         # 将所有技能标记为可用，避免被安全门过滤掉。
         if self._has_active_plan():
             result = self._patch_skills_available(result)
-            mfaalog.info("[AutoBattle] _observe() -> plan active, present servants' skills patched to available")
+            mfaalog.diagnostic("[AutoBattle] _observe() -> plan active, present servants' skills patched to available")
 
-        mfaalog.info(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
+        mfaalog.diagnostic(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
         return result
 
     def _update_frontline(self, servants) -> None:
@@ -936,7 +936,7 @@ class AutoBattleRuntime:
             return False
         deadline = time.monotonic() + (_ORDER_CHANGE_RETURN_TIMEOUT_S if timeout is None else timeout)
         try:
-            mfaalog.info("[AutoBattle] order change waiting for stable skill bar")
+            mfaalog.diagnostic("[AutoBattle] order change waiting for stable skill bar")
             detail = self.ctx.run_task("战斗_换人后等待技能栏稳定")
             if self.ctx.tasker.stopping or not detail or not detail.status.succeeded:
                 return False
@@ -953,7 +953,7 @@ class AutoBattleRuntime:
             )
             if not stable or self.ctx.tasker.stopping or time.monotonic() > deadline:
                 return False
-            mfaalog.info("[AutoBattle] order change skill bar stable")
+            mfaalog.diagnostic("[AutoBattle] order change skill bar stable")
             return True
         except Exception as exc:
             mfaalog.warning(f"[AutoBattle] order change stability check failed: {exc}")
@@ -1096,7 +1096,7 @@ class AutoBattleRuntime:
     def _wait_turn_settled(self) -> bool:
         self._post_attack_returned_to_map = False
         self._post_attack_failure_reason = "stuck_after_attack"
-        mfaalog.info(f"[AutoBattle] _wait_turn_settled() timeout={_ANIMATION_TIMEOUT_S}s")
+        mfaalog.diagnostic(f"[AutoBattle] _wait_turn_settled() timeout={_ANIMATION_TIMEOUT_S}s")
         getter = getattr(self.ctx, "get_node_data", None)
         guard = getter("结算-羁绊满停止") if getter else None
         preserve_bond_page = isinstance(guard, dict) and guard.get("enabled") is True
@@ -1105,7 +1105,7 @@ class AutoBattleRuntime:
         result = self._wait_until(_TERMINAL_OR_MAIN, _ANIMATION_TIMEOUT_S,
                                   tap_close=not preserve_bond_page, handle_story=True,
                                   command_selection_timeout_s=3.0)
-        mfaalog.info(f"[AutoBattle] _wait_turn_settled() result={result}")
+        mfaalog.diagnostic(f"[AutoBattle] _wait_turn_settled() result={result}")
         return result
 
     def _handle_post_attack_story(self, image) -> bool | None:
@@ -1135,7 +1135,7 @@ class AutoBattleRuntime:
     def _wait_until(self, scenes, timeout_s: float, tap_close: bool = False,
                     handle_story: bool = False,
                     command_selection_timeout_s: float | None = None) -> bool:
-        mfaalog.info(f"[AutoBattle] _wait_until() scenes={[s.name for s in scenes]} timeout={timeout_s}s")
+        mfaalog.diagnostic(f"[AutoBattle] _wait_until() scenes={[s.name for s in scenes]} timeout={timeout_s}s")
         deadline = time.monotonic() + timeout_s
         story_seen = False
         map_since = None
@@ -1153,7 +1153,7 @@ class AutoBattleRuntime:
             scene = (perception.detect_scene(self.ctx, img) if Scene.ORDER_CHANGE in scenes
                      else perception.detect_scene(self.ctx, img, check_order_change=False))
             if scene in scenes:
-                mfaalog.info(f"[AutoBattle] _wait_until() matched scene={scene.name}")
+                mfaalog.diagnostic(f"[AutoBattle] _wait_until() matched scene={scene.name}")
                 return True
             if command_selection_timeout_s is not None and scene is Scene.COMMAND_SELECTION:
                 now = time.monotonic()

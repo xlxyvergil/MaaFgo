@@ -1,5 +1,72 @@
 import sys
 import time
+import logging
+import os
+import threading
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+
+# 多个 Agent 分开写文件，避免跨进程轮转冲突；不经过 MXU 的输出通道。
+_DIAGNOSTIC_PATH = (Path(__file__).resolve().parents[2] / "debug"
+                    / f"recognition-{os.getpid()}.log")
+_DIAGNOSTIC_MAX_BYTES = 4 * 1024 * 1024
+_DIAGNOSTIC_BACKUP_COUNT = 2
+_diagnostic_handler = None
+_diagnostic_lock = threading.RLock()
+
+
+class _DiagnosticFileHandler(RotatingFileHandler):
+    def handleError(self, record):
+        # 交给 diagnostic 回退，避免 logging 静默丢失排查记录。
+        raise
+
+
+def _diagnostic_backup_name(name):
+    # 轮转文件也以 .log 结尾，兼容 MXU 的日志导出与清理。
+    base, index = name.rsplit(".", 1)
+    return f"{Path(base).with_suffix('')}.{index}.log"
+
+
+def diagnostic(msg):
+    """只保存详细识别日志；写文件失败时告知用户并回退到客户端。"""
+    global _diagnostic_handler
+    failure = None
+    with _diagnostic_lock:
+        if _diagnostic_handler is not False:
+            try:
+                if _diagnostic_handler is None:
+                    _DIAGNOSTIC_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    handler = _DiagnosticFileHandler(
+                        _DIAGNOSTIC_PATH, maxBytes=_DIAGNOSTIC_MAX_BYTES,
+                        backupCount=_DIAGNOSTIC_BACKUP_COUNT, encoding="utf-8",
+                    )
+                    handler.namer = _diagnostic_backup_name
+                    handler.setFormatter(logging.Formatter(
+                        "%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S",
+                    ))
+                    _diagnostic_handler = handler
+                record = logging.LogRecord(
+                    "maafgo.recognition", logging.INFO, __file__, 0, str(msg), (), None,
+                )
+                _diagnostic_handler.handle(record)
+                return
+            except Exception as exc:
+                failure = exc
+                if _diagnostic_handler is not None:
+                    try:
+                        _diagnostic_handler.close()
+                    except OSError:
+                        pass
+                _diagnostic_handler = False
+    if failure is not None:
+        warning(
+            f"详细识别日志无法写入 {_DIAGNOSTIC_PATH}，后续细节将暂时显示在运行日志中。"
+            "请检查该目录是否可写、磁盘是否有剩余空间，处理后停止并重新启动任务。"
+            f"原因：{failure}"
+        )
+    info(msg)
 
 # 核心修改：MFA GUI 监听的是标准输出，且需要特定的前缀
 # 开发者原话："focus或者字符串前面拼接info："
