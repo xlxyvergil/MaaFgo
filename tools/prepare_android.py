@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "Android" / "assets"
 ANDROID_OPTION_TYPES = {"select", "switch", "checkbox", "input"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
-REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍", "打开编队与战斗编辑器"}
+# MXU 内置任务由桌面客户端执行，安卓端没有对应的 CustomAction。
+REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍", "打开编队与战斗编辑器", "__MXU_KILLPROC__"}
 BILIBILI_ANDROID_LAUNCHERS = {
     "com.bilibili.fatego",
     "com.bilibili.fatego/.EmptyClass",

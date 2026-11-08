@@ -5,36 +5,81 @@
             "label": "$preset.default.label",
             "description": "$preset.default.description",
             "task": [
-                {
-                    "name": "登录"
-                },
-                {
-                    "name": "启动bbc"
-                },
-                {
-                    "name": "冠位戴冠战"
-                },
-                {
-                    "name": "日常战斗",
-                    "enabled": false
-                },
-                {
-                    "name": "迦勒底之门",
-                    "enabled": false
-                },
-                {
-                    "name": "直接bbc战斗",
-                    "enabled": false
-                },
-                {
-                    "name": "免费友情10连",
-                    "enabled": false
-                },
-                {
-                    "name": "常驻每日1抽",
-                    "enabled": false
-                }
+                { "name": "登录" },
+                { "name": "免费友情10连" },
+                { "name": "常驻每日1抽" },
+                { "name": "冠位戴冠战" },
+                { "name": "关闭游戏" },
+                { "name": "__MXU_KILLPROC__" }
+            ]
+        },
+        {
+            "name": "daily_event",
+            "label": "$preset.daily_event.label",
+            "description": "$preset.daily_event.description",
+            "task": [
+                { "name": "登录" },
+                { "name": "免费友情10连" },
+                { "name": "常驻每日1抽" },
+                { "name": "大活动" },
+                { "name": "小活动", "enabled": false },
+                { "name": "关闭游戏" },
+                { "name": "__MXU_KILLPROC__" }
+            ]
+        },
+        {
+            "name": "battle_only",
+            "label": "$preset.battle_only.label",
+            "description": "$preset.battle_only.description",
+            "task": [
+                { "name": "芥雏子学姐连续代打" }
+            ]
+        },
+        {
+            "name": "story",
+            "label": "$preset.story.label",
+            "description": "$preset.story.description",
+            "task": [
+                { "name": "自动清free本", "enabled": false },
+                { "name": "自动推主线（beta）", "enabled": false }
+            ]
+        },
+        {
+            "name": "daily_training",
+            "label": "$preset.daily_training.label",
+            "description": "$preset.daily_training.description",
+            "task": [
+                { "name": "种树", "enabled": false },
+                { "name": "每日1石", "enabled": false },
+                { "name": "免费友情10连", "enabled": false },
+                { "name": "常驻每日1抽", "enabled": false },
+                { "name": "技能升级", "enabled": false },
+                { "name": "被动升级", "enabled": false },
+                { "name": "整理礼物盒", "enabled": false },
+                { "name": "强化从者", "enabled": false },
+                { "name": "搓丸子", "enabled": false }
             ]
         }
-    ]
+    ],
+    "task": [
+        {
+            "name": "__MXU_KILLPROC__",
+            "label": "⛔ 结束进程",
+            "description": "使用 MXU 内置的结束进程任务，默认结束自身进程。",
+            "entry": "MXU_KILLPROC",
+            "option": ["__MXU_KILLPROC_SELF_OPTION__"],
+            "group": ["其他"]
+        }
+    ],
+    "option": {
+        "__MXU_KILLPROC_SELF_OPTION__": {
+            "type": "switch",
+            "label": "结束自身进程",
+            "default_case": "Yes",
+            "cases": [
+                { "name": "Yes" },
+                { "name": "No" }
+            ]
+        }
+    }
 }
