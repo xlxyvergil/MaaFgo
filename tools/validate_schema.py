@@ -242,6 +242,10 @@ def create_validator(schema, schema_store):
         return ValidatorClass(schema, resolver=resolver)
 
 
+# 这些入口由 MXU 客户端注册，不在资源 pipeline 中；必须同时匹配任务名与入口。
+MXU_BUILTIN_TASK_ENTRIES = {"__MXU_KILLPROC__": "MXU_KILLPROC"}
+
+
 def validate_interface_references(interface_path, require_tracked=False):
     """验证导入文件与任务入口，发布校验可额外拒绝本机未跟踪依赖。"""
     interface_path = Path(interface_path).resolve()
@@ -287,8 +291,11 @@ def validate_interface_references(interface_path, require_tracked=False):
                             nodes.update(load_jsonc(path))
         for document in documents.values():
             for task in document.get("task", []):
-                if task.get("entry") and task["entry"] not in nodes:
-                    raise ValueError(f"Missing task entry: {task['entry']}")
+                entry = task.get("entry")
+                if not entry or entry == MXU_BUILTIN_TASK_ENTRIES.get(task.get("name")):
+                    continue
+                if entry not in nodes:
+                    raise ValueError(f"Missing task entry: {entry}")
         return True
     except (OSError, ValueError, TypeError) as exc:
         print(f"::error file={interface_path},title=Interface reference error::{exc}")

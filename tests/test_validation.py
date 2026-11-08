@@ -44,6 +44,19 @@ class ValidationTests(unittest.TestCase):
             (root / "invalid.json").write_text('{"import":"not-a-list"}', encoding="utf-8")
             self.assertFalse(validate_interface_references(interface))
 
+    def test_mxu_builtin_entry_requires_the_exact_task_name_and_entry_pair(self):
+        with tempfile.TemporaryDirectory() as temp:
+            interface = Path(temp) / "interface.json"
+            for name, entry, expected in (
+                ("__MXU_KILLPROC__", "MXU_KILLPROC", True),
+                ("普通任务", "MXU_KILLPROC", False),
+                ("__MXU_KILLPROC__", "missing", False),
+                ("__MXU_UNKNOWN__", "MXU_UNKNOWN", False),
+            ):
+                with self.subTest(name=name, entry=entry):
+                    interface.write_text(json.dumps({"task": [{"name": name, "entry": entry}]}), encoding="utf-8")
+                    self.assertEqual(validate_interface_references(interface), expected)
+
     def test_local_only_import_cannot_pass_release_check(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
