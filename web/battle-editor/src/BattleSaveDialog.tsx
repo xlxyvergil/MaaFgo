@@ -14,7 +14,7 @@ export function BattleSaveDialog({name,source,pending,directory,busy,onName,onCl
     <p>已存在方案 <strong>{pending!.target!.name}</strong>，是否用当前编辑内容替换？</p>
     <label className="field"><span>将替换的文件</span><div className="path-display">{pending!.target!.path}</div></label>
     <div className="hint"><Info size={15}/><span>替换前会备份旧文件；如果文件已被其他窗口修改，将阻止替换并保留当前编辑内容。</span></div>
-    <div className="modal-bottom"><button className="button" disabled={busy} data-autofocus onClick={onClose}>取消</button><button className="button" disabled={busy} onClick={onRename}>修改文件名</button><button className="button primary" disabled={busy} onClick={onConfirm}><Save size={17}/>{busy?'正在保存…':'替换原文件'}</button></div>
+    <div className="modal-bottom"><button className="button" disabled={busy} data-autofocus onClick={onClose}>取消</button><button className="button" disabled={busy} onClick={onRename}>另存新文件</button><button className="button primary" disabled={busy} onClick={onConfirm}><Save size={17}/>{busy?'正在保存…':'替换原文件'}</button></div>
    </>:<>
     <label className="field"><span>JSON 文件名</span><input autoFocus aria-label="JSON 文件名" disabled={busy} value={name} onChange={event=>onName(event.target.value)} placeholder="local_前排1_前排2_前排3.json"/></label>
     <label className="field"><span>保存位置</span><div className="path-display">{directory}\{name}</div></label>

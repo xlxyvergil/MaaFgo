@@ -122,18 +122,25 @@ class FormationSessions:
                 session.continuation_battle = session.battle + 1
             return bool(eligible)
 
+    def awaiting_continuous_support(self, task_id: int, token: str) -> bool:
+        """只有本场确实等待新助战时，才允许复用上场自有成员。"""
+        with self._lock:
+            session = self._get(task_id, token)
+            return bool(session.continuation is not None and session.repeat and not session.error
+                        and not session.collecting and not session.support_fallback
+                        and session.continuation_battle == session.battle)
+
     def support_selected(self, task_id: int, token: str, servant_id: str | None,
                          *, confidence: Confidence = Confidence(0.0),
                          matched_template: str = "") -> InitialFormation | None:
-        """使用本次头像匹配成功并实际点击的助战，不使用未验证的筛选条件补身份。"""
+        """选中后沿用自有成员；助战未识别时仅撤销助战身份，不保留旧 ID。"""
         with self._lock:
             session = self._get(task_id, token)
             previous = session.continuation
-            can_reuse = (previous is not None and session.repeat and not session.error
-                         and not session.collecting and not session.support_fallback
-                         and session.continuation_battle == session.battle
-                         and isinstance(servant_id, str) and servant_id.isdecimal()
-                         and int(servant_id) > 0)
+            identified = (isinstance(servant_id, str) and servant_id.isdecimal()
+                          and int(servant_id) > 0)
+            can_reuse = (self.awaiting_continuous_support(task_id, token)
+                         and (servant_id is None or identified))
             self._invalidate(session, session.error or ("unfinished_capture" if session.collecting else ""))
             session.support_fallback = False
             bond_stops.clear_formation(task_id)
@@ -141,9 +148,11 @@ class FormationSessions:
                 return None
             # 相同从者可能同时出现在自有位和助战位，必须按唯一助战标记替换。
             slots = tuple(FormationSlot(
-                s.slot, "identified", servant_id, is_support=True,
-                identity_confidence=confidence, matched_template=matched_template,
-                reason="continuous_support_selected", search_scope="support_selection",
+                s.slot, "identified" if identified else "unknown", servant_id, is_support=True,
+                identity_confidence=confidence if identified else Confidence(0.0),
+                matched_template=matched_template if identified else "",
+                reason="continuous_support_selected" if identified else "continuous_support_unknown",
+                search_scope="support_selection",
             ) if s.is_support else s for s in previous.slots)
             snapshot = InitialFormation(
                 slots, task_id, token, session.revision,

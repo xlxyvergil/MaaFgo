@@ -694,7 +694,10 @@ class StoryRunner:
             target = self.locate()
             kind = "battle" if target is None else self.enter(target)
             if kind == "battle":
-                bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1)
+                # 推进关数可能包含剧情；只有当前战斗已是最后一个推进阶段时，
+                # 才能明确声明无下一场，其余阶段的战斗预算仍为未知。
+                bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
+                    another_battle_planned=False if self.completed + 1 == self.limit else None)
                 try:
                     self.fight()
                 except StoryQuestRetry as exc:

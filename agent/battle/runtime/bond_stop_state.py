@@ -40,8 +40,9 @@ class _Run:
     formation: tuple[dict, ...] = ()
     checked_images: tuple[str, ...] = ()
     stopped: BondStop | None = None
-    another_battle_planned: bool = False
+    another_battle_planned: bool | None = None
     deferred: BondStop | None = None
+    final_upgrade: BondStop | None = None
 
 
 class BondStopStates:
@@ -68,7 +69,7 @@ class BondStopStates:
             return bool(run and run.token == token)
 
     def battle_started(self, root: int, battle: int, *, keep_formation=False,
-                       another_battle_planned: bool = False) -> None:
+                       another_battle_planned: bool | None = None) -> None:
         with self._lock:
             self.ensure(root)
             run = self._runs[root]
@@ -77,6 +78,7 @@ class BondStopStates:
             run.battle = battle
             run.another_battle_planned = another_battle_planned
             run.deferred = None
+            run.final_upgrade = None
             run.checked_images = ()
             if not keep_formation:
                 run.formation = ()
@@ -139,12 +141,43 @@ class BondStopStates:
     def can_defer(self, root: int) -> bool:
         with self._lock:
             run = self._runs.get(root)
-            return bool(run and run.another_battle_planned and run.stopped is None)
+            return bool(run and run.another_battle_planned is True and run.stopped is None)
+
+    def is_last_battle(self, root: int) -> bool:
+        """只有调用方明确声明无下一场，才视为末场；未声明预算不作推断。"""
+        with self._lock:
+            run = self._runs.get(root)
+            return bool(run and run.another_battle_planned is False)
 
     def deferred(self, root: int) -> BondStop | None:
         with self._lock:
             run = self._runs.get(root)
             return run.deferred if run else None
+
+    def upgrade_continuation(self, root: int) -> BondStop | None:
+        """本场已确认升级后允许继续结算的证据，不等于已确认未满。"""
+        with self._lock:
+            run = self._runs.get(root)
+            if not run or run.stopped is not None:
+                return None
+            return run.deferred or run.final_upgrade
+
+    def continue_last_upgrade(self, root: int, token: str, *, message: str,
+                              image=None, latest_image=None) -> BondStop | None:
+        """明确末场的升级正常收尾，不登记下一场复核、不锁存停止。"""
+        with self._lock:
+            if not self.valid(root, token):
+                return None
+            run = self._runs[root]
+            if run.another_battle_planned is not False or run.stopped is not None:
+                return None
+            if run.final_upgrade is None:
+                run.final_upgrade = BondStop(
+                    reason="bond_upgrade_final", message=message, battle=run.battle,
+                    image=image.copy() if image is not None else None,
+                    latest_image=latest_image.copy() if latest_image is not None else None,
+                )
+            return run.final_upgrade
 
     def defer(self, root: int, token: str, *, message: str,
               image=None, latest_image=None) -> BondStop | None:

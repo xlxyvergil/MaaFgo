@@ -40,7 +40,7 @@ class ContinuationSessionTests(unittest.TestCase):
         self.token = self.store.begin(1, repeat=True)
 
     def test_only_unique_support_slot_changes_including_reserve_and_duplicate_id(self):
-        for support in (1, 3, 6):
+        for support in (1, 3, 4, 6):
             with self.subTest(support=support):
                 token = self.store.begin(1, repeat=True)
                 original = publish(self.store, 1, token, initial_slots(support))
@@ -91,8 +91,39 @@ class ContinuationSessionTests(unittest.TestCase):
                 self.store.battle_started(1, token, 2)
                 self.assertIsNone(self.store.support_selected(1, token, "100100"))
 
-    def test_single_battle_unknown_identity_and_fallback_do_not_reuse(self):
-        for mode in ("single", "any", "fallback", "no_selection"):
+    def test_unknown_support_preserves_own_members_including_reserve_slot(self):
+        from battle.perception.bond_result import result_formation_order
+
+        for support in (1, 4, 6):
+            with self.subTest(support=support):
+                token = self.store.begin(1, repeat=True)
+                original = publish(self.store, 1, token, initial_slots(support=support))
+                for number in (2, 3):
+                    self.assertTrue(self.store.prepare_continuation(1, token))
+                    self.store.battle_started(1, token, number)
+                    self.assertTrue(self.store.awaiting_continuous_support(1, token))
+                    result = self.store.support_selected(1, token, None,
+                        confidence=Confidence(.99, "stale"), matched_template="old.png")
+                    self.assertEqual(result.source, CONTINUOUS_FORMATION_SOURCE)
+                    self.assertEqual(result.captured_battle, number)
+                    unknown = result.slots[support - 1]
+                    self.assertEqual((unknown.status, unknown.servant_id, unknown.is_support),
+                                     ("unknown", None, True))
+                    self.assertEqual(unknown.identity_confidence.value, 0)
+                    self.assertEqual(unknown.matched_template, "")
+                    self.assertFalse(self.store.awaiting_continuous_support(1, token))
+                    for before, after in zip(original.slots, result.slots):
+                        if not before.is_support:
+                            self.assertIs(after, before)
+                    self.assertEqual(result_formation_order(result.slots),
+                                     tuple(i for i in range(1, 7) if i != support))
+                self.assertTrue(self.store.prepare_continuation(1, token))
+                self.store.battle_started(1, token, 4)
+                result = self.store.support_selected(1, token, "405900")
+                self.assertEqual(result.slots[support - 1].servant_id, "405900")
+
+    def test_single_battle_fallback_and_no_selection_do_not_reuse(self):
+        for mode in ("single", "fallback", "no_selection"):
             with self.subTest(mode=mode):
                 token = self.store.begin(1, repeat=mode != "single")
                 publish(self.store, 1, token)
@@ -143,6 +174,68 @@ class ContinuationActionTests(unittest.TestCase):
         self.addCleanup(sessions.stop_owner, "")
         for target in ("support_action.time.sleep", "support_action.mfaalog.info", "support_action.mfaalog.error"):
             p = patch(target); p.start(); self.addCleanup(p.stop)
+
+    def test_ce_only_reserve_support_keeps_frontline_skills_across_battles(self):
+        from battle.core.enums import Scene
+        from battle.core.models import BattleState
+        from battle.perception import perception
+        from battle.perception.frontline import FrontlineIdentity
+
+        ctx = Context(enabled=False)
+        ctx.attach.update(class_name="any", servant="stale", np_level=5, level=120,
+                          **{f"skill_active_{i}": 10 for i in range(1, 4)},
+                          **{f"skill_passive_{i}": 10 for i in range(1, 6)})
+        ids = ("100100", "200100", "300100", "400100", "500100", "600100")
+        original = publish(sessions, ctx.root, ctx.token, tuple(
+            replace(slot, servant_id=sid) for slot, sid in zip(initial_slots(4), ids)))
+        action = SupportAction()
+        for name, value in {
+            "_get_detector": NS(detect=lambda image: [(0, 0, 100, 100, .99)]),
+            "_init_scale": None, "_tap": None, "_shot_base": object(),
+            "_ref_shift": (0, 0), "_match_ce": True,
+            "_match_servant": False, "_check_active_view": False, "_match_passive": False,
+        }.items():
+            setattr(action, name, Mock(return_value=value))
+
+        def visible(candidates, lineup):
+            return tuple(FrontlineIdentity(slot, sid if sid in candidates else None,
+                                           Confidence(.98, "fixture"))
+                         for slot, sid in enumerate(lineup, 1))
+
+        for number, support_id in ((2, None), (3, "405900"), (4, "403200")):
+            with self.subTest(battle=number, support_id=support_id):
+                self.assertTrue(sessions.prepare_continuation(ctx.root, ctx.token))
+                sessions.battle_started(ctx.root, ctx.token, number)
+                def identify(*args):
+                    if support_id is not None:
+                        action._matched_face_evidence = (.95, f"{support_id}.png")
+                    return support_id
+                action._identify_unrestricted_support = Mock(side_effect=identify)
+                self.assertTrue(action.run(ctx, NS(node_name="助战action", custom_action_param="{}")).success)
+                action._identify_unrestricted_support.assert_called_once()
+                updated, _ = sessions.read(ctx.root, ctx.token)
+                self.assertEqual(updated.slots[3].servant_id, support_id)
+                for index in (0, 1, 2, 4, 5):
+                    self.assertIs(updated.slots[index], original.slots[index])
+                with patch.object(battle, "AutoBattleRuntime") as runtime:
+                    runtime.return_value.run.return_value = NS(ok=True, reason="fixture", turns=1)
+                    self.assertTrue(battle.AutoBattleAction().run(ctx, NS(custom_action_param="{}")).success)
+                    candidates = runtime.call_args.kwargs["roster_servant_ids"]
+                    decider = runtime.call_args.args[2]
+                self.assertEqual(candidates, ids[:3] + (support_id,) + ids[4:])
+                for lineup, expected_slots in ((ids[:3], (1, 2, 3)),
+                                               ((support_id, ids[1], ids[2]),
+                                                (1, 2, 3) if support_id else (2, 3))):
+                    recognizer = NS(detect=lambda image, supplied: visible(supplied, lineup))
+                    with patch.object(perception, "_reco", return_value=NS(hit=False)):
+                        servants = perception._detect_servants(ctx, object(), candidates, recognizer=recognizer)
+                    state = BattleState(Scene.MAIN_BATTLE, Confidence(1.0), (), (), (), servants=servants)
+                    skills = decider.decide(state).servant_skills
+                    self.assertEqual([(skill.servant_slot, skill.skill_index) for skill in skills],
+                                     [(slot, index) for slot in expected_slots for index in (1, 2, 3)])
+        action._match_servant.assert_not_called()
+        action._check_active_view.assert_not_called()
+        action._match_passive.assert_not_called()
 
     def test_actual_support_action_both_success_branches_update_runtime_roster(self):
         for passive, failed_click in ((False, False), (True, False), (False, True), (True, True)):
