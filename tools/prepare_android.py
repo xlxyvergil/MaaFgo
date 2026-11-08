@@ -380,7 +380,7 @@ def prepare(root: Path = ROOT, output: Path = OUTPUT) -> dict:
         pipeline.pop("关闭bbc", None)
         pipeline["关闭游戏"].pop("next", None)
         write_json(close, pipeline)
-    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json", "编队与战斗编辑器.json"):
+    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json", "编队与战斗编辑器.json", "MXU内置任务.json"):
         (output / "resource/base/pipeline" / name).unlink(missing_ok=True)
 
     for path in (output / "resource").glob("*/pipeline/**/*.json"):

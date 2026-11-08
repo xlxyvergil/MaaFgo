@@ -139,6 +139,10 @@ class AndroidInterfaceTests(unittest.TestCase):
                 "打开编队与战斗编辑器": {"action": {"type": "Custom", "param": {
                     "custom_action": "open_battle_editor"}}},
             })
+            android.write_json(root / "assets/resource/base/pipeline/MXU内置任务.json", {
+                "MXU_KILLPROC": {"action": {"type": "Custom", "param": {
+                    "custom_action": "MXU_KILLPROC_ACTION"}}},
+            })
             desktop_files = (
                 "assets/web/battle-editor/index.html", "assets/web/battle-editor/assets/app.js",
                 "agent/custom/battle_editor_action.py", "agent/battle_editor/server.py",
@@ -167,7 +171,8 @@ class AndroidInterfaceTests(unittest.TestCase):
             output = root / "Android/assets"
             android.prepare(root, output)
             for relative in ("web", "agent/battle_editor", "agent/custom/battle_editor_action.py",
-                             "resource/base/pipeline/编队与战斗编辑器.json", "打开编队编辑器.cmd"):
+                             "resource/base/pipeline/编队与战斗编辑器.json",
+                             "resource/base/pipeline/MXU内置任务.json", "打开编队编辑器.cmd"):
                 self.assertFalse((output / relative).exists(), relative)
             for relative in runtime_files:
                 packaged = relative.removeprefix("assets/")
