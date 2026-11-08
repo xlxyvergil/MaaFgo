@@ -107,16 +107,23 @@ class BondDeferredFrameworkTests(unittest.TestCase):
                     self.assertEqual(observed["root"], job.job_id)
                     stopped = bond_stops.get(job.job_id)
                     deferred = bond_stops.deferred(job.job_id)
-                    allowed = (mode in {"all", "slot", "slots"} and planned and not recognition_error
+                    allowed = (mode in {"all", "slot", "slots"} and planned is not None and not recognition_error
                                and (mode == "all" or not bad_mapping))
                     self.assertEqual(bool(stopped), not allowed)
-                    self.assertEqual(bool(deferred), allowed)
+                    self.assertEqual(bool(deferred), allowed and planned is True)
+                    continuation = bond_stops.upgrade_continuation(job.job_id)
+                    self.assertEqual(bool(continuation), allowed)
                     self.assertEqual(observed["seen"], ["settled", "parent_tail"] if allowed else [])
-                    result = deferred if allowed else stopped
-                    self.assertEqual(result.reason, "bond_upgrade_deferred" if allowed else "bond_check_unconfirmed")
-                    self.assertTrue(Path(result.screenshot_path).is_file())
-                    self.assertFalse(result.screenshot_error)
-                    self.assertTrue(Path(result.screenshot_path).is_relative_to(temp))
+                    result = continuation if allowed else stopped
+                    expected_reason = ("bond_upgrade_deferred" if planned else "bond_upgrade_final") if allowed else "bond_check_unconfirmed"
+                    self.assertEqual(result.reason, expected_reason)
+                    if allowed and planned is False:
+                        self.assertEqual(result.screenshot_path, "")
+                        self.assertFalse(result.evidence_attempted)
+                    else:
+                        self.assertTrue(Path(result.screenshot_path).is_file())
+                        self.assertFalse(result.screenshot_error)
+                        self.assertTrue(Path(result.screenshot_path).is_relative_to(temp))
                     self.assertEqual(controller.inputs, 0)
                     if recognition_error:
                         # A generic recognition failure must not be reclassified
@@ -129,20 +136,26 @@ class BondDeferredFrameworkTests(unittest.TestCase):
     def test_selected_slot_with_remaining_battle_returns_through_jumpback_to_parent_tail(self):
         self.scenario(mode="slot", planned=True)
 
-    def test_selected_slot_on_last_battle_stops_without_parent_tail(self):
+    def test_selected_slot_on_last_battle_settles_and_returns_to_parent_tail(self):
         self.scenario(mode="slot", planned=False)
 
     def test_multiple_slots_with_remaining_battle_defer(self):
         self.scenario(mode="slots", targets=(1, 6), planned=True)
 
-    def test_multiple_slots_on_last_battle_stop(self):
+    def test_multiple_slots_on_last_battle_settle_and_return_to_parent_tail(self):
         self.scenario(mode="slots", targets=(1, 6), planned=False)
 
     def test_all_mode_with_remaining_battle_returns_through_jumpback(self):
         self.scenario(mode="all", planned=True)
 
-    def test_all_mode_on_last_battle_stops_without_parent_tail(self):
+    def test_all_mode_on_last_battle_settles_and_returns_to_parent_tail(self):
         self.scenario(mode="all", planned=False)
+
+    def test_unknown_budget_cannot_authorize_final_battle_continuation(self):
+        self.scenario(mode="all", planned=None)
+
+    def test_final_battle_mapping_failure_still_stops_before_parent_tail(self):
+        self.scenario(mode="slot", planned=False, bad_mapping=True)
 
     def test_all_mode_deferral_does_not_require_per_slot_mapping(self):
         self.scenario(mode="all", planned=True, bad_mapping=True)

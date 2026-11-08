@@ -107,7 +107,7 @@ def _slot_mapping(context, target):
 
 
 def _inspect_upgrade(context, token, image, mode, target, *, evidence_image=None):
-    """明确升级遮挡可按已有剩余场次延后；不能把升级或识别失败当作未满。"""
+    """明确升级可下场复核或末场正常结算；不能把升级或识别失败当作未满。"""
     if not read_bond_upgrade(context, image):
         return False, None
     root = _root(context)
@@ -123,7 +123,15 @@ def _inspect_upgrade(context, token, image, mode, target, *, evidence_image=None
         if deferred and existing is None:
             _save_evidence(context, deferred)
         return True, None
-    message = "羁绊升级展示遮挡，当前没有已声明的剩余战斗次数，无法在下一场复核；已停止，未额外开战"
+    if bond_stops.is_last_battle(root):
+        existing = bond_stops.upgrade_continuation(root)
+        final = bond_stops.continue_last_upgrade(root, token,
+            message=f"第{bond_stops.battle_number(root)}场已确认羁绊升级，本场为最后一场；正常完成结算，后续任务可继续",
+            image=evidence, latest_image=image if evidence_image is not None else None)
+        if final is not None and existing is None:
+            mfaalog.info(f"[羁绊结算] {final.message}")
+        return True, None
+    message = "羁绊升级展示遮挡，当前无法确认本场是否为最后一场，也无法安排下场复核，已保留现场并停止。请保留当前截图和日志反馈。"
     return True, _latch_error(context, token, evidence, message,
                              latest_image=image if evidence_image is not None else None)
 
@@ -197,7 +205,7 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         return existing
     if context.tasker.stopping:
         return None
-    if bond_stops.deferred(root) is not None:
+    if bond_stops.upgrade_continuation(root) is not None:
         return None
     token = bond_stops.ensure(root)
     evidence_image, current_image = image, None
@@ -370,7 +378,7 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         return None
     root = _root(context)
     token = bond_stops.ensure(root)
-    if bond_stops.deferred(root) is not None:
+    if bond_stops.upgrade_continuation(root) is not None:
         return None
     evidence_image, image = None, None
     try:
@@ -431,7 +439,7 @@ class NativeBondUpgradeContinue(CustomRecognition):
         root = _root(context)
         if bond_stops.get(root) is not None:
             return None
-        if mode == "off" or bond_stops.deferred(root) is not None:
+        if mode == "off" or bond_stops.upgrade_continuation(root) is not None:
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"bond_upgrade_continue": True})
         return None
 

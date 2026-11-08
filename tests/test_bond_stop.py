@@ -287,7 +287,7 @@ class GuardTests(unittest.TestCase):
         ctx.run_task.assert_not_called()
         ctx.wait_freezes.assert_not_called()
 
-    def test_upgrade_does_not_defer_last_battle_in_selected_or_all_mode(self):
+    def test_last_battle_upgrade_continues_without_stop_or_deferral(self):
         for mode in ("slot", "all"):
             with self.subTest(mode=mode):
                 ctx = Context(mode=mode)
@@ -295,11 +295,70 @@ class GuardTests(unittest.TestCase):
                 bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
                 bond_stops.set_formation(ctx.root, slots(support=4))
                 action.read_bond_page.return_value = False
+                with patch.object(action, "read_bond_upgrade", return_value=True), \
+                     patch.object(action, "_save_evidence") as save:
+                    stopped = action.inspect_bond_stop(ctx, frame(9))
+                self.assertIsNone(stopped)
+                self.assertIsNone(bond_stops.get(ctx.root))
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+                continuation = bond_stops.upgrade_continuation(ctx.root)
+                self.assertEqual(continuation.reason, "bond_upgrade_final")
+                save.assert_not_called()
+                ctx.run_task.assert_not_called()
+
+    def test_unknown_battle_budget_still_stops_on_upgrade(self):
+        for mode in ("slot", "all"):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode)
+                bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1)
+                bond_stops.set_formation(ctx.root, slots(support=4))
+                action.read_bond_page.return_value = False
                 with patch.object(action, "read_bond_upgrade", return_value=True):
                     stopped = action.inspect_bond_stop(ctx, frame(9))
                 self.assertEqual(stopped.reason, "bond_check_unconfirmed")
                 self.assertIsNone(bond_stops.deferred(ctx.root))
-                self.assertNotIn("羁绊MAX，已停止", stopped.message)
+                self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+
+    def test_final_upgrade_does_not_recheck_later_experience_or_loot_as_missed_bond(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+        continuation = bond_stops.upgrade_continuation(ctx.root)
+        controller = Mock()
+        with patch.object(action, "read_bond_page", side_effect=AssertionError("finished upgrade was rechecked")), \
+             patch.object(action, "_reject_missed_bond_page", side_effect=AssertionError("finished upgrade reported as missed")):
+            for marker in (2, 3):
+                self.assertIsNone(action.inspect_bond_stop(ctx, frame(marker)))
+                self.assertIsNone(action.inspect_victory_settlement(
+                    ctx, NS(ok=True, reason="victory"), controller))
+        self.assertIs(bond_stops.upgrade_continuation(ctx.root), continuation)
+        self.assertIsNone(bond_stops.get(ctx.root))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        controller.post_screencap.assert_not_called()
+        ctx.run_task.assert_not_called()
+
+    def test_last_battle_visible_max_still_stops_before_upgrade_continuation(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        with patch.object(action, "read_any_bond_max", return_value=True), \
+             patch.object(action, "read_bond_upgrade", return_value=True) as upgrade:
+            stopped = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(stopped.reason, "bond_max")
+        self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+        upgrade.assert_not_called()
+
+    def test_last_battle_without_confirmed_upgrade_still_stops(self):
+        ctx = Context(mode="all", frames=[frame(9)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]), \
+             patch.object(action, "read_bond_upgrade", return_value=False):
+            stopped = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(stopped.reason, "bond_check_unconfirmed")
+        self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
 
     def test_all_checked_upgrade_defers_without_mapping_and_saves_once(self):
         ctx = self.multiselect(range(1, 7))
@@ -649,13 +708,29 @@ class UpgradeContinueAuthorizationTests(unittest.TestCase):
                 self.assertFalse(self.allowed(ctx))
                 ctx.run_task.assert_not_called()
 
-    def test_last_battle_without_registered_deferral_does_not_authorize_skip(self):
+    def test_last_battle_without_confirmed_upgrade_does_not_authorize_skip(self):
         ctx = Context(mode="all")
         token = bond_stops.begin(ctx.root)
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
         self.assertIsNone(bond_stops.defer(ctx.root, token, message="无剩余场次", image=frame(9)))
         self.assertFalse(self.allowed(ctx))
         ctx.run_task.assert_not_called()
+
+    def test_registered_last_upgrade_allows_skip_but_latched_max_or_user_stop_does_not(self):
+        for mode in ("all", "slot"):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode)
+                token = bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+                final = bond_stops.continue_last_upgrade(ctx.root, token, message="末场正常结算", image=frame(9))
+                self.assertEqual(final.reason, "bond_upgrade_final")
+                self.assertTrue(self.allowed(ctx))
+                ctx.tasker.stopping = True
+                self.assertFalse(self.allowed(ctx))
+                ctx.tasker.stopping = False
+                bond_stops.latch(ctx.root, token, reason="bond_max", message="MAX", image=frame(4))
+                self.assertFalse(self.allowed(ctx))
+                ctx.run_task.assert_not_called()
 
     def test_user_stop_denies_skip_even_when_guard_is_disabled(self):
         ctx = Context(mode="off")

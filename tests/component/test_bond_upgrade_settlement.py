@@ -36,7 +36,7 @@ class UpgradeSettlementTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def test_panel_defers_and_dismisses_only_with_existing_next_battle(self):
+    def test_panel_defers_or_finishes_with_declared_battle_budget(self):
         panels = {"legacy": image("jp_bond_level_up_overlay.png"),
                   "elisabeth": image("jp_bond_upgrade_panel.png")}
         experience = image("jp_experience_result.png")
@@ -68,7 +68,7 @@ class UpgradeSettlementTests(unittest.TestCase):
                     test.assertFalse(bond.read_bond_upgrade(context, image(name)), name)
                 for label, frame in panels.items():
                     for mode in ("all", "slots"):
-                        for remaining in (True, False):
+                        for remaining in (True, False, None):
                             with test.subTest(panel=label, mode=mode, remaining=remaining):
                                 bond.bond_stops.finish(root)
                                 bond.bond_stops.begin(root)
@@ -84,20 +84,25 @@ class UpgradeSettlementTests(unittest.TestCase):
                                 before = controller.inputs
                                 with patch.object(bond, "_save_evidence", side_effect=lambda c, r: r):
                                     stopped = bond.inspect_victory_settlement(context, NS(ok=True, reason="victory"), context.tasker.controller)
-                                if remaining:
+                                if remaining is not None:
                                     test.assertIsNone(stopped)
-                                    test.assertIsNotNone(bond.bond_stops.deferred(root))
+                                    continuation = bond.bond_stops.upgrade_continuation(root)
+                                    test.assertIsNotNone(continuation)
+                                    test.assertEqual(continuation.reason,
+                                        "bond_upgrade_deferred" if remaining else "bond_upgrade_final")
+                                    test.assertEqual(bond.bond_stops.deferred(root) is not None, remaining)
                                     test.assertTrue(context.run_recognition("结算-羁绊升级继续", frame).hit)
                                     test.assertTrue(context.run_task("结算-羁绊升级继续").status.succeeded)
                                     test.assertEqual(controller.inputs, before + 1)
                                     test.assertTrue(context.run_recognition("战斗_经验结算页", experience).hit)
                                     test.assertFalse(context.run_recognition("结算-羁绊升级继续", experience).hit)
-                                    # Fresh frame/callback after the popup keeps this battle deferred.
+                                    # Later callbacks preserve either valid continuation without inferring MAX.
                                     test.assertIsNone(bond.inspect_bond_stop(context, experience))
                                     test.assertIsNone(bond.bond_stops.get(root))
                                 else:
                                     test.assertEqual(stopped.reason, "bond_check_unconfirmed")
                                     test.assertIsNone(bond.bond_stops.deferred(root))
+                                    test.assertIsNone(bond.bond_stops.upgrade_continuation(root))
                                     test.assertFalse(context.run_recognition("结算-羁绊升级继续", frame).hit)
                                     test.assertEqual(controller.inputs, before)
                 report["passed"] = True
