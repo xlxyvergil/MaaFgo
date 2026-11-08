@@ -600,7 +600,7 @@ class ExecuteBbcTask(CustomAction):
                     state['finished'] = True
                     state['popup_title'] = popup_title
                     state['popup_message'] = popup_message
-                    mfaalog.info("[Callback] 用户拒绝助战，战斗结束")
+                    mfaalog.warning("[Callback] 用户拒绝助战，战斗结束")
                     return True
                 else:  # True = 继续
                     state['popup_title'] = ''
@@ -622,7 +622,7 @@ class ExecuteBbcTask(CustomAction):
                     state['finished'] = True
                     state['popup_title'] = popup_title
                     state['popup_message'] = popup_message
-                    mfaalog.info("[Callback] 用户拒绝队伍配置，战斗结束")
+                    mfaalog.warning("[Callback] 用户拒绝队伍配置，战斗结束")
                     return True
                 else:  # True = 继续
                     state['popup_title'] = ''
@@ -631,7 +631,7 @@ class ExecuteBbcTask(CustomAction):
             
             # 处理脚本停止 (showwarning 类型，BBC Server自动关闭)
             elif '脚本停止' in popup_title:
-                mfaalog.info(f"[Callback] 检测到脚本停止: {popup_message}")
+                mfaalog.warning(f"[Callback] 检测到脚本停止: {popup_message}")
                 
                 # 检查是否是游戏异常导致的脚本停止
                 if any(keyword in popup_message for keyword in [
@@ -752,7 +752,7 @@ class ExecuteBbcTask(CustomAction):
                         f"[ExecuteBbcTask] 识别到助战错误 ({miss_count}/{miss_threshold})"
                     )
                     if miss_count >= miss_threshold:
-                        mfaalog.info(f"[ExecuteBbcTask] 识别到助战错误，停止BBC脚本并正常结束任务")
+                        mfaalog.warning(f"[ExecuteBbcTask] 识别到助战错误，停止BBC脚本并正常结束任务")
                         # 先覆盖"执行战斗结束"的 next 为"阶段判断循环"（确保覆盖必然生效），
                         # 再停止BBC脚本：stop_battle 会触发"脚本停止"弹窗，避免其干扰后续流程
                         # （助战错误的点击会使游戏重新进入登录状态，"结束战斗"流程无法走通）

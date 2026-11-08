@@ -37,7 +37,7 @@ class OcrLogger(ContextEventSink):
             and "node_details" not in details
         ):
             name = details.get("name", "")
-            mfaalog.info(f"[超时] {name} 识别超时（next 列表未命中任何节点）")
+            mfaalog.warning(f"[超时] {name} 识别超时（next 列表未命中任何节点）")
 
         # 精确匹配，排除 RecognitionNode 和 Starting 事件。
         if msg not in ("Node.Recognition.Succeeded", "Node.Recognition.Failed"):

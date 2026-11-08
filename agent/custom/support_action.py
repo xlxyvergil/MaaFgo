@@ -916,7 +916,7 @@ class SupportAction(CustomAction):
         """撤销职介筛选并复用首个助战入口，不在本子任务中执行编队。"""
         if context.tasker.stopping:
             return CustomAction.RunResult(success=False)
-        mfaalog.info("[SupportAction] 刷新10次仍未找到目标，改用首个助战并跳过 Chaldea 配置")
+        mfaalog.warning("[SupportAction] 刷新10次仍未找到目标，改用首个助战并跳过 Chaldea 配置")
         detail = context.run_task(
             "助战兜底-选择首个助战",
             pipeline_override={"进本-选择助战": {"next": [], "on_error": []}},

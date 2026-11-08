@@ -132,6 +132,28 @@ class PlanFallbackTests(unittest.TestCase):
 
 
 class PlanFallbackEntryTests(unittest.TestCase):
+    def test_runtime_failure_is_visible_but_user_stop_and_success_are_not_errors(self):
+        for ok, reason, stopping, errors, warnings in (
+                (False, 'skill_execution_failed', False, 1, 0),
+                (False, 'stopped', True, 0, 0),
+                (True, 'defeat', False, 0, 1),
+                (True, 'returned_to_map', False, 0, 0)):
+            with self.subTest(reason=reason):
+                context = NS(tasker=NS(stopping=stopping, controller=object()))
+                argv = NS(custom_action_param='{}')
+                with patch.object(entry, 'context_session', return_value=(123, None)), \
+                        patch.object(entry, 'AutoBattleRuntime') as runtime, \
+                        patch.object(entry.mfaalog, 'error') as error, \
+                        patch.object(entry.mfaalog, 'warning') as warning:
+                    runtime.return_value.run.return_value = NS(ok=ok, reason=reason, turns=2)
+                    result = entry.AutoBattleAction().run(context, argv)
+                self.assertEqual(result.success, ok)
+                self.assertEqual(error.call_count, errors)
+                self.assertEqual(warning.call_count, warnings)
+                if errors:
+                    self.assertIn('导出日志', error.call_args.args[0])
+                    self.assertIn(reason, error.call_args.args[0])
+
     def run_entry(self, param):
         context = NS(tasker=NS(stopping=False, controller=object()))
         argv = NS(custom_action_param=json.dumps(param))

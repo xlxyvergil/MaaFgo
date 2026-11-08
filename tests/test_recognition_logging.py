@@ -26,7 +26,7 @@ class EventLogTests(unittest.TestCase):
         self.ctx = Mock(spec=["get_node_data"])
         self.ctx.get_node_data.return_value = {"recognition": {"param": {"threshold": .8}}}
         local_patch = patch.object(mfaalog, "diagnostic")
-        gui_patch = patch.object(mfaalog, "info")
+        gui_patch = patch.object(mfaalog, "warning")
         self.local = local_patch.start()
         self.gui = gui_patch.start()
         self.addCleanup(local_patch.stop)
@@ -98,6 +98,9 @@ class DiagnosticFileTests(unittest.TestCase):
         self.path_patch = patch.object(mfaalog, "_DIAGNOSTIC_PATH", self.path)
         self.path_patch.start()
         self.addCleanup(self.restore_handler)
+        toggle_patch = patch.object(mfaalog, "SHOW_VERBOSE_LOGS_IN_GUI", False)
+        toggle_patch.start()
+        self.addCleanup(toggle_patch.stop)
 
     def restore_handler(self):
         handler = mfaalog._diagnostic_handler
@@ -115,15 +118,50 @@ class DiagnosticFileTests(unittest.TestCase):
         self.assertRegex(self.path.read_text(encoding="utf8"),
                          r"\d{4}-\d{2}-\d{2} .*\[INFO\] \[SupportAction\] 英灵头像 score=0.255")
 
-    def test_progress_warning_and_error_remain_visible(self):
-        stdout = io.StringIO()
-        with contextlib.redirect_stdout(stdout):
+    def test_only_warning_error_and_focus_reach_gui_and_keep_local_levels(self):
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
             mfaalog.info("助战查找开始")
+            mfaalog.debug("战斗状态细节")
             mfaalog.warning("缺少模板")
             mfaalog.error("截图失败")
-        self.assertIn("info:🟣 >>> 助战查找开始", stdout.getvalue())
+            mfaalog.focus("任务1")
+        self.assertNotIn("助战查找开始", stdout.getvalue())
+        self.assertNotIn("战斗状态细节", stdout.getvalue())
+        self.assertNotIn("info:", stdout.getvalue())
+        self.assertNotIn("debug:", stdout.getvalue())
         self.assertIn("warn:⚠️ >>> 缺少模板", stdout.getvalue())
         self.assertIn("error:🔴 >>> 截图失败", stdout.getvalue())
+        self.assertIn("focus:任务1", stdout.getvalue())
+        self.assertEqual(stderr.getvalue(), "")
+        saved = self.path.read_text(encoding="utf8")
+        for level, message in (("INFO", "助战查找开始"), ("DEBUG", "战斗状态细节"),
+                               ("WARNING", "缺少模板"), ("ERROR", "截图失败")):
+            self.assertIn(f"[{level}] {message}", saved)
+
+    def test_multiline_info_does_not_leak_any_line_into_gui(self):
+        message = "[ChaldeaPlan] 回合1\ninfo:战斗队伍数据\nerror:这里只是正文"
+        stdout, stderr = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
+            mfaalog.info(message)
+        self.assertEqual(stdout.getvalue(), "")
+        self.assertEqual(stderr.getvalue(), "")
+        self.assertIn(message, self.path.read_text(encoding="utf8"))
+
+    def test_verbose_switch_restores_info_debug_and_can_be_switched_off_again(self):
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout):
+            with patch.object(mfaalog, "SHOW_VERBOSE_LOGS_IN_GUI", True):
+                mfaalog.info("开启时普通日志")
+                mfaalog.debug("开启时调试日志")
+            mfaalog.info("关闭时普通日志")
+            mfaalog.debug("关闭时调试日志")
+        self.assertIn("info:🟣 >>> 开启时普通日志", stdout.getvalue())
+        self.assertIn("debug:开启时调试日志", stdout.getvalue())
+        self.assertNotIn("关闭时", stdout.getvalue())
+        saved = self.path.read_text(encoding="utf8")
+        for message in ("开启时普通日志", "开启时调试日志", "关闭时普通日志", "关闭时调试日志"):
+            self.assertEqual(saved.count(message), 1)
 
     def test_rotation_is_bounded_and_exportable_as_log(self):
         with patch.object(mfaalog, "_DIAGNOSTIC_MAX_BYTES", 256):
@@ -144,22 +182,34 @@ class DiagnosticFileTests(unittest.TestCase):
         self.assertEqual({line.split("[INFO] ", 1)[1] for line in lines},
                          {f"记录{i:03}" for i in range(100)})
 
-    def test_file_open_failure_warns_once_and_preserves_records_in_gui(self):
+    def test_file_open_failure_warns_once_without_reintroducing_info_flood(self):
+        stdout = io.StringIO()
         with patch.object(mfaalog, "_DiagnosticFileHandler", side_effect=PermissionError("denied")), \
-                patch.object(mfaalog, "warning") as warning, patch.object(mfaalog, "info") as info:
+                contextlib.redirect_stdout(stdout):
             mfaalog.diagnostic("记录1")
             mfaalog.diagnostic("记录2")
-        warning.assert_called_once()
-        self.assertIn(str(self.path), warning.call_args.args[0])
-        self.assertEqual([c.args[0] for c in info.call_args_list], ["记录1", "记录2"])
+            mfaalog.info("普通文本")
+            mfaalog.debug("调试文本")
+            mfaalog.warning("重要警告")
+            mfaalog.error("重要错误")
+        output = stdout.getvalue()
+        self.assertEqual(output.count("本地日志无法写入"), 1)
+        self.assertIn(str(self.path), output)
+        for hidden in ("记录1", "记录2", "普通文本", "调试文本"):
+            self.assertNotIn(hidden, output)
+        self.assertIn("warn:⚠️ >>> 重要警告", output)
+        self.assertIn("error:🔴 >>> 重要错误", output)
 
-    def test_file_write_failure_also_falls_back(self):
+    def test_file_write_failure_does_not_recurse_or_leak_info(self):
         mfaalog.diagnostic("写入前")
+        stdout = io.StringIO()
         with patch.object(mfaalog._diagnostic_handler, "shouldRollover", side_effect=OSError("disk full")), \
-                patch.object(mfaalog, "warning") as warning, patch.object(mfaalog, "info") as info:
-            mfaalog.diagnostic("写入失败的记录")
-        warning.assert_called_once()
-        info.assert_called_once_with("写入失败的记录")
+                contextlib.redirect_stdout(stdout):
+            mfaalog.info("写入失败的普通记录")
+            mfaalog.error("停止原因")
+        self.assertEqual(stdout.getvalue().count("本地日志无法写入"), 1)
+        self.assertNotIn("写入失败的普通记录", stdout.getvalue())
+        self.assertIn("error:🔴 >>> 停止原因", stdout.getvalue())
 
 
 if __name__ == "__main__":

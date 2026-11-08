@@ -205,9 +205,9 @@ class AutoBattleRuntime:
                         return BattleResult.fail(
                             f"invalid_main_action:{verdict.reason}", turns
                         )
-                    mfaalog.info(
-                        "[AutoBattle] Main action validation warning; "
-                        f"continuing: {verdict.reason}"
+                    mfaalog.warning(
+                        "[自动战斗] 技能动作校验有提醒，本回合仍按现有逻辑继续。"
+                        f"原因：{verdict.reason}"
                     )
 
                 if action.target_enemy is not None:
@@ -219,9 +219,8 @@ class AutoBattleRuntime:
                         None,
                     )
                     if enemy is None:
-                        mfaalog.info(
-                            "[AutoBattle] target enemy "
-                            f"{action.target_enemy} not detected; skip target click"
+                        mfaalog.warning(
+                            f"[自动战斗] 未确认敌方{action.target_enemy}号目标，本次不点击切换，继续当前战斗。"
                         )
                         enemy = None
 
@@ -237,10 +236,10 @@ class AutoBattleRuntime:
                         )
                         self._mark_action("select_enemy")
                         if not self.executor.select_enemy(action.target_enemy):
-                            mfaalog.info("[AutoBattle] select_enemy failed; continuing")
+                            mfaalog.warning("[自动战斗] 切换敌方目标的点击未成功，继续当前战斗。")
                         if not self._wait_until_enemy_targeted(action.target_enemy):
-                            mfaalog.info(
-                                "[AutoBattle] enemy target confirmation failed; continuing"
+                            mfaalog.warning(
+                                "[自动战斗] 未能确认敌方目标已选中，继续当前战斗。"
                             )
 
                 if not self._execute_skills(action):
@@ -339,9 +338,9 @@ class AutoBattleRuntime:
                         return BattleResult.fail(
                             f"invalid_card_action:{verdict.reason}", turns
                         )
-                    mfaalog.info(
-                        "[AutoBattle] Card action validation warning; "
-                        f"continuing: {verdict.reason}"
+                    mfaalog.warning(
+                        "[自动战斗] 出卡动作校验有提醒，本回合仍按现有逻辑继续。"
+                        f"原因：{verdict.reason}"
                     )
                     
                 mfaalog.info("[AutoBattle] Executing picks...")
@@ -741,7 +740,7 @@ class AutoBattleRuntime:
                     and is_slot(sk.skill_index, 1, 3)
                     and (sk.target_ally is None or is_slot(sk.target_ally, 1, 3))
                 ):
-                    mfaalog.info(f"[AutoBattle] invalid servant skill skipped: {sk}")
+                    mfaalog.warning(f"[自动战斗] 从者位置、技能或目标序号超出范围，本次技能已跳过：{sk}")
                     continue
                 if sk.target_enemy is not None and not self._ensure_enemy_target(sk.target_enemy):
                     return False
@@ -767,7 +766,7 @@ class AutoBattleRuntime:
                     is_slot(sk.skill_index, 1, 3)
                     and (sk.target_ally is None or is_slot(sk.target_ally, 1, 3))
                 ):
-                    mfaalog.info(f"[AutoBattle] invalid master skill skipped: {sk}")
+                    mfaalog.warning(f"[自动战斗] 御主技能或目标序号超出范围，本次技能已跳过：{sk}")
                     continue
                 if sk.target_enemy is not None and not self._ensure_enemy_target(sk.target_enemy):
                     return False
@@ -793,7 +792,7 @@ class AutoBattleRuntime:
                 is_slot(oc.starting_member_idx, 1, 3)
                 and is_slot(oc.sub_member_idx, 4, 6)
             ):
-                mfaalog.info(f"[AutoBattle] invalid order change skipped: {oc}")
+                mfaalog.warning(f"[自动战斗] 换人的首发或候补位置超出范围，本次换人已跳过：{oc}")
                 continue
             self._ensure_member_tracking()
             if self._member_order[oc.sub_member_idx - 1] in self._retired_instances:

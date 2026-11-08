@@ -9,15 +9,14 @@ CUSTOM_PATH = os.path.join(AGENT_ROOT, 'custom')
 if os.path.exists(CUSTOM_PATH) and CUSTOM_PATH not in sys.path:
     sys.path.insert(0, CUSTOM_PATH)
 
-print(f"[Agent Init] Root: {AGENT_ROOT}")
-print(f"[Agent Init] Custom loaded: {os.path.exists(CUSTOM_PATH)}")
-
 # ================= 2. 导入核心模块 =================
 from maa.agent.agent_server import AgentServer
 from maa.toolkit import Toolkit
 
 # 导入自定义 Action (从 custom 目录)
 import mfaalog
+mfaalog.debug(f"[Agent Init] Root: {AGENT_ROOT}")
+mfaalog.debug(f"[Agent Init] Custom loaded: {os.path.exists(CUSTOM_PATH)}")
 # MaaFwApp 的 Python 运行时不安装 Windows BBC / psutil 依赖。
 IS_ANDROID = sys.platform == "android" or os.environ.get("MAAFGO_PLATFORM") == "android"
 if not IS_ANDROID:
@@ -53,18 +52,17 @@ def main():
     project_root_dir = os.path.dirname(AGENT_ROOT)
     if os.getcwd() != project_root_dir:
         os.chdir(project_root_dir)
-        print(f"[Agent] Working directory changed to: {project_root_dir}")
+        mfaalog.debug(f"[Agent] Working directory changed to: {project_root_dir}")
 
     # 初始化 MaaToolkit 选项
     Toolkit.init_option("./")
 
     if len(sys.argv) < 2:
-        print("Usage: python main.py <socket_id>")
-        print("socket_id is provided by AgentIdentifier.")
+        mfaalog.error("Agent 启动缺少连接参数，无法连接客户端。请从 MaaFGO 客户端启动任务，不要直接运行 agent/main.py。")
         sys.exit(1)
 
     socket_id = sys.argv[-1]
-    print(f"[Agent] Starting Agent Server with socket_id: {socket_id}")
+    mfaalog.debug(f"[Agent] Starting Agent Server with socket_id: {socket_id}")
 
     AgentServer.start_up(socket_id)
     AgentServer.join()
