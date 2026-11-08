@@ -340,7 +340,7 @@ def _save_evidence(context, result: BondStop | None) -> BondStop | None:
     except Exception as exc:
         result.screenshot_error = str(exc)
     label = "羁绊待复核" if result.reason == "bond_upgrade_deferred" else "羁绊停止"
-    mfaalog.info(f"[{label}] {result.display()}")
+    mfaalog.warning(f"[{label}] {result.display()}")
     return result
 
 

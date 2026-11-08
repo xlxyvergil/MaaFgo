@@ -645,7 +645,7 @@ class GeneralNavigationAction(CustomAction):
                     empty_count += 1
                     mfaalog.info(f"[导航] 空屏(无坐标锚点) {empty_count}/{EMPTY_SCREEN_LIMIT}")
                     if empty_count >= EMPTY_SCREEN_LIMIT:
-                        mfaalog.info("[导航] 连续空屏达阈值, 无法导航(无兜底)")
+                        mfaalog.error("[导航] 连续空屏达阈值, 无法继续自动进入目标关卡。请保留当前地图截图，并使用客户端“导出日志”反馈。")
                         return CustomAction.RunResult(success=False)
                     if last_dir is not None:
                         start = (int(round(SCREEN_CENTER[0] - SWIPE_SIGN * last_dir[0] * SWIPE_DIST)),
@@ -729,7 +729,7 @@ class GeneralNavigationAction(CustomAction):
                             mfaalog.info(f"[导航] 预测到位, 附近{NEAR_RADIUS}px有{len(nearby)}个YOLO框 "
                                          f"但局部模板未命中(<{MT_MIN_SCORE}), 原地重试 {wait_count}/{RECOG_WAIT_LIMIT}")
                             if wait_count >= RECOG_WAIT_LIMIT:
-                                mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
+                                mfaalog.error(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法继续自动进入目标关卡。请保留当前地图截图，并使用客户端“导出日志”反馈。")
                                 return CustomAction.RunResult(success=False)
                             time.sleep(1.5)   # 重试前等待, 给画面变化机会, 避免连续重复推理
                             continue
@@ -737,7 +737,7 @@ class GeneralNavigationAction(CustomAction):
                         wait_count += 1
                         mfaalog.info(f"[导航] 预测到位但附近{NEAR_RADIUS}px内无YOLO框, 原地重试 {wait_count}/{RECOG_WAIT_LIMIT}")
                         if wait_count >= RECOG_WAIT_LIMIT:
-                            mfaalog.info(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法导航(无兜底)")
+                            mfaalog.error(f"[导航] 预测已到位但 {RECOG_WAIT_LIMIT} 轮未识别到目标, 无法继续自动进入目标关卡。请保留当前地图截图，并使用客户端“导出日志”反馈。")
                             return CustomAction.RunResult(success=False)
                         time.sleep(1.5)   # 重试前等待, 给画面变化机会, 避免连续重复推理
                         continue
@@ -747,7 +747,7 @@ class GeneralNavigationAction(CustomAction):
                     no_progress += 1
                     mfaalog.info(f"[导航] 滑动无进展 {no_progress}/{NO_PROGRESS_LIMIT} (距中心 {dist_center:.0f} vs 上轮 {last_dist:.0f})")
                     if no_progress >= NO_PROGRESS_LIMIT:
-                        mfaalog.info("[导航] 滑动连续无进展, 无法导航(无兜底)")
+                        mfaalog.error("[导航] 滑动连续无进展, 无法继续自动进入目标关卡。请保留当前地图截图，并使用客户端“导出日志”反馈。")
                         return CustomAction.RunResult(success=False)
                 else:
                     no_progress = 0
@@ -770,7 +770,7 @@ class GeneralNavigationAction(CustomAction):
                 prevent_touch(context)   # 滑动后检查误触进入关卡
 
             # 步骤4: 超轮未达目标 -> 失败(无兜底)
-            mfaalog.info("[导航] 方案B超最大轮数未达目标, 无法导航(无兜底)")
+            mfaalog.error("[导航] 方案B超最大轮数未达目标, 无法继续自动进入目标关卡。请保留当前地图截图，并使用客户端“导出日志”反馈。")
             return CustomAction.RunResult(success=False)
 
         except Exception as e:

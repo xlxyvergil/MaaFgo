@@ -99,7 +99,7 @@ class StoryRunner:
         if not self.auto_handle_restrictions:
             raise StoryStopped("关卡存在编成限制，需要手动调整；或开启“自动处理编队限制情况”后重试")
         if not self.current_restricted:
-            mfaalog.info(
+            mfaalog.warning(
                 f"[自动推主线] 检测到限制编队（{reason}）；本关以游戏编队为准，"
                 "跳过 Chaldea 阵容检查、自动编队及羁绊补齐，使用默认战斗逻辑"
             )
@@ -273,12 +273,12 @@ class StoryRunner:
         self.check_stop()
         self.action("主线-灵脉石确认", confirm)
         self._spirit_stones_used += 1
-        mfaalog.info(f"[自动推主线] 已确认使用灵脉石，本关第{self._spirit_stones_used}/3次；等待续战，不计入通关数")
+        mfaalog.warning(f"[自动推主线] 已确认使用灵脉石，本关第{self._spirit_stones_used}/3次；等待续战，不计入通关数")
         deadline = self.clock() + self.timeout
         while self.clock() < deadline:
             image = self.frame()
             if self.reco("进本-战斗主界面已出现", image):
-                mfaalog.info("[自动推主线] 灵脉石续战成功，本关改用默认战斗逻辑")
+                mfaalog.warning("[自动推主线] 灵脉石续战成功，本关改用默认战斗逻辑")
                 return
             self.pause()
         raise StoryStopped("灵脉石确认后未返回战斗，停止任务；未重复消费")

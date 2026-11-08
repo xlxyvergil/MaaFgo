@@ -114,7 +114,7 @@ class AutoBattleAction(CustomAction):
                 initial_formation = None
                 if continued_formation_reset and token:
                     sessions.skip_capture(root, token)
-            mfaalog.info("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
+            mfaalog.warning("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
         plan = _parse_plan(param)
         chaldea_roster = None
         try:
@@ -143,7 +143,7 @@ class AutoBattleAction(CustomAction):
             battle_policy = _parse_battle_policy(param)
             if (battle_policy.card.native_strategy.opening_hand.enabled
                     and (plan is None or plan.active_turn(0) is None)):
-                mfaalog.info("[高级策略] 未设置有效首回合方案，跳过开局等待")
+                mfaalog.warning("[高级策略] 未设置有效首回合方案，跳过开局等待")
                 param = copy.deepcopy(param)
                 param["card_policy"]["native_strategy"]["opening_hand"]["enabled"] = False
                 battle_policy = _parse_battle_policy(param)
@@ -184,6 +184,14 @@ class AutoBattleAction(CustomAction):
         if not result.ok and token and sessions.valid(root, token):
             sessions.invalidate(root, token, "battle_runtime_failed")
         mfaalog.info(f"[auto_battle] end ok={result.ok} reason={result.reason} turns={result.turns}")
+        if not result.ok and not context.tasker.stopping:
+            mfaalog.error(
+                f"自动战斗未能完成，已停止本场自动战斗（已完成{result.turns}回合）。"
+                "请保留当前游戏画面截图，并使用客户端“导出日志”反馈。"
+                f"停止原因：{result.reason}"
+            )
+        elif result.reason == "defeat":
+            mfaalog.warning("本场战斗失败，将按现有流程处理撤退和结算。")
 
         # 已确认胜利后立即交接结算，避免Pipeline默认延迟错过短暂羁绊页。
         if result.ok and result.reason == "victory":

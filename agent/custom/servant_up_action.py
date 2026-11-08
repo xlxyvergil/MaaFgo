@@ -148,7 +148,7 @@ class ExecuteServantUp(CustomAction):
             if result == "failed":
                 return CustomAction.RunResult(success=False)
             if result == "dogfood_empty":
-                mfaalog.info("[强化从者] 狗粮已用完，未启用整理礼物盒循环，任务完成")
+                mfaalog.warning("[强化从者] 狗粮已用完，未启用整理礼物盒循环，任务完成")
 
             mfaalog.info("[强化从者] 完成")
             return CustomAction.RunResult(success=True)
@@ -182,7 +182,7 @@ class ExecuteServantUp(CustomAction):
             # 停止条件以本次实际领取为准（「全部领取」或「领取选中」均可），而不是
             # 后续筛选列表是否被扫空：同一次进入中已领过一次后再扫空，仍要继续强化。
             if not received_any:
-                mfaalog.info(
+                mfaalog.warning(
                     "[强化从者] 本次进入礼物盒未实际领取任何东西，任务完成"
                 )
                 return True
@@ -191,7 +191,7 @@ class ExecuteServantUp(CustomAction):
                 mfaalog.info(f"[强化从者] 已达到目标等级 {target_level}，任务完成")
                 return True
             if result == "no_material":
-                mfaalog.info("[强化从者] 道具不足，任务完成")
+                mfaalog.warning("[强化从者] 道具不足，任务完成")
                 return True
             if result == "dogfood_empty":
                 mfaalog.info("[强化从者] 狗粮已用完，进入下一轮礼物盒整理")
@@ -502,7 +502,7 @@ class ExecuteServantUp(CustomAction):
                 return "dogfood_empty"
             # 道具不足 / 狗粮用完，结束强化
             if any(self._match(t) is not None for t in TPL_NO_MATERIAL):
-                mfaalog.info("[强化从者] 道具不足，结束强化")
+                mfaalog.warning("[强化从者] 道具不足，结束强化")
                 return "no_material"
             if self._match(TPL_EMPTY_SLOT, roi=SLOT_ROI) is not None:
                 mfaalog.info("[强化从者] 狗粮用完，结束强化")
