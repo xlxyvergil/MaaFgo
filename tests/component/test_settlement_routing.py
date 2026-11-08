@@ -157,6 +157,39 @@ class SettlementTests(unittest.TestCase):
         self.assertEqual(seen.count("结算-活动报酬返回地图"), 1)
         self.assertNotIn("结算推进_点击右上角", seen)
 
+    def test_reward_details_return_to_each_settlement_poll_before_other_inputs(self):
+        # ESC may reveal another reward or a continue prompt rather than a map.
+        # Exercise every production poll that also handles the larger close button.
+        entries = [name for name, node in self.source.items()
+                   if "结算-活动报酬返回地图" in node.get("next", [])]
+        for entry in entries:
+            with self.subTest(entry=entry):
+                terminal = ("连续出击_继续" if "继续" in entry and
+                            "连续出击_继续" in self.source[entry]["next"]
+                            else "可能已经结束战斗_不回主界面")
+                seen = self.run_scenario(entry, [
+                    {entry},
+                    {"结算-奖励详情返回", "剧情奖励-礼装详情关闭",
+                     "结算-活动报酬返回地图"},
+                    {"结算-奖励详情返回"},
+                    {terminal},
+                ])
+                self.assertEqual(seen.count("结算-奖励详情返回"), 2)
+                self.assertIn(terminal, seen)
+                self.assertNotIn("剧情奖励-礼装详情关闭", seen)
+                self.assertNotIn("结算-活动报酬返回地图", seen)
+                blind = [n for n in seen if n.startswith("结算推进_点击右上角")]
+                self.assertEqual(blind, [entry] if entry.startswith("结算推进_") else [])
+
+    def test_reward_escape_without_return_evidence_does_not_finish_battle(self):
+        for entry in ("结算-关闭后返回复核", "结算-关闭后返回复核_继续"):
+            with self.subTest(entry=entry):
+                seen = self.run_scenario(entry, [{"结算-奖励详情返回"}], succeeds=False)
+                self.assertEqual(seen.count("结算-奖励详情返回"), 1)
+                self.assertNotIn("全局空节点", seen)
+                self.assertNotIn("连续出击_继续", seen)
+                self.assertFalse(any(n.startswith("结算推进_") for n in seen))
+
     def test_generic_close_waits_for_activity_rewards_and_map_before_completion(self):
         for entry, friend, close in (
             ("结束战斗_不回主界面", "好友申请界面_不回主界面", "战斗结束关闭_不回主界面"),
