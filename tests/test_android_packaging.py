@@ -122,6 +122,15 @@ class AndroidInterfaceTests(unittest.TestCase):
             })
             source["preset"][0]["task"].append({"name": "打开编队与战斗编辑器"})
             source["option"]["编队编辑器操作"] = {"type": "select", "cases": [{"name": "open"}]}
+            source["task"].append({
+                "name": "__MXU_KILLPROC__", "entry": "MXU_KILLPROC",
+                "option": ["__MXU_KILLPROC_SELF_OPTION__"],
+            })
+            source["preset"][0]["task"].append({"name": "__MXU_KILLPROC__"})
+            source["option"]["__MXU_KILLPROC_SELF_OPTION__"] = {
+                "type": "switch", "default_case": "Yes",
+                "cases": [{"name": "Yes"}, {"name": "No"}],
+            }
             description = "保留移动端说明\n\n[打开编队编辑器](http://127.0.0.1:18765/)"
             source["task"][0]["description"] = description
             source["option"]["native_setting"]["description"] = description
@@ -129,6 +138,10 @@ class AndroidInterfaceTests(unittest.TestCase):
             android.write_json(root / "assets/resource/base/pipeline/编队与战斗编辑器.json", {
                 "打开编队与战斗编辑器": {"action": {"type": "Custom", "param": {
                     "custom_action": "open_battle_editor"}}},
+            })
+            android.write_json(root / "assets/resource/base/pipeline/MXU内置任务.json", {
+                "MXU_KILLPROC": {"action": {"type": "Custom", "param": {
+                    "custom_action": "MXU_KILLPROC_ACTION"}}},
             })
             desktop_files = (
                 "assets/web/battle-editor/index.html", "assets/web/battle-editor/assets/app.js",
@@ -158,7 +171,8 @@ class AndroidInterfaceTests(unittest.TestCase):
             output = root / "Android/assets"
             android.prepare(root, output)
             for relative in ("web", "agent/battle_editor", "agent/custom/battle_editor_action.py",
-                             "resource/base/pipeline/编队与战斗编辑器.json", "打开编队编辑器.cmd"):
+                             "resource/base/pipeline/编队与战斗编辑器.json",
+                             "resource/base/pipeline/MXU内置任务.json", "打开编队编辑器.cmd"):
                 self.assertFalse((output / relative).exists(), relative)
             for relative in runtime_files:
                 packaged = relative.removeprefix("assets/")
@@ -169,6 +183,9 @@ class AndroidInterfaceTests(unittest.TestCase):
             self.assertNotIn("打开编队与战斗编辑器", {task["name"] for task in converted["task"]})
             self.assertNotIn("打开编队与战斗编辑器", {task["name"] for task in converted["preset"][0]["task"]})
             self.assertNotIn("编队编辑器操作", converted["option"])
+            self.assertNotIn("__MXU_KILLPROC__", {task["name"] for task in converted["task"]})
+            self.assertNotIn("__MXU_KILLPROC__", {task["name"] for task in converted["preset"][0]["task"]})
+            self.assertNotIn("__MXU_KILLPROC_SELF_OPTION__", converted["option"])
             self.assertNotIn("127.0.0.1:18765", json.dumps(converted, ensure_ascii=False))
             self.assertEqual(converted["task"][0]["description"], "保留移动端说明")
             self.assertEqual(converted["option"]["native_setting"]["description"], "保留移动端说明")
