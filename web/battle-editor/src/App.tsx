@@ -5,7 +5,9 @@ import {useCallback,useEffect,useMemo,useRef,useState} from 'react';
 import type {ReactNode} from 'react';
 import {Swords,Users,Layers,CheckCheck,Save,Undo2,Redo2,Plus,Search,ChevronDown,ChevronUp,ArrowLeft,ArrowRight,ArrowUp,ArrowDown,Copy,Trash2,X,Upload,Download,FileJson,Sun,Moon,ExternalLink,FolderOpen,AlertTriangle,CheckCircle2,ArrowLeftRight,GripVertical,Link as LinkIcon,RefreshCw,Settings2,Shield,Shirt,Target,Heart,Play,Power,Clipboard,Info,BookOpen,Image as ImageIcon} from 'lucide-react';
 import {api,session,ApiError,apiSupportCE} from './api';
+import {LatestCatalogRequest} from './catalogRefresh';
 import {SupportCEInstall} from './SupportCEInstall';
+import {SupportCEInstallDialog} from './SupportCEInstallDialog';
 import {clone,newBattle,assertEditable,members,setMember,turnsOf,writeTurns,rosterAt,canChange,isSwap,titleOf,colorName,colorClass,colorOf,makeCard,move,actionTitle,remapSlots,skillAt,servantFor,replaceServant,swapMembers,filterCatalog,appendSkillAt,appendSkillEntry,appendNPEntry,newServantAdvancedFilters,matchServantAdvanced,npFilterSummary,isRetire,retirementInfoAt,actionMemberAt,bindEntryActor,bindCardActor} from './model';
 import type {Json,Catalog,Servant,Equip,Mystic,Entry,Turn} from './model';
 import {actionRosterAt,resolveActionActor} from './actionRoster';
@@ -89,15 +91,36 @@ export default function App(){
  const [preferredFileName,setPreferredFileName]=useState<string|null>(null),[pendingSave,setPendingSave]=useState<PreparedBattleSave|null>(null);
  const saving=useRef(false);
  const [extensionInstalling,setExtensionInstalling]=useState(false),extensionPending=useRef(false);
+ const catalogRequests=useRef(new LatestCatalogRequest<Catalog>()),catalogRefreshId=useRef(0);
+ const [catalogRefreshing,setCatalogRefreshing]=useState(false),[catalogRefreshError,setCatalogRefreshError]=useState('');
+ const fetchCatalog=useCallback(()=>catalogRequests.current.refresh(signal=>api<Catalog>('/catalog','GET',undefined,signal),setCatalog),[]);
+ const refreshCatalog=useCallback(async()=>{
+  if(extensionPending.current)return false;
+  const request=++catalogRefreshId.current;
+  setCatalogRefreshing(true);setCatalogRefreshError('');
+  try{return await fetchCatalog();}
+  catch(cause){
+   if(request===catalogRefreshId.current){
+    if(cause instanceof ApiError&&['invalid_token','service_stopping'].includes(cause.code)){
+     setStatus('offline');
+     setCatalogRefreshError('本地编辑服务会话已更新，当前仍显示上次的礼装列表。请关闭此窗口并点击“重新连接”，再打开礼装选择。当前编队和编辑内容会保留。');
+    }else{
+     const detail=cause instanceof ApiError?cause.message:'暂时无法从本地编辑服务读取最新礼装资料。';
+     setCatalogRefreshError(`礼装列表刷新失败，当前仍显示上次的结果。${detail} 请点击“刷新礼装列表”重试。`);
+    }
+   }
+   return false;
+  }finally{if(request===catalogRefreshId.current)setCatalogRefreshing(false);}
+ },[fetchCatalog]);
  const installSupportExtension=async(file:File)=>{
   if(extensionPending.current)throw new Error('已有礼装扩展正在安装，请等待安装完成。');
   if(status!=='ready')throw new Error('编队编辑器服务尚未连接，无法安装礼装扩展。请重新连接服务后重试。');
   extensionPending.current=true;setExtensionInstalling(true);
+  catalogRequests.current.invalidate();catalogRefreshId.current++;
+  setCatalogRefreshing(false);setCatalogRefreshError('');
   try{
    const result=await apiSupportCE(file);
-   let refreshed:Catalog;
-   try{refreshed=await api<Catalog>('/catalog');}catch{throw new Error(`已安装 ${result.installed} 种助战礼装，但列表刷新失败。请重新打开编队编辑器后查看，无需重复安装。`);}
-   setCatalog(refreshed);
+   try{if(!await fetchCatalog())throw new Error('catalog request superseded');}catch{throw new Error(`已安装 ${result.installed} 种助战礼装，但列表尚未刷新。请返回礼装选择后点击“刷新礼装列表”，无需重复安装。`);}
    const message=`已安装 ${result.installed} 种助战礼装，列表已刷新。`;setNotice(message);return message;
   }finally{extensionPending.current=false;setExtensionInstalling(false);}
  };
@@ -131,8 +154,13 @@ export default function App(){
  const [libraryWarning,setLibraryWarning]=useState('');
  const loadLibrary=useCallback(async()=>{const request=++libraryRequest.current;const [b,d]=await Promise.all([api('/battles'),api('/drafts')]);if(request!==libraryRequest.current)return;setBattles(b.battles??[]);setDrafts(d.drafts??[]);setLibraryWarning(typeof b.libraryWarning==='string'?b.libraryWarning:'');},[]);
  const favoriteBattle=async(name:string,favorite:boolean)=>{const result=await api<{name:string;favorite:boolean}>('/library/favorite','PUT',{name,favorite});if(result.name!==name||typeof result.favorite!=='boolean')throw new Error('收藏结果与所选方案不一致，无法确认收藏状态。请刷新方案库后重试。');libraryRequest.current++;setBattles(items=>items.map(item=>item.name===name?{...item,favorite:result.favorite}:item));setLibraryWarning('');return result;};
- const connect=useCallback(async()=>{setStatus('loading');setError('');try{await session();const [c,cp]=await Promise.all([api<Catalog>('/catalog'),api('/capabilities')]);setCatalog(c);setCap(cp);setStatus('ready');await loadLibrary();}catch(e){setStatus('offline');setError((e as Error).message);}},[loadLibrary]);
+ const connect=useCallback(async()=>{setStatus('loading');setError('');try{await session();const [updated,cp]=await Promise.all([fetchCatalog(),api('/capabilities')]);if(!updated)return;setCap(cp);setStatus('ready');await loadLibrary();}catch(e){setStatus('offline');setError((e as Error).message);}},[loadLibrary,fetchCatalog]);
  useEffect(()=>{void connect();},[connect]);
+ useEffect(()=>{
+  if(selector?.type!=='equip'||status!=='ready')return;
+  void refreshCatalog();
+  return()=>{catalogRequests.current.invalidate();catalogRefreshId.current++;setCatalogRefreshing(false);};
+ },[selector,status,refreshCatalog]);
  useEffect(()=>{if(status!=='ready')return;const timer=setInterval(()=>{api('/heartbeat','POST',{}).catch(()=>{setStatus('offline');setDraftStatus('服务断开 · 编辑内容仍保留在页面');});},25000);return()=>clearInterval(timer);},[status]);
  const flushDraft=useCallback(()=>{if(status!=='ready')return Promise.resolve(false);const snapshot=clone(current.current);const editorState={tab,slot,turn,action,namingSource,preferredFileName,newTeamFirstSupport};const record=draft.current;setDraftStatus('正在保存草稿…');draftChain.current=draftChain.current.then(async()=>{try{const r=await api(`/drafts/${record.id}`,'PUT',{data:snapshot,editorState,revision:record.revision,sourceName:source?.name??null,sourceHash:source?.hash??null});record.revision=r.revision;if(draft.current===record)setDraftStatus(`草稿已保存 ${time(r.savedAt||new Date().toISOString())}`);return true;}catch(e){if(draft.current===record)setDraftStatus('草稿保存失败');setError((e as Error).message);return false;}});return draftChain.current;},[status,tab,slot,turn,action,source,namingSource,preferredFileName,newTeamFirstSupport]);
  useEffect(()=>{if(status!=='ready')return;setDraftStatus('草稿同步中…');clearTimeout(draftTimer.current);draftTimer.current=setTimeout(()=>void flushDraft(),1000);return()=>clearTimeout(draftTimer.current);},[data,status,flushDraft]);
@@ -250,7 +278,7 @@ export default function App(){
   <footer className="app-footer"><span><span className={`status-dot ${status!=='ready'?'amber':''}`}/>{status==='ready'?'本地服务已连接':'服务未就绪'}<i>·</i>{cap.mode==='mxu'?'MXU 托管模式':cap.mode==='standalone'?'独立运行模式':cap.mode??'本地编辑'}</span><span className="footer-path" title={cap.projectRoot}>{cap.projectRoot??'所有编辑数据保存在当前 MaaFGO 实例'}</span><button className="text-button" onClick={async()=>{if(!window.confirm('停止本地编辑服务？当前已接收的草稿会先保存。重新打开请运行 CMD 或 Maa 启动任务。'))return;const synced=await flushDraft();if(!synced&&dirty){setError('草稿未保存成功，服务保持运行。请先重试或下载保真 JSON。');return;}try{await api('/shutdown','POST',{});setStatus('offline');setNotice('本地服务已停止。');}catch(e){setError((e as Error).message);}}}><Power size={13}/>停止服务</button></footer>
   {notice&&<div className="toast" role="status"><CheckCircle2 size={18}/>{notice}<button className="icon" aria-label="关闭通知" onClick={()=>setNotice('')}><X size={14}/></button></div>}
 
-  {selector&&<Selector type={selector.type} catalog={catalog} initialFormServant={selector.formFor?servantFor(catalog,selector.formFor):undefined} currentMember={members(data)[selector.slot??0]} supportRequirement={selector.type==='equip'?supportEquipRequirement(members(data)[selector.slot??0],selector.equip??'equip1',selector.candidate??0,defaultSupportSlot===(selector.slot??0)):null} excludedIds={selector.type==='equip'?equipCandidatesForDisplay(members(data)[selector.slot??0],selector.equip??'equip1').filter((_,index)=>index!==(selector.candidate??0)).map(ce=>ce.id):[]} onInstallSupportCE={installSupportExtension} extensionInstalling={extensionInstalling} extensionInstallDisabled={status!=='ready'} onSelect={selectCatalogItem} onClose={()=>setSelector(null)}/>}
+  {selector&&<Selector type={selector.type} catalog={catalog} initialFormServant={selector.formFor?servantFor(catalog,selector.formFor):undefined} currentMember={members(data)[selector.slot??0]} supportRequirement={selector.type==='equip'?supportEquipRequirement(members(data)[selector.slot??0],selector.equip??'equip1',selector.candidate??0,defaultSupportSlot===(selector.slot??0)):null} excludedIds={selector.type==='equip'?equipCandidatesForDisplay(members(data)[selector.slot??0],selector.equip??'equip1').filter((_,index)=>index!==(selector.candidate??0)).map(ce=>ce.id):[]} onInstallSupportCE={installSupportExtension} extensionInstalling={extensionInstalling} extensionInstallDisabled={status!=='ready'} onRefreshCatalog={refreshCatalog} catalogRefreshing={catalogRefreshing} catalogRefreshError={catalogRefreshError} onSelect={selectCatalogItem} onClose={()=>setSelector(null)}/>}
   {modal==='common-teams'&&<CommonTeamsDialog catalog={catalog} onClose={()=>setModal(null)} onImport={async teamId=>{const r=await api('/import','POST',{source:`https://link.chaldea.center/laplace/share?id=${teamId}`});if(r.teamId!==teamId)throw new Error('Chaldea 返回的队伍与所选队伍不一致，已保留当前方案。请刷新队伍列表后重新导入。');if(!await installImported(r.data,null,undefined,'chaldea',false,undefined,r.validation))return false;setTab('team');setNotice(`Chaldea 队伍 #${teamId} 已导入草稿，请在“检查与保存”核对后保存方案。`);return true;}}/>}
   {modal==='cost'&&<PartyCostSettings summary={costSummary} limit={costLimit} onClose={()=>setModal(null)} onSave={limit=>{setCostLimit(limit);setModal(null);}}/>}
   {modal==='bond'&&<BondOptimizer data={data} catalog={catalog} preferredSupportSlot={defaultSupportSlot} initialCostLimit={costLimit} onCostLimitChange={setCostLimit} onClose={()=>setModal(null)} onApply={(response,snapshot)=>{const nextTeam=bondResultTeam(current.current,snapshot,response);apply(d=>{d.team=nextTeam;});setNotice('羁绊规划已应用到草稿，可用Ctrl+Z撤销。');}}/>}
@@ -266,7 +294,7 @@ export default function App(){
  </div>;
 }
 
-function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFormServant,currentMember,onInstallSupportCE,extensionInstalling,extensionInstallDisabled,onSelect,onClose}:{type:'servant'|'equip'|'mystic';catalog:Catalog;supportRequirement?:SupportEquipRequirement|null;excludedIds?:number[];initialFormServant?:Servant;currentMember?:Json|null;onInstallSupportCE:(file:File)=>Promise<string>;extensionInstalling:boolean;extensionInstallDisabled:boolean;onSelect:(item:Servant|Equip|Mystic,form?:ServantForm)=>void;onClose:()=>void}){
+function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFormServant,currentMember,onInstallSupportCE,extensionInstalling,extensionInstallDisabled,onRefreshCatalog,catalogRefreshing,catalogRefreshError,onSelect,onClose}:{type:'servant'|'equip'|'mystic';catalog:Catalog;supportRequirement?:SupportEquipRequirement|null;excludedIds?:number[];initialFormServant?:Servant;currentMember?:Json|null;onInstallSupportCE:(file:File)=>Promise<string>;extensionInstalling:boolean;extensionInstallDisabled:boolean;onRefreshCatalog:()=>Promise<boolean>;catalogRefreshing:boolean;catalogRefreshError:string;onSelect:(item:Servant|Equip|Mystic,form?:ServantForm)=>void;onClose:()=>void}){
  const [formServant,setFormServant]=useState<Servant|null>(()=>initialFormServant??null);
  const [remembered]=useState(()=>type==='servant'?loadServantSelectorPreferences(catalog.servants.length?catalog.servants.flatMap(s=>s.classKey?[s.classKey]:[]):undefined):defaultServantSelectorPreferences());
  const [equipRemembered]=useState(()=>type==='equip'?loadEquipSelectorPreferences(undefined,catalog):defaultEquipSelectorPreferences());
@@ -275,6 +303,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
  const [equipKind,setEquipKind]=useState(equipRemembered.kind),[equipSource,setEquipSource]=useState(equipRemembered.source),[equipAdvanced,setEquipAdvanced]=useState(()=>normalizeEquipAdvancedFilters(equipRemembered.advanced,catalog)),[equipSortKey,setEquipSortKey]=useState<EquipSortKey>(equipRemembered.sortKey),[equipDetail,setEquipDetail]=useState<Equip|null>(null);
  const [advanced,setAdvanced]=useState(newServantAdvancedFilters);
  const [supportOnly,setSupportOnly]=useState(true);
+ const [extensionDialogOpen,setExtensionDialogOpen]=useState(false);
  const supportSelection=type==='equip'&&supportRequirement!==null;
  const ownIds=type==='equip'?catalog.inventory?.equips:catalog.inventory?.servants;
  const inventoryStatus=type==='equip'?catalog.inventory?.equipsStatus:catalog.inventory?.servantsStatus;
@@ -297,6 +326,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
  const clearFilters=()=>{setQuery('');setClassKey('');setRarity('');setOwned(false);setAdvanced(newServantAdvancedFilters());if(type==='equip'){setCommon(false);setEquipKind('');setEquipSource('');setEquipAdvanced(newEquipAdvancedFilters());}};
  if(type==='servant'&&formServant)return <ServantFormPicker servant={formServant} member={currentMember?.svtId===formServant.id?currentMember:null} onSelect={form=>onSelect(formServant,form)} onBack={()=>setFormServant(null)} onClose={onClose}/>;
  if(type==='equip'&&equipDetail)return <EquipDetails equip={equipDetail} catalog={catalog} basis={equipAdvanced.basis} onClose={()=>setEquipDetail(null)} onSelect={()=>onSelect(equipDetail)}/>;
+ if(type==='equip'&&extensionDialogOpen)return <SupportCEInstallDialog busy={extensionInstalling} disabled={extensionInstallDisabled} common={common} onInstall={onInstallSupportCE} onClose={()=>setExtensionDialogOpen(false)}/>;
  return <Modal wide title={type==='servant'?'选择从者':type==='equip'?'选择概念礼装':'选择御主礼装'} onClose={onClose}><div className="selector-body">
   <div className="selector-filters"><label className="search-field"><Search size={18}/><input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder={type==='equip'?'礼装名 / 羁绊从者 / ID / 图鉴编号':'中文 / 日文 / 别名 / ID / 图鉴编号'} aria-label="搜索图鉴"/></label>
    {type==='equip'&&<label className="check-field common-filter"><input type="checkbox" checked={common} onChange={e=>setCommon(e.target.checked)}/>常用礼装</label>}
@@ -327,7 +357,9 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
   </>}
   <div className="selector-description"><span>共 {filtered.length} 项 · {type==='equip'&&common?'常用礼装 · ':''}{type==='equip'?(supportSelection&&supportOnly?'助战可识别礼装':'编队可识别礼装'):'离线图鉴'}{type==='equip'&&<span className="selector-description-actions">
    {common&&<small>已标记的重要礼装</small>}
-   <SupportCEInstall busy={extensionInstalling} disabled={extensionInstallDisabled} common={common} onInstall={onInstallSupportCE}/>
+   <SupportCEInstall busy={extensionInstalling} onOpen={()=>setExtensionDialogOpen(true)}/>
+   <button type="button" className="text-button support-ce-catalog-refresh" disabled={catalogRefreshing||extensionInstalling||extensionInstallDisabled} onClick={()=>void onRefreshCatalog()}><RefreshCw size={14} className={catalogRefreshing?'support-ce-install-spinner':undefined} aria-hidden="true"/>{catalogRefreshing?'正在刷新礼装…':'刷新礼装列表'}</button>
+   {catalogRefreshError&&<span className="support-ce-catalog-error" role="alert">{catalogRefreshError}</span>}
   </span>}</span>{type!=="mystic"&&<span>{inventorySummary}</span>}</div>
   <div className={`catalog-grid ${type==='servant'?'servant-catalog':''} ${type==='mystic'?'mystic-grid':''} ${type==='equip'?'equip-catalog':''}`}>{shown.map(item=>{if(type==='equip'){const equip=item as Equip;return <EquipCatalogCard key={equip.id} equip={equip} catalog={catalog} basis={equipAdvanced.basis} conditionalOnly={matchEquipAdvanced(equip,equipAdvanced).conditionalOnly} onSelect={()=>onSelect(equip)} onDetails={()=>setEquipDetail(equip)}/>;}const advancedMatch=type==='servant'?matchServantAdvanced(item as Servant,advanced):null;const npSummary=type==='servant'?npFilterSummary(item as Servant):'';return <button className="catalog-card" key={item.id} onClick={()=>type==='servant'&&(item as Servant).forms?.length?setFormServant(item as Servant):onSelect(item)}>
    {type==='mystic'?<Avatar item={item} size="catalog"/>:<div className="catalog-visual">

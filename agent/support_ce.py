@@ -36,7 +36,7 @@ class SupportCEError(ValueError):
 
 
 def _invalid(reason):
-    return SupportCEError("support_ce_pack", f"礼装扩展包无法安装：{reason}。请重新下载完整的礼装扩展 ZIP，再点击“安装礼装扩展”重试。")
+    return SupportCEError("support_ce_pack", f"礼装扩展包无法安装：{reason}。请重新下载完整的礼装扩展 ZIP，再在“安装礼装扩展”窗口点击“选择扩展包 ZIP”重试。")
 
 
 def normalized_name(value):
@@ -115,7 +115,7 @@ def _parse_manifest(raw):
 
 
 @lru_cache(maxsize=8)
-def _cached_manifest(path, modified, size):
+def _cached_manifest(path, modified, size, changed, identity):
     try:
         return _parse_manifest(Path(path).read_bytes())
     except (SupportCEError, OSError):
@@ -133,7 +133,7 @@ def read_manifest(root):
         info = path.stat()
         if info.st_size > MAX_MANIFEST_BYTES:
             return {}
-        return _cached_manifest(str(path), info.st_mtime_ns, info.st_size)
+        return _cached_manifest(str(path), info.st_mtime_ns, info.st_size, info.st_ctime_ns, info.st_ino)
     except OSError:
         return {}
 

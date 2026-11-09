@@ -42,3 +42,15 @@ python tools/build_battle_editor_catalog.py --refresh
 礼装筛选另使用 `equip_filters.json`（基础/满破效果、条件、类型/来源、属性与羁绊持有者）及 `equip_filters_sources.json`（官方来源版本与哈希）。维护运行 `python tools/build_battle_editor_equip_filters.py` 离线重建，`--refresh` 更新官方缓存；仅处理运行清单既有的礼装，不下载图片。原始整包缓存不随包发布，用户运行完全离线。470条旧羁绊分类的两字段修正通过 `agent/custom/equip_categories.json` 精确映射维护，源 CSV/Excel 本次未修改；完整规则见编辑器维护说明。
 
 修改 `agent/custom/equip_list.json` 的任何字段（包括仅用于显示分类的 `important`）后，都须运行上述离线命令，同步提交两个筛选索引；它们记录的是整个清单文件的 SHA256。提交前运行 `python -m unittest tests.test_battle_editor_equip_filters`，同时核对源清单、索引和来源清单的哈希链。
+
+## 缺失编队卡图的增量补齐
+
+`tools/build_battle_editor_missing_portraits.py` 仅处理实际可编辑且已登记、缺少完整卡图的从者，保留其他卡图、玛修形态、技能和来源记录；不联网、不修改原图。原始整包使用 `--source-kind fgo-dump`，按 Atlas 声明的 `@1/@2` 选择纹理左右半张；Atlas 原图缓存使用 `--source-kind atlas-cache`，目录为 `从者立绘/CharaGraph/<ID>/<ID>b@1.png` 等准确声明的文件名，内容必须为原始 512×724 单卡。禁止把小头像放大或将现有 WebP 当作原图。
+
+```powershell
+python tools/build_battle_editor_missing_portraits.py --source-root <原始图片缓存目录> --source-kind atlas-cache --servant-ids 205600 405900 506000 705300 705400 2301200 2801300
+python tools/build_battle_editor_missing_portraits.py --source-root <FGO整包目录> --source-kind fgo-dump --servant-ids 1700100 9935530
+python -m unittest tests.test_battle_editor_missing_portraits tests.test_battle_editor_ui_assets tests.test_battle_editor_mash_portraits
+```
+
+2026-11-09 补齐莉莉丝（骑）、红阎魔（狂）、Kingprotea（月）、比肖内（术）、小野小町（弓）、哈贝特洛特（伪）、代达罗斯（狂）七位从者，并补充两条所罗门敌方资料明确声明的灵基 0 单卡。统一沿用 358×507、不透明 RGB、LANCZOS、WebP Q90/method6；源图哈希、URL、裁区和编码配方记录于 UI manifest。无图鉴编号且被实际目录排除的 `1002100` 不补图。提交 `ui/manifest.json` 和新增 `ui/media/formation_*.webp`；原始下载缓存不随包发布，无需新增玩家运行依赖。后续若全量重建 UI，须重新应用增量卡图及玛修形态卡图，避免丢失已有映射。
