@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "generator": "tools/build_battle_editor_ui_assets.py",
-  "sourceLabel": "用户本地 FGO 整包及 Atlas Academy 明确声明的游戏资源；仅供 MaaFGO 本地界面使用，版权归原权利方",
+  "sourceLabel": "用户本地 FGO 整包及 Atlas Academy 原始图片缓存；仅供 MaaFGO 本地界面使用，版权归原权利方",
   "sources": {
     "catalog.json": {
       "sha256": "e6a2cdd121268909f7099840146970915a2cef71b0f7ff2861014eeb3a9f6bfe"
@@ -19,6 +19,12 @@
     "incremental/JP_servant_1102300": {
       "url": "https://api.atlasacademy.io/nice/JP/servant/1102300",
       "sha256": "7fc8630671be969811be10dc6221777e8a252f1fe7768a5113236d8c0b52cb67"
+    },
+    "incremental/formationPortraits/fgo-dump/JP_nice_servant.json": {
+      "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697"
+    },
+    "incremental/formationPortraits/atlas-cache/JP_nice_servant.json": {
+      "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697"
     }
   },
   "files": {
@@ -19433,6 +19439,339 @@
         "input_mode": "RGB",
         "alpha": "discardBeforeResizePreserveRGB"
       }
+    },
+    "formation_1700100_e3969081595f7d2a.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "1ccc0659dc9566fc74d8846763259a21b0df5de36796ff586a56dd4af37d7eb8",
+      "source": {
+        "kind": "fgo-dump",
+        "path": "从者立绘/CharaGraph/1700100/1700100a.png",
+        "sha256": "b1f409e2619103c4ee24f039f43a1c7733506dcb3839ae7df06936f7a44fd3e2",
+        "width": 1024,
+        "height": 1024,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/1700100/1700100a.png",
+        "ascension": 0
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_9935530_49a4c9d9a41a7509.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "70effd89d282b2945d08de2cad1c3a7b7cfdd0bf24ef33bf30e336db0b0baba4",
+      "source": {
+        "kind": "fgo-dump",
+        "path": "从者立绘/CharaGraph/9935530/9935530a.png",
+        "sha256": "595e855701f3e8edca22c18fd69bba0d5062fbe31cbd36aaa99c2b55d4b5fdd8",
+        "width": 1024,
+        "height": 1024,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/9935530/9935530a.png",
+        "ascension": 0
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_205600_a0fd35a131269bf8.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "c70bbd4af38461a7e2e10eba20686396e448e62d3b552a90fd1cfb03a2a04280",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/205600/205600b@1.png",
+        "sha256": "f8e4b01036662961daf2013352c81cf0ab6a0d0439432b3a86350ca9b81f4d68",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/205600/205600b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_506000_4b01fe6e8592a221.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "ef068b4bffd4f1adc67ead7f01ef13e2b43d96c3cf917be8babe5686132660ba",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/506000/506000b@1.png",
+        "sha256": "48e032392d7022f4815596911dded54dcabcf525eeb760caaf957380317332fa",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/506000/506000b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_705300_85272f36f62e888e.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "b842c7aef9cea586b4d7283b2aa1b8260d89706c6d8ab45af3e4051d7b140044",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/705300/705300b@1.png",
+        "sha256": "041c545ed6059827dcae97a0c800a30aacb439997618a1c066d22c074f479a1d",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/705300/705300b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_705400_7fb0813b4471b433.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "76cef0a93d146ffe81096b7b768346edf303818b87417f045ee8d70f7372cacf",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/705400/705400b@1.png",
+        "sha256": "07f9463047eac0dbc6cf931c39edcc6b9b6e8f70b25cb1047abde6ce9361495e",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/705400/705400b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_2301200_28a8a37f88f7c4ba.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "e167a14977e604bf2cd6b8494a7a2c433ba133c385a48fc8fda70cbe626ae9da",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/2301200/2301200b@1.png",
+        "sha256": "ca66d89e17d4772a7246fcab85828cf0b46c8b108e63fe09890ef5fd22cfb8ff",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/2301200/2301200b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_2801300_c36a843bc1841c79.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "a8682e12185bcea3b02cb4c3719654b398007a2457875e868d1967ae296daebb",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/2801300/2801300b@1.png",
+        "sha256": "02d38f31239ec3c79a7533e21098b2734a062d6ac5fb04be3014991ea0d44dd9",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/2801300/2801300b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_405900_6165d795e3d22501.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "d8fd3e23b25f7650b41c5a20e94d1865a4b5ad7c2ccf6e55e3c63928329ad2a7",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/405900/405900b@1.png",
+        "sha256": "b377be5bc55cf0a8cd3077ffa2cca2ea7deb784b482012308421f681557e9f50",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/405900/405900b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
     }
   },
   "servants": {
@@ -27321,7 +27660,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_2801300_c36a843bc1841c79.webp",
+      "formationPortraitAscension": 3
     },
     "203000": {
       "activeSkills": [
@@ -28650,7 +28991,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_205600_a0fd35a131269bf8.webp",
+      "formationPortraitAscension": 3
     },
     "501200": {
       "activeSkills": [
@@ -31177,7 +31520,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_506000_4b01fe6e8592a221.webp",
+      "formationPortraitAscension": 3
     },
     "704800": {
       "activeSkills": [
@@ -37814,7 +38159,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_2301200_28a8a37f88f7c4ba.webp",
+      "formationPortraitAscension": 3
     },
     "1102300": {
       "activeSkills": [
@@ -43767,7 +44114,9 @@
     },
     "9935530": {
       "activeSkills": [],
-      "appendSkills": []
+      "appendSkills": [],
+      "formationPortrait": "formation_9935530_49a4c9d9a41a7509.webp",
+      "formationPortraitAscension": 0
     },
     "2801200": {
       "activeSkills": [
@@ -46666,7 +47015,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_705300_85272f36f62e888e.webp",
+      "formationPortraitAscension": 3
     },
     "1100700": {
       "activeSkills": [
@@ -47171,7 +47522,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_405900_6165d795e3d22501.webp",
+      "formationPortraitAscension": 3
     },
     "100900": {
       "activeSkills": [
@@ -50674,7 +51027,9 @@
     },
     "1700100": {
       "activeSkills": [],
-      "appendSkills": []
+      "appendSkills": [],
+      "formationPortrait": "formation_1700100_e3969081595f7d2a.webp",
+      "formationPortraitAscension": 0
     },
     "4000100": {
       "activeSkills": [
@@ -50813,7 +51168,9 @@
           "nameJp": "スキル再装填",
           "icon": "skill_00613.png"
         }
-      ]
+      ],
+      "formationPortrait": "formation_705400_7fb0813b4471b433.webp",
+      "formationPortraitAscension": 3
     },
     "406000": {
       "activeSkills": [
@@ -51072,16 +51429,7 @@
       705400
     ],
     "formationPortraits": [
-      2801300,
-      205600,
-      506000,
-      2301200,
-      9935530,
-      705300,
-      405900,
-      1002100,
-      1700100,
-      705400
+      1002100
     ],
     "equipImages": [],
     "skillIcons": [],
@@ -51127,15 +51475,15 @@
   },
   "stats": {
     "portraits": 1,
-    "formationPortraits": 464,
+    "formationPortraits": 473,
     "servants": 474,
     "addedEquipImages": 0,
     "activeSkillMappings": 1786,
     "appendSkillMappings": 2355,
     "classes": 17,
     "classVariantMappings": 102,
-    "mediaFiles": 637,
-    "mediaBytes": 30541486,
+    "mediaFiles": 646,
+    "mediaBytes": 31034950,
     "formPortraitMappings": 6,
     "formPortraitImages": 3
   }
