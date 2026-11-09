@@ -56,6 +56,7 @@ class EditorHTTPServer(ThreadingHTTPServer):
         self.started_at = utc_now()
         self.token = secrets.token_urlsafe(32)
         self._catalog = None
+        self._catalog_support_ce_signature = self._support_ce_signature()
         self._catalog_lock = threading.Lock()
         self._bond_planning = threading.BoundedSemaphore(1)
         self._card_renderer = None
@@ -89,11 +90,28 @@ class EditorHTTPServer(ThreadingHTTPServer):
         finally:
             self._screenshot_worker.close()
 
+    def _support_ce_signature(self):
+        """Detect optional packs installed outside this HTTP process as well."""
+        directory = self.root / "config/SupportCE"
+        signature = []
+        # A manual extraction can write its manifest before its PNG files.
+        # Directory metadata catches referenced images added or removed later,
+        # without scanning the image collection on every catalog request.
+        for relative in ("manifest.json", "满破", "非满破"):
+            try:
+                info = (directory / relative).stat()
+                signature.append((info.st_mtime_ns, info.st_ctime_ns, info.st_size, info.st_ino))
+            except OSError:
+                signature.append(None)
+        return tuple(signature)
+
     def catalog(self) -> dict:
         with self._catalog_lock:
-            if self._catalog is None:
+            signature = self._support_ce_signature()
+            if self._catalog is None or signature != self._catalog_support_ce_signature:
                 from .catalog import build_catalog
                 self._catalog = build_catalog(self.root)
+                self._catalog_support_ce_signature = signature
             return self._catalog
 
     def install_support_ce(self, payload):

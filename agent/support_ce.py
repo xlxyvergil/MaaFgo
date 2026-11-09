@@ -115,7 +115,7 @@ def _parse_manifest(raw):
 
 
 @lru_cache(maxsize=8)
-def _cached_manifest(path, modified, size):
+def _cached_manifest(path, modified, size, changed, identity):
     try:
         return _parse_manifest(Path(path).read_bytes())
     except (SupportCEError, OSError):
@@ -133,7 +133,7 @@ def read_manifest(root):
         info = path.stat()
         if info.st_size > MAX_MANIFEST_BYTES:
             return {}
-        return _cached_manifest(str(path), info.st_mtime_ns, info.st_size)
+        return _cached_manifest(str(path), info.st_mtime_ns, info.st_size, info.st_ctime_ns, info.st_ino)
     except OSError:
         return {}
 

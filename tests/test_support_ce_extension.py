@@ -3,6 +3,7 @@ import hashlib
 import http.client
 import io
 import json
+import os
 from pathlib import Path
 import stat
 import tempfile
@@ -183,6 +184,72 @@ class SupportCEHTTPTests(unittest.TestCase):
         self.assertEqual(body["installed"], 1)
         self.assertIsNone(self.server._catalog)
         self.assertTrue((self.root / "config/SupportCE/manifest.json").is_file())
+        refreshed = self.server.catalog()
+        self.assertEqual(refreshed["supportExtension"]["installed"], 1)
+        self.assertTrue(all(refreshed["equips"][0]["supportRecognition"].values()))
+
+    def test_catalog_detects_manual_install_replacement_and_removal_without_restart(self):
+        def read_catalog():
+            connection = http.client.HTTPConnection("127.0.0.1", self.server.server_address[1], timeout=10)
+            connection.request("GET", "/api/catalog", headers={"X-Editor-Token": self.server.token})
+            response = connection.getresponse()
+            self.assertEqual(response.status, 200)
+            result = json.loads(response.read())
+            connection.close()
+            return result
+
+        from agent.battle_editor.catalog import build_catalog
+        with patch("agent.battle_editor.catalog.build_catalog", wraps=build_catalog) as build:
+            empty = read_catalog()
+            self.assertEqual(empty["supportExtension"]["installed"], 0)
+            self.assertEqual(read_catalog(), empty)
+            self.assertEqual(build.call_count, 1)
+
+            # A manual extraction never calls install_support_ce or its invalidation.
+            with zipfile.ZipFile(io.BytesIO(pack())) as archive:
+                archive.extractall(self.root / "config/SupportCE")
+            installed = read_catalog()
+            self.assertEqual(installed["supportExtension"]["installed"], 1)
+            self.assertEqual({row["id"] for row in installed["equips"]}, {9400010})
+            self.assertTrue(all(installed["equips"][0]["supportRecognition"].values()))
+            self.assertEqual(read_catalog(), installed)
+            self.assertEqual(build.call_count, 2)
+
+            # PNGs can arrive after the manifest during manual extraction, or be
+            # removed separately. Their directory metadata changes the cache key.
+            image = self.root / "config/SupportCE/满破/f_94000100.png"
+            original_image = image.read_bytes()
+            image.unlink()
+            without_max = read_catalog()
+            self.assertEqual(without_max["equips"][0]["supportRecognition"], {
+                "limitBreak": False, "nonLimitBreak": True})
+            self.assertEqual(build.call_count, 3)
+            image.write_bytes(original_image)
+            restored = read_catalog()
+            self.assertTrue(all(restored["equips"][0]["supportRecognition"].values()))
+            self.assertEqual(read_catalog(), restored)
+            self.assertEqual(build.call_count, 4)
+
+            # Replacing a same-sized manifest while preserving mtime must invalidate
+            # both the editor catalog and the shared parsed-manifest cache.
+            manifest = self.root / "config/SupportCE/manifest.json"
+            old_stat = manifest.stat()
+            replacement = manifest.with_suffix(".replacement")
+            with zipfile.ZipFile(io.BytesIO(pack(mutate=lambda value: value["equips"][0].update(id=9400020)))) as archive:
+                replacement.write_bytes(archive.read("manifest.json"))
+            self.assertEqual(replacement.stat().st_size, old_stat.st_size)
+            os.utime(replacement, ns=(old_stat.st_atime_ns, old_stat.st_mtime_ns))
+            replacement.replace(manifest)
+            replaced = read_catalog()
+            self.assertEqual({row["id"] for row in replaced["equips"]}, {9400020})
+            self.assertEqual(build.call_count, 5)
+
+            manifest.unlink()
+            removed = read_catalog()
+            self.assertEqual(removed["supportExtension"]["installed"], 0)
+            self.assertEqual(removed["equips"], [])
+            self.assertEqual(read_catalog(), removed)
+            self.assertEqual(build.call_count, 6)
 
     def test_auth_origin_project_type_and_empty_payload_rejected_before_install(self):
         for kwargs, expected in (({"token": False}, 403), ({"origin": "https://other.invalid"}, 403),

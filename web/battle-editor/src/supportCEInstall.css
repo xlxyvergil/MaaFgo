@@ -3,6 +3,9 @@
 .support-ce-install{display:inline-flex;align-items:baseline;gap:6px 12px;flex-wrap:wrap;min-width:0;max-width:100%;margin:0;font-size:inherit;line-height:1.7;color:var(--muted);overflow-wrap:anywhere}
 .support-ce-install .support-ce-install-button{display:inline-block;padding:0;white-space:nowrap;font-size:inherit;line-height:inherit}
 .support-ce-install-button>svg{display:inline-block;vertical-align:-2px;margin-right:6px}
+.selector-description-actions>.support-ce-catalog-refresh{display:inline-block;padding:0;font-size:inherit;line-height:1.7;white-space:nowrap}
+.support-ce-catalog-refresh>svg{display:inline-block;vertical-align:-2px;margin-right:6px}
+.selector-description-actions>.support-ce-catalog-error{flex-basis:100%;color:var(--error);font-size:11px;line-height:1.7}
 .support-ce-install-button:disabled{cursor:wait;opacity:.65}
 .support-ce-install-spinner{animation:support-ce-install-spin 1s linear infinite}
 @keyframes support-ce-install-spin{to{transform:rotate(360deg)}}
