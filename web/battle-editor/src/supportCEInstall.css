@@ -4,7 +4,6 @@
 .support-ce-install .support-ce-install-button{display:inline-block;padding:0;white-space:nowrap;font-size:inherit;line-height:inherit}
 .support-ce-install-button>svg{display:inline-block;vertical-align:-2px;margin-right:6px}
 .support-ce-install-button:disabled{cursor:wait;opacity:.65}
-.support-ce-install-error{color:var(--danger,#bd3b42)}
 .support-ce-install-spinner{animation:support-ce-install-spin 1s linear infinite}
 @keyframes support-ce-install-spin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.support-ce-install-spinner{animation:none}}

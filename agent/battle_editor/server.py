@@ -420,9 +420,9 @@ class EditorHandler(BaseHTTPRequestHandler):
 
     def _support_ce_body(self):
         if self.headers.get_all("Transfer-Encoding", []):
-            raise EditorError("support_ce_body", "礼装扩展包传输方式无法读取，安装未开始。请刷新编队编辑器，再点击“安装礼装扩展”重新选择 ZIP。")
+            raise EditorError("support_ce_body", "礼装扩展包传输方式无法读取，安装未开始。请刷新编队编辑器，再在“安装礼装扩展”窗口点击“选择扩展包 ZIP”重试。")
         if self.headers.get("Content-Type", "").split(";")[0].strip().lower() != "application/zip":
-            raise EditorError("support_ce_format", "所选文件不是礼装扩展 ZIP，无法安装。请点击“安装礼装扩展”选择生成的 .zip 压缩包。", 415)
+            raise EditorError("support_ce_format", "所选文件不是礼装扩展 ZIP，无法安装。请在“安装礼装扩展”窗口点击“选择扩展包 ZIP”，选择下载的礼装扩展 .zip 压缩包。", 415)
         length = self._content_length()
         if not 0 < length <= MAX_PACK_BYTES:
             raise EditorError("support_ce_size", "礼装扩展包为空或超过 64 MiB，无法安装。请重新下载不超过 64 MiB 的礼装扩展 ZIP 后重试。", 413)
@@ -430,7 +430,7 @@ class EditorHandler(BaseHTTPRequestHandler):
         while self._body_read < length:
             chunk = self.rfile.read1(min(length - self._body_read, 65536))
             if not chunk:
-                raise EditorError("support_ce_body", "礼装扩展包没有完整接收，安装未开始。请点击“安装礼装扩展”重新选择 ZIP 后重试。")
+                raise EditorError("support_ce_body", "礼装扩展包没有完整接收，安装未开始。请在“安装礼装扩展”窗口点击“选择扩展包 ZIP”，重新选择文件后重试。")
             self._body_read += len(chunk)
             chunks.append(chunk)
         return b"".join(chunks)

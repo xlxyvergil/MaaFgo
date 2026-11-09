@@ -36,7 +36,7 @@ class SupportCEError(ValueError):
 
 
 def _invalid(reason):
-    return SupportCEError("support_ce_pack", f"礼装扩展包无法安装：{reason}。请重新下载完整的礼装扩展 ZIP，再点击“安装礼装扩展”重试。")
+    return SupportCEError("support_ce_pack", f"礼装扩展包无法安装：{reason}。请重新下载完整的礼装扩展 ZIP，再在“安装礼装扩展”窗口点击“选择扩展包 ZIP”重试。")
 
 
 def normalized_name(value):

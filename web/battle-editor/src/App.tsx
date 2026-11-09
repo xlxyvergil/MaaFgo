@@ -6,6 +6,7 @@ import type {ReactNode} from 'react';
 import {Swords,Users,Layers,CheckCheck,Save,Undo2,Redo2,Plus,Search,ChevronDown,ChevronUp,ArrowLeft,ArrowRight,ArrowUp,ArrowDown,Copy,Trash2,X,Upload,Download,FileJson,Sun,Moon,ExternalLink,FolderOpen,AlertTriangle,CheckCircle2,ArrowLeftRight,GripVertical,Link as LinkIcon,RefreshCw,Settings2,Shield,Shirt,Target,Heart,Play,Power,Clipboard,Info,BookOpen,Image as ImageIcon} from 'lucide-react';
 import {api,session,ApiError,apiSupportCE} from './api';
 import {SupportCEInstall} from './SupportCEInstall';
+import {SupportCEInstallDialog} from './SupportCEInstallDialog';
 import {clone,newBattle,assertEditable,members,setMember,turnsOf,writeTurns,rosterAt,canChange,isSwap,titleOf,colorName,colorClass,colorOf,makeCard,move,actionTitle,remapSlots,skillAt,servantFor,replaceServant,swapMembers,filterCatalog,appendSkillAt,appendSkillEntry,appendNPEntry,newServantAdvancedFilters,matchServantAdvanced,npFilterSummary,isRetire,retirementInfoAt,actionMemberAt,bindEntryActor,bindCardActor} from './model';
 import type {Json,Catalog,Servant,Equip,Mystic,Entry,Turn} from './model';
 import {actionRosterAt,resolveActionActor} from './actionRoster';
@@ -275,6 +276,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
  const [equipKind,setEquipKind]=useState(equipRemembered.kind),[equipSource,setEquipSource]=useState(equipRemembered.source),[equipAdvanced,setEquipAdvanced]=useState(()=>normalizeEquipAdvancedFilters(equipRemembered.advanced,catalog)),[equipSortKey,setEquipSortKey]=useState<EquipSortKey>(equipRemembered.sortKey),[equipDetail,setEquipDetail]=useState<Equip|null>(null);
  const [advanced,setAdvanced]=useState(newServantAdvancedFilters);
  const [supportOnly,setSupportOnly]=useState(true);
+ const [extensionDialogOpen,setExtensionDialogOpen]=useState(false);
  const supportSelection=type==='equip'&&supportRequirement!==null;
  const ownIds=type==='equip'?catalog.inventory?.equips:catalog.inventory?.servants;
  const inventoryStatus=type==='equip'?catalog.inventory?.equipsStatus:catalog.inventory?.servantsStatus;
@@ -297,6 +299,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
  const clearFilters=()=>{setQuery('');setClassKey('');setRarity('');setOwned(false);setAdvanced(newServantAdvancedFilters());if(type==='equip'){setCommon(false);setEquipKind('');setEquipSource('');setEquipAdvanced(newEquipAdvancedFilters());}};
  if(type==='servant'&&formServant)return <ServantFormPicker servant={formServant} member={currentMember?.svtId===formServant.id?currentMember:null} onSelect={form=>onSelect(formServant,form)} onBack={()=>setFormServant(null)} onClose={onClose}/>;
  if(type==='equip'&&equipDetail)return <EquipDetails equip={equipDetail} catalog={catalog} basis={equipAdvanced.basis} onClose={()=>setEquipDetail(null)} onSelect={()=>onSelect(equipDetail)}/>;
+ if(type==='equip'&&extensionDialogOpen)return <SupportCEInstallDialog busy={extensionInstalling} disabled={extensionInstallDisabled} common={common} onInstall={onInstallSupportCE} onClose={()=>setExtensionDialogOpen(false)}/>;
  return <Modal wide title={type==='servant'?'选择从者':type==='equip'?'选择概念礼装':'选择御主礼装'} onClose={onClose}><div className="selector-body">
   <div className="selector-filters"><label className="search-field"><Search size={18}/><input autoFocus value={query} onChange={e=>setQuery(e.target.value)} placeholder={type==='equip'?'礼装名 / 羁绊从者 / ID / 图鉴编号':'中文 / 日文 / 别名 / ID / 图鉴编号'} aria-label="搜索图鉴"/></label>
    {type==='equip'&&<label className="check-field common-filter"><input type="checkbox" checked={common} onChange={e=>setCommon(e.target.checked)}/>常用礼装</label>}
@@ -327,7 +330,7 @@ function Selector({type,catalog,supportRequirement=null,excludedIds=[],initialFo
   </>}
   <div className="selector-description"><span>共 {filtered.length} 项 · {type==='equip'&&common?'常用礼装 · ':''}{type==='equip'?(supportSelection&&supportOnly?'助战可识别礼装':'编队可识别礼装'):'离线图鉴'}{type==='equip'&&<span className="selector-description-actions">
    {common&&<small>已标记的重要礼装</small>}
-   <SupportCEInstall busy={extensionInstalling} disabled={extensionInstallDisabled} common={common} onInstall={onInstallSupportCE}/>
+   <SupportCEInstall busy={extensionInstalling} onOpen={()=>setExtensionDialogOpen(true)}/>
   </span>}</span>{type!=="mystic"&&<span>{inventorySummary}</span>}</div>
   <div className={`catalog-grid ${type==='servant'?'servant-catalog':''} ${type==='mystic'?'mystic-grid':''} ${type==='equip'?'equip-catalog':''}`}>{shown.map(item=>{if(type==='equip'){const equip=item as Equip;return <EquipCatalogCard key={equip.id} equip={equip} catalog={catalog} basis={equipAdvanced.basis} conditionalOnly={matchEquipAdvanced(equip,equipAdvanced).conditionalOnly} onSelect={()=>onSelect(equip)} onDetails={()=>setEquipDetail(equip)}/>;}const advancedMatch=type==='servant'?matchServantAdvanced(item as Servant,advanced):null;const npSummary=type==='servant'?npFilterSummary(item as Servant):'';return <button className="catalog-card" key={item.id} onClick={()=>type==='servant'&&(item as Servant).forms?.length?setFormServant(item as Servant):onSelect(item)}>
    {type==='mystic'?<Avatar item={item} size="catalog"/>:<div className="catalog-visual">
