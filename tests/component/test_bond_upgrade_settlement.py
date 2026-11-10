@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 import sys
 import tempfile
+import time
 from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
@@ -146,10 +147,10 @@ class UpgradeSettlementTests(unittest.TestCase):
             def run(self, context, argv):
                 root = context.get_task_job().job_id
                 context.override_pipeline({
-                    "结算-羁绊快速复核": {"pre_delay": 0},
+                    "结算-羁绊观察间隔": {"pre_delay": 10, "post_delay": 0},
                     "结算-等待羁绊出现": {"pre_delay": 0},
                     bond.GUARD_NODE: {"attach": {
-                        "positive_attempts": 1, "positive_timeout_ms": 1000,
+                        "observation_attempts": 80, "observation_timeout_ms": 3000,
                         "page_wait_attempts": 6, "page_wait_timeout_ms": 3000,
                     }},
                 })
@@ -177,22 +178,10 @@ class UpgradeSettlementTests(unittest.TestCase):
                         controller.observations = []
                         controller.root = root
                         before = controller.inputs
-                        errors = []
-                        read_maxima = bond._read_maxima
-
-                        def record_maxima(*args):
-                            try:
-                                return read_maxima(*args)
-                            except ValueError as exc:
-                                errors.append(str(exc))
-                                raise
-
-                        with patch.object(bond, "_read_maxima", side_effect=record_maxima), \
-                                patch.object(bond, "_save_evidence", side_effect=lambda c, r: r):
+                        with patch.object(bond, "_save_evidence", side_effect=lambda c, r: r):
                             stopped = bond.inspect_victory_settlement(
                                 context, NS(ok=True, reason="victory"), context.tasker.controller)
                         test.assertIsNone(stopped)
-                        test.assertIn("bond_result_page_not_visible", errors)
                         test.assertTrue(any(phase == 1 for phase, _, _ in controller.observations))
                         test.assertTrue(any(phase == 3 for phase, _, _ in controller.observations))
                         for phase, inputs, deferred_state in controller.observations:
@@ -216,6 +205,87 @@ class UpgradeSettlementTests(unittest.TestCase):
                         test.assertEqual(rechecked.reason, "bond_max")
                         test.assertEqual(rechecked.battle, 2)
                         test.assertEqual(controller.inputs, before + 1)
+                report["passed"] = True
+                return True
+
+        self.run_probe(controller, Probe(), report)
+
+    def test_deadline_takes_a_fresh_max_frame_before_releasing(self):
+        initial = image("jp_bond_before_upgrade.png")
+        maximum = image("jp_bond_slot5_max.png")
+        controller = MemoryController(maximum)
+        report = {}
+        test = self
+
+        class Probe(CustomAction):
+            def run(self, context, argv):
+                root = context.get_task_job().job_id
+                context.override_pipeline({
+                    bond.CONFIG_NODE: {"attach": {"native_bond_stop_mode": "all"}},
+                    bond.GUARD_NODE: {"attach": {
+                        "observation_attempts": 80, "observation_timeout_ms": 100,
+                    }},
+                    "结算-羁绊观察间隔": {"pre_delay": 100, "post_delay": 0},
+                })
+                bond.bond_stops.begin(root)
+                started = time.monotonic()
+                stopped = bond.inspect_bond_stop(context, initial, controller=context.tasker.controller)
+                test.assertIsNotNone(stopped)
+                test.assertEqual(stopped.reason, "bond_max")
+                test.assertGreaterEqual(time.monotonic() - started, .1)
+                test.assertFalse(bond.bond_stops.observation_complete(root))
+                test.assertEqual(controller.inputs, 0)
+                report["passed"] = True
+                return True
+
+        self.run_probe(controller, Probe(), report)
+
+    def test_completed_window_ignores_changed_frames_and_allows_a_late_panel(self):
+        initial = image("jp_bond_before_upgrade.png")
+        panel = image("jp_bond_upgrade_panel.png")
+        experience = image("jp_experience_result.png")
+        report = {}
+        test = self
+
+        class Pages(MemoryController):
+            def click(self, x, y):
+                test.assertTrue(1203 <= x <= 1204 and 72 <= y <= 73)
+                self.inputs += 1
+                self.image = experience
+                return True
+
+        controller = Pages(initial)
+
+        class Probe(CustomAction):
+            def run(self, context, argv):
+                root = context.get_task_job().job_id
+                context.override_pipeline({
+                    bond.CONFIG_NODE: {"attach": {"native_bond_stop_mode": "all"}},
+                    bond.GUARD_NODE: {"attach": {
+                        "observation_attempts": 80, "observation_timeout_ms": 100,
+                    }},
+                    "结算-羁绊观察间隔": {"pre_delay": 10, "post_delay": 0},
+                })
+                bond.bond_stops.begin(root)
+                started = time.monotonic()
+                test.assertIsNone(bond.inspect_bond_stop(context, initial, controller=context.tasker.controller))
+                test.assertGreaterEqual(time.monotonic() - started, .1)
+                test.assertTrue(bond.bond_stops.observation_complete(root))
+                test.assertIsNone(bond.bond_stops.upgrade_continuation(root))
+                before = controller.frames
+                with patch.object(bond, "read_bond_page", side_effect=AssertionError("completed window reread page")), \
+                     patch.object(bond, "read_bond_upgrade", side_effect=AssertionError("completed window reread upgrade")):
+                    test.assertIsNone(bond.inspect_bond_stop(context, image("jp_bond_slot5_max.png")))
+                    test.assertIsNone(bond.inspect_victory_settlement(
+                        context, NS(ok=True, reason="victory"), context.tasker.controller))
+                test.assertEqual(controller.frames, before)
+                controller.image = panel
+                test.assertTrue(context.run_recognition("结算-羁绊升级继续", panel).hit)
+                test.assertTrue(context.run_task("结算-羁绊升级继续").status.succeeded)
+                test.assertEqual(controller.inputs, 1)
+                test.assertTrue(context.run_recognition("战斗_经验结算页", experience).hit)
+                test.assertIsNone(bond.bond_stops.get(root))
+                test.assertIsNone(bond.bond_stops.deferred(root))
                 report["passed"] = True
                 return True
 

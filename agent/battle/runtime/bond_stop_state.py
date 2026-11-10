@@ -43,6 +43,8 @@ class _Run:
     another_battle_planned: bool | None = None
     deferred: BondStop | None = None
     final_upgrade: BondStop | None = None
+    observation_started_at: float | None = None
+    observation_completed: bool = False
 
 
 class BondStopStates:
@@ -79,6 +81,8 @@ class BondStopStates:
             run.another_battle_planned = another_battle_planned
             run.deferred = None
             run.final_upgrade = None
+            run.observation_started_at = None
+            run.observation_completed = False
             run.checked_images = ()
             if not keep_formation:
                 run.formation = ()
@@ -120,6 +124,29 @@ class BondStopStates:
             if self.valid(root, token):
                 run = self._runs[root]
                 run.checked_images = tuple(dict.fromkeys((*run.checked_images, digest)))[-8:]
+
+    def start_observation(self, root: int, token: str, now: float) -> float | None:
+        """首次确认羁绊页时起计，同场回调共用开始时间。"""
+        with self._lock:
+            if not self.valid(root, token):
+                return None
+            run = self._runs[root]
+            if run.observation_started_at is None:
+                run.observation_started_at = now
+            return run.observation_started_at
+
+    def observation_complete(self, root: int) -> bool:
+        with self._lock:
+            run = self._runs.get(root)
+            return bool(run and run.observation_completed and run.stopped is None)
+
+    def complete_observation(self, root: int, token: str) -> None:
+        """完整观察窗口的末帧未命中MAX或升级，本场可按正常结算继续。"""
+        with self._lock:
+            if self.valid(root, token):
+                run = self._runs[root]
+                if run.observation_started_at is not None and run.stopped is None:
+                    run.observation_completed = True
 
     def latch(self, root: int, token: str, *, reason: str, message: str,
               image=None, latest_image=None, formation_slots=(), result_columns=()) -> BondStop | None:

@@ -1,4 +1,4 @@
-"""真实 Agent 跨回调复核羁绊；仅内存截图，不连接设备。"""
+"""真实 Agent 的观察窗口及跨回调完成状态；仅内存截图，不连接设备。"""
 import copy
 import json
 import os
@@ -35,8 +35,7 @@ class MemoryController(CustomController):
     def screencap(self):
         self.frames += 1
         image = np.zeros((720, 1280, 3), np.uint8)
-        # 新回调必须取得不同帧，不能因已检查截图的摘要缓存而跳过复核。
-        # 标记在冻结 ROI 外，保留真实画面稳定判断。
+        # 新回调取得不同帧，验证完成状态不依赖图片摘要，也不重启计时。
         image[0, 0, 0] = self.frames % 255
         return image
 
@@ -59,14 +58,12 @@ class BondStopAgentTests(unittest.TestCase):
     def run_case(self, scenario):
         source = json.loads((ROOT / "assets/resource/base/pipeline/原生自动战斗调度.json").read_text("utf-8"))
         nodes = {name: copy.deepcopy(source[name]) for name in (
-            "结算-羁绊满停止", "结算-羁绊停止等待动画", "结算-羁绊停止出口",
-            "结算-羁绊停止异常出口", "结算-羁绊快速复核")}
+            "结算-羁绊满停止", "结算-羁绊观察间隔", "结算-羁绊停止出口",
+            "结算-羁绊停止异常出口")}
         guard = nodes["结算-羁绊满停止"]
         guard["enabled"] = True
         guard["recognition"]["param"]["custom_recognition"] = "record_bond_guard"
-        guard["attach"].update(positive_attempts=1, positive_timeout_ms=1000)
-        nodes["结算-羁绊停止等待动画"]["post_wait_freezes"].update(
-            time=20, rate_limit=5, timeout=1000)
+        guard["attach"].update(observation_attempts=80, observation_timeout_ms=100)
         nodes.update({
             "原生自动战斗-羁绊停止配置": {"attach": {"native_bond_stop_mode": "all"}},
             "root": {"action": {"type": "Custom", "param": {
@@ -76,6 +73,7 @@ class BondStopAgentTests(unittest.TestCase):
         })
         for node in nodes.values():
             node.update(pre_delay=0, post_delay=0, rate_limit=1, timeout=2000)
+        nodes["结算-羁绊观察间隔"]["pre_delay"] = 10
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp)
             pipeline = directory / "pipeline"
@@ -119,19 +117,34 @@ class BondStopAgentTests(unittest.TestCase):
             self.assertTrue(report.exists(), output)
             result = json.loads(report.read_text("utf-8"))
             self.assertEqual(result["seed_reason"], "", output)
-            self.assertGreaterEqual(result["reads"]["seed"], 4, output)
+            if scenario != "window_max":
+                self.assertGreaterEqual(result["reads"]["seed"], 2, output)
+                self.assertGreaterEqual(result["seed_elapsed"], .1, output)
+                self.assertTrue(result["seed_complete"], output)
             self.assertEqual(controller.inputs, 0, output)
             self.assertNotIn("access violation", output)
             return result
 
-    def test_negative_result_can_be_rechecked_in_a_later_agent_callback(self):
+    def test_negative_result_is_not_rechecked_in_a_later_agent_callback(self):
         result = self.run_case("negative")
         self.assertEqual(result["guard_reason"], "")
-        self.assertGreaterEqual(result["reads"]["guard"], 4)
+        self.assertEqual(result["reads"]["guard"], 0)
         self.assertTrue(result["tail"])
 
-    def test_max_after_a_later_callback_screenshot_still_stops_before_tail(self):
+    def test_max_appearing_inside_the_observation_window_stops_before_tail(self):
+        result = self.run_case("window_max")
+        self.assertEqual(result["guard_reason"], "bond_max")
+        self.assertEqual(result["reads"]["guard"], 2)
+        self.assertFalse(result["tail"])
+
+    def test_changed_frame_with_late_max_does_not_restart_completed_window(self):
         result = self.run_case("late_max")
+        self.assertEqual(result["guard_reason"], "")
+        self.assertEqual(result["reads"]["guard"], 0)
+        self.assertTrue(result["tail"])
+
+    def test_new_battle_clears_completion_and_checks_max_again(self):
+        result = self.run_case("next_battle_max")
         self.assertEqual(result["guard_reason"], "bond_max")
         self.assertEqual(result["reads"]["guard"], 2)
         self.assertFalse(result["tail"])

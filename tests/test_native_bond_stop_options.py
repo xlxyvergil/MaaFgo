@@ -83,21 +83,23 @@ class NativeBondOptionTests(unittest.TestCase):
             self.assertEqual(nodes[exit_name]["action"]["type"], "StopTask")
             self.assertEqual(nodes[exit_name]["next"], [])
             self.assertEqual(nodes[exit_name]["on_error"], [])
-        self.assertGreaterEqual(guard["attach"]["check_attempts"], 2)
-        wait = nodes[guard["attach"]["check_wait_node"]]
-        self.assertGreater(wait["pre_delay"], 0)
-        self.assertEqual(wait["action"]["type"], "DoNothing")
-        freezes = wait["post_wait_freezes"]
-        self.assertGreaterEqual(freezes["time"], 1000)
-        self.assertGreaterEqual(freezes["timeout"], freezes["time"])
-        self.assertEqual(freezes["target"], [80, 450, 1120, 100])
-        for prefix, expected_delay in (("page_wait", 50), ("positive", 100)):
-            key = f"{prefix}_node" if prefix == "page_wait" else "positive_wait_node"
-            polling = nodes[guard["attach"][key]]
+        attach = guard["attach"]
+        self.assertEqual(attach["observation_timeout_ms"], 4000)
+        self.assertEqual(attach["page_wait_timeout_ms"], 5000)
+        self.assertNotIn("check_wait_node", attach)
+        self.assertNotIn("positive_wait_node", attach)
+        self.assertNotIn("结算-羁绊快速复核", nodes)
+        self.assertNotIn("结算-羁绊停止等待动画", nodes)
+        for prefix, expected_delay in (("page_wait", 50), ("observation", 100)):
+            polling = nodes[attach[f"{prefix}_node"]]
             self.assertEqual(polling["pre_delay"], expected_delay)
             self.assertEqual(polling["post_delay"], 0)
             self.assertEqual(polling["action"]["type"], "DoNothing")
             self.assertEqual(polling["next"], [])
+            self.assertEqual(polling["on_error"], [])
+            self.assertNotIn("post_wait_freezes", polling)
+        self.assertGreaterEqual(attach["observation_attempts"] * 100,
+                                attach["observation_timeout_ms"])
 
 
 if __name__ == "__main__":
