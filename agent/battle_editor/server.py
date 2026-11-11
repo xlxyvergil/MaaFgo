@@ -327,7 +327,7 @@ class EditorHandler(BaseHTTPRequestHandler):
         if self.headers.get("Sec-Fetch-Site", "none") not in {"same-origin", "none"}:
             raise EditorError("invalid_origin", "拒绝跨站访问本地编辑服务", 403)
         if token and not hmac.compare_digest(self.headers.get("X-Editor-Token", ""), self.server.token):
-            raise EditorError("invalid_token", "编辑器会话已失效，请刷新页面重新连接", 403)
+            raise EditorError("invalid_token", "编辑器会话已失效。请关闭当前弹窗，点击“重新连接”后重试；当前编队和编辑内容会保留。", 403)
 
     def _headers(self, status, content_type, length, *, cache=False, extra_headers=None):
         self.send_response(status)
@@ -376,8 +376,21 @@ class EditorHandler(BaseHTTPRequestHandler):
             length = self._content_length()
         except EditorError:
             return
+        # Authentication and project binding can reject an upload before its
+        # reader runs. Use that endpoint's byte limit rather than JSON's 4 MiB
+        # limit, without parsing or storing any rejected payload.
+        limit = MAX_JSON_BYTES
+        if self.command == "POST":
+            try:
+                path = unquote(urlsplit(self.path).path, encoding="utf-8", errors="strict")
+            except (UnicodeError, ValueError):
+                return
+            if path == "/api/support-ce/install":
+                limit = MAX_PACK_BYTES
+            elif path == "/api/import-image":
+                limit = MAX_IMAGE_BYTES
         remaining = length - self._body_read
-        if length > MAX_JSON_BYTES or remaining <= 0:
+        if length > limit or remaining <= 0:
             return
         deadline = time.monotonic() + 0.2
         original_timeout = self.connection.gettimeout()

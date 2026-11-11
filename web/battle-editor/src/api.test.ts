@@ -128,9 +128,16 @@ test('session handshake also works without a browser window global',async()=>{
 test('support extension upload sends ZIP bytes to the bound authenticated installation',async()=>{
  await withAPI(`?project=${firstProject}`,async api=>{
   const archive=new Blob(['PK archive bytes'],{type:'application/octet-stream'}),controller=new AbortController();
+  const paths:string[]=[];
   globalThis.fetch=async(path,options)=>{
+   paths.push(String(path));
    if(path==='/health')return json(health());
    if(path==='/api/session')return json({token:'extension-token',projectId:firstProject});
+   if(path==='/api/heartbeat'){
+    assert.equal(options?.method,'POST');assert.equal(options?.body,'{}');assert.equal(options?.signal,controller.signal);
+    assert.deepEqual(options?.headers,{'Content-Type':'application/json','X-Editor-Project':firstProject,'X-Editor-Token':'extension-token'});
+    return json({ok:true});
+   }
    assert.equal(path,'/api/support-ce/install');
    assert.equal(options?.method,'POST');assert.equal(options?.credentials,'same-origin');
    assert.equal(options?.body,archive);assert.equal(options?.signal,controller.signal);
@@ -139,13 +146,14 @@ test('support extension upload sends ZIP bytes to the bound authenticated instal
   };
   await api.session();
   assert.deepEqual(await api.apiSupportCE(archive,controller.signal),{installed:1110,name:'助战礼装扩展',version:'2026-11-06'});
+  assert.deepEqual(paths,['/health','/api/session','/api/heartbeat','/api/support-ce/install']);
  });
 });
 
 test('support extension errors preserve the actionable backend message',async()=>{
  await withAPI('',async api=>{
   const message='压缩包中没有礼装清单，无法安装。请选择从 MaaFGO 下载的礼装扩展 ZIP 文件重试。';
-  globalThis.fetch=async()=>json({error:{code:'support_ce_manifest',message}},422);
+  globalThis.fetch=async path=>path==='/api/heartbeat'?json({ok:true}):json({error:{code:'support_ce_manifest',message}},422);
   await assert.rejects(api.apiSupportCE(new Blob(['invalid'])),error=>error instanceof api.ApiError&&error.code==='support_ce_manifest'&&error.message===message&&error.status===422);
  });
 });
@@ -153,8 +161,60 @@ test('support extension errors preserve the actionable backend message',async()=
 test('support extension malformed responses cannot report an unconfirmed installation as success',async()=>{
  await withAPI('',async api=>{
   for(const response of [new Response('unreadable'),json({installed:-1,name:'扩展',version:'1'}),json({installed:1,name:'扩展'}),json(null)]){
-   globalThis.fetch=async()=>response;
+   globalThis.fetch=async path=>path==='/api/heartbeat'?json({ok:true}):response;
    await assert.rejects(api.apiSupportCE(new Blob(['zip'])),/重新打开编队编辑器/);
   }
+ });
+});
+
+test('support extension expired session is explained in Chinese before any ZIP is uploaded',async()=>{
+ await withAPI('',async api=>{
+  const paths:string[]=[];
+  globalThis.fetch=async path=>{paths.push(String(path));return json({error:{code:'invalid_token',message:'old session'}},403);};
+  await assert.rejects(api.apiSupportCE(new Blob(['zip'])),error=>error instanceof api.ApiError&&error.code==='invalid_token'&&error.status===403&&/会话已失效/.test(error.message)&&/重新连接/.test(error.message)&&/尚未安装/.test(error.message));
+  assert.deepEqual(paths,['/api/heartbeat'],'must not upload a ZIP or silently acquire another session');
+ });
+});
+
+test('support extension session expiring between the check and upload keeps the same clear error',async()=>{
+ await withAPI('',async api=>{
+  globalThis.fetch=async path=>path==='/api/heartbeat'?json({ok:true}):json({error:{code:'invalid_token',message:'old session'}},403);
+  await assert.rejects(api.apiSupportCE(new Blob(['zip'])),error=>error instanceof api.ApiError&&error.code==='invalid_token'&&/会话已失效/.test(error.message)&&/重新连接/.test(error.message));
+ });
+});
+
+test('support extension network failures never expose raw fetch errors or retry the upload',async()=>{
+ for(const duringUpload of [false,true]){
+  await withAPI('',async api=>{
+   const paths:string[]=[];
+   globalThis.fetch=async path=>{
+    paths.push(String(path));
+    if(duringUpload&&path==='/api/heartbeat')return json({ok:true});
+    throw new TypeError('Failed to fetch');
+   };
+   await assert.rejects(api.apiSupportCE(new Blob(['zip'])),error=>error instanceof api.ApiError&&error.code==='support_ce_connection'&&/重新连接/.test(error.message)&&!error.message.includes('fetch')&&(duringUpload?/无法确认安装结果/.test(error.message):/尚未上传/.test(error.message)));
+   assert.deepEqual(paths,duringUpload?['/api/heartbeat','/api/support-ce/install']:['/api/heartbeat']);
+  });
+ }
+});
+
+test('support extension rejects empty and oversized archives locally',async()=>{
+ await withAPI('',async api=>{
+  let requests=0;globalThis.fetch=async()=>{requests++;throw new Error('must not fetch');};
+  for(const archive of [new Blob(),new Blob([new Uint8Array(64*1024*1024+1)])]){
+   await assert.rejects(api.apiSupportCE(archive),error=>error instanceof api.ApiError&&error.code==='support_ce_size'&&/64 MiB/.test(error.message));
+  }
+  assert.equal(requests,0);
+ });
+});
+
+test('support extension preserves explicit aborts and cross-project rejection',async()=>{
+ await withAPI('',async api=>{
+  const controller=new AbortController();controller.abort();
+  globalThis.fetch=async(_path,options)=>{assert.equal(options?.signal,controller.signal);throw controller.signal.reason;};
+  await assert.rejects(api.apiSupportCE(new Blob(['zip']),controller.signal),error=>error===controller.signal.reason);
+  const message='当前端口已切换到另一份 MaaFGO，请从启动器打开新页面。';
+  globalThis.fetch=async()=>json({error:{code:'project_mismatch',message}},409);
+  await assert.rejects(api.apiSupportCE(new Blob(['zip'])),error=>error instanceof api.ApiError&&error.code==='project_mismatch'&&error.message===message);
  });
 });
