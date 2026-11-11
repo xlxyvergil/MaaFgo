@@ -1,4 +1,15 @@
 {
+  "助战选择-界面标题锚点": {
+    "doc": "识别右上角助战选择标题，列表为空时仍可确认助战界面并进入自定义筛选。base 使用日服模板，国服由 cn 同名模板覆盖。",
+    "recognition": {
+      "type": "TemplateMatch",
+      "param": {
+        "roi": [900, 0, 380, 90],
+        "template": "助战选择界面标记.png",
+        "threshold": 0.8
+      }
+    }
+  },
   "助战选择-确认按钮锚点": {
     "recognition": {
       "type": "TemplateMatch",
