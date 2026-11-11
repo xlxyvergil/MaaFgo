@@ -166,13 +166,18 @@ def _battle_data(row: dict) -> dict | None:
 
 
 def _equip_preview(value: Any, *, legacy: dict | None = None) -> dict | None:
+    if value is not None and not isinstance(value, dict):
+        return None
     equip = value if isinstance(value, dict) else {}
     legacy = legacy or {}
-    equip_id = _positive_int(equip.get("id")) or _positive_int(legacy.get("ceId")) or 0
-    level = _positive_int(equip.get("lv")) or _positive_int(legacy.get("ceLevel"))
-    limit_break = equip.get("limitBreak")
-    if type(limit_break) is not bool:
-        limit_break = legacy.get("ceLimitBreak")
+    # Match equipForDisplay: only an absent/null ID inherits the legacy CE;
+    # zero explicitly clears it, and malformed modern data must not revive it.
+    raw_id = equip.get("id")
+    if raw_id is not None and _positive_int(raw_id) is None:
+        return None
+    equip_id = _positive_int(raw_id) or _positive_int(legacy.get("ceId")) or 0
+    level = _positive_int(equip["lv"] if "lv" in equip else legacy.get("ceLv"))
+    limit_break = equip["limitBreak"] if "limitBreak" in equip else legacy.get("ceLimitBreak")
     if type(limit_break) is not bool:
         limit_break = None
     if not equip_id and level is None and limit_break is None:
