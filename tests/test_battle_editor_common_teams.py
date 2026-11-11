@@ -268,13 +268,51 @@ class CommonTeamGrandEquipTests(unittest.TestCase):
                                        "classBoardData": {"grandBondEquipSkillChange": False}})["bondEffect"], "original")
 
     def test_legacy_ce_fields_fallback_and_modern_explicit_false_are_retained(self):
-        legacy = {"supportType": "friend", "ceId": 9400400, "ceLevel": 80, "ceLimitBreak": False}
-        self.assertEqual(common._slot(legacy)["equips"], [
-            {"id": 9400400, "lv": 80, "limitBreak": False}, None, None])
+        legacy = {"supportType": "friend", "ceId": 9400400, "ceLv": 80, "ceLimitBreak": False}
+        for changes in ({}, {"equip1": None}, {"equip1": {}}, {"equip1": {"id": None}}):
+            with self.subTest(changes=changes):
+                self.assertEqual(common._slot(dict(legacy, **changes))["equips"], [
+                    {"id": 9400400, "lv": 80, "limitBreak": False}, None, None])
         modern = dict(legacy, equip1={"id": 9400480, "lv": 100, "limitBreak": False}, ceLimitBreak=True)
         self.assertEqual(common._slot(modern)["equips"][0],
                          {"id": 9400480, "lv": 100, "limitBreak": False})
         self.assertEqual(common._slot(dict(legacy, equip1={"id": None}))["equipId"], 9400400)
+
+    def test_cleared_or_invalid_modern_requirement_never_revives_legacy_equip(self):
+        legacy = {"svtId": 200900, "ceId": 9400400, "ceLv": 100, "ceLimitBreak": True}
+        invalid = [0, False, True, -1, "9400480", {}, []]
+        for requirement in [*({"id": value} for value in invalid), False, "9400480", []]:
+            with self.subTest(requirement=requirement):
+                preview = common._slot(dict(legacy, equip1=requirement))
+                self.assertEqual(preview["equipId"], 0)
+                self.assertEqual(preview["equips"], [None, None, None])
+
+    def test_present_modern_metadata_never_falls_back_even_when_null_or_invalid(self):
+        legacy = {"ceId": 9400400, "ceLv": 100, "ceLimitBreak": True}
+        for level in (None, 0, False, -1, "80"):
+            with self.subTest(level=level):
+                preview = common._slot(dict(legacy, equip1={"id": 9400400, "lv": level}))
+                self.assertEqual(preview["equips"][0], {"id": 9400400, "lv": None, "limitBreak": True})
+        for state, expected in ((None, None), (False, False), (True, True), (0, None), ("false", None)):
+            with self.subTest(state=state):
+                preview = common._slot(dict(legacy, equip1={"id": 9400400, "limitBreak": state}))
+                self.assertEqual(preview["equips"][0], {"id": 9400400, "lv": 100, "limitBreak": expected})
+
+    def test_encoded_team_summary_preserves_preview_semantics_and_original_data(self):
+        members = [
+            {"svtId": 200900, "ceId": 9400400, "ceLv": 100},
+            {"svtId": 200900, "ceId": 9400400, "equip1": {"id": 0}},
+            {"svtId": 200900, "ceId": 9400400, "ceLimitBreak": True,
+             "equip1": {"id": 9400400, "limitBreak": None}, "unknown": {"keep": [None]}},
+        ]
+        battle = {"team": {"onFieldSvts": members}, "actions": []}
+        before = copy.deepcopy(battle)
+        result = common._summary(row(data=packed(battle)))
+        self.assertEqual([member["equips"][0] for member in result["servants"][:3]], [
+            {"id": 9400400, "lv": 100, "limitBreak": None}, None,
+            {"id": 9400400, "lv": None, "limitBreak": None}])
+        self.assertEqual(battle, before)
+        self.assertEqual(common._battle_data(row(data=packed(battle))), before)
 
     def test_normal_members_ignore_grand_only_data_and_malformed_metadata_is_unknown(self):
         member = {"svtId": 200900, "equip2": {"id": 9300310}, "equip3": {"id": 9407480},
@@ -287,9 +325,7 @@ class CommonTeamGrandEquipTests(unittest.TestCase):
                 preview = common._slot({"svtId": 200900, "grandSvt": True,
                                         "equip1": {"id": bad, "lv": bad, "limitBreak": bad},
                                         "equip2": bad, "equip3": bad})
-                # A strict boolean is valid for the full-limit-break state only.
-                expected = [{"id": 0, "lv": None, "limitBreak": True}, None, None] if bad is True else [None] * 3
-                self.assertEqual(preview["equips"], expected)
+                self.assertEqual(preview["equips"], [None] * 3)
 
 
 class CommonTeamNetworkTests(unittest.TestCase):
