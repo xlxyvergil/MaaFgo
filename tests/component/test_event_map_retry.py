@@ -24,13 +24,17 @@ FINAL = "巡-最终未找到"
 class MapController(CustomController):
     def __init__(self):
         self.zoom_calls, self.clicks = 0, []
+        self.swipes_after_zoom = 0
         super().__init__()
 
     def connect(self): return True
     def request_uuid(self): return "event-map-memory-only"
     def get_features(self): return 0
     def screencap(self): return np.zeros((720, 1280, 3), np.uint8)
-    def swipe(self, *args): return True
+    def swipe(self, *args):
+        if self.zoom_calls:
+            self.swipes_after_zoom += 1
+        return True
     def click(self, x, y):
         self.clicks.append((x, y))
         return True
@@ -53,7 +57,10 @@ class EventMapRetryTests(unittest.TestCase):
 
         class Target(CustomRecognition):
             def analyze(self, context, argv):
-                visible = found == "first" or (found == "retry" and controller.zoom_calls)
+                visible = (found == "first"
+                           or (found == "retry" and controller.zoom_calls)
+                           or (found == "retry_after_scan" and controller.zoom_calls
+                               and controller.swipes_after_zoom))
                 return (600, 350, 30, 20) if visible else None
 
         class Zoom(CustomAction):
@@ -97,11 +104,23 @@ class EventMapRetryTests(unittest.TestCase):
         self.assertEqual(seen[-1], "地图轮巡-成功")
         self.assertNotIn(FINAL, seen)
 
-    def test_second_pass_found_exits_without_missing_message(self):
+    def test_target_visible_after_zoom_skips_second_initialization(self):
         controller, seen = self.run_map("retry")
         self.assertEqual(controller.zoom_calls, 1)
         self.assertEqual(seen.count(ZOOM), 1)
+        self.assertEqual(seen.count("巡-初始化左滑"), 1)
+        self.assertEqual(seen.count("巡-初始化上滑"), 1)
+        self.assertEqual(controller.swipes_after_zoom, 1, "only the existing target-centering swipe is needed")
+        self.assertEqual(seen[seen.index(ZOOM) + 1], "巡-找到目标-设为中心")
+        self.assertEqual(seen[-1], "地图轮巡-成功")
+        self.assertNotIn(FINAL, seen)
+
+    def test_target_not_visible_after_zoom_falls_back_to_second_scan(self):
+        controller, seen = self.run_map("retry_after_scan")
+        self.assertEqual(controller.zoom_calls, 1)
+        self.assertEqual(seen.count(ZOOM), 1)
         self.assertEqual(seen.count("巡-初始化左滑"), 2)
+        self.assertEqual(seen.count("巡-初始化上滑"), 2)
         self.assertEqual(seen[-1], "地图轮巡-成功")
         self.assertNotIn(FINAL, seen)
 

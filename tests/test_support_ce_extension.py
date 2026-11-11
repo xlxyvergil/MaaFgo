@@ -15,7 +15,7 @@ import zipfile
 from PIL import Image
 
 from agent.support_ce import (MAX_PACK_BYTES, SupportCEError, extension_entries,
-                              install_extension, read_manifest, resolve_external_templates)
+                              extension_snapshot, install_extension, read_manifest, resolve_external_templates)
 from agent.battle_editor.server import create_server
 
 
@@ -116,6 +116,37 @@ class SupportCEPackTests(unittest.TestCase):
         (self.root / "config/SupportCE/满破/f_94000100.png").unlink()
         self.assertEqual(resolve_external_templates(self.root, "ignored.png", "满破", 9400010), [])
         self.assertEqual(len(resolve_external_templates(self.root, "ignored.png", "非满破", 9400010)), 1)
+
+    def test_snapshot_reads_one_manifest_and_refreshes_template_availability(self):
+        install_extension(self.root, pack())
+        with patch("agent.support_ce.read_manifest", wraps=read_manifest) as read:
+            entries, templates = extension_snapshot(self.root)
+            self.assertEqual(read.call_count, 1)
+        self.assertEqual([entry["id"] for entry in entries], [9400010])
+        self.assertEqual(set(templates[9400010]), {"满破", "非满破"})
+        maximum = self.root / "config/SupportCE/满破/f_94000100.png"
+        original = maximum.read_bytes()
+        maximum.unlink()
+        self.assertEqual(set(extension_snapshot(self.root)[1][9400010]), {"非满破"})
+        maximum.write_bytes(original)
+        self.assertEqual(set(extension_snapshot(self.root)[1][9400010]), {"满破", "非满破"})
+
+    def test_catalog_reuses_template_availability_but_media_requests_recheck_files(self):
+        from agent.battle_editor.catalog import build_catalog, resolve_media
+        install_extension(self.root, pack())
+        # Per-row scans must not return as the number of catalog entries grows.
+        with patch("agent.battle_editor.catalog.resolve_external_templates", side_effect=AssertionError("repeated template scan")):
+            catalog = build_catalog(self.root)
+        equip = catalog["equips"][0]
+        self.assertEqual(equip["supportRecognition"], {"limitBreak": True, "nonLimitBreak": True})
+        self.assertEqual(equip["supportImage"], "/media/supportce/support_9400010_normal.png")
+        normal = self.root / "config/SupportCE/非满破/f_94000100.png"
+        self.assertEqual(resolve_media(self.root, "supportce", "support_9400010_normal.png"), normal)
+        normal.unlink()
+        self.assertIsNone(resolve_media(self.root, "supportce", "support_9400010_normal.png"))
+        updated = build_catalog(self.root)["equips"][0]
+        self.assertEqual(updated["supportRecognition"], {"limitBreak": True, "nonLimitBreak": False})
+        self.assertEqual(updated["supportImage"], "/media/supportce/support_9400010_max.png")
 
     def test_failed_final_rename_restores_previous_install(self):
         install_extension(self.root, pack(version="1"))
