@@ -1,0 +1,48 @@
+{
+  "option": {
+    "幕间-挑战次数上限": {
+      "type": "input",
+      "label": "挑战次数上限",
+      "description": "每完成一个小关计一次，包含纯剧情关；一个幕间可能需要多次挑战。达到上限后停止，无可挑战条目时提前结束。",
+      "inputs": [
+        {
+          "name": "count",
+          "label": "挑战次数",
+          "default": "999",
+          "verify": "^[1-9][0-9]{0,2}$",
+          "pipeline_type": "int"
+        }
+      ],
+      "pipeline_override": {
+        "幕间-配置": {
+          "attach": {
+            "quest_limit": "{count}",
+            "battle_mode": "native"
+          }
+        }
+      }
+    },
+    "幕间-自动处理编队限制": {
+      "type": "switch",
+      "label": "自动处理编队限制情况",
+      "description": "限制关按游戏要求编队，本关忽略编辑器/Chaldea 编队与战斗配置，使用默认战斗逻辑；下一关恢复。关闭后遇到限制将停止，请按画面要求手动调整编队。",
+      "default_case": "Yes",
+      "cases": [
+        {
+          "name": "Yes",
+          "label": "开启",
+          "pipeline_override": {
+            "幕间-配置": {"attach": {"auto_handle_restrictions": true}}
+          }
+        },
+        {
+          "name": "No",
+          "label": "关闭",
+          "pipeline_override": {
+            "幕间-配置": {"attach": {"auto_handle_restrictions": false}}
+          }
+        }
+      ]
+    }
+  }
+}
