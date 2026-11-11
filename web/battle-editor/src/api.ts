@@ -40,12 +40,34 @@ export async function apiImage(blob:Blob,mime:string,signal?:AbortSignal):Promis
 
 export type SupportCEInstallResult={installed:number;name:string;version:string};
 
+function supportCERequestError(cause:unknown,uploadStarted:boolean):unknown {
+ if(cause instanceof ApiError){
+  const message=cause.code==='invalid_token'
+   ?'编辑器会话已失效，礼装扩展尚未安装。请返回编辑器点击“重新连接”，再重新选择扩展包 ZIP。当前编队和编辑内容会保留。'
+   :cause.code==='service_stopping'
+    ?'本地编辑服务正在停止，礼装扩展尚未安装。请从 MaaFGO 重新打开编辑器，再重新选择扩展包 ZIP。当前编队和编辑内容会保留。'
+    :undefined;
+  return message?new ApiError(cause.status,{error:{code:cause.code,message,details:cause.details}}):cause;
+ }
+ if(cause instanceof Error&&cause.name==='AbortError')return cause;
+ const message=uploadStarted
+  ?'礼装扩展上传连接已中断，暂时无法确认安装结果。请返回编辑器点击“重新连接”，先检查礼装列表；如未安装，再重新选择扩展包 ZIP。当前编队和编辑内容会保留。'
+  :'无法连接或确认本地编辑服务，礼装扩展尚未上传。请确认 MaaFGO 仍在运行，返回编辑器点击“重新连接”后重试。当前编队和编辑内容会保留。';
+ return new ApiError(0,{error:{code:'support_ce_connection',message}});
+}
+
 /** The local service chooses the installation directory; uploads contain no filesystem path. */
 export async function apiSupportCE(blob:Blob,signal?:AbortSignal):Promise<SupportCEInstallResult> {
- const res=await fetch('/api/support-ce/install',{method:'POST',headers:{'Content-Type':'application/zip',...sessionHeaders()},body:blob,signal,credentials:'same-origin'});
+ if(!blob.size||blob.size>64*1024*1024)throw new ApiError(413,{error:{code:'support_ce_size',message:'礼装扩展包为空或超过 64 MiB，无法安装。请选择完整且不超过 64 MiB 的礼装扩展 ZIP 后重试。'}});
+ // Check the existing session with a small request before sending a large ZIP.
+ // Never silently renew its token or retry an upload with an unknown outcome.
+ try{await api('/heartbeat','POST',{},signal);}catch(cause){throw supportCERequestError(cause,false);}
+ let res:Response;
+ try{res=await fetch('/api/support-ce/install',{method:'POST',headers:{'Content-Type':'application/zip',...sessionHeaders()},body:blob,signal,credentials:'same-origin'});}
+ catch(cause){throw supportCERequestError(cause,true);}
  let body:any;
  try{body=await res.json();}catch{throw new Error('礼装扩展安装结果无法读取。请重新打开编队编辑器后检查礼装列表；如未安装，请再次点击“安装礼装扩展”。');}
- if(!res.ok)throw new ApiError(res.status,body);
+ if(!res.ok)throw supportCERequestError(new ApiError(res.status,body),true);
  if(!body||!Number.isSafeInteger(body.installed)||body.installed<0||typeof body.name!=='string'||typeof body.version!=='string')throw new Error('礼装扩展安装结果无法确认。请重新打开编队编辑器后检查礼装列表；如未安装，请再次点击“安装礼装扩展”。');
  return body;
 }

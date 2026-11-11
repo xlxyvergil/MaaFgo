@@ -166,7 +166,7 @@ class SupportCEHTTPTests(unittest.TestCase):
         connection = http.client.HTTPConnection("127.0.0.1", self.server.server_address[1], timeout=10)
         headers = {"Content-Type": mime}
         if token:
-            headers["X-Editor-Token"] = self.server.token
+            headers["X-Editor-Token"] = self.server.token if token is True else token
         if origin:
             headers["Origin"] = origin
         if project:
@@ -257,6 +257,26 @@ class SupportCEHTTPTests(unittest.TestCase):
                                  ({"raw": b""}, 413)):
             with self.subTest(kwargs=kwargs):
                 self.assertEqual(self.request(**kwargs)[0], expected)
+        self.assertFalse((self.root / "config/SupportCE").exists())
+
+    def test_rejected_large_upload_returns_actionable_error_without_tcp_reset(self):
+        # Real packs exceed JSON's 4 MiB limit. Sending the entire body exposes
+        # Windows' unread-data TCP reset instead of only testing headers.
+        payload = b"x" * (16 * 1024 * 1024 + 1)
+        cases = (({"token": "expired-token"}, 403, "invalid_token"),
+                 ({"project": "another-installation"}, 409, "project_mismatch"),
+                 ({"origin": "https://other.invalid"}, 403, "invalid_origin"))
+        with patch("agent.battle_editor.server.install_extension") as install:
+            for kwargs, expected_status, expected_code in cases:
+                with self.subTest(kwargs=kwargs):
+                    status, body = self.request(raw=payload, **kwargs)
+                    self.assertEqual(status, expected_status)
+                    self.assertEqual(body["error"]["code"], expected_code)
+                    if expected_code == "invalid_token":
+                        self.assertIn("会话已失效", body["error"]["message"])
+                        self.assertIn("重新连接", body["error"]["message"])
+                        self.assertNotIn("刷新页面", body["error"]["message"])
+            install.assert_not_called()
         self.assertFalse((self.root / "config/SupportCE").exists())
 
     def test_oversized_declared_zip_rejected_without_waiting_for_payload(self):

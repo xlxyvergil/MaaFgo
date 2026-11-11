@@ -19,6 +19,8 @@ from unittest.mock import patch
 from agent.battle_editor.server import EditorHandler, create_server
 from agent.battle_editor.storage import BattleStorage, EditorError, MAX_JSON_BYTES, decode_json, digest
 from agent.battle_editor.validation import DEFAULTS, validate_battle
+from agent.battle_editor.screenshot_import import MAX_IMAGE_BYTES
+from agent.support_ce import MAX_PACK_BYTES
 
 ROOT = Path(__file__).resolve().parents[1]
 OFFICIAL_FIXTURES = ROOT / "tests" / "fixtures" / "battle_editor"
@@ -814,8 +816,10 @@ class HTTPTests(unittest.TestCase):
 
 
 class RejectedBodyCleanupTests(unittest.TestCase):
-    def handler(self, length, body, already_read=0, transfer_encoding=None):
+    def handler(self, length, body, already_read=0, transfer_encoding=None, path="/api/validate", method="POST"):
         handler = EditorHandler.__new__(EditorHandler)
+        handler.path = path
+        handler.command = method
         handler.headers = Message()
         if length is not None:
             handler.headers["Content-Length"] = str(length)
@@ -848,6 +852,28 @@ class RejectedBodyCleanupTests(unittest.TestCase):
                 handler._discard_unread_body()
                 self.assertEqual(handler.rfile.read(), b"UNREAD")
                 handler.connection.settimeout.assert_not_called()
+
+    def test_upload_cleanup_uses_endpoint_limit_and_leaves_following_bytes(self):
+        for path, limit in (("/api/support-ce/install", MAX_PACK_BYTES),
+                            ("/api/import-image", MAX_IMAGE_BYTES)):
+            with self.subTest(path=path):
+                remaining = 64 * 1024
+                handler = self.handler(limit, b"x" * remaining + b"NEXT",
+                                       already_read=limit - remaining, path=path)
+                handler._discard_unread_body()
+                self.assertEqual(handler._body_read, limit)
+                self.assertEqual(handler.rfile.read(), b"NEXT")
+                oversized = self.handler(limit + 1, b"UNREAD", path=path)
+                oversized._discard_unread_body()
+                self.assertEqual(oversized.rfile.read(), b"UNREAD")
+                oversized.connection.settimeout.assert_not_called()
+
+    def test_upload_cleanup_limit_does_not_apply_to_other_methods(self):
+        handler = self.handler(MAX_JSON_BYTES + 1, b"UNREAD",
+                               path="/api/support-ce/install", method="PUT")
+        handler._discard_unread_body()
+        self.assertEqual(handler.rfile.read(), b"UNREAD")
+        handler.connection.settimeout.assert_not_called()
 
     def test_slow_sender_only_gets_short_drain_deadline(self):
         handler = self.handler(100, b"")

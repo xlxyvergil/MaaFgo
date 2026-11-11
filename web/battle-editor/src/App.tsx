@@ -122,6 +122,11 @@ export default function App(){
    const result=await apiSupportCE(file);
    try{if(!await fetchCatalog())throw new Error('catalog request superseded');}catch{throw new Error(`已安装 ${result.installed} 种助战礼装，但列表尚未刷新。请返回礼装选择后点击“刷新礼装列表”，无需重复安装。`);}
    const message=`已安装 ${result.installed} 种助战礼装，列表已刷新。`;setNotice(message);return message;
+  }catch(cause){
+   if(cause instanceof ApiError&&['invalid_token','service_stopping','project_mismatch','project_required','support_ce_connection'].includes(cause.code)){
+    setStatus('offline');setDraftStatus('服务断开 · 编辑内容仍保留在页面');
+   }
+   throw cause;
   }finally{extensionPending.current=false;setExtensionInstalling(false);}
  };
  const [newTeamFirstSupport,setNewTeamFirstSupport]=useState(true);
