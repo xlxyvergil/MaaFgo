@@ -6200,6 +6200,45 @@
           },
           "icon": "resource/base/image/servant_face/f_4060000.png",
           "description": "タマモアリア · ID 406000\n\n<img src=\"resource/base/image/servant_face/f_4060000.png\" width=\"79\" alt=\"タマモアリア\" />"
+        },
+        {
+          "name": "2801400",
+          "label": "484. 卑弥呼＆壹与（5星·伪(pretender)）[2801400]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "2801400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28014000.png",
+          "description": "卑弥呼＆壹与 · ID 2801400\n\n<img src=\"resource/base/image/servant_face/f_28014000.png\" width=\"79\" alt=\"卑弥呼＆壹与\" />"
+        },
+        {
+          "name": "406100",
+          "label": "485. 杂贺孙一（4星·骑(rider)）[406100]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "406100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4061000.png",
+          "description": "杂贺孙一 · ID 406100\n\n<img src=\"resource/base/image/servant_face/f_4061000.png\" width=\"79\" alt=\"杂贺孙一\" />"
+        },
+        {
+          "name": "705500",
+          "label": "486. 松永久秀（4星·狂(berserker)）[705500]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "705500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7055000.png",
+          "description": "松永久秀 · ID 705500\n\n<img src=\"resource/base/image/servant_face/f_7055000.png\" width=\"79\" alt=\"松永久秀\" />"
         }
       ],
       "description": "可搜索名称或 ID。目录复用工程已有资料；缺少可用识别图的保留目标会在启动前说明并停止。"
@@ -38312,6 +38351,141 @@
           },
           "icon": "resource/base/image/EquipFaces/team/f_93126200.png",
           "description": "桃狐半月国傾剣 · ID 9312620\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126200.png\" width=\"79\" alt=\"桃狐半月国傾剣\" />"
+        },
+        {
+          "name": "9312630",
+          "label": "2708. FGO THE DRAMALOGUE（4星）[9312630]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9312630"
+              }
+            }
+          }
+        },
+        {
+          "name": "9312600",
+          "label": "2709. 祝花の汀（4星）[9312600]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9312600"
+              }
+            }
+          }
+        },
+        {
+          "name": "9409660",
+          "label": "2710. 泡沫の遭逢（5星）[9409660]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9409660"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_94096600.png",
+          "description": "泡沫の遭逢 · ID 9409660\n\n<img src=\"resource/base/image/EquipFaces/team/f_94096600.png\" width=\"79\" alt=\"泡沫の遭逢\" />"
+        },
+        {
+          "name": "9409670",
+          "label": "2711. 帰路への旗印（4星）[9409670]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9409670"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_94096700.png",
+          "description": "帰路への旗印 · ID 9409670\n\n<img src=\"resource/base/image/EquipFaces/team/f_94096700.png\" width=\"79\" alt=\"帰路への旗印\" />"
+        },
+        {
+          "name": "9409680",
+          "label": "2712. 秘湯の来訪者（3星）[9409680]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9409680"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_94096800.png",
+          "description": "秘湯の来訪者 · ID 9409680\n\n<img src=\"resource/base/image/EquipFaces/team/f_94096800.png\" width=\"79\" alt=\"秘湯の来訪者\" />"
+        },
+        {
+          "name": "9409690",
+          "label": "2713. いざ、尋常に川中島！？（5星）[9409690]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9409690"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_94096900.png",
+          "description": "いざ、尋常に川中島！？ · ID 9409690\n\n<img src=\"resource/base/image/EquipFaces/team/f_94096900.png\" width=\"79\" alt=\"いざ、尋常に川中島！？\" />"
+        },
+        {
+          "name": "9809900",
+          "label": "2714. 概念礼装EXPカード：ヤマタイガールズ！（4星）[9809900]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9809900"
+              }
+            }
+          }
+        },
+        {
+          "name": "9809910",
+          "label": "2715. 概念礼装EXPカード：爆・DAN・ジョー！（3星）[9809910]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9809910"
+              }
+            }
+          }
+        },
+        {
+          "name": "9312640",
+          "label": "2716. 放課後邪馬台国（4星）[9312640]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9312640"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_93126400.png",
+          "description": "放課後邪馬台国 · ID 9312640\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126400.png\" width=\"79\" alt=\"放課後邪馬台国\" />"
+        },
+        {
+          "name": "9312670",
+          "label": "2717. ツイン・ヤタガラス（4星）[9312670]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9312670"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_93126700.png",
+          "description": "ツイン・ヤタガラス · ID 9312670\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126700.png\" width=\"79\" alt=\"ツイン・ヤタガラス\" />"
+        },
+        {
+          "name": "9312660",
+          "label": "2718. 平蜘蛛くん（4星）[9312660]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_2_id": "9312660"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_93126600.png",
+          "description": "平蜘蛛くん · ID 9312660\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126600.png\" width=\"79\" alt=\"平蜘蛛くん\" />"
         },
         {
           "name": "90086002",

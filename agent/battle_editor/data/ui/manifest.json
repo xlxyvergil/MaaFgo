@@ -4,7 +4,7 @@
   "sourceLabel": "用户本地 FGO 整包及 Atlas Academy 原始图片缓存；仅供 MaaFGO 本地界面使用，版权归原权利方",
   "sources": {
     "catalog.json": {
-      "sha256": "e6a2cdd121268909f7099840146970915a2cef71b0f7ff2861014eeb3a9f6bfe"
+      "sha256": "4c5182a09cef17d6e991a4c316d5b473e2ac6204009e7180fa3797b83876db51"
     },
     "JP_nice_servant.json": {
       "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697"
@@ -25,6 +25,22 @@
     },
     "incremental/formationPortraits/atlas-cache/JP_nice_servant.json": {
       "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697"
+    },
+    "incremental/JP_servant_2801400": {
+      "url": "https://api.atlasacademy.io/nice/JP/servant/2801400",
+      "sha256": "9872fe519e540e1304ee2ac786f063a7c08c3a043f152e7f1fe9bcef4518f808"
+    },
+    "incremental/JP_servant_406100": {
+      "url": "https://api.atlasacademy.io/nice/JP/servant/406100",
+      "sha256": "7e9185180a1fac6d3645a8efcff39aaed8e7f49ef3b1082d1bf4012ee7eb808e"
+    },
+    "incremental/JP_servant_705500": {
+      "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
+      "sha256": "80e3078a38ed70795faa9322983895b5d1b4fd1335b1d4996d3fc2b2a4eb1861"
+    },
+    "incremental/JP_servant_204700": {
+      "url": "https://api.atlasacademy.io/nice/JP/servant/204700",
+      "sha256": "b9a5645a8d0db21a65d44b196df5436d28ff3a5db577b0aafc7c1fec3aa18ef8"
     }
   },
   "files": {
@@ -19760,6 +19776,117 @@
           "mode": "RGB"
         },
         "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/405900/405900b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_2801400_dcae571eeed715a1.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "5f6208f1a5722f0d2de6b0030593f724a120a61723c8c54afae575d67de2527a",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/2801400/2801400b@1.png",
+        "sha256": "e4d89e4a1357dbd8d62decc9461108baeaa8744a65ae7f4844893fb9c20ebb0a",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/2801400/2801400b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_406100_ac9aafde9199ea9d.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "8ae20c131d35b09af0e675b45ebd7af56efba0d4080fc2cc290f076b1a8403ac",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/406100/406100b@1.png",
+        "sha256": "fd62a462f322bc26b736f53917d553da2de9cebc2473e4c4a26bb8a039cc20dd",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/406100/406100b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_705500_59b1762b09ab7f83.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "f5e84c5ed3ccdebd114f24dc708ecd2c0d7b2cd29023236d9cfad18d5806154f",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/705500/705500b@1.png",
+        "sha256": "43b0c0b845b4b5947d083ef4f5fa3659a3bb3120bac4d0e773266eeb8cfbf62c",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/705500/705500b@1.png",
         "ascension": 3
       },
       "mode": "RGB",
@@ -51233,6 +51360,192 @@
       "portraitAscension": 3,
       "formationPortrait": "formation_406000_b47b37757ef2e3e7.webp",
       "formationPortraitAscension": 3
+    },
+    "2801400": {
+      "activeSkills": [
+        {
+          "id": 2713550,
+          "num": 1,
+          "name": "光の力 A",
+          "icon": "skill_00315.png"
+        },
+        {
+          "id": 2714450,
+          "num": 2,
+          "name": "闇の力 B",
+          "icon": "skill_00302.png"
+        },
+        {
+          "id": 2715450,
+          "num": 3,
+          "name": "ヤマタイコンビネーション B",
+          "icon": "skill_00301.png"
+        }
+      ],
+      "appendSkills": [
+        {
+          "id": 3001000,
+          "num": 1,
+          "name": "追击技巧提升",
+          "nameJp": "追撃技巧向上",
+          "icon": "skill_00301.png"
+        },
+        {
+          "id": 3002000,
+          "num": 2,
+          "name": "魔力装填",
+          "nameJp": "魔力装填",
+          "icon": "skill_00601.png"
+        },
+        {
+          "id": 3003000,
+          "num": 3,
+          "name": "对剑士攻击适性",
+          "nameJp": "対セイバー攻撃適性",
+          "icon": "skill_00300.png"
+        },
+        {
+          "id": 3033000,
+          "num": 4,
+          "name": "特击技巧提升",
+          "nameJp": "特撃技巧向上",
+          "icon": "skill_00303.png"
+        },
+        {
+          "id": 3034000,
+          "num": 5,
+          "name": "技能再装填",
+          "nameJp": "スキル再装填",
+          "icon": "skill_00613.png"
+        }
+      ],
+      "portraitAscension": 3,
+      "formationPortrait": "formation_2801400_dcae571eeed715a1.webp",
+      "formationPortraitAscension": 3
+    },
+    "406100": {
+      "activeSkills": [
+        {
+          "id": 2716450,
+          "num": 1,
+          "name": "ぴょんぴょんライド B",
+          "icon": "skill_00402.png"
+        },
+        {
+          "id": 2717450,
+          "num": 2,
+          "name": "雑賀マリンコンバット B",
+          "icon": "skill_00314.png"
+        },
+        {
+          "id": 2718350,
+          "num": 3,
+          "name": "Ｆ・Ｓ・Ａ C",
+          "icon": "skill_00302.png"
+        }
+      ],
+      "appendSkills": [
+        {
+          "id": 3001000,
+          "num": 1,
+          "name": "追击技巧提升",
+          "nameJp": "追撃技巧向上",
+          "icon": "skill_00301.png"
+        },
+        {
+          "id": 3002000,
+          "num": 2,
+          "name": "魔力装填",
+          "nameJp": "魔力装填",
+          "icon": "skill_00601.png"
+        },
+        {
+          "id": 3004000,
+          "num": 3,
+          "name": "对弓兵攻击适性",
+          "nameJp": "対アーチャー攻撃適性",
+          "icon": "skill_00300.png"
+        },
+        {
+          "id": 3033000,
+          "num": 4,
+          "name": "特击技巧提升",
+          "nameJp": "特撃技巧向上",
+          "icon": "skill_00303.png"
+        },
+        {
+          "id": 3034000,
+          "num": 5,
+          "name": "技能再装填",
+          "nameJp": "スキル再装填",
+          "icon": "skill_00613.png"
+        }
+      ],
+      "portraitAscension": 3,
+      "formationPortrait": "formation_406100_ac9aafde9199ea9d.webp",
+      "formationPortraitAscension": 3
+    },
+    "705500": {
+      "activeSkills": [
+        {
+          "id": 2722450,
+          "num": 1,
+          "name": "爆・DAN・ジョー！ B",
+          "icon": "skill_00315.png"
+        },
+        {
+          "id": 2723350,
+          "num": 2,
+          "name": "大悪党 C",
+          "icon": "skill_00512.png"
+        },
+        {
+          "id": 2724350,
+          "num": 3,
+          "name": "真瓦津日 C",
+          "icon": "skill_00601.png"
+        }
+      ],
+      "appendSkills": [
+        {
+          "id": 3001000,
+          "num": 1,
+          "name": "追击技巧提升",
+          "nameJp": "追撃技巧向上",
+          "icon": "skill_00301.png"
+        },
+        {
+          "id": 3002000,
+          "num": 2,
+          "name": "魔力装填",
+          "nameJp": "魔力装填",
+          "icon": "skill_00601.png"
+        },
+        {
+          "id": 3018000,
+          "num": 3,
+          "name": "对弓兵暴击耐性",
+          "nameJp": "対ｱｰﾁｬｰｸﾘﾃｨｶﾙ発生耐性",
+          "icon": "skill_00417.png"
+        },
+        {
+          "id": 3033000,
+          "num": 4,
+          "name": "特击技巧提升",
+          "nameJp": "特撃技巧向上",
+          "icon": "skill_00303.png"
+        },
+        {
+          "id": 3034000,
+          "num": 5,
+          "name": "技能再装填",
+          "nameJp": "スキル再装填",
+          "icon": "skill_00613.png"
+        }
+      ],
+      "portraitAscension": 3,
+      "formationPortrait": "formation_705500_59b1762b09ab7f83.webp",
+      "formationPortraitAscension": 3
     }
   },
   "equips": {},
@@ -51475,15 +51788,15 @@
   },
   "stats": {
     "portraits": 1,
-    "formationPortraits": 473,
-    "servants": 474,
+    "formationPortraits": 476,
+    "servants": 477,
     "addedEquipImages": 0,
-    "activeSkillMappings": 1786,
-    "appendSkillMappings": 2355,
+    "activeSkillMappings": 1795,
+    "appendSkillMappings": 2370,
     "classes": 17,
     "classVariantMappings": 102,
-    "mediaFiles": 646,
-    "mediaBytes": 31034950,
+    "mediaFiles": 649,
+    "mediaBytes": 31199948,
     "formPortraitMappings": 6,
     "formPortraitImages": 3
   }

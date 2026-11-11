@@ -10224,6 +10224,13 @@
       ]
     },
     {
+      "id": "9312600",
+      "name": "祝花の汀",
+      "name_jp": "祝花の汀",
+      "rarity": 4,
+      "images": []
+    },
+    {
       "id": "9312620",
       "name": "桃狐半月国傾剣",
       "name_jp": "桃狐半月国傾剣",
@@ -10231,6 +10238,43 @@
       "images": [
         "EquipFaces/list/f_93126200.png",
         "EquipFaces/team/f_93126200.png"
+      ]
+    },
+    {
+      "id": "9312630",
+      "name": "FGO THE DRAMALOGUE",
+      "name_jp": "FGO THE DRAMALOGUE",
+      "rarity": 4,
+      "images": []
+    },
+    {
+      "id": "9312640",
+      "name": "放課後邪馬台国",
+      "name_jp": "放課後邪馬台国",
+      "rarity": 4,
+      "images": [
+        "EquipFaces/list/f_93126400.png",
+        "EquipFaces/team/f_93126400.png"
+      ]
+    },
+    {
+      "id": "9312660",
+      "name": "平蜘蛛くん",
+      "name_jp": "平蜘蛛くん",
+      "rarity": 4,
+      "images": [
+        "EquipFaces/list/f_93126600.png",
+        "EquipFaces/team/f_93126600.png"
+      ]
+    },
+    {
+      "id": "9312670",
+      "name": "ツイン・ヤタガラス",
+      "name_jp": "ツイン・ヤタガラス",
+      "rarity": 4,
+      "images": [
+        "EquipFaces/list/f_93126700.png",
+        "EquipFaces/team/f_93126700.png"
       ]
     },
     {
@@ -18842,6 +18886,46 @@
       ]
     },
     {
+      "id": "9409660",
+      "name": "泡沫の遭逢",
+      "name_jp": "泡沫の遭逢",
+      "rarity": 5,
+      "images": [
+        "EquipFaces/list/f_94096600.png",
+        "EquipFaces/team/f_94096600.png"
+      ]
+    },
+    {
+      "id": "9409670",
+      "name": "帰路への旗印",
+      "name_jp": "帰路への旗印",
+      "rarity": 4,
+      "images": [
+        "EquipFaces/list/f_94096700.png",
+        "EquipFaces/team/f_94096700.png"
+      ]
+    },
+    {
+      "id": "9409680",
+      "name": "秘湯の来訪者",
+      "name_jp": "秘湯の来訪者",
+      "rarity": 3,
+      "images": [
+        "EquipFaces/list/f_94096800.png",
+        "EquipFaces/team/f_94096800.png"
+      ]
+    },
+    {
+      "id": "9409690",
+      "name": "いざ、尋常に川中島！？",
+      "name_jp": "いざ、尋常に川中島！？",
+      "rarity": 5,
+      "images": [
+        "EquipFaces/list/f_94096900.png",
+        "EquipFaces/team/f_94096900.png"
+      ]
+    },
+    {
       "id": "9800300",
       "name": "概念礼装经验卡：冲太",
       "name_jp": "概念礼装EXPカード：おき太",
@@ -22584,6 +22668,20 @@
       "name": "概念礼装EXPカード：ロックにキメてこうぜ！",
       "name_jp": "概念礼装EXPカード：ロックにキメてこうぜ！",
       "rarity": 4,
+      "images": []
+    },
+    {
+      "id": "9809900",
+      "name": "概念礼装EXPカード：ヤマタイガールズ！",
+      "name_jp": "概念礼装EXPカード：ヤマタイガールズ！",
+      "rarity": 4,
+      "images": []
+    },
+    {
+      "id": "9809910",
+      "name": "概念礼装EXPカード：爆・DAN・ジョー！",
+      "name_jp": "概念礼装EXPカード：爆・DAN・ジョー！",
+      "rarity": 3,
       "images": []
     },
     {
@@ -30912,10 +31010,12 @@
         "servant_face/f_2047002.png",
         "servant_face/f_2047003.png",
         "servant_face/f_2047004.png",
+        "servant_face/f_2047300.png",
         "NarrowFigures/f_2047000.png",
         "NarrowFigures/f_2047001.png",
         "NarrowFigures/f_2047002.png",
-        "NarrowFigures/f_2047003.png"
+        "NarrowFigures/f_2047003.png",
+        "NarrowFigures/f_2047300.png"
       ]
     },
     {
@@ -31020,6 +31120,54 @@
         "NarrowFigures/f_4060001.png",
         "NarrowFigures/f_4060002.png",
         "NarrowFigures/f_4060003.png"
+      ]
+    },
+    {
+      "id": "2801400",
+      "name": "卑弥呼＆壹与",
+      "name_jp": "卑弥呼＆壱与",
+      "rarity": 5,
+      "images": [
+        "servant_face/f_28014000.png",
+        "servant_face/f_28014001.png",
+        "servant_face/f_28014002.png",
+        "servant_face/f_28014003.png",
+        "NarrowFigures/f_28014000.png",
+        "NarrowFigures/f_28014001.png",
+        "NarrowFigures/f_28014002.png",
+        "NarrowFigures/f_28014003.png"
+      ]
+    },
+    {
+      "id": "406100",
+      "name": "杂贺孙一",
+      "name_jp": "雑賀孫一",
+      "rarity": 4,
+      "images": [
+        "servant_face/f_4061000.png",
+        "servant_face/f_4061001.png",
+        "servant_face/f_4061002.png",
+        "servant_face/f_4061003.png",
+        "NarrowFigures/f_4061000.png",
+        "NarrowFigures/f_4061001.png",
+        "NarrowFigures/f_4061002.png",
+        "NarrowFigures/f_4061003.png"
+      ]
+    },
+    {
+      "id": "705500",
+      "name": "松永久秀",
+      "name_jp": "松永久秀",
+      "rarity": 4,
+      "images": [
+        "servant_face/f_7055000.png",
+        "servant_face/f_7055001.png",
+        "servant_face/f_7055002.png",
+        "servant_face/f_7055003.png",
+        "NarrowFigures/f_7055000.png",
+        "NarrowFigures/f_7055001.png",
+        "NarrowFigures/f_7055002.png",
+        "NarrowFigures/f_7055003.png"
       ]
     }
   ]

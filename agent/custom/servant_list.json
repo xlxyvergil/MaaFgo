@@ -20422,7 +20422,8 @@
         "f_2047001.png",
         "f_2047002.png",
         "f_2047003.png",
-        "f_2047004.png"
+        "f_2047004.png",
+        "f_2047300.png"
       ],
       "name_jp": "高杉晋作",
       "bond": {
@@ -20829,6 +20830,172 @@
           "name_jp": "回眸一笑・空呑海麒",
           "type": "群体输出",
           "card": "Arts"
+        }
+      ]
+    },
+    {
+      "id": "2801400",
+      "collection_no": 484,
+      "name": "卑弥呼＆壹与",
+      "class": "pretender",
+      "rarity": 5,
+      "images": [
+        "f_28014000.png",
+        "f_28014001.png",
+        "f_28014002.png",
+        "f_28014003.png"
+      ],
+      "name_jp": "卑弥呼＆壱与",
+      "bond": {
+        "tags": [
+          "female",
+          "neutral"
+        ],
+        "tags_by_ascension": {},
+        "tags_by_costume": {},
+        "alignment": "neutral",
+        "attribute": "summer",
+        "gender": "female",
+        "sub_attribute": "earth",
+        "atlas_tags_raw": [
+          "genderFemale",
+          "classPretender",
+          "attributeEarth",
+          "alignmentNeutral",
+          "alignmentSummer",
+          "fiveStarServant",
+          "servant",
+          "humanoid",
+          "weakToEnumaElish",
+          "skyOrEarthServant",
+          "skyOrEarthExceptPseudoAndDemiServant",
+          "king",
+          "hominidaeServant",
+          "summerModeServant",
+          "groupServant",
+          "canBeInBattle",
+          "unknown"
+        ]
+      },
+      "np_type": "群体输出",
+      "np_card": "Arts",
+      "np_variants": [
+        {
+          "treasureDeviceId": 2801401,
+          "name_jp": "超古代巨神・埴輪ノッブ",
+          "type": "群体输出",
+          "card": "Arts"
+        }
+      ]
+    },
+    {
+      "id": "406100",
+      "collection_no": 485,
+      "name": "杂贺孙一",
+      "class": "rider",
+      "rarity": 4,
+      "images": [
+        "f_4061000.png",
+        "f_4061001.png",
+        "f_4061002.png",
+        "f_4061003.png"
+      ],
+      "name_jp": "雑賀孫一",
+      "bond": {
+        "tags": [
+          "female",
+          "rider_class",
+          "lawful"
+        ],
+        "tags_by_ascension": {},
+        "tags_by_costume": {},
+        "alignment": "lawful",
+        "attribute": "summer",
+        "gender": "female",
+        "sub_attribute": "human",
+        "atlas_tags_raw": [
+          "genderFemale",
+          "classRider",
+          "attributeHuman",
+          "alignmentLawful",
+          "alignmentSummer",
+          "fourStarServant",
+          "servant",
+          "humanoid",
+          "weakToEnumaElish",
+          "riding",
+          "hominidaeServant",
+          "summerModeServant",
+          "standardClassServant",
+          "canBeInBattle",
+          "unknown"
+        ]
+      },
+      "np_type": "群体输出",
+      "np_card": "Quick",
+      "np_variants": [
+        {
+          "treasureDeviceId": 406101,
+          "name_jp": "銃神・ヤタガラスMG-01",
+          "type": "群体输出",
+          "card": "Quick"
+        }
+      ]
+    },
+    {
+      "id": "705500",
+      "collection_no": 486,
+      "name": "松永久秀",
+      "class": "berserker",
+      "rarity": 4,
+      "images": [
+        "f_7055000.png",
+        "f_7055001.png",
+        "f_7055002.png",
+        "f_7055003.png"
+      ],
+      "name_jp": "松永久秀",
+      "bond": {
+        "tags": [
+          "female",
+          "berserker_class",
+          "chaotic",
+          "good"
+        ],
+        "tags_by_ascension": {},
+        "tags_by_costume": {},
+        "alignment": "chaotic",
+        "attribute": "good",
+        "gender": "female",
+        "sub_attribute": "human",
+        "atlas_tags_raw": [
+          "genderFemale",
+          "classBerserker",
+          "attributeHuman",
+          "alignmentChaotic",
+          "alignmentGood",
+          "fourStarServant",
+          "servant",
+          "divine",
+          "humanoid",
+          "weakToEnumaElish",
+          "divineOrDemonOrUndead",
+          "hominidaeServant",
+          "hasCostume",
+          "summerModeServant",
+          "standardClassServant",
+          "canBeInBattle",
+          "unknown"
+        ]
+      },
+      "np_type": "群体输出",
+      "np_card": "Buster",
+      "np_variants": [
+        {
+          "treasureDeviceId": 705501,
+          "name_jp": "ビッグバン・DAN・ジョー！",
+          "type": "群体输出",
+          "card": "Buster"
         }
       ]
     }

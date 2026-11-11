@@ -49,7 +49,7 @@
       "bytes": 193947
     }
   ],
-  "servantCatalogSha256": "7b34ab18afa27b297804c4a310a1ec85d8c4836c5dc13a64dfa2dee3f1b330d0",
+  "servantCatalogSha256": "7a3c178b0aec812f58e394f939ff83e88c14cf54fe9f282d54eeac6e6acbdedf",
   "missingServantIds": [],
   "noActiveSkillMetadataIds": [
     1700100,
@@ -804,6 +804,84 @@
         "Historical Ortinax skill/TD presets share one costume identity; restored preset is the group default",
         "Costume 800210/20 shares Paladin facts: Atlas rarity/COST overwrite and NP800107 releaseCondition confirm the group"
       ]
+    },
+    {
+      "date": "2026-11-12",
+      "servantIds": [
+        2801400,
+        406100,
+        705500
+      ],
+      "costumeServantIds": [
+        204700
+      ],
+      "equipIds": [
+        9409660,
+        9409670,
+        9409680,
+        9409690,
+        9312640,
+        9312670,
+        9312660
+      ],
+      "sourceOnlyEquipIds": [
+        9312630,
+        9312600,
+        9809900,
+        9809910
+      ],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/2801400",
+          "sha256": "9872fe519e540e1304ee2ac786f063a7c08c3a043f152e7f1fe9bcef4518f808"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/406100",
+          "sha256": "7e9185180a1fac6d3645a8efcff39aaed8e7f49ef3b1082d1bf4012ee7eb808e"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
+          "sha256": "80e3078a38ed70795faa9322983895b5d1b4fd1335b1d4996d3fc2b2a4eb1861"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/204700",
+          "sha256": "b9a5645a8d0db21a65d44b196df5436d28ff3a5db577b0aafc7c1fec3aa18ef8"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409660",
+          "sha256": "6b6d713cc531fe75c34dbd13cf29b08a217f3ede2b17c5c334d4f109671751a0"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409670",
+          "sha256": "89709e84b9b2551c3264b192e9505b1ace7567241933ac716e3f5a25a818ab85"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409680",
+          "sha256": "d38e2b6e82bc0bf858c87aef2af53e98ffef57eaa4faa4c1f2fbc06db82fb9ac"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409690",
+          "sha256": "229ff997088b0aee4b2ae4842bdb007eb04ba746972afd8e2eb8b1ebeac95261"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312640",
+          "sha256": "c2207a7874b192bf56d4134135674e615b41c45a93617aaecc6f3fbe90b94c98"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312670",
+          "sha256": "fa8a3f0d229e459a4ca33f9e01848362a52bf0988783b6ef104dd571af06339c"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312660",
+          "sha256": "8aa0ae22e737b26a4c57923c6f01ea9f31b40cf9a948c1d2d6e90e5169d2bcfd"
+        }
+      ],
+      "missingCostume": {
+        "servantId": 705500,
+        "costumeId": 705530,
+        "reason": "Atlas HTTP 404; user approved regular forms only"
+      },
+      "method": "incremental; no existing facts overwritten"
     }
   ]
 }

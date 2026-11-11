@@ -840,7 +840,7 @@ class BundledCatalogTests(unittest.TestCase):
         self.assertEqual(sum(equip["common"] and equip["recognizable"]
                              for equip in catalog["equips"]), 48)
         recognized = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
-        self.assertEqual(len(recognized), 1158)
+        self.assertEqual(len(recognized), 1165)
         expected_equip_ids = {int(row["id"]) for row in recognized
                               if any(resolve_media(ROOT, "equip", image) for image in row.get("images", []))}
         self.assertEqual({equip["id"] for equip in catalog["equips"] if equip["recognizable"]}, expected_equip_ids)
@@ -912,6 +912,33 @@ class BundledCatalogTests(unittest.TestCase):
         record = next(row for row in local["equips"] if row["id"] == "9400180")
         self.assertEqual(record["important"], 0)
         self.assertEqual(record["images"], ["f_94001800.png"])
+
+    def test_gudaguda_resources_include_battle_and_bond_equips_but_not_exp_cards(self):
+        catalog = build_catalog(ROOT)
+        servants = {row["id"]: row for row in catalog["servants"]}
+        for sid, number, class_key, np_id, color in (
+            (2801400, 484, "pretender", 2801401, 1),
+            (406100, 485, "rider", 406101, 3),
+            (705500, 486, "berserker", 705501, 2),
+        ):
+            with self.subTest(servant=sid):
+                row = servants[sid]
+                self.assertEqual((row["collectionNo"], row["classKey"]), (number, class_key))
+                self.assertEqual((row["np"]["id"], row["np"]["cardType"]), (np_id, color))
+                self.assertEqual((row["portraitWidth"], row["portraitHeight"]), (358, 507))
+                self.assertEqual((len(row["skills"]), len(row["appendSkills"])), (3, 5))
+        equips = {row["id"]: row for row in catalog["equips"]}
+        local = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
+        local_by_id = {int(row["id"]): row for row in local}
+        for eid in (9409660, 9409670, 9409680, 9409690, 9312640, 9312670, 9312660):
+            with self.subTest(equip=eid):
+                self.assertTrue(equips[eid]["recognizable"])
+                self.assertFalse(equips[eid]["common"])
+                self.assertEqual(local_by_id[eid]["important"], 0)
+        for eid in (9809900, 9809910):
+            self.assertNotIn(eid, local_by_id)
+            self.assertFalse(equips[eid]["recognizable"])
+        self.assertEqual(catalog["commonEquips"]["count"], 48)
 
     def test_bundled_servants_have_official_decks_and_media_hashes_match(self):
         directory = ROOT / "agent/battle_editor/data"
