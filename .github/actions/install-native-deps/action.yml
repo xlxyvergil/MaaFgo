@@ -1,0 +1,18 @@
+name: Install MaaFramework system dependencies
+description: Install Linux dependencies using the Ubuntu archive with bounded download retries.
+runs:
+  using: composite
+  steps:
+    - name: Install native dependencies
+      shell: bash
+      run: |
+        # Hosted runners can select the Azure mirror through either source format.
+        # Use the public Ubuntu archive to avoid Azure mirror DNS failures.
+        for source in /etc/apt/apt-mirrors.txt /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources; do
+          if [[ -f "$source" ]]; then
+            sudo sed -i -E 's|https?://azure\.archive\.ubuntu\.com/ubuntu/?|https://archive.ubuntu.com/ubuntu/|g' "$source"
+          fi
+        done
+        apt_options=(-o Acquire::Retries=3 -o Acquire::http::Timeout=30 -o Acquire::https::Timeout=30)
+        sudo apt-get "${apt_options[@]}" -o APT::Update::Error-Mode=any update
+        sudo apt-get "${apt_options[@]}" install -y libpipewire-0.3-0
