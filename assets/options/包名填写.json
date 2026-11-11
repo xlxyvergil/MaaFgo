@@ -216,6 +216,36 @@
                     }
                 },
                 {
+                    "name": "华为服",
+                    "label": "华为服",
+                    "pipeline_override": {
+                        "打开游戏": {
+                            "action": {
+                                "type": "StartApp",
+                                "param": {
+                                    "package": "com.bilibili.fgo.huawei"
+                                }
+                            }
+                        },
+                        "关闭游戏": {
+                            "action": {
+                                "type": "StopApp",
+                                "param": {
+                                    "package": "com.bilibili.fgo.huawei"
+                                }
+                            }
+                        },
+                        "登录-关闭游戏": {
+                            "action": {
+                                "type": "StopApp",
+                                "param": {
+                                    "package": "com.bilibili.fgo.huawei"
+                                }
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "小米服",
                     "label": "小米服",
                     "pipeline_override": {

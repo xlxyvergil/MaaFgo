@@ -2,6 +2,7 @@
 import json
 from pathlib import Path
 import sys
+import time
 from types import SimpleNamespace
 
 from maa.define import LoggingLevelEnum
@@ -21,7 +22,8 @@ ROOT = Path(__file__).resolve().parents[3]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
 import bond_stop_action as bond
 
-report = {"seed_reason": None, "guard_reason": None, "reads": {"seed": 0, "guard": 0}, "tail": False}
+report = {"seed_reason": None, "guard_reason": None, "reads": {"seed": 0, "guard": 0}, "tail": False,
+          "seed_elapsed": 0, "seed_complete": False}
 phase = "seed"
 
 
@@ -31,10 +33,11 @@ def save():
 
 def read_max(context, image):
     report["reads"][phase] += 1
-    return phase == "guard" and scenario == "late_max" and report["reads"][phase] >= 2
+    return (phase == "guard" and scenario in {"window_max", "late_max", "next_battle_max"}
+            and report["reads"][phase] >= 2)
 
 
-# 明确模拟正常羁绊页、MAX与无升级遮挡；截图、嵌套等待及冻结由真实框架执行。
+# 明确模拟正常羁绊页及MAX，截图和观察间隔由真实框架执行。
 bond.read_bond_page = lambda context, image: True
 bond.read_any_bond_max = read_max
 bond.read_bond_upgrade = lambda context, image: False
@@ -45,9 +48,15 @@ class VictoryHandoff(CustomAction):
     def run(self, context, argv):
         global phase
         controller = context.tasker.controller
-        result = bond.inspect_victory_settlement(
-            context, SimpleNamespace(ok=True, reason="victory"), controller)
+        started = time.monotonic()
+        result = (None if scenario == "window_max" else bond.inspect_victory_settlement(
+            context, SimpleNamespace(ok=True, reason="victory"), controller))
+        report["seed_elapsed"] = time.monotonic() - started
+        root = context.get_task_job().job_id
+        report["seed_complete"] = bond.bond_stops.observation_complete(root)
         report["seed_reason"] = result.reason if result else ""
+        if scenario == "next_battle_max":
+            bond.bond_stops.battle_started(root, 2, another_battle_planned=False)
         phase = "guard"
         save()
         return result is None

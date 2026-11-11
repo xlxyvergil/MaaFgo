@@ -1,4 +1,4 @@
-"""真实框架调用羁绊守卫、嵌套等待和冻结确认；仅内存画面，无设备输入。"""
+"""真实框架调用羁绊守卫及单一观察窗口；仅内存画面，无设备输入。"""
 import copy
 import json
 from pathlib import Path
@@ -30,20 +30,18 @@ class BondStopFrameworkTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def test_real_guard_nested_wait_and_freeze_stop_before_parent_tail(self):
+    def test_real_guard_observation_window_or_max_controls_parent_tail(self):
         source = json.loads((ROOT / "assets/resource/base/pipeline/原生自动战斗调度.json").read_text("utf-8"))
         for is_max in (False, True):
             with self.subTest(is_max=is_max), tempfile.TemporaryDirectory() as temp:
                 nodes = {name: copy.deepcopy(source[name]) for name in (
-                    action.GUARD_NODE, "结算-羁绊停止等待动画", "结算-羁绊停止出口",
+                    action.GUARD_NODE, "结算-羁绊观察间隔", "结算-羁绊停止出口",
                     "结算-羁绊停止异常出口",
-                    "结算-等待羁绊出现", "结算-羁绊快速复核")}
+                    "结算-等待羁绊出现")}
                 nodes[action.GUARD_NODE]["enabled"] = True
-                nodes[action.GUARD_NODE]["attach"].update(positive_attempts=2, positive_timeout_ms=1000)
-                nodes["结算-羁绊快速复核"]["pre_delay"] = 0
-                nodes["结算-羁绊停止等待动画"]["pre_delay"] = 0
-                nodes["结算-羁绊停止等待动画"]["post_wait_freezes"].update(
-                    time=20, rate_limit=5, timeout=1000)
+                nodes[action.GUARD_NODE]["attach"].update(
+                    observation_attempts=80, observation_timeout_ms=100)
+                nodes["结算-羁绊观察间隔"].update(pre_delay=10, post_delay=0)
                 nodes[action.CONFIG_NODE] = {"attach": {"native_bond_stop_mode": "all"}}
                 nodes["root"] = {"next": [action.GUARD_NODE, "tail"], "on_error": []}
                 nodes["tail"] = {"action": {"type": "Custom", "param": {"custom_action": "tail"}}}
@@ -65,10 +63,15 @@ class BondStopFrameworkTests(unittest.TestCase):
                 self.assertTrue(controller.post_connection().wait().succeeded)
                 tasker = Tasker()
                 self.assertTrue(tasker.bind(resource, controller))
+                samples = []
+                def read_max(context, image):
+                    samples.append(int(image[0, 0, 0]))
+                    return is_max
                 with patch.object(action, "read_bond_page", return_value=True), \
-                     patch.object(action, "read_any_bond_max", return_value=is_max), \
+                     patch.object(action, "read_any_bond_max", side_effect=read_max), \
                      patch.object(action, "read_bond_upgrade", return_value=False), \
                      patch.object(action, "Path", side_effect=lambda value: Path(temp) / value):
+                    started = time.monotonic()
                     job = tasker.post_task("root")
                     deadline = time.monotonic() + 5
                     try:
@@ -82,6 +85,12 @@ class BondStopFrameworkTests(unittest.TestCase):
                         if is_max:
                             self.assertEqual(stopped.reason, "bond_max")
                             self.assertTrue(Path(stopped.screenshot_path).is_file())
+                            self.assertEqual(len(samples), 1)
+                        else:
+                            self.assertGreaterEqual(time.monotonic() - started, .1)
+                            self.assertTrue(bond_stops.observation_complete(job.job_id))
+                            self.assertGreaterEqual(len(samples), 2)
+                            self.assertGreater(samples[-1], samples[0])
                         self.assertEqual(controller.inputs, 0)
                     finally:
                         tasker.post_stop().wait()

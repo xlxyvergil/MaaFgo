@@ -150,6 +150,23 @@ def extension_entries(root):
     return read_manifest(root).get("equips", [])
 
 
+def extension_snapshot(root):
+    """Read one manifest and check each template once for a catalog build.
+
+    This index is request-local: rebuilding observes missing/replaced files,
+    while media requests still validate their own paths when serving images.
+    """
+    entries = extension_entries(root)
+    templates = {
+        entry["id"]: {
+            state_name: path for state_name, relative in entry["templates"].items()
+            if (path := _installed_path(root, relative)) is not None
+        }
+        for entry in entries
+    }
+    return entries, templates
+
+
 def resolve_external_templates(root, ce_name, status, equip_id=None):
     states = STATES if status == "任意" else (status,)
     if equip_id is None and isinstance(ce_name, str) and re.fullmatch(r"support-ce:[1-9][0-9]{0,9}", ce_name):

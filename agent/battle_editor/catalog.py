@@ -17,9 +17,9 @@ from urllib.parse import quote
 from .special_choices import special_skill_catalog
 from .equip_filters import catalog_filter_metadata, equip_filter_facts, read_equip_filters
 try:
-    from support_ce import extension_entries, resolve_external_templates
+    from support_ce import extension_snapshot, resolve_external_templates
 except ModuleNotFoundError:
-    from ..support_ce import extension_entries, resolve_external_templates
+    from ..support_ce import extension_snapshot, resolve_external_templates
 
 
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -241,7 +241,7 @@ def _common_equips(equips: list[dict], runtime_records: list[dict]) -> tuple[dic
     return mapped, {"count": len(mapped), "unmatched": [], "ambiguous": []}
 
 
-def _support_equip_recognition(root: Path, name, equip_id=None) -> dict[str, bool]:
+def _support_equip_recognition(root: Path, name, equip_id=None, extension_templates=None) -> dict[str, bool]:
     """Mirror Chaldea's filename normalization, without importing its online clients.
 
     Team portraits and common/NFKC-name matches cannot prove support recognition.
@@ -249,7 +249,10 @@ def _support_equip_recognition(root: Path, name, equip_id=None) -> dict[str, boo
     """
     result = {"limitBreak": False, "nonLimitBreak": False}
     for key, state in (("limitBreak", "满破"), ("nonLimitBreak", "非满破")):
-        result[key] = bool(resolve_external_templates(root, "", state, equip_id)) if equip_id else False
+        if extension_templates is not None:
+            result[key] = state in extension_templates.get(equip_id, {})
+        else:
+            result[key] = bool(resolve_external_templates(root, "", state, equip_id)) if equip_id else False
     if not isinstance(name, str) or not name.strip():
         return result
     fullwidth_alnum = {code: code - 0xFEE0 for start, end in
@@ -468,7 +471,7 @@ def build_catalog(project_root: Path | str) -> dict:
     equip_filter_index = read_equip_filters(root)
     cn_names = _read(names_dir / "equip_names_CN.json", {})
     jp_names = _read(names_dir / "equip_names_JP.json", {})
-    installed = extension_entries(root)
+    installed, extension_templates = extension_snapshot(root)
     extension_by_id = {str(entry["id"]): entry for entry in installed}
     equips = []
     for key in sorted(set(recognized) | set(equip_meta) | set(cn_names) | set(jp_names) | set(extension_by_id), key=str):
@@ -480,14 +483,17 @@ def build_catalog(project_root: Path | str) -> dict:
         # and complete metadata must not expand the executable selection set.
         image = _image(root, "equip", item.get("images", []), media_cache) if key in recognized else None
         image_width, image_height = _dimensions(root, image)
-        support_image = _image(root, "supportce", [f"support_{eid}_{state}.png" for state in ("normal", "max")], media_cache) if key in extension_by_id else None
+        available_templates = extension_templates.get(eid, {})
+        support_image = next((f"/media/supportce/support_{eid}_{label}.png"
+                              for label, state in (("normal", "非满破"), ("max", "满破"))
+                              if state in available_templates), None)
         equips.append({
             "id": eid, "name": item.get("name") or cn_names.get(key) or extra.get("name") or extra.get("nameJp") or jp_names.get(key) or extension_by_id.get(key, {}).get("name") or f"礼装 {eid}",
             "nameJp": item.get("name_jp") or extra.get("nameJp") or jp_names.get(key, ""),
             "collectionNo": item.get("collection_no", extra.get("collectionNo")),
             "rarity": item.get("rarity", extra.get("rarity")), "cost": equip_costs.get(key),
             "recognizable": key in recognized and image is not None,
-            "supportRecognition": _support_equip_recognition(root, cn_names.get(key), eid),
+            "supportRecognition": _support_equip_recognition(root, cn_names.get(key), eid, extension_templates),
             "image": image, "imageWidth": image_width, "imageHeight": image_height,
             "supportImage": support_image,
             "filters": equip_filter_facts(equip_filter_index, key) if key in recognized else None,

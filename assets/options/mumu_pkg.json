@@ -83,6 +83,17 @@
           }
         },
         {
+          "name": "华为服",
+          "label": "华为服",
+          "pipeline_override": {
+            "启动bbc": {
+              "attach": {
+                "mumu_pkg": "com.bilibili.fgo.huawei"
+              }
+            }
+          }
+        },
+        {
           "name": "小米服",
           "label": "小米服",
           "pipeline_override": {
