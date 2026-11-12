@@ -6,19 +6,4 @@ runs:
     - name: Install native dependencies
       shell: bash
       run: |
-        # Azure, archive and security can all fail when ubuntu.com DNS is unavailable.
-        # Keep mirrors on independent domains so APT can fail over between them.
-        printf '%s\tpriority:%s\n' \
-          'https://mirrors.edge.kernel.org/ubuntu/' 1 \
-          'https://mirrors.mit.edu/ubuntu/' 2 \
-          'https://archive.ubuntu.com/ubuntu/' 3 \
-          | sudo tee /etc/apt/apt-mirrors.txt
-        for source in /etc/apt/sources.list /etc/apt/sources.list.d/ubuntu.sources; do
-          if [[ -f "$source" ]]; then
-            sudo sed -i -E 's#https?://(azure\.archive|archive|security)\.ubuntu\.com/ubuntu/?#mirror+file:/etc/apt/apt-mirrors.txt#g' "$source"
-          fi
-        done
-        # APT retries each URI before moving to the next mirror; keep failover fast.
-        apt_options=(-o Acquire::Retries=1 -o Acquire::http::Timeout=15 -o Acquire::https::Timeout=15)
-        sudo apt-get "${apt_options[@]}" -o APT::Update::Error-Mode=any update
-        sudo apt-get "${apt_options[@]}" install -y libpipewire-0.3-0
+        bash "$GITHUB_ACTION_PATH/install.sh"
