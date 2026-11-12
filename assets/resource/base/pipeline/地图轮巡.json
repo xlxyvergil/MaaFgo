@@ -994,6 +994,10 @@
         ]
     },
     "巡-最终未找到": {
+        "doc": "两轮遍历均未找到目标时，参考风暴罐不足-结束任务，使用StopTask终止当前顶层任务及其JumpBack回程，阻止原生/BBC战斗入口和正常完成提示继续执行；不终止队列中的后续任务。框架将此主动停止报告为succeeded，不作为任务失败出口。",
+        "action": {
+            "type": "StopTask"
+        },
         "focus": {
             "Node.Recognition.Starting": "遍历完成，未找到目标！"
         }

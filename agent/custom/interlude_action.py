@@ -23,15 +23,18 @@ def recognition_detail(result):
 
 
 def same_list(first, second):
-    """只比较右侧正文，避开粒子、头像与倒计时；滚动停止必须再次确认。"""
+    """比较卡片头像右缘，避开下沿轮播文字、PICKUP/NEW和进度箭头。"""
     if not isinstance(first, np.ndarray) or not isinstance(second, np.ndarray):
         return False
     if first.shape != second.shape:
         return False
     def patch(image):
         h, w = image.shape[:2]
-        crop = image[round(h * .14):round(h * .81), round(w * .60):round(w * .84)]
-        return cv2.resize(cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY), (160, 220))
+        # 1280×720国服实拍：下沿增益说明从x775起，PICKUP最右约x740。
+        # 保留整段绝对纵坐标，滚动时头像和卡片边界仍会移动；不逐行对齐。
+        crop = image[round(h * .14):round(h * .81),
+                     round(w * 745 / 1280):round(w * 765 / 1280)]
+        return cv2.resize(cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY), (32, 220))
     return float(np.mean(cv2.absdiff(patch(first), patch(second)))) < 1.5
 
 

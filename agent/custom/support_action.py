@@ -475,8 +475,12 @@ class SupportAction(CustomAction):
         tpl = next((image for path in tpl_paths
                     if (image := _imread(path, gray=True)) is not None), None)
         if tpl is None:
-            mfaalog.warning(f"[SupportAction] 礼装模板不存在: {ce_name} "
-                            f"(目录 {'/'.join(os.path.dirname(path) for path in tpl_paths)})")
+            mfaalog.warning(
+                f"[SupportAction] 找不到礼装「{ce_name}」的{ce_sub}助战图片，无法识别该礼装。"
+                "请打开编队编辑器，点击编队中的礼装位置，在“选择概念礼装”窗口点击“安装礼装扩展”，"
+                "按窗口指引下载包含该礼装的扩展包，再点击“选择扩展包 ZIP”安装，完成后重新运行任务。"
+                f"（查找目录：{'/'.join(os.path.dirname(path) for path in tpl_paths)}）"
+            )
             return False
         # 锚点是礼装框左上角: 直接以锚点为左上角取 160x50 窗口(与礼装模板同量级),
         # 固定尺度整卡匹配: 模板与卡面显示同尺寸, 不做缩放搜索
@@ -1062,8 +1066,9 @@ class SupportAction(CustomAction):
                             display_name = f"{_ce_builtin_names().get(eid, '礼装')}（ID {eid}）"
                         mfaalog.error(
                             f"[SupportAction] 找不到礼装「{display_name}」的{status}助战图片，无法按此条件选择助战。"
-                            "请打开编队编辑器，在“选择概念礼装”中点击“安装礼装扩展”，"
-                            "选择包含该礼装的扩展包 ZIP，安装后重试；也可重新选择已有识别图片的礼装。"
+                            "请打开编队编辑器，点击编队中的礼装位置，在“选择概念礼装”窗口点击“安装礼装扩展”，"
+                            "按窗口指引下载包含该礼装的扩展包，再点击“选择扩展包 ZIP”安装，完成后重新运行任务；"
+                            "也可重新选择已有识别图片的礼装。"
                         )
                         return CustomAction.RunResult(success=False)
             np_dir = os.path.join(base_dir, "nplevel")   # 宝具模板按 pkg 动态选择(base/cn)
