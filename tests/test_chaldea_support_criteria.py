@@ -147,8 +147,9 @@ class ChaldeaSupportCriteriaTests(unittest.TestCase):
             self.assertFalse(action.run(context, argv).success)
             log_error.assert_called_with(
                 "[SupportAction] 找不到礼装「秘密任务」的满破助战图片，无法按此条件选择助战。"
-                "请打开编队编辑器，在“选择概念礼装”中点击“安装礼装扩展”，"
-                "选择包含该礼装的扩展包 ZIP，安装后重试；也可重新选择已有识别图片的礼装。"
+                "请打开编队编辑器，点击编队中的礼装位置，在“选择概念礼装”窗口点击“安装礼装扩展”，"
+                "按窗口指引下载包含该礼装的扩展包，再点击“选择扩展包 ZIP”安装，完成后重新运行任务；"
+                "也可重新选择已有识别图片的礼装。"
             )
 
     def test_option_route_and_failure_propagation(self):
