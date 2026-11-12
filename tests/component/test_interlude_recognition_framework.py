@@ -163,17 +163,47 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             return bool(result and result.hit)
         self.assertFalse(self.probe(image, cn_header, "cn"))
 
-    def test_jp_pending_return_and_reward_keep_base_fallback_contract(self):
-        # 这里只核对资源合并契约；未取得日服地图/奖励实图，不宣称已实机覆盖。
+    def test_real_jp_map_return_rejects_dimmed_background_and_other_pages(self):
+        image = self.fixture("jp_map_locked_free.png")
+        list_image = self.fixture("jp_list_direct_locked.png")
+
+        def callback(context):
+            results = []
+            for screenshot in (image, (image * .55).astype(np.uint8), list_image):
+                result = context.run_recognition("幕间-返回列表", screenshot)
+                results.append(bool(result and result.hit))
+            return results
+
+        self.assertEqual(self.probe(image, callback, "jp"), [True, False, False])
+
+        # 国服文案不能命中日服实图，确保测试确实加载了日服覆盖。
+        def cn_return(context):
+            result = context.run_recognition("幕间-返回列表", image)
+            return bool(result and result.hit)
+
+        self.assertFalse(self.probe(image, cn_return, "cn"))
+
+    def test_real_jp_map_locked_interludes_and_free_are_not_available(self):
+        report = self.scan(self.fixture("jp_map_locked_free.png"), True, "jp")
+        self.assertEqual(report["entries"], [])
+        self.assertEqual(report["locked_count"], 2)
+        self.assertEqual(report["free_count"], 1)
+        self.assertEqual(report["uncertain_count"], 0)
+        self.assertTrue(report["empty_confirmed"])
+
+    def test_jp_return_keeps_foreground_gate_and_click_action(self):
         resource = self.resource("jp")
         back = resource.get_node_data("幕间-返回列表")
         self.assertEqual(back["recognition"]["type"], "And")
         clauses = back["recognition"]["param"]["all_of"]
         self.assertIn("幕间-地图返回前景", clauses)
         expected = clauses[1]["param"]["expected"]
-        self.assertIn("前往幕间物语", expected)
         self.assertTrue(any("幕間の物語" in value for value in expected))
         self.assertEqual(back["action"]["type"], "Click")
+
+    def test_jp_pending_reward_keeps_base_fallback_contract(self):
+        # 奖励尚无本轮日服实图；此处只核对合并契约，不计作实机覆盖。
+        resource = self.resource("jp")
         reward = resource.get_node_data("剧情奖励-展示继续")
         expected = reward["recognition"]["param"]["expected"]
         self.assertTrue(any("画面をタッチ" in value for value in expected))
