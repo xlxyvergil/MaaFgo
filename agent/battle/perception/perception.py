@@ -261,15 +261,19 @@ def _count(reco) -> int:
 
 
 def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None) -> Tuple[ServantState, ...]:
-    """先识别各位置的战斗头像，再检测已确认从者的技能 CD。
+    """有编队候选时先确认头像；无候选时仅按前排位置检测技能 CD。
 
-    头像未匹配时按空位处理，不识别或使用该位置的技能。
-    存在从者时，技能按钮命中 CD 数字模板则不可用，否则可用。
-    搜索范围为已确认编队（含候补），身份与位置取自当前截图。
+    无候选路径暂不判断空位，身份保持未知，不作为攻略身份校验的证据。
+    有候选时仍仅搜索已确认编队（含候补），头像未匹配则跳过该位置。
+    技能按钮命中 CD 数字模板则不可用，否则可用。
     """
     out: List[ServantState] = []
     if not any(candidate_servant_ids):
-        return ()
+        return tuple(
+            ServantState(slot, _detect_servant_skills(context, img, slot),
+                         Confidence(0.0, "identity:unknown"))
+            for slot in config.FRONTLINE_SLOTS
+        )
     recognizer = recognizer or FrontlineServantRecognizer.from_context(context)
     for identity in recognizer.detect(img, candidate_servant_ids):
         if identity.servant_id is None or getattr(identity, "visible_top", 35) != 35:
@@ -279,19 +283,22 @@ def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None)
         if identity.servant_id is None:
             continue
         slot = identity.slot
-        skills: List[SkillState] = []
-        for idx in range(1, 4):
-            cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
-            cd_result = _reco(context, cd_node, img)
-            if cd_result and cd_result.hit:
-                # 命中 CD 数字模板 → 技能在冷却，不可用。
-                score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
-                skills.append(SkillState(False, Confidence(float(score), "template:cd")))
-                continue
-            # 未命中任何 CD 数字 → 技能可用。
-            skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
-        out.append(ServantState(slot, tuple(skills), identity.confidence, identity.servant_id))
+        out.append(ServantState(slot, _detect_servant_skills(context, img, slot),
+                                identity.confidence, identity.servant_id))
     return tuple(out)
+
+
+def _detect_servant_skills(context, img, slot: int) -> Tuple[SkillState, SkillState, SkillState]:
+    skills: List[SkillState] = []
+    for idx in range(1, 4):
+        cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
+        cd_result = _reco(context, cd_node, img)
+        if cd_result and cd_result.hit:
+            score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
+            skills.append(SkillState(False, Confidence(float(score), "template:cd")))
+        else:
+            skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
+    return tuple(skills)
 
 
 def _detect_master_skills(context, img) -> Tuple[SkillState, ...]:

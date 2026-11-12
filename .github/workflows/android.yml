@@ -30,6 +30,7 @@ on:
       - "tests/test_android*.py"
       - "tests/android/**"
       - ".github/workflows/android.yml"
+      - ".github/actions/install-native-deps/**"
   # 与 MXU 一致：普通分支 push 不打包；v* tag 由 install.yml 调用本流程发布。
 
 permissions:
@@ -82,10 +83,11 @@ jobs:
             Android/MaaFwApp/.maafw
             Android/MaaFwApp/.maa-cache
           key: android-${{ runner.os }}-${{ matrix.abi }}-${{ hashFiles('Android/versions.json', 'tools/build_android_opencv.py', 'Android/MaaFwApp') }}
+      - name: Install MaaFramework system deps
+        uses: ./.github/actions/install-native-deps
+        timeout-minutes: 10
       - name: Check Android regressions
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libpipewire-0.3-0
           maafw_version=$(python -c 'import json; print(json.load(open("Android/versions.json"))["maafw"].removeprefix("v"))')
           python -m pip install "maafw==$maafw_version" numpy opencv-python-headless onnxruntime
           python -m unittest discover -s tests -p 'test_android*.py' -v

@@ -22731,6 +22731,149 @@
         "effect_desc": "",
         "atlas_effects": []
       }
+    },
+    {
+      "id": "9409660",
+      "collection_no": 2710,
+      "name": "泡沫の遭逢",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94096600.png"
+      ],
+      "name_jp": "泡沫の遭逢",
+      "acquisition_category_jp": "イベントガチャ（期間限定）",
+      "filter_tag": "活动召唤",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9409670",
+      "collection_no": 2711,
+      "name": "帰路への旗印",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_94096700.png"
+      ],
+      "name_jp": "帰路への旗印",
+      "acquisition_category_jp": "イベントガチャ（期間限定）",
+      "filter_tag": "活动召唤",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9409680",
+      "collection_no": 2712,
+      "name": "秘湯の来訪者",
+      "rarity": 3,
+      "important": 0,
+      "images": [
+        "f_94096800.png"
+      ],
+      "name_jp": "秘湯の来訪者",
+      "acquisition_category_jp": "イベントガチャ（期間限定）",
+      "filter_tag": "活动召唤",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9409690",
+      "collection_no": 2713,
+      "name": "いざ、尋常に川中島！？",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94096900.png"
+      ],
+      "name_jp": "いざ、尋常に川中島！？",
+      "acquisition_category_jp": "イベント報酬",
+      "filter_tag": "活动报酬",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      }
+    },
+    {
+      "id": "9312640",
+      "collection_no": 2716,
+      "name": "放課後邪馬台国",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93126400.png"
+      ],
+      "name_jp": "放課後邪馬台国",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      },
+      "bondOwner": 2801400
+    },
+    {
+      "id": "9312670",
+      "collection_no": 2717,
+      "name": "ツイン・ヤタガラス",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93126700.png"
+      ],
+      "name_jp": "ツイン・ヤタガラス",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      },
+      "bondOwner": 406100
+    },
+    {
+      "id": "9312660",
+      "collection_no": 2718,
+      "name": "平蜘蛛くん",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93126600.png"
+      ],
+      "name_jp": "平蜘蛛くん",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      },
+      "bondOwner": 705500
     }
   ]
 }

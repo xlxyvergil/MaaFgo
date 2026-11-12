@@ -6151,6 +6151,45 @@
           },
           "icon": "resource/base/image/servant_face/f_4060000.png",
           "description": "タマモアリア · ID 406000\n\n<img src=\"resource/base/image/servant_face/f_4060000.png\" width=\"79\" alt=\"タマモアリア\" />"
+        },
+        {
+          "name": "2801400",
+          "label": "484. 卑弥呼＆壹与（5星·伪(pretender)）[2801400]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "level_servant_id": "2801400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28014000.png",
+          "description": "卑弥呼＆壹与 · ID 2801400\n\n<img src=\"resource/base/image/servant_face/f_28014000.png\" width=\"79\" alt=\"卑弥呼＆壹与\" />"
+        },
+        {
+          "name": "406100",
+          "label": "485. 杂贺孙一（4星·骑(rider)）[406100]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "level_servant_id": "406100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4061000.png",
+          "description": "杂贺孙一 · ID 406100\n\n<img src=\"resource/base/image/servant_face/f_4061000.png\" width=\"79\" alt=\"杂贺孙一\" />"
+        },
+        {
+          "name": "705500",
+          "label": "486. 松永久秀（4星·狂(berserker)）[705500]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "level_servant_id": "705500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7055000.png",
+          "description": "松永久秀 · ID 705500\n\n<img src=\"resource/base/image/servant_face/f_7055000.png\" width=\"79\" alt=\"松永久秀\" />"
         }
       ],
       "description": "可搜索名称或 ID。目录复用工程已有资料；缺少可用识别图的保留目标会在启动前说明并停止。"

@@ -75,21 +75,23 @@
     "助战action": {
         "doc": "助战阶段(自定义筛选): 正向识别到助战选择界面后执行 support_action。原为 DirectHit(当轮必中, 需依赖 队伍确认 前置挡枪, 且连续出击第2场会在 队伍确认 超时卡死), 现加正向识别: 可安全严格排在编队之前, 助战后进入 助战后判分(第1场→编队, 连续出击第2场→直接实际战斗)。2026-11-06调整：不要求英灵时保留游戏当前职介页签，不执行职介切换。2026-10-26日服MaaMCP历史实测：英灵选择注入 class_name=any 时，当时复用助战兜底-选择首个助战的 ALL 页签坐标，忽略残留英灵ID、技能、宝具及等级条件，仅按礼装匹配；满破异星之神命中后到达队伍确认，英灵相关匹配调用均为0。2026-10-28普通助战MaaMCP实测：多选按同格OR判定，2030年的碎片未中后继续匹配记忆的大图书馆并选中；候选通过独立attach键传入，冠位两格各自仍须通过。 2026-11-05国服MaaMCP实测：攻击力顺序下等级ROI读到攻击13,432、攻击12,485；有等级要求但读取失败时实时提醒一次，继续滑动和刷新。测试专用第二次刷新失败节点触发后再次提醒检查从者等级显示，并保留助战界面；不是自然查找超时验收。识别入口可参考助战选择-确认按钮锚点。",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "Or",
             "param": {
-                "roi": [
-                    1020,
-                    165,
-                    195,
-                    545
-                ],
-                "template": [
-                    "support/助战编入确认.png",
-                    "support/助战NPC.png"
-                ],
-                "green_mask": true,
-                "threshold": 0.8,
-                "order_by": "Vertical"
+                "any_of": [
+                    "助战选择-界面标题锚点",
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "roi": [1020, 165, 195, 545],
+                                "template": ["support/助战编入确认.png", "support/助战NPC.png"],
+                                "green_mask": true,
+                                "threshold": 0.8,
+                                "order_by": "Vertical"
+                            }
+                        }
+                    }
+                ]
             }
         },
         "pre_delay": 0,
@@ -129,21 +131,23 @@
     "Chaldea助战action": {
         "doc": "助战阶段(Chaldea 配置): 先读取已启用的 Chaldea 队伍并筛选唯一标记助战，复用助战action的头像/OCR筛选。可选刷新10次仍无目标时选择首个助战，按会话标记跳过队伍校验、自动编队、羁绊补齐和身份采集，改用无配置原生战斗。默认关闭兜底；输入、队伍解析或缺少礼装模板等配置错误仍立即失败。",
         "recognition": {
-            "type": "TemplateMatch",
+            "type": "Or",
             "param": {
-                "roi": [
-                    1020,
-                    165,
-                    195,
-                    545
-                ],
-                "template": [
-                    "support/助战编入确认.png",
-                    "support/助战NPC.png"
-                ],
-                "green_mask": true,
-                "threshold": 0.8,
-                "order_by": "Vertical"
+                "any_of": [
+                    "助战选择-界面标题锚点",
+                    {
+                        "recognition": {
+                            "type": "TemplateMatch",
+                            "param": {
+                                "roi": [1020, 165, 195, 545],
+                                "template": ["support/助战编入确认.png", "support/助战NPC.png"],
+                                "green_mask": true,
+                                "threshold": 0.8,
+                                "order_by": "Vertical"
+                            }
+                        }
+                    }
+                ]
             }
         },
         "action": {

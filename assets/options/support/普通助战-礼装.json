@@ -12811,6 +12811,83 @@
                             }
                         }
                     }
+                },
+                {
+                    "name": "support-ce:9409660",
+                    "label": "泡沫の遭逢",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9409660": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409670",
+                    "label": "帰路への旗印",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9409670": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409680",
+                    "label": "秘湯の来訪者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9409680": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409690",
+                    "label": "いざ、尋常に川中島！？",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9409690": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312640",
+                    "label": "放課後邪馬台国",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9312640": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312670",
+                    "label": "ツイン・ヤタガラス",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9312670": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312660",
+                    "label": "平蜘蛛くん",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-满破-扩展候选:support-ce:9312660": true
+                            }
+                        }
+                    }
                 }
             ]
         },
@@ -26194,6 +26271,83 @@
                         "助战action": {
                             "attach": {
                                 "普通助战-礼装-非满破-扩展候选:support-ce:9312620": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409660",
+                    "label": "泡沫の遭逢",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9409660": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409670",
+                    "label": "帰路への旗印",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9409670": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409680",
+                    "label": "秘湯の来訪者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9409680": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9409690",
+                    "label": "いざ、尋常に川中島！？",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9409690": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312640",
+                    "label": "放課後邪馬台国",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9312640": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312670",
+                    "label": "ツイン・ヤタガラス",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9312670": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312660",
+                    "label": "平蜘蛛くん",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "普通助战-礼装-非满破-扩展候选:support-ce:9312660": true
                             }
                         }
                     }

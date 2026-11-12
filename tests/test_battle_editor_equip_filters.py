@@ -178,7 +178,7 @@ class BundledEquipFilterTests(unittest.TestCase):
         curated_path = ROOT / "agent/custom/equip_list.json"
         curated = json.loads(curated_path.read_text(encoding="utf-8"))["equips"]
         self.assertEqual(set(index["equips"]), {row["id"] for row in curated})
-        self.assertEqual(len(index["equips"]), 1158)
+        self.assertEqual(len(index["equips"]), 1165)
         self.assertEqual(
             index["version"]["curatedSha256"], hashlib.sha256(curated_path.read_bytes()).hexdigest(),
             "礼装清单已变更，筛选索引仍记录旧的来源。请运行 "

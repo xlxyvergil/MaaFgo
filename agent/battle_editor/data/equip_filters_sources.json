@@ -7,11 +7,11 @@
       "dataVer": 2691,
       "dateVer": 1793264400
     },
-    "curatedSha256": "d0908b1c324a87efb7282cd7749db9630e361e23587213f41824f816574ece32",
+    "curatedSha256": "cda620e6fedce4a14e1c40e8c2da97bfaf3267b9859e8738f55f9301437227f3",
     "niceEquipSha256": "3c8d444a3f0d828ef14eb3439fced34503955a659434910e77dcee0494ca72ad"
   },
-  "curatedCount": 1158,
-  "indexSha256": "823c0230306ef6f09b47cca7a4521253bb2ccbc8be42d65b90ddcc775c02b51c",
+  "curatedCount": 1165,
+  "indexSha256": "d9609e38b7bdf0ea4ee01dd1025b0c087c746c12d75e0508b530a7113cfcc190",
   "sources": [
     {
       "file": "JP_info.json",
@@ -612,6 +612,70 @@
       "url": "https://api.atlasacademy.io/nice/JP/skill/995432",
       "sha256": "667c12f15011adda5c7e3f2c3a1d1baf6aba7aa44c9567dc531bcab00fb5c9aa",
       "bytes": 616
+    }
+  ],
+  "incrementalUpdates": [
+    {
+      "date": "2026-11-12",
+      "equipIds": [
+        9409660,
+        9409670,
+        9409680,
+        9409690,
+        9312640,
+        9312670,
+        9312660
+      ],
+      "sources": [
+        {
+          "file": "incremental-20261112/equip-9409660.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409660",
+          "sha256": "6b6d713cc531fe75c34dbd13cf29b08a217f3ede2b17c5c334d4f109671751a0",
+          "bytes": 22701
+        },
+        {
+          "file": "incremental-20261112/equip-9409670.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409670",
+          "sha256": "89709e84b9b2551c3264b192e9505b1ace7567241933ac716e3f5a25a818ab85",
+          "bytes": 29700
+        },
+        {
+          "file": "incremental-20261112/equip-9409680.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409680",
+          "sha256": "d38e2b6e82bc0bf858c87aef2af53e98ffef57eaa4faa4c1f2fbc06db82fb9ac",
+          "bytes": 24032
+        },
+        {
+          "file": "incremental-20261112/equip-9409690.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409690",
+          "sha256": "229ff997088b0aee4b2ae4842bdb007eb04ba746972afd8e2eb8b1ebeac95261",
+          "bytes": 33309
+        },
+        {
+          "file": "incremental-20261112/equip-9312640.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312640",
+          "sha256": "c2207a7874b192bf56d4134135674e615b41c45a93617aaecc6f3fbe90b94c98",
+          "bytes": 15098
+        },
+        {
+          "file": "incremental-20261112/equip-9312670.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312670",
+          "sha256": "fa8a3f0d229e459a4ca33f9e01848362a52bf0988783b6ef104dd571af06339c",
+          "bytes": 13176
+        },
+        {
+          "file": "incremental-20261112/equip-9312660.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312660",
+          "sha256": "8aa0ae22e737b26a4c57923c6f01ea9f31b40cf9a948c1d2d6e90e5169d2bcfd",
+          "bytes": 12246
+        },
+        {
+          "file": "incremental-20261112/skill-995526.json",
+          "url": "https://api.atlasacademy.io/nice/JP/skill/995526",
+          "sha256": "db0fbea92c36094328f7d0a036f4e263167e4f8a4cc159140b384c27b8d5c626",
+          "bytes": 630
+        }
+      ]
     }
   ]
 }

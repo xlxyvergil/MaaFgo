@@ -2364,6 +2364,21 @@
       "acquisition_category_jp": "絆礼装",
       "filter_tag": "羁绊礼装",
       "bondOwner": 406000
+    },
+    "9312640": {
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bondOwner": 2801400
+    },
+    "9312670": {
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bondOwner": 406100
+    },
+    "9312660": {
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bondOwner": 705500
     }
   }
 }

@@ -28,3 +28,5 @@
 !main_story/cn_tiamat_map_phase8.png
 !main_story/cn_tiamat_map_absent.png
 !main_story/cn_tiamat_map_moved.png
+# Anonymous CN interlude card lists and one explicitly synthetic Free-only map.
+!interlude/*.png
