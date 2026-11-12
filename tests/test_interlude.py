@@ -53,7 +53,7 @@ TARGET = ("幕间-测试条目", object())
 
 
 class ConfigurationTests(unittest.TestCase):
-    def test_task_is_imported_for_current_cn_resource_and_android(self):
+    def test_task_is_imported_for_current_cn_jp_resources_and_android(self):
         interface = load("assets/interface.json")
         task = load("assets/tasks/自动幕间副本.json")["task"][0]
         self.assertIn("tasks/自动幕间副本.json", interface["import"])
@@ -61,9 +61,11 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(task["name"], "自动幕间副本")
         self.assertEqual(task["entry"], "自动幕间副本调度")
         self.assertEqual(task["controller"], ["安卓设备"])
-        cn_resources = {item["name"] for item in interface["resource"]
-                        if "resource/cn" in item["path"]}
-        self.assertEqual(set(task["resource"]), cn_resources)
+        supported_resources = {item["name"] for item in interface["resource"]
+                               if any(layer in item["path"]
+                                      for layer in ("resource/cn", "resource/jp"))}
+        self.assertIn("日服", task["resource"])
+        self.assertEqual(set(task["resource"]), supported_resources)
 
     def test_basic_battle_options_are_available(self):
         task = load("assets/tasks/自动幕间副本.json")["task"][0]

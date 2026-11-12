@@ -113,6 +113,63 @@ class InterludeRecognitionTests(unittest.TestCase):
         self.assertEqual(len(report["entries"]), 1)
         self.assertEqual(report["locked_count"], 0)
 
+    def test_japanese_progress_supports_ap_zero_without_english_marker(self):
+        report = scan_entries(Context(["鬼と修羅と華と華", "クエスト進行度", "AP0"]),
+                              card_image())
+        self.assertEqual(report["entries"][0]["kind"], "direct")
+        self.assertEqual(report["entries"][0]["title"], "鬼と修羅と華と華")
+
+    def test_japanese_stage_text_is_available(self):
+        report = scan_entries(Context(["剣の誓い", "物語の舞台へ"]), card_image())
+        self.assertEqual(report["entries"][0]["kind"], "stage")
+        self.assertEqual(report["locked_count"], 0)
+
+    def test_japanese_unlock_conditions_are_explicit_future_conditions(self):
+        conditions = (
+            "第一特異点をクリア&霊基再臨2段階&絆Lv.4で開放",
+            "クエストクリアで開放",
+            "第二部クリア後に開放",
+            "第二部クリア後開放",
+            "絆Lv.4 で 開放",
+        )
+        for condition in conditions:
+            with self.subTest(condition=condition):
+                report = scan_entries(Context(["剣の誓い", "物語の舞台へ", condition]), card_image())
+                self.assertEqual(report["entries"], [])
+                self.assertEqual(report["locked_count"], 1)
+
+    def test_japanese_formation_requirement_and_relaxation_are_not_locks(self):
+        for status in ("編成条件あり", "開放条件緩和中", "クエストクリアで開放済み",
+                       "クエストクリア後開放済み", "クエストクリアで開放中"):
+            with self.subTest(status=status):
+                report = scan_entries(Context(["総るべき杖は", "クエスト進行度", "AP20", status]),
+                                      card_image())
+                self.assertEqual(report["entries"][0]["kind"], "direct")
+                self.assertEqual(report["locked_count"], 0)
+
+    def test_japanese_title_excludes_auxiliary_labels(self):
+        class JapaneseTitleContext(Context):
+            def run_recognition(self, name, image, pipeline_override=None):
+                result = super().run_recognition(name, image, pipeline_override)
+                labels = ("NEW!", "推奨Lv.60", "クラス", "消費", "クエスト進行度", "前回", "前回実行")
+                result.all_results = [
+                    NS(text=text, score=.99999, box=NS(x=780, y=127, w=140, h=15))
+                    for text in labels
+                ] + [
+                    NS(text="鬼と修羅と華と華", score=.995, box=NS(x=780, y=145, w=180, h=22)),
+                    NS(text="AP18", score=.9999, box=NS(x=780, y=210, w=70, h=20)),
+                ]
+                return result
+        report = scan_entries(JapaneseTitleContext(), card_image())
+        self.assertEqual(report["entries"][0]["title"], "鬼と修羅と華と華")
+
+    def test_japanese_free_card_is_positive_empty_map_evidence(self):
+        report = scan_entries(Context(["フリークエスト", "AP15"]),
+                              card_image(green=True), map_mode=True)
+        self.assertEqual(report["entries"], [])
+        self.assertEqual(report["free_count"], 1)
+        self.assertTrue(report["empty_confirmed"])
+
     def test_explicit_unlock_requirement_rejects_even_a_bright_card(self):
         report = scan_entries(Context(["通关终局特异点后开放", "前往故事的舞台"]), card_image())
         self.assertEqual(report["entries"], [])

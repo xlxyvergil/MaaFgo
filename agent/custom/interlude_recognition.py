@@ -140,9 +140,13 @@ def scan_entries(context, image, *, map_mode=False, params=None):
             marker_text = re.sub(r"\s+", "", " ".join(item["text"] for item in marker_items)).lower()
             candidate["marker_ocr"] = marker_items
             interlude = re.search(r"[il1]nterlu(?:d)?e?", marker_text) is not None
-        locked_text = any(re.search(r"(?:后开放|後開放|未开放|未開放|未解锁|未开启)", text)
+        # 日服条件行会以“絆Lv.4で開放”等结尾；“開放条件緩和中”和
+        # “編成条件あり”分别表示临时放宽和编队限制，不能据此跳过已开放任务。
+        locked_text = any(re.search(
+            r"(?:(?:后开放|後開放)(?!済|中)|未开放|未開放|未解锁|未开启|"
+            r"(?:で|後(?:に)?)(?:開放|解放)(?!済|中))", re.sub(r"\s+", "", text))
                           for text in texts)
-        progress = "任务进行度" in compact or "任务进度" in compact
+        progress = any(label in compact for label in ("任务进行度", "任务进度", "クエスト進行度"))
         task_evidence = stage or interlude or ap or progress or locked_text
         dark = candidate["brightness"] < float(params.get("min_brightness", 135))
         # 地图背景棕色候选既无任务标记也无锁定说明时忽略；列表色带则须报告未知。
@@ -158,7 +162,8 @@ def scan_entries(context, image, *, map_mode=False, params=None):
             report["locked_count"] += 1
             candidate["status"] = "locked"
             continue
-        completed = any(re.search(r"clear|クリア|(?:^|[-－])完成(?:$|[-－])", item["text"], re.I)
+        completed = any(re.search(r"clear|(?:^|[-－])(?:クリア(?:済み)?[!！]?|完成)(?:$|[-－])",
+                                  item["text"], re.I)
                         and item["box"][1] >= y + round(70 * sy) for item in items)
         if map_mode:
             # 完成角标在卡片左下、标题OCR区域之外，复用国日服各自的Free完成模板。
@@ -185,7 +190,9 @@ def scan_entries(context, image, *, map_mode=False, params=None):
             marker_text = re.fullmatch(r"[il1]nt(?:er)?(?:[il1]u)?d?e?", normalized)
             if (item["box"][1] >= y + round(50 * sy) or item["score"] < .85
                     or marker_text or re.fullmatch(r"[a-z]", normalized)
-                    or re.search(r"pickup|推荐|职阶|消耗|任务进[行]?度|^新[!！]?$", normalized)):
+                    or re.search(r"pickup|推荐|职阶|消耗|任务进[行]?度|消費|クエスト進行度|推奨|クラス|"
+                                 r"^(?:new|新)[!！]?$|^前回(?:実行)?$|^上次(?:执行|執行|进行|進行)$",
+                                 normalized)):
                 continue
             title_items.append(item)
         # 背景地图碎字偶尔出现在卡片上沿，低置信或更早的字框不能抢走真实标题。

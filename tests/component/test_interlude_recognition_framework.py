@@ -1,4 +1,4 @@
-"""真实 MaaFramework/OCR 回放匿名国服幕间画面；仅使用内存控制器。"""
+"""真实 MaaFramework/OCR 回放匿名国日服幕间画面；仅使用内存控制器。"""
 import json
 from pathlib import Path
 import sys
@@ -26,8 +26,8 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         self.assertIsNotNone(image)
         return image
 
-    def probe(self, image, callback):
-        resource = self.resource("cn")
+    def probe(self, image, callback, server="cn"):
+        resource = self.resource(server)
         resource.register_custom_recognition("interlude_scan", InterludeScan())
         resource.register_custom_recognition("interlude_entry", InterludeEntry())
         resource.register_custom_recognition("interlude_quest", InterludeQuest())
@@ -60,7 +60,7 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         finally:
             tasker.post_stop().wait()
 
-    def scan(self, image, map_mode=False):
+    def scan(self, image, map_mode=False, server="cn"):
         def callback(context):
             result = context.run_recognition("幕间-条目扫描", image, {
                 "幕间-条目扫描": {"recognition": {"param": {
@@ -69,7 +69,7 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             })
             self.assertTrue(result and result.hit)
             return detail(result)
-        return self.probe(image, callback)
+        return self.probe(image, callback, server)
 
     def test_real_stage_direct_ap_zero_and_locked_lists(self):
         cases = (
@@ -130,6 +130,55 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             dimmed = context.run_recognition("幕间-返回列表", (image * .55).astype(np.uint8))
             return bool(visible and visible.hit), bool(dimmed and dimmed.hit)
         self.assertEqual(self.probe(image, callback), (True, False))
+
+    def test_real_jp_direct_entries_and_locked_stage_are_separate(self):
+        image = self.fixture("jp_list_direct_locked.png")
+        report = self.scan(image, server="jp")
+        self.assertEqual([entry["kind"] for entry in report["entries"]], ["direct", "direct"])
+        self.assertGreaterEqual(report["locked_count"], 1)
+        self.assertEqual(report["uncertain_count"], 0)
+        self.assertTrue(all(entry["title"] for entry in report["entries"]))
+        # 編成条件あり是允许进本后处理的限制，不能当作尚未开启。
+        self.assertGreater(report["entries"][1]["row_box"][1], 300)
+
+    def test_real_jp_locked_list_has_no_available_entries(self):
+        report = self.scan(self.fixture("jp_list_locked.png"), server="jp")
+        self.assertEqual(report["entries"], [])
+        self.assertGreaterEqual(report["locked_count"], 3)
+        self.assertEqual(report["uncertain_count"], 0)
+
+    def test_real_jp_header_and_shared_exit_reject_dimmed_background(self):
+        image = self.fixture("jp_list_direct_locked.png")
+        def callback(context):
+            outcomes = []
+            for node in ("幕间-列表界面", "结算-已返回幕间列表"):
+                visible = context.run_recognition(node, image)
+                dimmed = context.run_recognition(node, (image * .55).astype(np.uint8))
+                outcomes.append((bool(visible and visible.hit), bool(dimmed and dimmed.hit)))
+            return outcomes
+        self.assertEqual(self.probe(image, callback, "jp"), [(True, False), (True, False)])
+        # 同一实图在国服资源下不能通过，避免把未生效的日服覆盖计作通过。
+        def cn_header(context):
+            result = context.run_recognition("幕间-列表界面", image)
+            return bool(result and result.hit)
+        self.assertFalse(self.probe(image, cn_header, "cn"))
+
+    def test_jp_pending_return_and_reward_keep_base_fallback_contract(self):
+        # 这里只核对资源合并契约；未取得日服地图/奖励实图，不宣称已实机覆盖。
+        resource = self.resource("jp")
+        back = resource.get_node_data("幕间-返回列表")
+        self.assertEqual(back["recognition"]["type"], "And")
+        clauses = back["recognition"]["param"]["all_of"]
+        self.assertIn("幕间-地图返回前景", clauses)
+        expected = clauses[1]["param"]["expected"]
+        self.assertIn("前往幕间物语", expected)
+        self.assertTrue(any("幕間の物語" in value for value in expected))
+        self.assertEqual(back["action"]["type"], "Click")
+        reward = resource.get_node_data("剧情奖励-展示继续")
+        expected = reward["recognition"]["param"]["expected"]
+        self.assertTrue(any("画面をタッチ" in value for value in expected))
+        self.assertTrue(any("请点击" in value for value in expected))
+        self.assertEqual(reward["action"]["type"], "Click")
 
     def test_clear_template_is_limited_to_the_interlude_row(self):
         image = self.fixture("cn_map_interlude.png")
