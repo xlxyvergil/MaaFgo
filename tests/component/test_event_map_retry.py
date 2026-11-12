@@ -51,8 +51,27 @@ class EventMapRetryTests(unittest.TestCase):
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = json.loads((ROOT / "assets/resource/base/pipeline/地图轮巡.json").read_text("utf8"))
 
-    def run_map(self, found):
+    def run_map(self, found, outer_mode=None):
         nodes = copy.deepcopy(self.source)
+        entry = "巡-初始化左滑"
+        if outer_mode:
+            daily = json.loads((ROOT / "assets/resource/base/pipeline/日常战斗.json").read_text("utf8"))
+            modes = json.loads((ROOT / "assets/options/战斗方式.json").read_text("utf8"))
+            option = next(case for case in modes["option"]["battle_mode"]["cases"]
+                          if case["name"] == outer_mode)
+            nodes.update(daily)
+            nodes.update(copy.deepcopy(option["pipeline_override"]))
+            # 隔离导航返回后的外层行为；战斗入口只保留命中上限，不实际执行战斗。
+            for name in ("执行回主界面", "执行队伍选择", "执行战斗结束"):
+                nodes[name] = {"enabled": False}
+            nodes["执行章节导航"]["next"] = [entry]
+            nodes["bbc战斗"] = {}
+            native = json.loads((ROOT / "assets/resource/base/pipeline/原生自动战斗.json").read_text("utf8"))
+            nodes["原生自动战斗_多次入口"] = {
+                "max_hit": native["原生自动战斗_多次入口"]["max_hit"]
+            }
+            nodes["地图测试-后续任务"] = {}
+            entry = "通用战斗调度"
         controller = MapController()
 
         class Target(CustomRecognition):
@@ -85,13 +104,18 @@ class EventMapRetryTests(unittest.TestCase):
         tasker = Tasker()
         self.assertTrue(tasker.bind(resource, controller))
         try:
-            job = tasker.post_task("巡-初始化左滑")
+            job = tasker.post_task(entry)
             deadline = time.monotonic() + 10
             while not job.status.done and time.monotonic() < deadline:
                 time.sleep(.01)
+            self.assertTrue(job.status.done, "地图测试未能在10秒内结束")
             detail = job.get()
             self.assertTrue(job.status.succeeded, [(node.name, node.action) for node in detail.nodes][-3:])
             seen = [node.name for node in detail.nodes]
+            if outer_mode:
+                following = tasker.post_task("地图测试-后续任务").wait().get()
+                self.assertTrue(following.status.succeeded)
+                self.assertEqual([node.name for node in following.nodes], ["地图测试-后续任务"])
             return controller, seen
         finally:
             tasker.post_stop().wait()
@@ -133,6 +157,29 @@ class EventMapRetryTests(unittest.TestCase):
         self.assertEqual(seen.count("巡-初始化上滑"), 2)
         self.assertEqual(seen.count("巡-左4c"), 2)
         self.assertEqual(seen[-1], FINAL)
+
+    def test_missing_target_stops_outer_battle_and_completion(self):
+        for mode in ("bbc", "native"):
+            with self.subTest(mode=mode):
+                controller, seen = self.run_map("missing", outer_mode=mode)
+                self.assertEqual(controller.zoom_calls, 1)
+                self.assertEqual(controller.clicks, [])
+                self.assertEqual(seen.count("巡-左4c"), 2)
+                self.assertEqual(seen[-1], FINAL)
+                for forbidden in ("执行bbc战斗", "bbc战斗", "原生自动战斗_多次入口",
+                                  "战斗完成信息", "bbc弹窗信息输出"):
+                    self.assertNotIn(forbidden, seen)
+
+    def test_found_target_still_reaches_outer_battle(self):
+        for mode in ("bbc", "native"):
+            for found in ("first", "retry", "retry_after_scan"):
+                with self.subTest(mode=mode, found=found):
+                    _, seen = self.run_map(found, outer_mode=mode)
+                    self.assertNotIn(FINAL, seen)
+                    battle = "bbc战斗" if mode == "bbc" else "原生自动战斗_多次入口"
+                    self.assertIn(battle, seen)
+                    self.assertLess(seen.index("地图轮巡-成功"), seen.index(battle))
+                    self.assertEqual(seen[-1], "bbc弹窗信息输出")
 
 
 if __name__ == "__main__":
