@@ -57,13 +57,14 @@ timeout() {
   "$@"
 }
 apt-get() {
-  local phase=install source_file= lists= parts= argument
+  local phase=install source_file= lists= parts= argument allow_downgrades=false
   for argument in "$@"; do
     case "$argument" in
       update) phase=update ;;
       Dir::Etc::sourcelist=*) source_file="${argument#*=}" ;;
       Dir::Etc::sourceparts=*) parts="${argument#*=}" ;;
       Dir::State::lists=*) lists="${argument#*=}" ;;
+      --allow-downgrades) allow_downgrades=true ;;
     esac
   done
   [[ -n "$source_file" && -n "$lists" && -n "$parts" ]] || return 90
@@ -71,6 +72,10 @@ apt-get() {
   for argument in "$@"; do
     record $'ARG\t'"$phase"$'\t'"$argument"
   done
+  if [[ "$NATIVE_TEST_SCENARIO" == downgrade_required && "$phase" == install && "$allow_downgrades" == false ]]; then
+    echo 'E: Packages were downgraded and -y was used without --allow-downgrades.' >&2
+    return 100
+  fi
   case "$NATIVE_TEST_SCENARIO:$phase:$source_file" in
     update_fail:update:*/mirror-0/ubuntu.list) return 100 ;;
     update_timeout:update:*/mirror-0/ubuntu.list) return 124 ;;
@@ -130,6 +135,14 @@ class NativeDependencyInstallerTests(unittest.TestCase):
                 self.assertEqual(len(outcome.events), queries)
                 self.assertTrue(all(event[0] == "QUERY" for event in outcome.events))
                 self.assertEqual(outcome.apt, [])
+
+    def test_resolute_can_align_preinstalled_libraries_with_mirror_dependencies(self):
+        outcome = self.execute("downgrade_required", codename="resolute")
+        self.assert_code(outcome, 0)
+        self.assertEqual([event[0] for event in outcome.apt], ["update", "install"])
+        install = [event[2] for event in outcome.events if event[0] == "ARG" and event[1] == "install"]
+        self.assertIn("--allow-downgrades", install)
+        self.assertIn("--no-remove", install)
 
     def test_success_updates_then_installs_once_and_cleans_only_its_temp_directory(self):
         outcome = self.execute()
@@ -220,6 +233,10 @@ class NativeDependencyInstallerTests(unittest.TestCase):
             self.assertEqual("APT::Update::Error-Mode=any" in arguments, phase == "update")
         install = [event[2] for event in outcome.events if event[0] == "ARG" and event[1] == "install"]
         self.assertIn("--no-install-recommends", install)
+        self.assertIn("--allow-downgrades", install)
+        self.assertIn("--no-remove", install)
+        self.assertNotIn("--force-yes", install)
+        self.assertNotIn("--allow-unauthenticated", install)
         self.assertIn("libpipewire-0.3-0", install)
 
     def test_unsupported_os_or_invalid_codename_fails_without_apt(self):

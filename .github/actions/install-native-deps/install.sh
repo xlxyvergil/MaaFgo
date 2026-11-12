@@ -59,7 +59,11 @@ for index in "${!mirrors[@]}"; do
   )
   echo "Installing native dependency from $mirror"
   if sudo -n timeout --kill-after=5s 75s apt-get "${apt_options[@]}" -o APT::Update::Error-Mode=any update; then
-    if sudo -n timeout --kill-after=5s 75s apt-get "${apt_options[@]}" install -y --no-install-recommends libpipewire-0.3-0; then
+    # Disposable CI runners can have newer preinstalled libraries than this
+    # mirror. Let APT align exact-version dependencies (e.g. FFTW/Vorbis on
+    # Resolute), but abort if the dependency solution would remove any package.
+    if sudo -n timeout --kill-after=5s 75s apt-get "${apt_options[@]}" install \
+      -y --no-install-recommends --allow-downgrades --no-remove libpipewire-0.3-0; then
       exit 0
     else
       status=$?
