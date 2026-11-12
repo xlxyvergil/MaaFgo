@@ -1,0 +1,49 @@
+{
+  "战斗_失败_常规": {
+    "doc": "2026-11-13国服幕间实机的三按钮续关页，撤退位于左侧，原base固定中部ROI无法命中，导致战败被误报为出卡后等待超时。另保留2026-10-30国服灵脉石四按钮实图的中下撤退布局，两者均复用battle/撤退.png中文文字模板。共同确认续关标题和对应按钮的亮白前景，拒绝普通战斗及确认弹窗背后的暗色撤退。仅识别，不点击令咒、圣晶石、灵脉石或撤退；后续交给现有主线/幕间失败处理。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "cn/自动战斗_感知/战斗_失败_常规/OCR1",
+            "recognition": {"type": "OCR", "param": {
+              "roi": [540, 90, 200, 80], "expected": ["^续关$"], "threshold": 0.8
+            }}
+          },
+          "战斗_失败_国服撤退按钮"
+        ],
+        "box_index": 1
+      }
+    }
+  },
+  "战斗_失败_国服撤退按钮": {
+    "recognition": {"type": "Or", "param": {"any_of": [
+      "战斗_失败_国服三按钮撤退", "战斗_失败_国服四按钮撤退"
+    ]}}
+  },
+  "战斗_失败_国服三按钮撤退": {
+    "doc": "2026-11-13国服幕间三按钮实图：左侧撤退，白底ROI像素11190；只能由战斗_失败_常规结合续关标题使用。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"recognition": {"type": "ColorMatch", "param": {
+        "roi": [205, 290, 250, 55], "method": 4,
+        "lower": [210, 210, 210], "upper": [255, 255, 255], "count": 7000
+      }}},
+      {"recognition": {"type": "TemplateMatch", "param": {
+        "roi": [180, 270, 310, 105], "template": "battle/撤退.png", "threshold": 0.9
+      }}}
+    ], "box_index": 1}}
+  },
+  "战斗_失败_国服四按钮撤退": {
+    "doc": "2026-10-30国服灵脉石四按钮实图：撤退位于中下，白底ROI像素11182；不将本次三按钮位置强加给旧续关页。只能由战斗_失败_常规结合续关标题使用。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"recognition": {"type": "ColorMatch", "param": {
+        "roi": [520, 370, 245, 55], "method": 4,
+        "lower": [210, 210, 210], "upper": [255, 255, 255], "count": 7000
+      }}},
+      {"recognition": {"type": "TemplateMatch", "param": {
+        "roi": [500, 350, 300, 105], "template": "battle/撤退.png", "threshold": 0.9
+      }}}
+    ], "box_index": 1}}
+  }
+}
