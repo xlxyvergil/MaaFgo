@@ -232,7 +232,7 @@
         "职介筛选": {
             "type": "select",
             "label": "职介筛选",
-            "description": "指定英灵时，选择 ALL 阶或从者所属职介；选择“0-不要求英灵”时保留游戏当前职介页签。",
+            "description": "指定英灵时，选择 ALL 阶或从者所属职介。",
             "default": "默认",
             "cases": [
                 {
