@@ -56,6 +56,7 @@ class InterludeRunner(StoryRunner):
             raise ValueError("幕间界面等待时间无法读取。请恢复任务默认设置后重试。")
         self.auto_handle_restrictions = self.config.get("auto_handle_restrictions", True) is True
         self._map_opened_at = None
+        self._skip_next_reset = False
 
     def total_list(self, image):
         return bool(self.reco("幕间-列表界面", image))
@@ -95,29 +96,34 @@ class InterludeRunner(StoryRunner):
             not detail["row_count"] and not detail.get("empty_confirmed", False))
 
     def scan_entries(self, image, map_mode=False):
-        """先复位，逐页查找；只有确认触底且没有未知条目才能报告清空。"""
+        """首次复位、完成小关后直接扫描；确认触底且无未知条目才报告清空。"""
         up = "幕间-地图列表复位" if map_mode else "幕间-列表复位"
         down = "幕间-地图列表向下滑动" if map_mode else "幕间-列表向下滑动"
         node = "幕间-地图关卡" if map_mode else "幕间-可挑战条目"
         # 总列表还含大量未开启条目；不能用当前可见的少数幕间推定列表长度。
         bound = 12 if map_mode else 400
         self._ensure_list(image, map_mode)
-        # 一次动作后等待新截图，两次稳定才认定边界，避免短暂加载被当作触底。
-        for _ in range(bound):
-            previous = image
-            self.action(up)
-            self.pause(.6)
-            image = self.frame()
-            self._ensure_list(image, map_mode)
-            if same_list(previous, image):
-                self.pause(.5)
-                stable = self.frame()
-                self._ensure_list(stable, map_mode)
-                if same_list(image, stable):
-                    image = stable
-                    break
-        else:
-            raise StoryStopped("幕间列表复位超过上限，无法确认已回到顶部。请手动将列表拉到顶部后重试。")
+        # 战斗/纯剧情完成后，游戏返回列表顶部；只跳过紧接着的一次复位。
+        # 任务首次启动、新进入地图，以及扫描空地图后切回总列表仍须复位。
+        skip_reset = self._skip_next_reset
+        self._skip_next_reset = False
+        if not skip_reset:
+            # 一次动作后等待新截图，两次稳定才认定边界。
+            for _ in range(bound):
+                previous = image
+                self.action(up)
+                self.pause(.6)
+                image = self.frame()
+                self._ensure_list(image, map_mode)
+                if same_list(previous, image):
+                    self.pause(.5)
+                    stable = self.frame()
+                    self._ensure_list(stable, map_mode)
+                    if same_list(image, stable):
+                        image = stable
+                        break
+            else:
+                raise StoryStopped("幕间列表复位超过上限，无法确认已回到顶部。请手动将列表拉到顶部后重试。")
         uncertain = False
         for _ in range(bound):
             result = self.reco(node, image)
@@ -238,6 +244,7 @@ class InterludeRunner(StoryRunner):
                 self.settle()
                 self.battles += 1
             self.completed += 1
+            self._skip_next_reset = True
             mfaalog.info(f"[自动幕间副本] 已完成 {self.completed}/{self.limit} 个小关，战斗 {self.battles} 场")
         return f"达到挑战次数上限：完成 {self.completed} 个小关，其中战斗 {self.battles} 场。"
 

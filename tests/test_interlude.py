@@ -265,6 +265,78 @@ class NavigationSafetyTests(unittest.TestCase):
         self.assertEqual(name, "幕间-可挑战条目")
         self.assertEqual([name for name, _ in context.actions], ["幕间-列表复位"])
 
+    def test_completed_quest_resumes_without_resetting_list_or_map(self):
+        for panel, node, reset in (
+            (LIST, "幕间-可挑战条目", "幕间-列表复位"),
+            (MAP, "幕间-地图关卡", "幕间-地图列表复位"),
+        ):
+            for kind in ("battle", "story"):
+                with self.subTest(panel=panel, kind=kind):
+                    runtime, context = runner([panel | {node}], {"quest_limit": 2})
+                    with patch("interlude_action.same_list", return_value=True), \
+                         patch.object(runtime, "enter", return_value=kind) as enter, \
+                         patch.object(runtime, "fight"), patch.object(runtime, "settle"):
+                        runtime.run()
+                    self.assertEqual(runtime.completed, 2)
+                    self.assertEqual(enter.call_count, 2)
+                    self.assertEqual([name for name, _ in context.actions], [reset])
+
+    def test_entering_new_map_still_resets_before_first_battle(self):
+        runtime, context = runner(config={"quest_limit": 1})
+        current = [LIST | {"幕间-可挑战条目"}]
+
+        def enter(target):
+            if target[0] == "幕间-可挑战条目":
+                current[0] = MAP | {"幕间-地图关卡"}
+                return "map"
+            return "battle"
+
+        with patch("interlude_action.same_list", return_value=True), \
+             patch.object(runtime, "frame", side_effect=lambda: current[0]), \
+             patch.object(runtime, "enter", side_effect=enter), \
+             patch.object(runtime, "fight"), patch.object(runtime, "settle"):
+            runtime.run()
+        self.assertEqual(runtime.completed, 1)
+        self.assertEqual([name for name, _ in context.actions],
+                         ["幕间-列表复位", "幕间-地图列表复位"])
+
+    def test_empty_page_after_battle_still_scans_down_before_finishing(self):
+        runtime, context = runner(config={"quest_limit": 2})
+        current = [LIST | {"幕间-可挑战条目"}]
+
+        def settle():
+            current[0] = LIST
+
+        with patch("interlude_action.same_list", return_value=True), \
+             patch.object(runtime, "frame", side_effect=lambda: current[0]), \
+             patch.object(runtime, "enter", return_value="battle"), \
+             patch.object(runtime, "fight"), patch.object(runtime, "settle", side_effect=settle):
+            runtime.run()
+        self.assertEqual(runtime.completed, 1)
+        self.assertEqual([name for name, _ in context.actions],
+                         ["幕间-列表复位", "幕间-列表向下滑动"])
+
+    def test_finished_map_does_not_skip_reset_of_new_total_list(self):
+        runtime, context = runner(config={"quest_limit": 2})
+        current = [MAP | {"幕间-地图关卡"}]
+
+        def settle():
+            current[0] = MAP
+
+        def back():
+            current[0] = LIST | {"幕间-可挑战条目"}
+
+        with patch("interlude_action.same_list", return_value=True), \
+             patch.object(runtime, "frame", side_effect=lambda: current[0]), \
+             patch.object(runtime, "enter", return_value="battle"), \
+             patch.object(runtime, "fight"), patch.object(runtime, "settle", side_effect=settle), \
+             patch.object(runtime, "return_to_list", side_effect=back) as return_to_list:
+            runtime.run()
+        self.assertEqual(runtime.completed, 2)
+        return_to_list.assert_called_once()
+        self.assertEqual([name for name, _ in context.actions],
+                         ["幕间-地图列表复位", "幕间-地图列表向下滑动", "幕间-列表复位"])
+
     def test_uncertain_entries_are_not_reported_as_all_finished(self):
         runtime, context = runner([LIST])
         context.scan_detail = {"uncertain_count": 1}
