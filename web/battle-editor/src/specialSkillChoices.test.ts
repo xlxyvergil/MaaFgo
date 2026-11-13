@@ -2,7 +2,8 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {appendSkillEntry,clone,remapSlots,turnsOf,writeTurns} from './model';
 import type {Catalog,Entry,Json} from './model';
-import {reconcileSpecialSkillChoices,setEntrySpecialSkillChoice,specialSkillChoiceDiagnostics,specialSkillChoiceFor,specialSkillChoiceLabel} from './specialSkillChoices';
+import {reconcileSpecialSkillChoices,setEntrySpecialSkillChoice,specialSkillChoiceDiagnostics,specialSkillChoiceFor,specialSkillChoiceLabel,specialSkillChoiceColor,specialSkillChoiceNP} from './specialSkillChoices';
+import {cardArtworkRequest} from './npCardRequest';
 import type {SpecialSkillChoiceGroup} from './specialSkillChoices';
 
 // Deliberately small fixtures: production group membership only comes from catalog.
@@ -135,4 +136,44 @@ test('implicit defaults and exhausted queues are visibly distinct and legacy TD 
  const missing=fixture([skill(1,0),skill(1,1),attack()],{skillActSelectSelections:[0]}),t=entries(missing);
  assert.equal(t[0].entries[1].specialChoice?.missing,true);setEntrySpecialSkillChoice(t[0].entries[1],act,1);
  assert.equal(t[0].entries[1].specialChoice?.missing,undefined);writeTurns(missing,t,catalog);assert.deepEqual(missing.delegate.skillActSelectSelections,[0,1]);
+});
+
+test('BB Dubai attack and defense remain Arts while their shared TD queue retains distinct values',()=>{
+ const bb:SpecialSkillChoiceGroup={id:'bb-dubai',servantIds:[2300600],skillNumbers:[3],field:'tdTypeChanges',defaultValue:1,
+  options:[{value:1,label:'攻击宝具（C.C.C.）',cardType:1,npId:2300601},{value:2,label:'防御宝具（G.G.G.）',cardType:1,npId:2300698}]};
+ const meta:Catalog={...catalog,servants:[...catalog.servants,{id:2300600,name:'BB迪拜'}],specialSkillChoices:{schemaVersion:1,groups:[td,bb]}};
+ const data=fixture([skill(0,1),skill(1,2),attack()],{tdTypeChanges:[3,2]});data.team.onFieldSvts[1]={svtId:2300600};
+ const before=clone(data),turns=clone(turnsOf(data,meta));
+ assert.equal(specialSkillChoiceLabel(turns[0].entries[1],meta),'防御宝具（G.G.G.）');
+ assert.deepEqual(bb.options.map(specialSkillChoiceColor),['arts','arts']);
+ assert.deepEqual(td.options.map(specialSkillChoiceColor),['arts','buster','quick']);
+ writeTurns(data,turns,meta);assert.deepEqual(data,before);
+ setEntrySpecialSkillChoice(turns[0].entries[1],bb,1);writeTurns(data,turns,meta);
+ assert.deepEqual(data.delegate.tdTypeChanges,[3,1]);
+ assert.equal(data.team.onFieldSvts[1].tdId,undefined);
+});
+
+test('NP choice artwork uses the chosen NP while keeping the actor costume and preview region',()=>{
+ const actor={svtId:2300600,tdId:2300698,limitCount:2,transformVal:230063};
+ const servant={id:2300600,name:'BB迪拜',np:{id:2300601,name:'C.C.C.',cardType:1},npVariants:[{id:2300601,name:'C.C.C.',cardType:1},{id:2300698,name:'G.G.G.',cardType:1}]};
+ const config={enabled:true,regions:['JP','CN'],defaultRegion:'JP',endpoint:'/api/np-card'};
+ const before=clone(actor),options=[{value:1,label:'攻击',npId:2300601},{value:2,label:'防御',npId:2300698}];
+ const urls=options.map(option=>cardArtworkRequest({member:actor,np:specialSkillChoiceNP(option,servant.np,servant),kind:'np',region:'CN',config}).url!);
+ assert.notEqual(urls[0],urls[1]);
+ for(const [index,url] of urls.entries()){
+  const query=new URL(url,'http://localhost').searchParams;
+  assert.equal(query.get('tdId'),String(options[index].npId));assert.equal(query.get('svtId'),'2300600');
+  assert.equal(query.get('region'),'CN');assert.equal(query.get('limitCount'),'2');assert.equal(query.get('transformVal'),'230063');
+ }
+ assert.deepEqual(actor,before);
+});
+
+test('NP artwork choice respects strengthened families and leaves unavailable or non-NP choices unresolved',()=>{
+ const servant={id:200100,name:'卫宫',np:{id:200102,name:'强化Buster'},npVariants:[{id:200101,name:'旧Buster'},{id:200102,name:'强化Buster'},{id:200197,name:'强化Arts'},{id:200198,name:'旧Arts'}]};
+ const option={value:1,label:'Arts',npIdsByBase:{200101:200198,200102:200197}};
+ assert.equal(specialSkillChoiceNP(option,{id:200101},servant)?.id,200198);
+ assert.equal(specialSkillChoiceNP(option,{id:200102},servant)?.id,200197);
+ assert.equal(specialSkillChoiceNP(option,{id:999},servant),undefined);
+ assert.equal(specialSkillChoiceNP({value:0,label:'不消耗'},servant.np,servant),undefined);
+ assert.equal(specialSkillChoiceNP({value:2,label:'未知',npId:999},servant.np,servant),undefined);
 });

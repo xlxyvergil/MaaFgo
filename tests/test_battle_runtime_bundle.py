@@ -144,7 +144,7 @@ from platform_waits import is_android
 assert is_android()
 assert Path(composed_card.__file__).resolve().is_relative_to(root / 'agent')
 assert Path(special_skills.__file__).resolve().is_relative_to(root / 'agent')
-assert len(special_skills.SPECIAL_SKILL_GROUPS) == 14
+assert len(special_skills.SPECIAL_SKILL_GROUPS) == 16
 categories = json.loads((root / 'agent/custom/equip_categories.json').read_text(encoding='utf-8'))
 assert categories['equips']['9300070']['filter_tag'] == '羁绊礼装'
 equips = json.loads((root / 'agent/custom/equip_list.json').read_text(encoding='utf-8'))['equips']

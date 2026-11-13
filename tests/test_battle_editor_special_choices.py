@@ -15,7 +15,7 @@ from battle_editor.catalog import build_catalog
 from battle_editor.bbc_import import import_bbc_document
 from battle_editor.server import EditorHTTPServer
 from battle_editor.special_choices import match_special_skill, special_skill_catalog
-from battle_editor.storage import BattleStorage, EditorError
+from battle_editor.storage import BattleStorage
 from battle_editor.validation import validate_battle
 
 
@@ -43,7 +43,7 @@ class SpecialSkillCatalogTests(unittest.TestCase):
     def test_every_native_group_and_option_has_the_same_numbering(self):
         catalog = special_skill_catalog()
         self.assertEqual(catalog["schemaVersion"], 1)
-        self.assertEqual(len(catalog["groups"]), 14)
+        self.assertEqual(len(catalog["groups"]), 16)
         for actual, native in zip(catalog["groups"], SPECIAL_SKILL_GROUPS):
             with self.subTest(native.root):
                 self.assertEqual(actual["id"], native.root)
@@ -73,7 +73,7 @@ root = pathlib.Path(sys.argv[1])
 sys.path[:0] = [str(root), str(root / 'agent')]
 for name in ('battle_editor.catalog', 'agent.battle_editor.catalog'):
     module = importlib.import_module(name)
-    assert len(module.special_skill_catalog()['groups']) == 14
+    assert len(module.special_skill_catalog()['groups']) == 16
 assert not any(name == 'maa' or name.startswith('maa.') for name in sys.modules)
 assert not any(name.endswith('chaldea') or name.endswith('game_data') for name in sys.modules)
 """
@@ -86,7 +86,8 @@ assert not any(name.endswith('chaldea') or name.endswith('game_data') for name i
         by_id = {row["id"]: row for row in rows}
         cases = [(203300, 1, 604450, 604550), (603800, 3, 645251, 2379350),
                  (1002000, 3, 2588650, 2589650), (1002100, 3, 2588650, 2589675),
-                 (1100100, 3, 199550, 458900), (1100100, 3, 458650, 458900)]
+                 (1100100, 3, 199550, 458900), (1100100, 3, 458650, 458900),
+                 (200100, 3, 94349, 754650), (200100, 3, 263550, 754650)]
         for sid, number, old_id, current_id in cases:
             with self.subTest(sid=sid, old=old_id):
                 explicit = [None] * 3
@@ -113,8 +114,59 @@ assert not any(name.endswith('chaldea') or name.endswith('game_data') for name i
         kuku = next(group for group in groups if "2501100" in group["servantIds"])
         self.assertTrue(all("target" not in option for option in kuku["options"]))
 
+    def test_bb_effect_values_are_not_mistaken_for_arts_and_buster_colors(self):
+        groups = special_skill_catalog()["groups"]
+        bb = next(group for group in groups if group["servantIds"] == ["2300600"])
+        self.assertEqual(bb["field"], "tdTypeChanges")
+        self.assertEqual([option["value"] for option in bb["options"]], [1, 2])
+        self.assertEqual([option["label"] for option in bb["options"]],
+                         ["攻击宝具（C.C.C.）", "防御宝具（G.G.G.）"])
+        self.assertEqual([option["cardType"] for option in bb["options"]], [1, 1])
+        self.assertEqual([option["npId"] for option in bb["options"]], [2300601, 2300698])
+        self.assertEqual(bb["durationTurns"], 3)
+        self.assertTrue(all(option["target"] == "none" for option in bb["options"]))
+        emiya = next(group for group in groups if group["servantIds"] == ["200100"])
+        self.assertEqual(emiya["skillIds"], [754650])
+        self.assertEqual([option["cardType"] for option in emiya["options"]], [1, 2])
+        self.assertEqual(emiya["durationTurns"], 1)
+        self.assertEqual(emiya["options"][0]["npIdsByBase"][200101], 200198)
+        self.assertEqual(emiya["options"][0]["npIdsByBase"][200102], 200197)
+        self.assertEqual(emiya["options"][1]["npIdsByBase"][200197], 200102)
+        self.assertEqual(emiya["options"][1]["npIdsByBase"][200198], 200101)
+
 
 class SpecialSkillValidationTests(unittest.TestCase):
+    def test_bb_emiya_and_space_ishtar_consume_one_td_queue_in_action_order(self):
+        data = battle([2300600, 200100, 1100900], [skill(0, 3), skill(1, 3), skill(2, 2)],
+                      {"tdTypeChanges": [2, 1, 3]})
+        data["team"]["onFieldSvts"][1]["skillIds"] = [None, None, 754650]
+        original = copy.deepcopy(data)
+        self.assertEqual(errors(data), [])
+        self.assertEqual(data, original)
+        self.assertNotIn("unused_special_choices", [issue["code"] for issue in validate_battle(data)["issues"]])
+        data["delegate"]["tdTypeChanges"] = [2, 1]
+        exhausted = next(issue for issue in errors(data) if issue["code"] == "special_choice_exhausted")
+        self.assertEqual(exhausted["actionIndex"], 2)
+
+    def test_bb_and_emiya_reject_quick_in_their_two_option_menus(self):
+        for sid in (2300600, 200100):
+            data = battle([sid], [skill(0, 3)], {"tdTypeChanges": [3]})
+            if sid == 200100:
+                data["team"]["onFieldSvts"][0]["skillIds"] = [None, None, 754650]
+            with self.subTest(sid=sid):
+                self.assertIn("special_choice_out_of_range", [issue["code"] for issue in errors(data)])
+
+    def test_emiya_pre_upgrade_skill_is_only_blocked_by_an_active_td_queue(self):
+        for old_id in (94349, 263550):
+            data = battle([200100], [skill(0, 3)])
+            data["team"]["onFieldSvts"][0]["skillIds"] = [None, None, old_id]
+            with self.subTest(skill=old_id):
+                self.assertEqual(errors(data), [])
+                data["delegate"] = {"skillActSelectSelections": [0]}
+                self.assertEqual(errors(data), [])
+                data["delegate"] = {"tdTypeChanges": [1]}
+                self.assertIn("special_choice_variant_unresolved", [issue["code"] for issue in errors(data)])
+
     def test_catalog_aliases_consume_the_canonical_special_queue(self):
         meta = {"id": 1100900, "aliases": [9100900], "skills": [{"num": 2, "id": 687450}]}
         data = battle([9100900], [skill(0, 2), skill(0, 2)], {"tdTypeChanges": [1]})
@@ -209,7 +261,7 @@ class SpecialSkillValidationTests(unittest.TestCase):
             with self.subTest(choices=choices):
                 self.assertIn("unsupported_delegate", [row["code"] for row in errors(data)])
 
-    def test_existing_chaldea_and_bbc_fixtures_do_not_acquire_special_choices(self):
+    def test_existing_fixtures_keep_their_supported_special_choices(self):
         catalog = json.loads((ROOT / "agent/battle_editor/data/catalog.json").read_text(encoding="utf-8"))
         for path in (ROOT / "tests/fixtures/chaldea").glob("*.json"):
             raw = path.read_bytes()
@@ -225,16 +277,13 @@ class SpecialSkillValidationTests(unittest.TestCase):
             raw = path.read_bytes()
             source = json.loads(raw)
             with self.subTest(bbc=path.name):
+                data = import_bbc_document(ROOT, source, path.name)["data"]
+                self.assertEqual(errors(data, catalog), [])
                 if path.name.startswith("迪拜BB"):
-                    # BBC's custom BBDubai operation has no supported native
-                    # equivalent; the existing importer must keep rejecting it.
-                    with self.assertRaisesRegex(EditorError, "BB迪拜.*尚无对应原生菜单"):
-                        import_bbc_document(ROOT, source, path.name)
+                    self.assertEqual(data["delegate"]["tdTypeChanges"], [1])
                 else:
-                    data = import_bbc_document(ROOT, source, path.name)["data"]
-                    self.assertEqual(errors(data, catalog), [])
                     self.assertFalse((data.get("delegate") or {}).get("tdTypeChanges"))
-                    self.assertFalse((data.get("delegate") or {}).get("skillActSelectSelections"))
+                self.assertFalse((data.get("delegate") or {}).get("skillActSelectSelections"))
                 self.assertEqual(source, json.loads(raw))
                 self.assertEqual(path.read_bytes(), raw)
 

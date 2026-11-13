@@ -209,7 +209,22 @@ class BbcUploadTests(unittest.TestCase):
                 self.assertEqual(status, 400, result)
         self.assertEqual(list(self.server.storage.battle_dir.iterdir()), [])
 
-    def test_unsupported_extended_instruction_is_rejected_before_import(self):
+    def test_bb_dubai_upload_preserves_attack_np_switch_without_writing(self):
+        fixture = ROOT / "tests/fixtures/bbc/迪拜BB_棉被王_Caber_花嫁.json"
+        config = json.loads(fixture.read_text(encoding="utf-8"))
+        original = copy.deepcopy(config)
+        before = {str(path.relative_to(self.root)): path.read_bytes()
+                  for path in self.root.rglob("*") if path.is_file()}
+        status, result = self.request({"config": config, "name": fixture.name})
+        self.assertEqual(status, 200, result)
+        self.assertTrue(result["validation"]["valid"], result["validation"])
+        self.assertEqual(result["data"]["delegate"]["tdTypeChanges"], [1])
+        self.assertEqual(result["data"]["team"]["onFieldSvts"][0]["svtId"], 2300600)
+        self.assertEqual(config, original)
+        self.assertEqual(before, {str(path.relative_to(self.root)): path.read_bytes()
+                                 for path in self.root.rglob("*") if path.is_file()})
+
+    def test_special_instruction_for_the_wrong_actor_is_rejected_before_import(self):
         self.config["round1_turn0_skill"] = [["BBDubai", 3, 0]]
         status, result = self.request({"config": self.config, "name": "extended.json"})
         self.assertEqual(status, 422, result)

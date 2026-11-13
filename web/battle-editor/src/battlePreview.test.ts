@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import {clone} from './model';
 import type {Catalog,Json} from './model';
 import {previewTurn,cooldownBounds,npAt,skillTargetMode,allowedAllyTargets,hasEnemyTarget} from './battlePreview';
@@ -215,4 +216,66 @@ test('missing or invalid servant identity cannot use a leftover chosen NP even w
     const member={svtId,supportType:'friend',tdId:102};const before=clone(member);
     assert.equal(npAt(member,catalog.servants[0]),undefined);assert.deepEqual(member,before);
   }
+});
+
+const npServants=JSON.parse(readFileSync(new URL('../../../agent/battle_editor/data/catalog.json',import.meta.url),'utf8')).servants
+ .filter((row:Json)=>[2300600,200100,1100900].includes(row.id));
+const npCatalog:Catalog={equips:[],servants:npServants,mysticCodes:catalog.mysticCodes,specialSkillChoices:{schemaVersion:1,groups:[
+ {id:'bb-dubai',servantIds:[2300600],skillNumbers:[3],field:'tdTypeChanges',defaultValue:1,durationTurns:3,
+  options:[{value:1,label:'攻击宝具',cardType:1,npId:2300601},{value:2,label:'防御宝具',cardType:1,npId:2300698}]},
+ {id:'emiya',servantIds:[200100],skillNumbers:[3],skillIds:[754650],field:'tdTypeChanges',defaultValue:1,durationTurns:1,
+  options:[{value:1,label:'Arts',cardType:1,npIdsByBase:{200101:200198,200102:200197,200197:200197,200198:200198}},
+   {value:2,label:'Buster',cardType:2,npIdsByBase:{200101:200101,200102:200102,200197:200102,200198:200101}}]},
+ {id:'space-ishtar',servantIds:[1100900],skillNumbers:[2],field:'tdTypeChanges',defaultValue:1,durationTurns:3,
+  options:[{value:1,label:'Arts',cardType:1,npId:1100901},{value:2,label:'Buster',cardType:2,npId:1100997},{value:3,label:'Quick',cardType:3,npId:1100998}]},
+]}};
+const npFixture=():Json=>({team:{onFieldSvts:[{svtId:2300600,tdId:2300601},{svtId:200100},{svtId:1100900}],backupSvts:[null,null,null],mysticCode:{mysticCodeId:20}},actions:[]});
+
+test('BB Dubai defense changes the preview for three turns without changing the saved initial NP',()=>{
+ const data=npFixture();data.actions=[cast(0,2),...Array.from({length:4},attack)];data.delegate={tdTypeChanges:[2]};
+ const before=clone(data);
+ assert.deepEqual([0,1,2,3].map(turn=>previewTurn(data,npCatalog,turn).front[0].np?.id),[2300698,2300698,2300698,2300601]);
+ assert.deepEqual([0,1,2,3].map(turn=>previewTurn(data,npCatalog,turn).front[0].np?.cardType),[1,1,1,1]);
+ assert.deepEqual(data,before);
+});
+
+test('Emiya strengthened S3 preserves the chosen NP upgrade family and expires after one turn',()=>{
+ for(const [base,arts] of [[200101,200198],[200102,200197]]){
+  const data=npFixture();data.team.onFieldSvts[1].tdId=base;data.actions=[cast(1,2),attack(),attack()];data.delegate={tdTypeChanges:[1]};
+  const before=clone(data);
+  assert.equal(previewTurn(data,npCatalog,0).front[1].np?.id,arts);
+  assert.equal(previewTurn(data,npCatalog,1).front[1].np?.id,base);
+  data.team.onFieldSvts[1].skillIds=[null,null,263550];
+  assert.equal(previewTurn(data,npCatalog,0).front[1].np?.id,base);
+  delete data.team.onFieldSvts[1].skillIds;assert.deepEqual(data,before);
+ }
+});
+
+test('BB, Emiya and Space Ishtar share the replay queue without treating every index as a card color',()=>{
+ const data=npFixture();data.actions=[cast(0,2),cast(1,2),cast(2,1),attack(),attack()];data.delegate={tdTypeChanges:[2,1,3]};
+ const before=clone(data),first=previewTurn(data,npCatalog,0),second=previewTurn(data,npCatalog,1);
+ assert.deepEqual(first.front.map(actor=>actor.np?.id),[2300698,200197,1100998]);
+ assert.deepEqual(first.front.map(actor=>actor.np?.cardType),[1,1,3]);
+ assert.deepEqual(second.front.map(actor=>actor.np?.id),[2300698,200102,1100998]);
+ assert.deepEqual(data,before);
+});
+
+test('a switched NP follows its owner through order change and its timer pauses in reserve',()=>{
+ const data=npFixture();data.team.backupSvts[0]={svtId:200100};
+ data.actions=[cast(0,2),attack(),cast(null,2),attack(),attack(),cast(null,2),attack(),attack(),attack()];
+ data.delegate={tdTypeChanges:[2],replaceMemberIndexes:[[0,0],[0,0]]};
+ const before=clone(data),reserve=previewTurn(data,npCatalog,2),returned=previewTurn(data,npCatalog,3);
+ assert.equal(reserve.roster[3].np?.id,2300698);assert.equal(reserve.roster[3].npState?.remainingTurns,2);
+ assert.equal(returned.front[0].np?.id,2300698);assert.equal(returned.front[0].npState?.remainingTurns,2);
+ assert.equal(previewTurn(data,npCatalog,5).front[0].np?.id,2300601);assert.deepEqual(data,before);
+});
+
+test('unresolved or invalid menu choices never guess a replacement NP',()=>{
+ for(const value of [3,null,'ARTS']){
+  const data=npFixture();data.actions=[cast(0,2),attack()];data.delegate={tdTypeChanges:[value]};
+  assert.equal(previewTurn(data,npCatalog,0).front[0].np?.id,2300601);
+ }
+ const data=npFixture();data.team.onFieldSvts[0].tdId=2300698;data.team.onFieldSvts[1].skillIds=[null,null,263550];
+ data.actions=[cast(1,2),cast(0,2),attack()];data.delegate={tdTypeChanges:[2]};
+ assert.equal(previewTurn(data,npCatalog,0).front[0].np?.id,2300698);
 });

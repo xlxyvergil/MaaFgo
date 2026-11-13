@@ -35,6 +35,16 @@ _MAX_PREPARED_TEMPLATES = 256  # Per region; JP+CN auto remains bounded by 512.
 _NP_GLARE_SCORE_WINDOW = .20
 _NP_GLARE_MIN_SATURATION = .10
 _NP_GLARE_WHITE_LEVEL = 230
+# 2026-11-14 JP BB Dubai/Emiya: the persistent NP-type-change badge covers
+# the lower rays at rows 200:230. Keeping that HUD makes real G.G.G./Arts
+# cards score .73/.78; masking it restores .84+/.90+ at the same .80 gate.
+# Only calibrated identities and their selectable NP colours use this mask;
+# preserve other colours' rays, ordinary NP names and all face-card features.
+_NP_TYPE_CHANGE_HUD_BOTTOM = {
+    ('2300600', 'arts'): 200,
+    ('200100', 'arts'): 200,
+    ('200100', 'buster'): 200,
+}
 
 
 @dataclass(frozen=True)
@@ -297,6 +307,9 @@ class ComposedCardRecognizer:
                             # The seal overlay crosses this central band. Keep
                             # the separate portrait, coloured rays and NP title.
                             mask[80:140] = 0
+                            hud_bottom = _NP_TYPE_CHANGE_HUD_BOTTOM.get((render_sid, color))
+                            if hud_bottom is not None:
+                                mask[hud_bottom:] = 0
                         bgr = cv2.resize(card.bgr, None, fx=_WORK_SCALE, fy=_WORK_SCALE,
                                          interpolation=cv2.INTER_AREA)
                         mask = cv2.resize(mask, (bgr.shape[1], bgr.shape[0]), interpolation=cv2.INTER_NEAREST)

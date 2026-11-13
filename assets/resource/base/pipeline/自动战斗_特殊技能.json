@@ -1,4 +1,77 @@
 {
+    "战斗_BB迪拜3技能_宝具类型选择": {
+        "doc": "BB迪拜S3：以宝具类型标题及攻击/防御两项按钮文字共同正向确认；选项依据Atlas JP技能2403650的selectTreasureDeviceInfo。Runtime必须按当前释放者路由，显式或临时默认Dispatcher仅接所选项。无配置默认攻击型。2026-11-14日服MaaMCP使用Runtime生成的局部路由，标题和两项OCR均命中，按tdTypeChanges=2点击防御型后成功释放G.G.G.；国服待实机。点击OCR框，不猜坐标，可参考战斗_卫宫3技能_宝具类型选择的图卡门禁。",
+        "recognition": {"type": "And", "param": {"all_of": [
+            {"sub_name": "base/自动战斗_特殊技能/战斗_BB迪拜3技能_宝具类型选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [200, 130, 880, 130], "expected": ["どのタイプに変更するか|变更为何种类型|變更為何種類型|宝具.*类型|寶具.*類型"]}}},
+            {"sub_name": "base/自动战斗_特殊技能/战斗_BB迪拜3技能_宝具类型选择/OCR2", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["攻撃タイプ|攻击类型|攻击型|攻擊類型|攻擊型"]}}},
+            {"sub_name": "base/自动战斗_特殊技能/战斗_BB迪拜3技能_宝具类型选择/OCR3", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["防御タイプ|防御类型|防御型|防禦類型|防禦型"]}}}
+        ]}},
+        "action": {"type": "DoNothing"},
+        "timeout": 5000,
+        "next": ["战斗_BB迪拜3技能_攻击宝具选择"],
+        "on_error": []
+    },
+    "战斗_BB迪拜3技能_攻击宝具选择": {
+        "doc": "tdTypeChanges=1，攻击型C.C.C.（2300601）；实际卡色为Arts。只在宝具菜单正向确认后点击OCR结果，尚待实机验收。",
+        "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["攻撃タイプ|攻击类型|攻击型|攻擊類型|攻擊型"]}},
+        "action": {"type": "Click", "param": {"target": true}},
+        "post_wait_freezes": 500,
+        "post_delay": 500,
+        "next": ["战斗_特殊技能_已回主界面"],
+        "on_error": []
+    },
+    "战斗_BB迪拜3技能_防御宝具选择": {
+        "doc": "tdTypeChanges=2，防御型G.G.G.（2300698）；选择值2不表示Buster，实际仍是Arts。2026-11-14日服MaaMCP在完整父门禁后命中防御类型OCR并点击，选卡和宝具释放已验证；国服待实机。类型变化标签会遮挡选卡图的下部射线，正式合成卡识别对已标定身份屏蔽该HUD，保持0.80阈值。",
+        "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["防御タイプ|防御类型|防御型|防禦類型|防禦型"]}},
+        "action": {"type": "Click", "param": {"target": true}},
+        "post_wait_freezes": 500,
+        "post_delay": 500,
+        "next": ["战斗_特殊技能_已回主界面"],
+        "on_error": []
+    },
+    "战斗_卫宫3技能_宝具类型选择": {
+        "doc": "仅强化S3回路连接EX（754650）产生两张宝具卡菜单；94349、263550无菜单。2026-11-14日服MaaMCP现场没有Arts/Buster文字，故复用下列两项的NP色带识别并保留文字回退；标题及两张卡必须同时命中。已用Runtime局部路由按tdTypeChanges=1点击Arts并释放，第2回合恢复Buster；国服尚未实机。必须由Runtime确认释放者/技能后保留本分支，身份不明交宝具类型守卫停止。无配置默认Arts，旧技能直接施法保留无覆盖层路径。",
+        "recognition": {"type": "And", "param": {"all_of": [
+            {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_宝具类型选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [200, 130, 880, 130], "expected": ["どのタイプに変更するか|变更为何种类型|變更為何種類型|宝具.*类型|寶具.*類型"]}}},
+            "战斗_卫宫3技能_Arts宝具选择",
+            "战斗_卫宫3技能_Buster宝具选择"
+        ]}},
+        "action": {"type": "DoNothing"},
+        "timeout": 5000,
+        "next": ["战斗_卫宫3技能_Arts宝具选择"],
+        "on_error": []
+    },
+    "战斗_卫宫3技能_Arts宝具选择": {
+        "doc": "tdTypeChanges=1，Arts宝具，持续1回合。仅由卫宫完整菜单门禁进入，点击识别到的卡内色带或文字。method=4按RGB计数，避开立绘/译名及当前类型蓝框；日服现场蓝色像素2154，右侧红卡同色0，阈值1500。不用形状相关系数区分红蓝，以免不同颜色拿到相同分数。可参考战斗_卫宫3技能_Buster宝具选择。",
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Arts宝具选择/Color1", "recognition": {"type": "ColorMatch", "param": {"roi": [390, 470, 200, 52], "method": 4, "lower": [0, 50, 140], "upper": [120, 210, 255], "count": 1500, "connected": false}}},
+            {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Arts宝具选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["Arts|Ａｒｔｓ|アーツ"]}}}
+        ]}},
+        "action": {"type": "Click", "param": {"target": true}},
+        "post_wait_freezes": 500,
+        "post_delay": 500,
+        "next": ["战斗_特殊技能_已回主界面"],
+        "on_error": []
+    },
+    "战斗_卫宫3技能_Buster宝具选择": {
+        "doc": "tdTypeChanges=2，Buster宝具，持续1回合。仅由卫宫完整菜单门禁进入，点击识别到的卡内色带或文字。RGB红色计数不含立绘/译名及蓝色当前类型边框；日服现场红色2379，左侧蓝卡同色0，阈值1500。与Arts项一起正向确认菜单，国日服不依赖宝具文字翻译。可参考战斗_卫宫3技能_Arts宝具选择。",
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Buster宝具选择/Color1", "recognition": {"type": "ColorMatch", "param": {"roi": [700, 470, 190, 52], "method": 4, "lower": [170, 0, 0], "upper": [255, 110, 110], "count": 1500, "connected": false}}},
+            {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Buster宝具选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["Buster|Ｂｕｓｔｅｒ|バスター"]}}}
+        ]}},
+        "action": {"type": "Click", "param": {"target": true}},
+        "post_wait_freezes": 500,
+        "post_delay": 500,
+        "next": ["战斗_特殊技能_已回主界面"],
+        "on_error": []
+    },
+    "战斗_宝具类型选择_身份未确认": {
+        "doc": "Runtime置于普通目标选择之前的非点击守卫：未能确认当前从者菜单时，不将宝具类型标题中的‘選択’当作我方目标。命中后Python明确停止；不猜测当前从者、不消费选项队列。",
+        "recognition": {"type": "OCR", "param": {"roi": [200, 130, 880, 130], "expected": ["どのタイプに変更するか|变更为何种类型|變更為何種類型|宝具.*类型|寶具.*類型"]}},
+        "action": {"type": "DoNothing"},
+        "next": [],
+        "on_error": []
+    },
     "战斗_仇凛2技能_色卡选择": {
         "doc": "已标定：识别文案（变更为何种类型）+ ROI [366,151,563,94]；Q(327,402) A(650,399) B(943,393)。无配置时默认 A；Chaldea tdTypeChanges 按 1=Arts、2=Buster、3=Quick 由本次局部路由指定唯一选项。2026-10-29日服MaaMCP两场5AP已验证[2]命中选B、[3]命中选Q；子选项为DirectHit，必须先经本标题正向门禁，不能把子项放进菜单识别的Or。可参考战斗_梵高矿工1技能_Buster选择的同场独立队列验证。",
         "recognition": {
@@ -338,6 +411,12 @@
                 "战斗_安哥拉曼纽3技能_1HP毅力选择": ["1100100"],
                 "战斗_但丁2技能_天国Arts选择": ["2801000"],
                 "战斗_但丁2技能_地狱Buster选择": ["2801000"],
+                "战斗_BB迪拜3技能_宝具类型选择": ["2300600"],
+                "战斗_BB迪拜3技能_攻击宝具选择": ["2300600"],
+                "战斗_BB迪拜3技能_防御宝具选择": ["2300600"],
+                "战斗_卫宫3技能_宝具类型选择": ["200100"],
+                "战斗_卫宫3技能_Arts宝具选择": ["200100"],
+                "战斗_卫宫3技能_Buster宝具选择": ["200100"],
                 "战斗_仇凛2技能_色卡选择": ["1100900"],
                 "战斗_库库尔坎_暴击星消耗": ["2501100"],
                 "战斗_库库尔坎_不消耗": ["2501100"],
@@ -361,6 +440,8 @@
             "战斗_芙萝拉3技能_通常状态选择",
             "战斗_安哥拉曼纽3技能_50%毅力选择",
             "战斗_但丁2技能_天国Arts选择",
+            "战斗_BB迪拜3技能_宝具类型选择",
+            "战斗_卫宫3技能_宝具类型选择",
             "战斗_仇凛2技能_色卡选择",
             "战斗_库库尔坎_暴击星消耗",
             "战斗_玉兔2技能_宝具类型选择",

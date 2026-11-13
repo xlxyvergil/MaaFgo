@@ -1,0 +1,54 @@
+[
+  {
+    "file": "jp_emiya_buster_20261114.png",
+    "source": "np-before-switch.png",
+    "source_sha256": "5b4e3bbfe9778b8bc5263a051cc55afb21ef093bdb7f99fa6f700d9e89129b61",
+    "source_size": [
+      1280,
+      720
+    ],
+    "source_roi": [
+      496,
+      70,
+      288,
+      300
+    ],
+    "work_roi": [
+      248,
+      35,
+      144,
+      150
+    ],
+    "work_scale": 0.5,
+    "description": "Initial Emiya Buster NP before the S3 NP-type selection",
+    "preparation": "Exact native recognizer half-scale BGR NP2 ROI, lossless PNG; replay by nearest-neighbor 2x expansion before the unchanged recognizer AREA normalization.",
+    "sha256": "eb1f6d2736d886d7654b8e61432f891e1f62b5fbabb8292af888267ae84df5d6",
+    "bytes": 43493
+  },
+  {
+    "file": "jp_emiya_arts_badge_flash_20261114.png",
+    "source": "np-defense-arts-steady-1.png",
+    "source_sha256": "c76a860b1d0c68bd05ef801bad6dd44dea20edd15662a4b98ee74202580572b7",
+    "source_size": [
+      1280,
+      720
+    ],
+    "source_roi": [
+      496,
+      70,
+      288,
+      300
+    ],
+    "work_roi": [
+      248,
+      35,
+      144,
+      150
+    ],
+    "work_scale": 0.5,
+    "description": "Emiya Arts NP with persistent one-turn NP-type-change badge, brighter flash phase",
+    "preparation": "Exact native recognizer half-scale BGR NP2 ROI, lossless PNG; replay by nearest-neighbor 2x expansion before the unchanged recognizer AREA normalization.",
+    "sha256": "96eebb8cde5c53d4efaddc1764991c5cbe83cb285668ab142cf99ebfbaba8c63",
+    "bytes": 45127
+  }
+]

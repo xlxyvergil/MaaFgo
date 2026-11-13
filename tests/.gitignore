@@ -12,6 +12,12 @@
 # Real-image regressions for NP glare and support HUD recognition only.
 !fixtures/battle_np/jp_hellish_glare_20261031.png
 !fixtures/battle_np/jp_hellish_clear_20261031.png
+# Retained BB Dubai / Emiya NP-type-change badge regressions.
+!fixtures/battle_np/jp_bb_dubai_ccc_20261114.png
+!fixtures/battle_np/jp_bb_dubai_ggg_badge_20261114.png
+!fixtures/battle_np/jp_bb_dubai_ggg_badge_flash_20261114.png
+!fixtures/battle_np/jp_emiya_arts_badge_flash_20261114.png
+!fixtures/battle_np/jp_emiya_buster_20261114.png
 !fixtures/battle_frontline/jp_support_hud_20261031.png
 !fixtures/battle_frontline/jp_np_animation_no_hud_20261031.png
 # Retained bond-result and automatic level-up overlay regressions.
