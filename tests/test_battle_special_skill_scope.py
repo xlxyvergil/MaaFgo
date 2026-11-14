@@ -22,7 +22,7 @@ COMMON = ("战斗_技能使用弹窗", "战斗_技能无法使用弹窗",
 PIPELINE = json.loads((ROOT / "assets/resource/base/pipeline/自动战斗_特殊技能.json").read_text("utf-8"))
 
 
-def snapshot(ids=("405900", "100500", "200100", None, None, None), *, support=1):
+def snapshot(ids=("405900", "100500", "200200", None, None, None), *, support=1):
     return InitialFormation(
         slots=tuple(FormationSlot(i, "identified" if sid else "empty", sid,
                                   is_support=i == support if sid else False)
@@ -51,16 +51,16 @@ class SpecialSkillScopeTests(unittest.TestCase):
 
     def test_support_and_reserves_are_included_and_name_does_not_define_identity(self):
         # 两种职阶的莉莉丝不能按同名合并；后排马嘶与助战骑莉莉丝均保留。
-        r = runtime(snapshot(("705100", "405900", "200100", "203300", None, None), support=2))
+        r = runtime(snapshot(("705100", "405900", "200200", "203300", None, None), support=2))
         kept = r._special_skill_pipeline_override()[ENTRY]["next"]
         self.assertIn(LILITH, kept)
         self.assertIn(ASH, kept)
-        r = runtime(snapshot(("705100", "100500", "200100", None, None, None)))
+        r = runtime(snapshot(("705100", "100500", "200200", None, None, None)))
         self.assertEqual(r._special_skill_pipeline_override()[ENTRY]["next"], list(COMMON))
 
     def test_transformation_aliases_preserve_all_selected_option_nodes(self):
-        for ids in (("505700", "1002100", "200100", None, None, None),
-                    ("505600", "1002000", "200100", None, None, None)):
+        for ids in (("505700", "1002100", "200200", None, None, None),
+                    ("505600", "1002000", "200200", None, None, None)):
             with self.subTest(ids=ids):
                 r = runtime(snapshot(ids))
                 kept = r._special_skill_pipeline_override()[ENTRY]["next"]
@@ -69,11 +69,11 @@ class SpecialSkillScopeTests(unittest.TestCase):
                 self.assertNotIn(ASH, kept)
 
     def test_all_ordinary_members_leave_only_common_checks(self):
-        r = runtime(snapshot(("100100", "200100", "300100", "400100", "500100", "600100")))
+        r = runtime(snapshot(("100100", "200200", "300100", "400100", "500100", "600100")))
         self.assertEqual(r._special_skill_pipeline_override()[ENTRY]["next"], list(COMMON))
 
     def test_direct_battle_and_chaldea_only_roster_do_not_exclude_any_branch(self):
-        for roster in (None, ("405900", "100500", "200100", None, None, None)):
+        for roster in (None, ("405900", "100500", "200200", None, None, None)):
             r = runtime(roster=roster)
             self.assertEqual(r._special_skill_pipeline_override(), {})
             r.ctx.get_node_data.assert_not_called()
@@ -103,8 +103,8 @@ class SpecialSkillScopeTests(unittest.TestCase):
         self.assertEqual(runtime(partial, battle=2)._special_skill_pipeline_override(), {})
 
     def test_merged_roster_conflict_or_extra_member_does_not_prove_absence(self):
-        for roster in ((None, "100500", "200100", None, None, None),
-                       ("405900", "100500", "200100", "203300", None, None)):
+        for roster in ((None, "100500", "200200", None, None, None),
+                       ("405900", "100500", "200200", "203300", None, None)):
             self.assertEqual(runtime(snapshot(), roster=roster)._special_skill_pipeline_override(), {})
 
     def test_future_unmapped_and_malformed_metadata_branches_are_kept(self):
@@ -143,9 +143,9 @@ class SpecialSkillScopeTests(unittest.TestCase):
         self.assertEqual(nodes, original)
 
     def test_scope_does_not_shrink_when_frontline_changes_or_reserve_dies(self):
-        r = runtime(snapshot(("405900", "100500", "200100", "203300", None, None)))
+        r = runtime(snapshot(("405900", "100500", "200200", "203300", None, None)))
         before = r._special_skill_pipeline_override()
-        r.roster_servant_ids = ("203300", None, "200100", None, None, None)
+        r.roster_servant_ids = ("203300", None, "200200", None, None, None)
         self.assertEqual(r._special_skill_pipeline_override(), before)
 
     def test_subtask_override_preserves_target_selection_and_does_not_disable_nodes(self):

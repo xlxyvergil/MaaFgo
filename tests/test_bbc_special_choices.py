@@ -39,6 +39,19 @@ class BbcSpecialChoicesTests(unittest.TestCase):
             with self.subTest(delegate=delegate):
                 self.assertEqual(chaldea_to_bbc(self.share(delegate)), baseline)
 
+    def test_bb_dubai_switch_is_rejected_on_export_instead_of_becoming_an_ordinary_skill(self):
+        for variant in (1, 2):
+            data = self.share({"tdTypeChanges": [variant]})
+            data["team"]["onFieldSvts"] = [{"svtId": 2300600}]
+            data["actions"].insert(0, {"type": "skill", "svt": 0, "skill": 2})
+            original = copy.deepcopy(data)
+            with self.subTest(variant=variant):
+                with self.assertRaisesRegex(ValueError, "BBC 导出.*原生自动战斗"):
+                    chaldea_to_bbc(data)
+                with self.assertRaisesRegex(ValueError, "BBC 导出.*原生自动战斗"):
+                    convert_actions_to_bbc_rounds(data["actions"], data["delegate"])
+                self.assertEqual(data, original)
+
     def test_rejection_does_not_create_or_overwrite_bbc_config(self):
         for field, values in (("tdTypeChanges", [2]), ("skillActSelectSelections", [0])):
             data = self.share({field: values})

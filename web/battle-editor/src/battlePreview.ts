@@ -1,8 +1,9 @@
 import {projectServantForm} from './servantForms';
 import {members,servantFor,skillAt,turnsOf,isSwap,hasServantIdentity,isUnspecifiedSupport} from './model';
-import type {Catalog,Json,Mystic,Servant} from './model';
+import type {Catalog,Entry,Json,Mystic,Servant} from './model';
 import {advanceActionRoster,isRetire,resolveActionActor} from './actionRoster';
 import {isAutoAttackCard} from './attackCards';
+import {specialSkillChoiceFor,specialSkillChoiceNP} from './specialSkillChoices';
 
 /** Display-only cooldown information. This module never edits BattleShareData. */
 export interface CooldownBounds {
@@ -25,7 +26,7 @@ export interface PreviewMember {
   member:Json|null;
   servant:Servant|undefined;
   np:Json|undefined;
-  npState?:{kind:'mash-sword-loaded';remainingTurns:number};
+  npState?:{kind:'mash-sword-loaded';remainingTurns:number}|{kind:'skill-np-change';remainingTurns:number;np:Json};
   skills:PreviewSkill[];
   retired:boolean;
 }
@@ -97,8 +98,26 @@ export function npAtAction(data:Json,catalog:Catalog,actionIndex:number,slot:num
 function updateLoadedNP(actor:PreviewMember) {
   const initial=npAt(actor.member,actor.servant);
   actor.np=actor.npState?.remainingTurns
-    ?actor.servant?.npVariants?.find(np=>np.id===800108)??{id:800108,name:'圣剑装填宝具（资料待补充）',cardType:2}
+    ?actor.npState.kind==='skill-np-change'?actor.npState.np
+      :actor.servant?.npVariants?.find(np=>np.id===800108)??{id:800108,name:'圣剑装填宝具（资料待补充）',cardType:2}
     :initial;
+}
+
+/** Replay the selected NP for display; saved team.tdId and delegate stay intact. */
+function applySkillNPChange(actor:PreviewMember,entry:Entry,catalog:Catalog) {
+  const group=specialSkillChoiceFor(actor.member,actor.servant,entry.raw.skill,catalog);
+  const duration=group?.durationTurns;
+  const binding=entry.specialChoice;
+  if(group?.field!=='tdTypeChanges'||typeof duration!=='number'||!Number.isInteger(duration)||duration<=0||!binding||binding.groupId!==group.id||binding.missing)return;
+  const rawValue=binding.value;
+  const value=typeof rawValue==='string'?({arts:1,buster:2,quick:3} as Record<string,number>)[rawValue]:rawValue;
+  const option=group.options.find(item=>item.value===value);
+  if(!option)return;
+  const base=npAt(actor.member,actor.servant);
+  const np=specialSkillChoiceNP(option,base,actor.servant);
+  if(!np)return;
+  actor.npState={kind:'skill-np-change',remainingTurns:duration,np};
+  updateLoadedNP(actor);
 }
 
 /** Atlas buff 5825 lasts three on-field turns; only NP 800107 grants it. */
@@ -153,7 +172,7 @@ function decrease(skills:PreviewSkill[]) {
  * instance; only members on field at an attack boundary receive the basic tick.
  */
 export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePreview {
-  const turns=turnsOf(data);
+  const turns=turnsOf(data,catalog);
   const selected=Math.max(0,Math.min(Math.max(0,turns.length-1),Number.isInteger(turnIndex)?turnIndex:0));
   const roster:PreviewMember[]=members(data).map((member,initialSlot)=>{
     const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId,member):undefined;
@@ -197,6 +216,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
       // A click is one recorded use even for a rare zero-CD skill. Another use
       // in this turn still requires the explicit manual-ready interaction.
       state.ready=false;
+      if(actor)applySkillNPChange(actor,entry,catalog);
       if(state.remainingMax==null)warnings.push({code:'unknown-cooldown',actionIndex:entry.index,message:'缺少可靠技能或等级 CD 元数据；冷却保持未知，可手动右键就绪。'});
       if(isSwap(data,action)){
         const pair=entry.replacement,front=pair?.[0],back=pair?.[1]<3?pair[1]+3:pair?.[1];

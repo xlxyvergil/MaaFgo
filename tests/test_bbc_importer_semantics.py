@@ -148,13 +148,13 @@ class BbcImportSemanticsTest(unittest.TestCase):
         with self.assertRaisesRegex(BbcImportError, "条件"):
             self.convert()
 
-    def test_death_replacement_and_custom_option_do_not_silently_drop(self):
+    def test_death_replacement_and_wrong_actor_special_option_do_not_silently_drop(self):
         self.config["round1_turn0_replace"] = {"1": 4, "4": None}
         with self.assertRaisesRegex(BbcImportError, "退场"):
             self.convert()
         del self.config["round1_turn0_replace"]
         self.config["round1_turn0_skill"] = [["BBDubai", 3, 0]]
-        with self.assertRaisesRegex(BbcImportError, "特殊技能"):
+        with self.assertRaisesRegex(BbcImportError, "真实从者"):
             self.convert()
 
     def test_ce_only_support_omits_servant_and_cannot_use_its_skill(self):

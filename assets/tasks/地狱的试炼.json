@@ -40,6 +40,7 @@
           "attach": {
             "chaldea_enabled": true,
             "fallback_after_refresh": false,
+            "search_all_support_slots": true,
             "max_swipes_before_refresh": 60
           }
         },

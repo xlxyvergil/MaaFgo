@@ -92,10 +92,52 @@ class BbcSpecialChoicesTests(unittest.TestCase):
             with self.subTest(raw=raw), self.assertRaises(ValueError):
                 BbcSpecialSkillChoices(ROOT).convert(raw, roster, "bad")
 
-    def test_bbdubai_is_explicitly_rejected_and_unknown_opcodes_return_to_strict_importer(self):
+    def test_bbdubai_converts_both_np_variants_in_each_actual_frontline_slot(self):
+        for slot in range(3):
+            for button, variant in ((0, 1), (1, 2)):
+                with self.subTest(slot=slot, button=button):
+                    roster = [{"svtId": 100100} for _ in range(6)]
+                    roster[slot] = {"svtId": 2300600}
+                    choices = BbcSpecialSkillChoices(ROOT)
+                    action = choices.convert(["BBDubai", slot * 3 + 3, button], roster, "turn")
+                    self.assertEqual(action, skill(slot, 2))
+                    self.assertEqual(choices.delegate(), {"tdTypeChanges": [variant]})
+
+    def test_bbdubai_preserves_shared_queue_order_with_space_ishtar_and_defaults(self):
+        roster = [{"svtId": 2300600}, {"svtId": 1100900}, None]
         choices = BbcSpecialSkillChoices(ROOT)
-        with self.assertRaisesRegex(ValueError, "BB迪拜.*不能忽略"):
-            choices.convert(["BBDubai", 3, 0], [{"svtId": 2300600}], "bbc")
+        choices.observe(skill(0, 2), roster, "ordinary_bb_default")
+        choices.convert([-5, 1], roster, "space_ishtar_quick")
+        choices.convert(["BBDubai", 3, 1], roster, "bb_defense")
+        choices.observe(skill(1, 1), roster, "ordinary_space_ishtar_default")
+        choices.convert(["BBDubai", 3, 0], roster, "bb_attack")
+        self.assertEqual(choices.delegate(), {"tdTypeChanges": [1, 3, 2, 1, 1]})
+
+    def test_bbdubai_uses_its_actual_position_after_an_order_change(self):
+        roster = [{"svtId": 100100}, None, None, {"svtId": 2300600}]
+        choices = BbcSpecialSkillChoices(ROOT)
+        with self.assertRaisesRegex(ValueError, "真实从者"):
+            choices.convert(["BBDubai", 3, 1], roster, "before_swap")
+        roster[0], roster[3] = roster[3], roster[0]
+        self.assertEqual(choices.convert(["BBDubai", 3, 1], roster, "after_swap"), skill(0, 2))
+        self.assertEqual(choices.delegate(), {"tdTypeChanges": [2]})
+
+    def test_bbdubai_rejects_wrong_actor_skill_or_button_without_creating_a_queue(self):
+        roster = [{"svtId": 2300600}, {"svtId": 100100}, None]
+        invalid = (["BBDubai"], ["BBDubai", 3], ["BBDubai", 3, 0, "extra"],
+                   ["BBDubai", 1, 0], ["BBDubai", 2, 0], ["BBDubai", 0, 0],
+                   ["BBDubai", 10, 0], ["BBDubai", True, 0],
+                   ["BBDubai", 3, -1], ["BBDubai", 3, 2], ["BBDubai", 3, True],
+                   ["BBDubai", 3, "0"], ["BBDubai", 6, 0])
+        for raw in invalid:
+            with self.subTest(raw=raw):
+                choices = BbcSpecialSkillChoices(ROOT)
+                with self.assertRaises(ValueError):
+                    choices.convert(raw, roster, "invalid_bb")
+                self.assertEqual(choices.delegate(), {})
+
+    def test_unknown_opcodes_return_to_the_strict_importer(self):
+        choices = BbcSpecialSkillChoices(ROOT)
         self.assertIsNone(choices.convert(["unsupported", 1, 0], [], "bbc"))
         self.assertIsNone(choices.convert([1, 2], [], "bbc"))
         self.assertEqual(choices.delegate(), {})

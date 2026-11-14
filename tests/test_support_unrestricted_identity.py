@@ -25,6 +25,9 @@ class UnrestrictedSupportIdentityTests(unittest.TestCase):
         self.addCleanup(support.sessions.stop_owner, "")
 
     def identify_scores(self, scores, *, aliases=False):
+        # 有纹理的头像才有可定义的相关度；这里只模拟候选分数与身份排序。
+        self.frame[39:109, 27:167] = np.random.default_rng(14).integers(
+            0, 256, (70, 140, 3), dtype=np.uint8)
         first = {"id": "100100", "images": ["first.png", "second_form.png"]}
         catalog = {"100100": first, "200100": {"id": "200100", "images": ["other.png"]}}
         if aliases:

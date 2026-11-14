@@ -27,3 +27,21 @@ test('share image uses the NP name, color and card artwork at each attack bounda
  assert.deepEqual(data,original);
  assert.equal(data.team.onFieldSvts[0].tdId,800107);
 });
+
+test('BB Dubai defense uses G.G.G. Arts artwork in the summary and returns to the initial NP after expiry',()=>{
+ const bb:Servant={...bundled.servants.find((item:Json)=>item.id===2300600),name:'BB迪拜'};
+ const bbCatalog:Catalog={servants:[bb],equips:[],mysticCodes:[],specialSkillChoices:{schemaVersion:1,groups:[{
+  id:'bb-dubai',servantIds:[2300600],skillNumbers:[3],field:'tdTypeChanges',defaultValue:1,durationTurns:3,
+  options:[{value:1,label:'攻击宝具（C.C.C.）',cardType:1,npId:2300601},{value:2,label:'防御宝具（G.G.G.）',cardType:1,npId:2300698}],
+ }]}};
+ const data:Json={team:{onFieldSvts:[{svtId:2300600},null,null],backupSvts:[null,null,null]},delegate:{tdTypeChanges:[2]},
+  actions:[{type:'skill',svt:0,skill:2},...Array.from({length:4},()=>({type:'attack',attacks:[{isTD:true,svt:0,card:-1}]}))]};
+ const before=structuredClone(data),model=shareImageModel(data,bbCatalog,{cardPreviewConfig:config});
+ const first=model.turns[0].actions.at(-1)!,last=model.turns[3].actions.at(-1)!;
+ assert.equal(first.kind,'attack');assert.equal(last.kind,'attack');
+ if(first.kind!=='attack'||last.kind!=='attack')throw new Error('expected attack rows');
+ assert.equal(first.cards[0].name,'Ｇ.Ｇ.Ｇ.');assert.equal(first.cards[0].color,'arts');
+ assert.match(first.cards[0].image!,/tdId=2300698(?:&|$)/);
+ assert.equal(last.cards[0].name,'Ｃ.Ｃ.Ｃ.');assert.match(last.cards[0].image!,/tdId=2300601(?:&|$)/);
+ assert.deepEqual(data,before);
+});

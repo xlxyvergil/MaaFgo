@@ -42,21 +42,25 @@ from battle.runtime.runtime import AutoBattleRuntime
 from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRuntime,
                                          trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
+from battle.runtime.skill_confirmation_reminder import skill_confirmation_reminders
 from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
 
 
 @AgentServer.tasker_sink()
 class FormationTaskLifecycle(TaskerEventSink):
-    """与 BBC 停止监听并列，只清理编队内存，不控制任何游戏/进程。"""
+    """与 BBC 停止监听并列，维护编队和任务提醒内存，不控制游戏/进程。"""
 
     def on_tasker_task(self, tasker, noti_type, detail):
         if detail.entry == "MaaTaskerPostStop":
             sessions.stop_owner(detail.uuid)
+            skill_confirmation_reminders.stop_owner(detail.uuid)
         elif noti_type == NotificationType.Starting:
             sessions.task_started(detail.task_id, detail.uuid)
+            skill_confirmation_reminders.task_started(detail.task_id, detail.uuid)
         elif noti_type in (NotificationType.Succeeded, NotificationType.Failed):
             sessions.finish(detail.task_id)
+            skill_confirmation_reminders.finish(detail.task_id)
 
 
 @AgentServer.custom_action("begin_native_formation_session")
@@ -160,6 +164,13 @@ class AutoBattleAction(CustomAction):
             decider = HellishTrialDecider(decider, trial_config)
             runtime_class = HellishTrialRuntime
             mfaalog.info("[试炼策略] 已由本任务标记与导入方案共同启用202611专用策略")
+
+        if not context.tasker.stopping and skill_confirmation_reminders.claim(root):
+            mfaalog.warning(
+                "[原生战斗提醒] 请在游戏内关闭“技能使用确认”（技能二次确认）；"
+                "开启时可能取消或跳过技能。若已开启，请停止任务，关闭后重新运行。"
+                "如已关闭弹窗可以无视。"
+            )
 
         # Agent 控制器代理仅在当前回调内复用；重复获取会使旧代理失效，
         # 回调结束后也不能交给后续结算回调，因此只获取一次并显式传递。

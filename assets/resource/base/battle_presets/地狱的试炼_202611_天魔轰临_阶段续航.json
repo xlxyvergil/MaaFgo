@@ -1,0 +1,522 @@
+{
+  "team": {
+    "name": "地狱的试炼第四期_天魔轰临_阶段续航（冠妖兰＋冠莉莉丝）",
+    "mysticCode": {
+      "mysticCodeId": 440,
+      "level": 6
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 304800,
+        "supportType": "none",
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480,
+          "lv": 100,
+          "limitBreak": true
+        },
+        "classBoardData": {
+          "grandClassBoardSquares": [
+            12,
+            16
+          ],
+          "grandBondEquipSkillChange": true
+        },
+        "lv": 120,
+        "tdLv": 5,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "equip2": {
+          "id": 9305580,
+          "lv": 80
+        },
+        "equip3": {
+          "id": 9401970,
+          "lv": 100
+        }
+      },
+      {
+        "svtId": 1000200,
+        "supportType": "friend",
+        "lv": 100,
+        "tdLv": 5,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "tdId": 1000202,
+        "grandSvt": true,
+        "equip1": {
+          "id": 9400480
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": true
+        },
+        "appendLvs": [
+          0,
+          10,
+          0,
+          0,
+          10
+        ]
+      },
+      {
+        "svtId": 4000100,
+        "supportType": "none",
+        "lv": 120,
+        "tdLv": 5,
+        "limitCount": 4,
+        "tdId": 4000101,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          2512650,
+          2513450,
+          2514650
+        ],
+        "equip1": {
+          "id": 9400340,
+          "limitBreak": true
+        }
+      }
+    ],
+    "backupSvts": [
+      {
+        "svtId": 504500,
+        "supportType": "none",
+        "lv": 100,
+        "tdLv": 3,
+        "tdId": 504501,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          761450,
+          762550,
+          763650
+        ],
+        "equip1": {
+          "id": 9400180,
+          "limitBreak": true
+        }
+      },
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 304800
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 2,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 2,
+            "svtId": 4000100
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 304800
+          }
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "isAuto": true
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      },
+      "options": {
+        "playerTarget": 0
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "isAuto": true
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      },
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 0,
+      "options": {
+        "playerTarget": 2
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1000200
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1000200
+          }
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": [
+      [
+        0,
+        0
+      ]
+    ]
+  },
+  "maaAdvancedStrategy": {
+    "preset": "balanced",
+    "openingHand": {
+      "enabled": false,
+      "servantId": null,
+      "servantSlot": null,
+      "requiredColors": [
+        "B",
+        "Q"
+      ],
+      "maxWaitTurns": 2
+    },
+    "nativeStrategyOverrides": {
+      "np_colors_by_servant_id": {
+        "304800": "B",
+        "1000200": "Q",
+        "4000100": "B",
+        "504500": "A"
+      }
+    },
+    "autoServantSkills": true,
+    "maxTurns": 40
+  },
+  "_guideNotes": {
+    "status": "2026-11-14共8场实际战斗，第五场及第八场胜利。第八场入口至T6自动，T7因旧finisherFacePhases=[2,4]只能构成Mighty而停止；原战裁剪已执行技能并按现场身份重绑后恢复，没有重放技能，以术呆宝具→莉莉丝宝具→术呆A收尾，莉莉丝宝具伤害2277276直接击杀、尾卡未出手，四人全部存活，14条件事件账本闭环。正式整合版采用完整v4动作与finisherFacePhases=[2]，尚未额外完成从入口无中断整场复跑。9/9b/9c/9d/9e均停在助战、没有入战；账号起点已本期15/15、全局30/30，不以旧进度宣称本轮新领取15项。",
+    "cost": 77,
+    "source": "melt_oc_phase_candidate_v4.json的完整actions、delegate、maaAdvancedStrategy保留；maaTrialStrategy只将finisherFacePhases由[2,4]改为[2]。第八场T7恢复源裁剪已执行技能并按现场身份重绑，只执行剩余宝具链，属于同场恢复证据而非正式完整文件的无中断复跑。",
+    "support": "第八场实际好友冠位莉莉丝Lv109宝5、黑杯、NP50，附加5满级的冷却条件已核对。正式筛选Lv100以上、宝5、主动10/10/10、附加2与5均10（appendLvs=[0,10,0,0,10]），不要求附加4，不要求第三礼装，不额外增加黑杯等级或满破筛选。Lv100是查找下限，不是已实测最低练度；优先使用与本次Lv109及其他条件相同或更高的助战。",
+    "formation": [
+      "首发冠位妖兰Lv120宝5、好友冠位莉莉丝、第三战斗形态所长Lv120宝5，后排第一位术呆Lv100宝3，后两位为空；普通迦勒底制服440、实机Lv6，Cost77。",
+      "妖兰黑杯Lv100满破、羁绊极光Lv80且启用NP50、午餐时光Lv100，冠枪盘12伤害前解除敌防和16御主技能冷却加速；须放入生效冠位格，并以第一／第二形态进场，首行3技能切到红色全体宝具。",
+      "所长第三战斗形态、满破万华镜9400340，术呆满破龙脉9400180。两位冠位NP50须在游戏里实际生效，自动编队不会代为设置自有羁绊效果或冠位盘。"
+    ],
+    "stagePlan": [
+      "第1条弓／行1：莉莉丝1→所长1→妖兰1→2→3；所长B全体宝具→妖兰B全体宝具→auto。首条安排两B与两次全体NP，仍须由妖兰实际破条。",
+      "第2条杀／行2：御主3将前排1妖兰与后排第一位术呆换人，术呆1；术呆NP→auto→auto，优先累计两次真实蓝攻击；辅助NP不算蓝攻击。",
+      "第2条杀／行3：所长2→3、莉莉丝3、术呆3给自己；莉莉丝Q NP→auto→auto。蓝色或合法面卡不足时扣主攻NP等待；本行不再固定莉莉丝1或2。",
+      "第3条骑／行4：术呆2给莉莉丝、御主2给莉莉丝、御主1给当前前排3（通常为所长）；术呆NP→莉莉丝NP→auto。御主1是1500治疗与10星，不提供攻击力提升。",
+      "第4条术／行5：固定莉莉丝1→2，冷却未好时可能跳过；术呆NP先弱解→莉莉丝NP→auto。没有固定所长1，避免所长不在时因旧actor硬停止。"
+    ],
+    "dynamicSkills": "重复行按真实CD补放莉莉丝、术呆、所长的可用技能，默认目标自己；所长3禁止自动补放。名单含莉莉丝，因此莉莉丝2可能在骑条等待回合早于固定末条释放，第八场实际T5骑条便动态使用了1、2。固定行位置不是严格保留技能的承诺。",
+    "strategy": [
+      "phasePlanTurns=[[1],[2,3],[4],[5]]按真实敌人职阶推进，不以游戏TURN猜血条；同一行首次固定技能只执行一次，等待不消费下一行。",
+      "useCleanseNpWhileWaiting=false，保留术呆NP给完整计划链，避免等牌时先烧掉又反复等回充；末条仍要求当回合先弱解，不把上回合的弱解视为本回合已弱解。",
+      "finisherFacePhases=[2]只在杀条限制主攻NP同组三牌的普通卡必须是术或AE。骑、术条允许辅助从者尾卡来减少等牌，不保证AE宝具必定独自破条；伤害不足时可能被其他职阶尾卡抢破，须实测核对或分次补任务。",
+      "全程禁止完整Mighty三色链。120版仅对phasePlan中明确auto位、正常候选只剩Mighty的情况转有界安全普通卡等待；三张固定Mighty及最终输入守卫仍硬停。等待不插攻击NP，末条等待不选AE面卡。",
+      "每行额外等待8回合，整场40回合；chargePriorityServantIds为术呆、莉莉丝，已可靠就绪但本组不消耗NP者取消蓄能偏好；固定NP缺失按可靠身份/actor蓄能，不将封印断言为NP不足。",
+      "仅地狱的试炼任务标记hellish_202611且源maaTrialStrategy.enabled=true双门启用；高级策略选使用编辑器/chaldea配置，平衡、不等开局关键牌、上限40，其他task不默认调用。"
+    ],
+    "observedRuns": [
+      "第五场v2b游戏7T通关，但所长T6退场死因缺帧；原源不限羁绊、初始80NP不能直接证明NP50。保留为通关历史，不称同羁绊复现或稳定。",
+      "第六场明确NP50，T2莉莉丝暴击退场；第七场所长退场后旧固定所长1在T7停止并撤退，均不作为全任务成功。",
+      "第八场v4从入口自动执行至T6，T7全员存活但原末条face限制使候选只能构成Mighty而停止；同一游戏战斗裁剪并重绑恢复，不重放技能，末条face限制改[2]，实际CNP→MeltNP→CastA。MeltNP伤害2277276、宝具内Overkill且敌0，尾卡没有出手；骑条同样在MeltNP内Overgauge后才CastA。",
+      "第八场覆盖14条件的同场事件与机制账本，四名从者全部存活，不用起点已完成15/15推新增完成；末条直接收尾未实际触发新Mighty→WAIT分支。",
+      "后续9/9b/9c/9d/9e均停在助战筛选，未进入战斗，所以实际战斗总数仍为8；宝3助战候选也未入战，不能声称阶段续航新逻辑已用宝3验证。整合后的正式完整配置尚无额外从入口无中断整场复跑。"
+    ],
+    "repeat": "任务重复挑战默认1；可按缺项选择不超过10次作为尝试预算，失败或守卫停止会中止。允许多次胜利补任务，不编造成功率或10次必满保证。",
+    "verification": "正式与config/Battle本地副本字节哈希一致，执行字段保持正式4e86基线不变，仅更新说明。编辑器保存/读回、converter、助战条件提取另有最终报告。此前广回归939项通过（4项环境跳过）；MIX相关304项通过（1项环境跳过），两组含重叠用例，不累计为独立成功次数。第八场是同场恢复后7T胜利，不是恢复日志1T整场胜利；最终整合版未完成额外无中断整场复跑，不保证10次必满或固定回合数。",
+    "evidence": [
+      "attempt8_mission_ledger.md",
+      "attempt8_frames/frame_*.png",
+      "attempt8_finish_frames/frame_*.png",
+      "melt_oc_phase_candidate_v4.json",
+      "attempt8_phase4_finish_source.json",
+      "debug/recognition-51004.log",
+      "debug/recognition-41348.log",
+      "melt_oc_phase_candidate_v2b.json",
+      "final_activity_verified.png",
+      "trial_mix_tab_ui_verified.png",
+      "formal_v4_broader_20261114_053253/summary.json",
+      "support_mix_regression_20261114_060928/summary.json",
+      "final_preset_composite_audit.md"
+    ],
+    "supportSearch": "仅地狱的试炼任务的Chaldea助战action开启search_all_support_slots=true；指定从者时点击MIX跨全部助战栏查找，避免遗漏独立ALL栏。MIX不放宽从者、NP5、主动/附加、等级、礼装或NP50羁绊条件；any仍保留当前页签，其他任务默认选栏不变。官方MIX说明：https://news.fate-go.jp/2018/1207kybrn/"
+  },
+  "maaTrialStrategy": {
+    "enabled": true,
+    "phase": 1,
+    "remainingColorAttacks": 2,
+    "requireCleanseBeforeFinish": true,
+    "finalBarPreparationTurns": [],
+    "npMetadata": [
+      {
+        "servantId": "304800",
+        "color": "B",
+        "role": "lancer_finisher",
+        "damaging": true
+      },
+      {
+        "servantId": "1000200",
+        "color": "Q",
+        "role": "alterego_finisher",
+        "damaging": true
+      },
+      {
+        "servantId": "4000100",
+        "color": "B",
+        "role": "explicit_preparation",
+        "damaging": true
+      }
+    ],
+    "phasePlanTurns": [
+      [
+        1
+      ],
+      [
+        2,
+        3
+      ],
+      [
+        4
+      ],
+      [
+        5
+      ]
+    ],
+    "maxWaitTurnsPerStep": 8,
+    "finalBarPreparationMode": "strict",
+    "chargePriorityServantIds": [
+      "504500",
+      "1000200"
+    ],
+    "useCleanseNpWhileWaiting": false,
+    "avoidMightyChains": true,
+    "selfCleanseFinishers": [],
+    "repeatReadySkillServantIds": [
+      "1000200",
+      "504500",
+      "4000100"
+    ],
+    "finisherFacePhases": [
+      2
+    ]
+  }
+}

@@ -15,8 +15,8 @@ from collections import Counter
 from dataclasses import dataclass, replace
 
 from ..core.decider import Decider, RuleDecider
-from ..core.special_skills import SpecialSkillChoiceError
-from .special_skills import SpecialSkillDispatcher
+from ..core.special_skills import SPECIAL_SKILL_GROUPS, TD, SpecialSkillChoiceError, SpecialSkillChoices
+from .special_skills import DEFAULT_NP_MENU_ROOTS, NP_IDENTITY_GUARD, SpecialSkillDispatcher
 from ..core.enums import PrimitiveKind, Scene
 from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, InitialFormation,
                            MasterSkillAction, OrderChangeAction, RetireAction,
@@ -161,6 +161,8 @@ class AutoBattleRuntime:
         while turns < self.profile.max_turns:
             self._turn_index = plan_turn
             state = self._observe(settle_main=True)
+            plan_turn = self._plan_turn_after_observation(plan_turn, state)
+            self._turn_index = plan_turn
             scene = state.scene
             mfaalog.info(f"[AutoBattle] Turn {turns+1} | scene={scene.name} | unknown={state.unknown_fields}")
 
@@ -362,7 +364,7 @@ class AutoBattleRuntime:
                 if waiting_action is not None:
                     opening_waits += 1
                 else:
-                    plan_turn += 1
+                    plan_turn = self._plan_turn_after_settlement(plan_turn)
                 continue
 
             # UNKNOWN / ANIMATION（非攻击后语境，如加载）：有界等待
@@ -376,6 +378,13 @@ class AutoBattleRuntime:
         return BattleResult.fail("max_turns_exceeded", turns)
 
     # ---- 内部 ----
+
+    def _plan_turn_after_observation(self, plan_turn, state):
+        """Default plans follow turns; encounter adapters may bind observed stages."""
+        return plan_turn
+
+    def _plan_turn_after_settlement(self, plan_turn):
+        return plan_turn + 1
 
     def _opening_roster_unchanged(self):
         self._ensure_member_tracking()
@@ -1035,6 +1044,13 @@ class AutoBattleRuntime:
             )
             for slot in (1, 2, 3)
         }
+        if Scene.ORDER_CHANGE in return_scenes:
+            # Opening the swap menu is an intermediate step, not a cast animation.
+            # The normal no-overlay acceleration tap dismisses this menu in-game.
+            override[self._SKILL_NO_OVERLAY_BRANCH] = {
+                "action": {"type": "DoNothing"},
+                "post_delay": 600,
+            }
         try:
             entry = (self._run_special_skill_pipeline(override, skill=skill) if skill is not None
                      else self._run_special_skill_pipeline(override))
@@ -1061,15 +1077,50 @@ class AutoBattleRuntime:
         plan = getattr(self.decider, "plan", None)
         use_choices = (isinstance(skill, ServantSkillAction) and isinstance(plan, BattlePlan)
                        and plan.special_choices.configured and 0 <= self._turn_index < len(plan.turns))
+        sid = (canonical_servant_id(self.roster_servant_ids[skill.servant_slot - 1])
+               if isinstance(skill, ServantSkillAction) else None)
+        default_group = next((group for group in SPECIAL_SKILL_GROUPS
+                              if group.root in DEFAULT_NP_MENU_ROOTS and sid in group.servant_ids
+                              and skill.skill_index in group.skills), None) if isinstance(skill, ServantSkillAction) else None
+        use_default = bool(default_group and not (use_choices and plan.special_choices.td_type_changes))
         try:
             override = self._special_skill_pipeline_override()
             override.update(pipeline_override or {})
-            if use_choices:
+            if isinstance(skill, ServantSkillAction):
+                entry = self.ctx.get_node_data(self._SPECIAL_SKILL_PIPELINE) or {}
+                branches = override.get(self._SPECIAL_SKILL_PIPELINE, {}).get("next", entry.get("next", []))
+                td_groups = {group.root: group for group in SPECIAL_SKILL_GROUPS if group.field == TD}
+                routed = []
+                for branch in branches:
+                    name = branch if isinstance(branch, str) else branch.get("name")
+                    group = td_groups.get(name)
+                    if group is not None and (sid not in group.servant_ids or skill.skill_index not in group.skills):
+                        continue
+                    if name == self._SKILL_TARGET_BRANCH:
+                        # Do not let the generic "選択" target OCR click an
+                        # unrecognized NP menu after its actor-specific gate fails.
+                        routed.append(NP_IDENTITY_GUARD)
+                    routed.append(branch)
+                override.setdefault(self._SPECIAL_SKILL_PIPELINE, {})["next"] = routed
+                target_node = self.ctx.get_node_data(self._SKILL_TARGET_BRANCH) or {}
+                target_recognition = target_node.get("recognition", {})
+                if target_recognition.get("type") == "OCR":
+                    param = target_recognition.get("param", {})
+                    override.setdefault(self._SKILL_TARGET_BRANCH, {})["recognition"] = {
+                        **target_recognition,
+                        "param": {**param, "expected": [text for text in param.get("expected", []) if text != "選択"]},
+                    }
+            if use_default:
+                # This one-cast dispatcher never changes the plan's queue or
+                # cursor, including when only the other field is configured.
+                default_choices = SpecialSkillChoices((default_group.default,))
+                detail = SpecialSkillDispatcher(default_choices).run(
+                    self.ctx, override, servant_id=sid, skill_index=skill.skill_index, default_only=True)
+            elif use_choices:
                 dispatcher = getattr(self, "_special_choice_dispatcher", None)
                 if dispatcher is None:
                     dispatcher = self._special_choice_dispatcher = SpecialSkillDispatcher(plan.special_choices)
-                sid = self.roster_servant_ids[skill.servant_slot - 1]
-                detail = dispatcher.run(self.ctx, override, servant_id=canonical_servant_id(sid),
+                detail = dispatcher.run(self.ctx, override, servant_id=sid,
                                         skill_index=skill.skill_index)
             else:
                 detail = self.ctx.run_task(self._SPECIAL_SKILL_PIPELINE,
@@ -1077,7 +1128,7 @@ class AutoBattleRuntime:
         except SpecialSkillChoiceError:
             raise
         except Exception as e:
-            if use_choices:
+            if use_choices or use_default:
                 raise SpecialSkillChoiceError(f"特殊技能流水线异常，无法确认已配置的选项: {e}") from e
             mfaalog.error(f"[AutoBattle] special skill pipeline error: {e}")
             return None
@@ -1089,6 +1140,11 @@ class AutoBattleRuntime:
         # detail.entry 恒为入口名（战斗_特殊技能处理），真正命中的分支
         # 要看最后执行的节点：nodes 非空取末尾节点名，否则回退 entry
         nodes = getattr(detail, "nodes", None) or []
+        if any(getattr(node, "name", None) == NP_IDENTITY_GUARD for node in nodes):
+            raise SpecialSkillChoiceError(
+                "检测到宝具切换弹窗，但未能确认当前从者和可用选项，无法安全点击。"
+                "请确认编队中的从者与技能形态后重试；若仍失败，请反馈这张弹窗截图。"
+            )
         last = nodes[-1] if nodes else None
         return getattr(last, "name", None) or getattr(detail, "entry", None)
 

@@ -10,8 +10,10 @@ import unittest
 import maa
 import numpy as np
 from maa.controller import CustomController
+from maa.context import ContextEventSink
 from maa.custom_action import CustomAction
 from maa.define import LoggingLevelEnum
+from maa.event_sink import NotificationType
 from maa.library import Library
 from maa.resource import Resource
 from maa.tasker import Tasker
@@ -44,6 +46,12 @@ class TrialRepeatFrameworkTests(unittest.TestCase):
         wrapper["attach"]["battle_count"] = count
         rounds = []
         owners = []
+        progress = []
+
+        class Progress(ContextEventSink):
+            def on_node_action(self, context, noti_type, detail):
+                if noti_type == NotificationType.Starting and detail.name == "地狱的试炼-单场入口":
+                    progress.append(context.get_node_data(detail.name)["focus"]["Node.Action.Starting"])
 
         class Record(CustomAction):
             def run(self, context, argv):
@@ -51,6 +59,7 @@ class TrialRepeatFrameworkTests(unittest.TestCase):
                 token = context.get_node_data(SESSION_NODE)["attach"]["session_id"]
                 owners.append((root, token))
                 rounds.append(len(rounds) + 1)
+                progress.append(len(rounds))
                 return CustomAction.RunResult(success=len(rounds) != fail_at)
 
         # The real wrapper and its reset list run unchanged. The screen-dependent
@@ -77,10 +86,13 @@ class TrialRepeatFrameworkTests(unittest.TestCase):
             self.assertTrue(resource.register_custom_action("record", Record()))
             self.assertTrue(resource.post_bundle(str(directory)).wait().succeeded)
             self.assertTrue(tasker.bind(resource, controller))
+            tasker.add_context_sink(Progress())
             try:
                 result = tasker.post_task("地狱的试炼-入口").wait()
                 self.assertEqual(result.succeeded, fail_at is None)
                 self.assertEqual(rounds, list(range(1, (count if fail_at is None else fail_at) + 1)))
+                self.assertEqual(progress, [item for current in rounds
+                                            for item in (f"当前第{current}场战斗。", current)])
                 self.assertTrue(owners)
                 self.assertEqual(len(set(owners)), 1)
                 self.assertFalse(sessions.valid(*owners[0]))

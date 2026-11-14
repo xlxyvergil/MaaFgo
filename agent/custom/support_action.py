@@ -78,9 +78,9 @@ BASE_W, BASE_H = 1280, 720
 LEVEL_ROI = (62, 15, 118, 27)      # 英灵等级: x62-180 y15-42 -> (x,y,w,h)
 # 英灵头像多边形(相对框顶点), 裁剪区域是 servant_face 大模板(158x158)的子区域:
 # 用该截图在模板上滑动匹配找最高分。
-# 多边形本身已把头像上覆盖的特殊 UI(右上角职介/等级、右下角金星/星级)排除在外:
-#   左上斜切(51,39)->(27,57) 让开左上角图标, 右下缺口 x140-166 y84-108 让开金星/星级
-FACE_POLY = [(27, 57), (27, 108), (140, 108), (140, 84), (166, 84), (166, 39), (51, 39)]
+# 排除左上职介、上沿等级文字、右下星级；日服 Lv.120 的描边会落到框内 y43。
+# 顶边从 y45 开始，避免等级文字混入头发区域；左上斜切及右下缺口仍保留。
+FACE_POLY = [(27, 57), (27, 108), (140, 108), (140, 84), (166, 84), (166, 45), (43, 45)]
 TH_FACE = 0.75
 TH_UNRESTRICTED_FACE_MARGIN = 0.10   # 仅礼装助战补身份须排除相似的其他从者
 CE_ANCHOR_NORMAL = (6, 134)        # 普通助战 礼装 左上角(166x53 窗口)
@@ -117,6 +117,7 @@ CLASS_TABS = {
     "狂战士": (565, 130),
     "OTHER": (629, 130),   # 盾/裁定者/复仇者/降临者/兽/他人格/伪装者/月之癌 共用
     "ALL": (91, 130),      # all 阶(职介筛选选项选 ALL 时点击)
+    "MIX": (698, 130),     # 跨全部助战栏查询；ALL 仅表示独立的 ALL 栏
 }
 
 # ---------------- OCR 资源：兼容打包版和开发目录 ----------------
@@ -177,6 +178,19 @@ EMPTY_CE = ("0_空.png", "空.png")
 
 
 # ---------------- 通用工具 ----------------
+def _support_class_tab(attach, class_name, class_all):
+    """指定从者可显式跨栏搜索；未启用时保留原职介/ALL 筛选。"""
+    if class_name == "any":
+        return None
+    if attach.get("search_all_support_slots") is True:
+        return CLASS_TABS["MIX"]
+    if class_name:
+        if "all" in class_all:
+            return CLASS_TABS["ALL"]
+        return CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
+    return None
+
+
 def _max_swipes_before_refresh(attach):
     """允许特定任务查找更长的助战列表，其余任务保留原来的刷新频率。"""
     value = attach.get("max_swipes_before_refresh", MAX_SWIPE_BEFORE_REFRESH)
@@ -436,27 +450,37 @@ class SupportAction(CustomAction):
         return dx, dy
 
     # ---------- 英灵匹配 ----------
-    def _match_servant(self, img, face_dir, bx, by, images, support_type):
-        # 头像匹配: 裁剪框内头像区域, 用多边形 mask 物理排除覆盖 UI(金星/职介/等级/星级),
-        # 再把多边形外像素设为脸部均值(中性化, 不参与相关度), 最后在 servant_face 模板上滑动匹配
+    def _face_crop(self, image, bx, by):
+        """保留原始头像像素；边缘残缺的头像不能套用完整多边形。"""
         import cv2
-        bx, by = int(bx), int(by)
-        fxs = [p[0] for p in FACE_POLY]; fys = [p[1] for p in FACE_POLY]
-        xmin, xmax, ymin, ymax = min(fxs), max(fxs), min(fys), max(fys)
-        poly = img[by + ymin:by + ymax + 1, bx + xmin:bx + xmax + 1]
-        if poly.size == 0:
-            return False
-        cg = cv2.cvtColor(poly, cv2.COLOR_BGR2GRAY)
+        xs, ys = zip(*FACE_POLY)
+        x0, y0 = int(bx) + min(xs), int(by) + min(ys)
+        x1, y1 = int(bx) + max(xs) + 1, int(by) + max(ys) + 1
+        if x0 < 0 or y0 < 0 or x1 > image.shape[1] or y1 > image.shape[0]:
+            return None
+        return cv2.cvtColor(image[y0:y1, x0:x1], cv2.COLOR_BGR2GRAY)
+
+    def _face_score(self, template, gray):
+        """以同一多边形计算两侧均值、方差和相关度，真正排除覆盖 UI。"""
+        import cv2
         mask = self._get_face_mask()
-        sel = mask > 0
-        face_mean = int(round(float(cg[sel].mean())))
-        cg = cg.copy()
-        cg[~sel] = face_mean   # 多边形外(特殊覆盖UI)设为脸部均值, 中性化排除
+        if (template is None or gray.shape != mask.shape
+                or any(size > limit for size, limit in zip(gray.shape, template.shape))
+                or np.ptp(gray[mask > 0]) == 0):
+            return -1.0
+        # 填充灰色仍会让遮挡区域参与评分；mask 必须直接传给 matchTemplate。
+        scores = cv2.matchTemplate(template, gray, cv2.TM_CCOEFF_NORMED, mask=mask)
+        # 常量候选窗口可能产生 NaN/Inf，不能让它们盖过其他有效位置。
+        valid = scores[np.isfinite(scores) & (np.abs(scores) <= 1.00001)]
+        return float(np.clip(valid.max(), -1.0, 1.0)) if valid.size else -1.0
+
+    def _match_servant(self, img, face_dir, bx, by, images, support_type):
+        gray = self._face_crop(img, bx, by)
+        if gray is None:
+            return False
         for f in images:
             tpl = _imread(os.path.join(face_dir, f), gray=True)
-            if tpl is None or cg.shape[0] > tpl.shape[0] or cg.shape[1] > tpl.shape[1]:
-                continue
-            s = float(cv2.matchTemplate(tpl, cg, cv2.TM_CCOEFF_NORMED).max())
+            s = self._face_score(tpl, gray)
             mfaalog.diagnostic(f"[SupportAction] 英灵头像 {f}: score={s:.3f}")
             if s >= TH_FACE:
                 self._matched_face_evidence = (s, f)
@@ -851,15 +875,9 @@ class SupportAction(CustomAction):
     # ---------- 主流程 ----------
     def _identify_unrestricted_support(self, image, face_dir, bx, by):
         """在已点击条目的留存帧上补识别身份；不改变礼装筛选或再次操作列表。"""
-        import cv2
-        xs, ys = zip(*FACE_POLY)
-        crop = image[int(by) + min(ys):int(by) + max(ys) + 1,
-                     int(bx) + min(xs):int(bx) + max(xs) + 1]
-        mask = self._get_face_mask() > 0
-        if crop.shape[:2] != mask.shape:
+        gray = self._face_crop(image, bx, by)
+        if gray is None:
             return None
-        gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-        gray[~mask] = int(round(float(gray[mask].mean())))
         candidates = {}
         for servant in self._get_servant_map().values():
             sid = canonical_servant_id(servant.get("id"))
@@ -871,10 +889,7 @@ class SupportAction(CustomAction):
             for filename in sorted(filenames):
                 if filename not in scores:
                     template = _imread(os.path.join(face_dir, filename), gray=True)
-                    score = (-1.0 if template is None or any(
-                        size > limit for size, limit in zip(gray.shape, template.shape)
-                    ) else float(cv2.matchTemplate(template, gray, cv2.TM_CCOEFF_NORMED).max()))
-                    scores[filename] = score if np.isfinite(score) else -1.0
+                    scores[filename] = self._face_score(template, gray)
                 if scores[filename] > best[0]:
                     best = (scores[filename], filename)
             if best[1]:
@@ -1096,17 +1111,17 @@ class SupportAction(CustomAction):
             self._init_scale(controller)
 
             # 不要求英灵时沿用游戏当前页签；指定英灵时才按职介筛选设置切换。
+            tab = _support_class_tab(attach, class_name, class_all)
             if skip_servant:
                 mfaalog.info("[SupportAction] 不要求英灵，保留当前职介页签")
-            elif class_name:
-                if "all" in class_all:
-                    tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
-                else:
-                    tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
+            if tab is not None:
                 for _ in range(3):
                     self._tap(controller, tab[0], tab[1])
                     time.sleep(0.5)
-                mfaalog.info(f"[SupportAction] 点击职介筛选: {class_name} @ {tab}")
+                if attach.get("search_all_support_slots") is True:
+                    mfaalog.info(f"[SupportAction] 点击 MIX 跨全部助战栏查找指定英灵: {class_name} @ {tab}")
+                else:
+                    mfaalog.info(f"[SupportAction] 点击职介筛选: {class_name} @ {tab}")
 
             # 识别一次: 截图->YOLO检测->逐个框判定; 命中点击条目并返回 True(未命中 False)
             def try_match():
