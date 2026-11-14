@@ -40,6 +40,9 @@ class _Session:
     capture_seed: tuple[FormationSlot, ...] = ()
     continuation: InitialFormation | None = None
     continuation_battle: int = 0
+    # 茶壶开关由游戏跨场继承，不随编队快照的更新/失效清除。
+    # 只有实际确认目标开关后才写入；无茶壶栏不能写入。
+    teapot_state: bool | None = None
 
 
 class FormationSessions:
@@ -75,6 +78,38 @@ class FormationSessions:
                 return session.repeat if repeat else True
             except ValueError:
                 return False
+
+    def teapot_confirmed(self, task_id: int, token: str, desired: bool) -> bool:
+        """同一连续战斗仅复用已确认且与当前配置相同的开关状态。"""
+        if type(desired) is not bool:
+            return False
+        with self._lock:
+            try:
+                session = self._get(task_id, token)
+            except ValueError:
+                return False
+            if not session.repeat:
+                return False
+            if session.teapot_state is not desired:
+                # 配置变更后必须重新实查。即使新检查失败并再改回原配置，
+                # 也不能复用可能已经被点击改变的旧状态。
+                session.teapot_state = None
+                return False
+            return True
+
+    def confirm_teapot(self, task_id: int, token: str, desired: bool) -> bool:
+        """仅接收实际开关复核结果；失效回调不能写入新任务。"""
+        if type(desired) is not bool:
+            return False
+        with self._lock:
+            try:
+                session = self._get(task_id, token)
+            except ValueError:
+                return False
+            if not session.repeat:
+                return False
+            session.teapot_state = desired
+            return True
 
     def battle_started(self, task_id: int, token: str, battle: int) -> None:
         with self._lock:
