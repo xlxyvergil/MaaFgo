@@ -224,6 +224,37 @@ class SharedEmptyItemBarTests(unittest.TestCase):
             self.assertEqual(controller.inputs, 0)
         self.run_in_context(check)
 
+    def test_live_carousel_sequence_preserves_real_bar_across_empty_fade(self):
+        def check(context, controller):
+            for desired, crop in ((False, "bar_tea_off"), (True, "bar_tea_on")):
+                self.assertTrue(context.override_pipeline({tea.CONFIG_NODE:{"attach":{"use_teapot":desired}}}))
+                bar = self.page(item=crop)
+                empty = self.page()
+                storm = self.page(item="bar_storm_on")
+                transition = self.page(empty=False)
+                runner = CapturedSequenceRunner(context, controller,
+                    [storm, transition, bar, empty, storm, transition, bar, transition])
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observations, 7)
+                self.assertEqual(runner.observed_kinds,
+                    ["storm", "transition", "bar", "absent", "storm", "transition", "bar"])
+                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * 7)
+        self.run_in_context(check)
+
+    def test_single_real_bar_then_empty_strip_never_verifies_or_skips_as_absent(self):
+        def check(context, controller):
+            for desired, crop in ((False, "bar_tea_off"), (True, "bar_tea_on")):
+                self.assertTrue(context.override_pipeline({tea.CONFIG_NODE:{"attach":{"use_teapot":desired}}}))
+                runner = CapturedSequenceRunner(context, controller,
+                    [self.page(item=crop)] + [self.page()] * 7)
+                self.assertFalse(runner.run())
+                self.assertEqual(runner.observations, tea.OBSERVATION_ROUNDS)
+                self.assertEqual(runner.observed_kinds, ["bar"] + ["absent"] * 7)
+                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * tea.OBSERVATION_ROUNDS)
+                message = context.get_node_data(tea.NOTICE_NODE)["focus"]["Node.Recognition.Starting"]
+                self.assertNotIn("本关无法使用茶壶", message)
+        self.run_in_context(check)
+
 
 if __name__ == "__main__":
     unittest.main()
