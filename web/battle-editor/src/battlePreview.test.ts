@@ -154,12 +154,29 @@ test('target helpers distinguish a chosen ally, selected enemy, enemy all and un
   assert.equal(skillTargetMode({target:'ally'}),'ally');assert.equal(skillTargetMode({target:'none'}),'none');
   assert.equal(skillTargetMode(undefined),'unknown');
   assert.deepEqual(allowedAllyTargets({target:'ally',targets:['ptOne']},0,roster),[0,1]);
-  assert.deepEqual(allowedAllyTargets({target:'ally',targets:['ptOneOther']},0,roster),[1]);
+  assert.deepEqual(allowedAllyTargets({target:'ally',targets:['ptOneOther']},0,roster),[0,1]);
   assert.deepEqual(allowedAllyTargets({target:'ally',targets:['ptOneOther']},-1,roster),[0,1]);
   assert.deepEqual(allowedAllyTargets({target:'ally',targets:['ptOne','ptOneOther']},0,roster),[0,1]);
   assert.deepEqual(allowedAllyTargets(undefined,0,roster),[0,1]);
   assert.equal(hasEnemyTarget({target:'none',targets:['enemy','self']}),true);
   assert.equal(hasEnemyTarget({targets:['enemyAll']}),false);assert.equal(hasEnemyTarget(undefined),false);
+});
+
+test('Himiko and Iyo S2 and Odysseus S1 can select themselves in every current frontline slot',()=>{
+  const facts=JSON.parse(readFileSync(new URL('../../../agent/battle_editor/data/catalog.json',import.meta.url),'utf8'));
+  const actual:Catalog={...facts,servants:facts.servants.map((s:Json)=>({...s,name:s.nameJp}))};
+  for(const [id,index,skillId] of [[2801400,1,2714450],[403800,0,722452]]){
+    for(const caster of [0,1,2]){
+      const data=fixture();
+      data.team.onFieldSvts=[100100,100200,504500].map(svtId=>({svtId,skillLvs:[10,10,10]}));
+      data.team.onFieldSvts[caster]={svtId:id,skillLvs:[10,10,10]};
+      const preview=previewTurn(data,actual,0),meta=preview.front[caster].skills[index].skill;
+      assert.equal(meta?.id,skillId);
+      assert.equal(skillTargetMode(meta),'ally');
+      assert.ok(meta?.targets.includes('ptOneOther'));
+      assert.deepEqual(allowedAllyTargets(meta,caster,preview.roster),[0,1,2]);
+    }
+  }
 });
 
 test('empty plans clamp invalid turn indices and zero-CD actions still require explicit manual repeat in the same turn',()=>{

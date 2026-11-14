@@ -279,6 +279,44 @@ class ValidationTests(unittest.TestCase):
         data["actions"][0]["options"] = {"playerTarget": 1}
         self.assertTrue(validate_battle(data, catalog)["valid"])
 
+    def test_selected_ally_exclusion_effects_keep_self_targets_through_native_import(self):
+        # ptOneOther excludes the selected ally from an effect, not the caster
+        # from the selectable targets. Use real bundled skills, not a rewritten
+        # ptOne fixture, to retain this distinction across validation/import.
+        catalog = json.loads((ROOT / "agent/battle_editor/data/catalog.json").read_text(encoding="utf-8"))
+        with patch.object(sys, "path", [str(ROOT / "agent"), str(ROOT / "agent/custom"), *sys.path]):
+            from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
+
+        for servant_id, skill_id, skill_num in ((2801400, 2714450, 2), (403800, 722452, 1)):
+            servant = next(row for row in catalog["servants"] if row["id"] == servant_id)
+            skill = next(row for row in servant["skills"] if row["id"] == skill_id)
+            self.assertEqual(skill["target"], "ally")
+            self.assertIn("ptOneOther", skill["targets"])
+            self.assertNotIn("ptOne", skill["targets"])
+            for caster in range(3):
+                with self.subTest(servant_id=servant_id, caster=caster):
+                    data = battle()
+                    member = data["team"]["onFieldSvts"][caster]
+                    member["svtId"] = servant_id
+                    member["skillIds"] = [None, None, None]
+                    member["skillIds"][skill_num - 1] = skill_id
+                    data["actions"] = [
+                        {"type": "skill", "svt": caster, "skill": skill_num - 1,
+                         "options": {"playerTarget": caster}},
+                        {"type": "attack", "attacks": []},
+                    ]
+                    original = copy.deepcopy(data)
+                    report = validate_battle(data, catalog)
+                    self.assertTrue(report["valid"], report)
+                    self.assertEqual(data, original)
+                    saved = decode_json(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+                    self.assertEqual(saved, original)
+                    plan = convert_chaldea_actions_to_battle_plan(saved["actions"])
+                    cast = plan.turns[0].servant_skills[0]
+                    self.assertEqual((cast.servant_slot, cast.skill_index, cast.target_ally),
+                                     (caster + 1, skill_num, caster + 1))
+                    self.assertEqual(saved, original)
+
     def test_historical_alias_uses_canonical_metadata_without_rewriting_original_id(self):
         data = battle()
         data["team"]["onFieldSvts"][0]["svtId"] = 1002100

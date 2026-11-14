@@ -148,12 +148,10 @@ export function hasEnemyTarget(skill:Json|undefined):boolean {
   return Array.isArray(skill?.targets)&&skill.targets.includes('enemy');
 }
 
-/** Ally indices remain current-front 0..2; casterSlot=-1 represents the master. */
-export function allowedAllyTargets(skill:Json|undefined,casterSlot:number,roster:readonly PreviewMember[]):number[] {
-  const targets=Array.isArray(skill?.targets)?skill.targets:[];
-  const excludesSelf=targets.includes('ptOneOther')&&!targets.includes('ptOne');
+/** Effect recipients do not restrict selection: ptOneOther excludes the chosen ally, not the caster. */
+export function allowedAllyTargets(_skill:Json|undefined,_casterSlot:number,roster:readonly PreviewMember[]):number[] {
   return roster.slice(0,3).flatMap((entry,index)=>
-    (hasServantIdentity(entry.member)||isUnspecifiedSupport(entry.member))&&(!excludesSelf||index!==casterSlot)?[index]:[]);
+    hasServantIdentity(entry.member)||isUnspecifiedSupport(entry.member)?[index]:[]);
 }
 
 function decrease(skills:PreviewSkill[]) {
