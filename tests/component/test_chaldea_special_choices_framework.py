@@ -57,7 +57,7 @@ class SpecialChoicesFrameworkTests(unittest.TestCase):
                     state["clicks"].append(name)
                     state["group"] = None
                     state["target"] = state["follow_target"]
-                elif name.startswith("战斗_技能目标子屏_选从者"):
+                elif name.startswith("战斗_技能目标子屏_选从者") and state["target"]:
                     state["clicks"].append(name)
                     state["target"] = False
                 return True

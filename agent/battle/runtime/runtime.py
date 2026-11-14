@@ -1044,6 +1044,13 @@ class AutoBattleRuntime:
             )
             for slot in (1, 2, 3)
         }
+        if Scene.ORDER_CHANGE in return_scenes:
+            # Opening the swap menu is an intermediate step, not a cast animation.
+            # The normal no-overlay acceleration tap dismisses this menu in-game.
+            override[self._SKILL_NO_OVERLAY_BRANCH] = {
+                "action": {"type": "DoNothing"},
+                "post_delay": 600,
+            }
         try:
             entry = (self._run_special_skill_pipeline(override, skill=skill) if skill is not None
                      else self._run_special_skill_pipeline(override))
