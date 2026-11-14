@@ -1,0 +1,2 @@
+# Keep the published PNG conversion reproducible across build hosts.
+Pillow==11.3.0
