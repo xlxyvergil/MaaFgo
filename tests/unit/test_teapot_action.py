@@ -243,7 +243,7 @@ class TeapotTests(unittest.TestCase):
         self.assertEqual(runner.actions, ["茶壶-关闭弹窗"])
 
     def test_transition_does_not_preserve_bar_across_unknown_or_conflicting_entry(self):
-        for kind in ("unknown", "entry", "absent"):
+        for kind in ("unknown", "entry"):
             with self.subTest(kind=kind):
                 frames = [t.TeapotFrame("bar", False), t.TeapotFrame("transition"),
                           t.TeapotFrame(kind), t.TeapotFrame("transition")] * 2
@@ -310,14 +310,55 @@ class TeapotTests(unittest.TestCase):
                 self.assertEqual(runner.actions, [])
                 self.assertEqual(runner.observation_count, 3)
 
-    def test_generic_entry_unknown_and_absence_reset_initial_bar_reading(self):
-        for kind in ("entry", "unknown", "absent"):
+    def test_generic_entry_and_unknown_reset_initial_bar_reading(self):
+        for kind in ("entry", "unknown"):
             with self.subTest(kind=kind):
                 frames = [t.TeapotFrame("bar", False), t.TeapotFrame(kind)] * 4
                 runner = ScriptedRunner(frames)
                 self.assertFalse(runner.run())
                 self.assertEqual(runner.actions, [])
                 self.assertEqual(runner.observation_count, t.OBSERVATION_ROUNDS)
+
+    def test_live_carousel_sequence_keeps_bar_reading_across_empty_fade(self):
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                frames = [t.TeapotFrame("storm"), t.TeapotFrame("transition"),
+                          t.TeapotFrame("bar", desired), t.TeapotFrame("absent"),
+                          t.TeapotFrame("storm"), t.TeapotFrame("transition"),
+                          t.TeapotFrame("bar", desired), t.TeapotFrame("transition")]
+                runner = ScriptedRunner(frames, desired=desired)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observation_count, 7)
+                self.assertEqual(runner.actions, [])
+
+    def test_one_real_bar_then_empty_fades_proves_neither_state_nor_absence(self):
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                runner = ScriptedRunner([t.TeapotFrame("bar", desired)] +
+                                        [t.TeapotFrame("absent")] * 7, desired=desired)
+                self.assertFalse(runner.run())
+                self.assertEqual(runner.observation_count, t.OBSERVATION_ROUNDS)
+                self.assertEqual(runner.actions, [])
+                message = runner.context.override_pipeline.call_args.args[0][t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"]
+                self.assertNotIn("本关无法使用茶壶", message)
+
+    def test_empty_fade_does_not_bridge_unknown_conflict_or_popup(self):
+        for interrupted in (t.TeapotFrame("unknown"), t.TeapotFrame("entry"),
+                            t.TeapotFrame("popup", False)):
+            with self.subTest(interrupted=interrupted):
+                frames = [t.TeapotFrame("bar", False), t.TeapotFrame("absent"),
+                          interrupted, t.TeapotFrame("bar", False)] + [t.TeapotFrame("transition")] * 4
+                runner = ScriptedRunner(frames)
+                self.assertFalse(runner.run())
+                self.assertEqual(runner.observation_count, t.OBSERVATION_ROUNDS)
+                self.assertEqual(runner.actions, [])
+
+    def test_opposite_bar_readings_do_not_accumulate_across_empty_fades(self):
+        frames = [t.TeapotFrame("bar", False), t.TeapotFrame("absent"),
+                  t.TeapotFrame("bar", True), t.TeapotFrame("absent")] * 2
+        runner = ScriptedRunner(frames)
+        self.assertFalse(runner.run())
+        self.assertEqual(runner.actions, [])
 
     def test_opposite_teapot_states_cannot_accumulate_across_storm(self):
         frames = [t.TeapotFrame("bar", False), t.TeapotFrame("storm"),
@@ -367,13 +408,43 @@ class TeapotTests(unittest.TestCase):
         self.assertEqual(runner.actions, ["茶壶-直接设为开启"])
 
     def test_generic_or_opposite_frames_reset_switch_verification(self):
-        for kind, enabled in (("entry", None), ("unknown", None), ("absent", None), ("bar", False)):
+        for kind, enabled in (("entry", None), ("unknown", None), ("bar", False)):
             with self.subTest(kind=kind):
                 frames = ([t.TeapotFrame("bar", False)] * 2 +
                           [t.TeapotFrame("bar", True), t.TeapotFrame(kind, enabled)] * 4)
                 runner = ScriptedRunner(frames, desired=True)
                 self.assertFalse(runner.run())
                 self.assertEqual(runner.actions, ["茶壶-直接设为开启"])
+
+    def test_direct_switch_verification_accepts_two_target_bars_across_empty_fade(self):
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                frames = ([t.TeapotFrame("bar", not desired)] * 2 +
+                          [t.TeapotFrame("bar", desired), t.TeapotFrame("absent"),
+                           t.TeapotFrame("bar", desired)])
+                runner = ScriptedRunner(frames, desired=desired)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observation_count, 5)
+                self.assertEqual(runner.actions, ["茶壶-直接设为开启" if desired else "茶壶-直接设为关闭"])
+
+    def test_one_target_bar_then_empty_fades_cannot_verify_switch(self):
+        frames = ([t.TeapotFrame("bar", False)] * 2 +
+                  [t.TeapotFrame("bar", True)] + [t.TeapotFrame("absent")] * 7)
+        runner = ScriptedRunner(frames, desired=True)
+        self.assertFalse(runner.run())
+        self.assertEqual(runner.observation_count, 2 + t.OBSERVATION_ROUNDS)
+        self.assertEqual(runner.actions, ["茶壶-直接设为开启"])
+
+    def test_popup_close_rechecks_two_outer_bars_across_empty_fade(self):
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                frames = ([t.TeapotFrame("popup", desired)] * 2 +
+                          [t.TeapotFrame("bar", desired), t.TeapotFrame("absent"),
+                           t.TeapotFrame("bar", desired)])
+                runner = ScriptedRunner(frames, desired=desired)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observation_count, 5)
+                self.assertEqual(runner.actions, ["茶壶-关闭弹窗"])
 
     def test_popup_response_cannot_accumulate_across_storm(self):
         frames = ([t.TeapotFrame("bar", False)] * 2 +

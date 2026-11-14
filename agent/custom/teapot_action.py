@@ -141,6 +141,12 @@ class TeapotRunner:
             self._guard()
             saw_formation |= frame.kind != "unknown"
             if frame.kind == "absent":
+                if previous is not None and previous.kind == "bar":
+                    # The automatic-item carousel briefly fades to an empty
+                    # strip. Once a real teapot state is seen, that frame is
+                    # neutral and cannot prove this quest has no teapot bar.
+                    absent_rounds = 0
+                    continue
                 absent_rounds += 1
                 previous, consecutive = None, 0
                 if absent_rounds >= ABSENT_STABLE_FRAMES:
@@ -176,7 +182,7 @@ class TeapotRunner:
             self._guard()
             frame = self.observe()
             self._guard()
-            if (frame.kind in {"storm", "transition"} and previous is not None and previous.kind == "bar"
+            if (frame.kind in {"storm", "transition", "absent"} and previous is not None and previous.kind == "bar"
                     and predicate(previous)):
                 continue
             if predicate(frame):
