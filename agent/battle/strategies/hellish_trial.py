@@ -68,6 +68,9 @@ DEFAULT_NP_INFO = (
     NpInfo("504500", CardColor.ARTS, NpRole.CLEANSE, False),
     NpInfo("500100", CardColor.ARTS, NpRole.PREPARATION, True),
 )
+# Verified JP Tiamat NP: self subState before Buster-up/damageNp. The identity
+# and colour are facts, not configurable roles that another AE may imitate.
+SELF_CLEANSE_FINISHER_COLORS = {"1001600": CardColor.BUSTER}
 _GOAL_COLOR = {1: CardColor.BUSTER, 2: CardColor.ARTS, 3: CardColor.QUICK, 4: None}
 
 
@@ -154,6 +157,10 @@ def propose_cards(
     allow_attack_np: bool = True,
     require_cleanse_before_finish: bool = False,
     np_info: Sequence[NpInfo] = DEFAULT_NP_INFO,
+    charge_priority_servant_ids: Sequence[str] = (),
+    avoid_mighty_chains: bool = False,
+    self_cleanse_finishers: Sequence[str] = (),
+    allowed_face_servant_ids: Sequence[str] | None = None,
 ) -> TrialCardSuggestion:
     """Return three candidates or an explicit no-input wait recommendation.
 
@@ -167,12 +174,39 @@ def propose_cards(
     available cleanse NP first; without one the policy returns no picks. It
     never guesses that Scorch has already expired or was resisted.
 
+    ``charge_priority_servant_ids`` is an optional encounter caller preference:
+    after legal NPs and colour goals, prefer those servants' Arts and later
+    positions. A verified ready NP cancels its owner's priority unless that NP
+    is selected in the same combination. Empty retains the original scoring.
+    ``avoid_mighty_chains`` is a hard filter over all three colours, including
+    verified NP colours. With that filter and final cleansing still required,
+    ``self_cleanse_finishers`` can explicitly whitelist only verified Tiamat:
+    her first Buster attacking NP cleanses before its own damage. Other AEs and
+    a Tiamat NP placed after an ordinary attack get no exception.
+    ``allowed_face_servant_ids`` defaults None. When supplied by the encounter
+    runtime, every ordinary face in a group containing a main finisher NP must
+    belong to that whitelist. Illegal explicitly fixed faces stop; unavailable
+    automatic faces withhold the NP. Pure ordinary collection stays unrestricted.
+
     Reliable ordinary cards may be proposed to cycle an insufficient hand and
     accumulate colours. This is not a damage forecast: ordinary attacks can
     also kill a low-HP bar. The caller remains responsible for stage observation.
     """
     if type(require_cleanse_before_finish) is not bool or type(allow_attack_np) is not bool:
         raise ValueError("解弱化与自动攻击宝具要求必须明确设置为布尔值")
+    if type(avoid_mighty_chains) is not bool:
+        raise ValueError("禁止三色链要求必须明确设置为布尔值")
+    if (any(sid not in SELF_CLEANSE_FINISHER_COLORS for sid in self_cleanse_finishers)
+            or len(set(self_cleanse_finishers)) != len(self_cleanse_finishers)
+            or self_cleanse_finishers and (not avoid_mighty_chains or not require_cleanse_before_finish)):
+        raise ValueError("自身解弱化收尾仅支持已验证的提亚马特，且必须同时禁止三色链并保留收尾解弱化要求")
+    if (any(_identity(sid) != sid for sid in charge_priority_servant_ids)
+            or len(set(charge_priority_servant_ids)) != len(charge_priority_servant_ids)):
+        raise ValueError("蓄能优先名单需要不重复的数字从者ID字符串")
+    if allowed_face_servant_ids is not None and (
+            any(_identity(sid) != sid for sid in allowed_face_servant_ids)
+            or len(set(allowed_face_servant_ids)) != len(allowed_face_servant_ids)):
+        raise ValueError("破条普通卡名单需要不重复的数字从者ID字符串")
     if state.scene is not Scene.COMMAND_SELECTION or not state.scene_confidence.passes(0.95):
         return TrialCardSuggestion(waiting=True, reason="command_scene_not_confirmed")
     if len(state.cards) != 5:
@@ -205,19 +239,32 @@ def propose_cards(
 
     if progress.phase == 4 and require_cleanse_before_finish:
         cleanses = tuple(pick for pick, info in nps.items() if info.role is NpRole.CLEANSE)
-        if not cleanses:
-            return TrialCardSuggestion(waiting=True, reason="cleanse_np_unavailable")
-        if nps.get(fixed[0], None) is None or nps[fixed[0]].role is not NpRole.CLEANSE:
-            if any(pick in fixed for pick in cleanses) or positions and fixed[0] is not None:
-                return TrialCardSuggestion(waiting=True, reason="cleanse_must_precede_all_attacks")
-            if len(prefix) == 3:
-                return TrialCardSuggestion(waiting=True, reason="no_slot_for_required_cleanse")
-            if prefix:
-                fixed = [cleanses[0], *prefix, *([None] * (2 - len(prefix)))]
+        self_cleanses = tuple(pick for pick, info in nps.items()
+            if info.servant_id in self_cleanse_finishers and info.role is NpRole.ALTEREGO
+            and info.damaging and info.color is SELF_CLEANSE_FINISHER_COLORS[info.servant_id])
+        if fixed[0] not in self_cleanses:
+            # An attacking self-cleanse NP is never inserted into a plan that
+            # forbids unplanned attacking NPs. Explicit Tiamat-first is allowed.
+            if not requested and allow_attack_np and self_cleanses:
+                fixed[0] = self_cleanses[0]
             else:
-                fixed[0] = cleanses[0]
+                if not cleanses:
+                    return TrialCardSuggestion(waiting=True, reason="cleanse_np_unavailable")
+                if nps.get(fixed[0], None) is None or nps[fixed[0]].role is not NpRole.CLEANSE:
+                    if any(pick in fixed for pick in cleanses) or positions and fixed[0] is not None:
+                        return TrialCardSuggestion(waiting=True, reason="cleanse_must_precede_all_attacks")
+                    if len(prefix) == 3:
+                        return TrialCardSuggestion(waiting=True, reason="no_slot_for_required_cleanse")
+                    if prefix:
+                        fixed = [cleanses[0], *prefix, *([None] * (2 - len(prefix)))]
+                    else:
+                        fixed[0] = cleanses[0]
 
     mains = tuple(pick for pick, info in nps.items() if info.role is main_role)
+    if (allowed_face_servant_ids is not None and any(pick in mains for pick in requested)
+            and any(pick in faces and faces[pick].owner_servant_id not in allowed_face_servant_ids
+                    for pick in requested)):
+        return TrialCardSuggestion(waiting=True, reason="fixed_finisher_face_forbidden")
     # Other attack/support NPs are never inserted automatically. A caller may
     # explicitly reserve Castoria's NP for final cleansing by omitting its prefix.
     pool = tuple(dict.fromkeys((*faces, *(mains if allow_attack_np else ()))))
@@ -227,6 +274,8 @@ def propose_cards(
     if len(available) < missing:
         return TrialCardSuggestion(waiting=True, reason="fewer_than_three_reliable_candidates")
     candidates = []
+    mighty_blocked = False
+    finisher_face_blocked = False
     for tail in permutations(available, missing):
         picks = list(fixed)
         for index, pick in zip(holes, tail):
@@ -236,8 +285,21 @@ def propose_cards(
         has_main = any(pick in mains for pick in picks)
         if has_main and count < progress.remaining_color_attacks:
             continue
+        if (has_main and allowed_face_servant_ids is not None
+                and any(pick in faces and faces[pick].owner_servant_id not in allowed_face_servant_ids
+                        for pick in picks)):
+            finisher_face_blocked = True
+            continue
+        colors = {faces[pick].color if pick in faces else nps[pick].color for pick in picks}
+        if avoid_mighty_chains and colors == {CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK}:
+            mighty_blocked = True
+            continue
         candidates.append((picks, count))
     if not candidates:
+        if mighty_blocked:
+            return TrialCardSuggestion(waiting=True, reason="mighty_chain_forbidden")
+        if finisher_face_blocked:
+            return TrialCardSuggestion(waiting=True, reason="finisher_faces_unavailable", holds_attack_np=True)
         return TrialCardSuggestion(waiting=True, reason="fixed_np_would_break_before_colour_goal",
                                    holds_attack_np=bool(mains))
 
@@ -270,8 +332,18 @@ def propose_cards(
                 if pick in faces and faces[pick].owner_servant_id in finisher_ids)
             if not collecting and main_positions else 0
         )
+        ready_ids = {info.servant_id for info in nps.values()}
+        spent_ids = {nps[pick].servant_id for pick in picks if pick in nps}
+        charge_weights = {sid: len(charge_priority_servant_ids) - index
+                          for index, sid in enumerate(charge_priority_servant_ids)
+                          if sid not in ready_ids or sid in spent_ids}
+        charge_arts = sum(charge_weights.get(faces[pick].owner_servant_id, 0)
+                          for pick in picks if pick in faces and faces[pick].color is CardColor.ARTS)
+        charge_order = sum((index + 1) * charge_weights.get(faces[pick].owner_servant_id, 0)
+                           for index, pick in enumerate(picks)
+                           if pick in faces and faces[pick].color is CardColor.ARTS)
         return (min(count, progress.remaining_color_attacks), bool(main_positions), first_main,
-                owner_score, finisher_order, colour_order, arts, deterministic)
+                charge_arts, charge_order, owner_score, finisher_order, colour_order, arts, deterministic)
 
     picks, count = max(candidates, key=score)
     holds = bool(mains) and not any(pick in mains for pick in picks)

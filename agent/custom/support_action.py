@@ -117,6 +117,7 @@ CLASS_TABS = {
     "狂战士": (565, 130),
     "OTHER": (629, 130),   # 盾/裁定者/复仇者/降临者/兽/他人格/伪装者/月之癌 共用
     "ALL": (91, 130),      # all 阶(职介筛选选项选 ALL 时点击)
+    "MIX": (698, 130),     # 跨全部助战栏查询；ALL 仅表示独立的 ALL 栏
 }
 
 # ---------------- OCR 资源：兼容打包版和开发目录 ----------------
@@ -177,6 +178,19 @@ EMPTY_CE = ("0_空.png", "空.png")
 
 
 # ---------------- 通用工具 ----------------
+def _support_class_tab(attach, class_name, class_all):
+    """指定从者可显式跨栏搜索；未启用时保留原职介/ALL 筛选。"""
+    if class_name == "any":
+        return None
+    if attach.get("search_all_support_slots") is True:
+        return CLASS_TABS["MIX"]
+    if class_name:
+        if "all" in class_all:
+            return CLASS_TABS["ALL"]
+        return CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
+    return None
+
+
 def _max_swipes_before_refresh(attach):
     """允许特定任务查找更长的助战列表，其余任务保留原来的刷新频率。"""
     value = attach.get("max_swipes_before_refresh", MAX_SWIPE_BEFORE_REFRESH)
@@ -1096,17 +1110,17 @@ class SupportAction(CustomAction):
             self._init_scale(controller)
 
             # 不要求英灵时沿用游戏当前页签；指定英灵时才按职介筛选设置切换。
+            tab = _support_class_tab(attach, class_name, class_all)
             if skip_servant:
                 mfaalog.info("[SupportAction] 不要求英灵，保留当前职介页签")
-            elif class_name:
-                if "all" in class_all:
-                    tab = CLASS_TABS["ALL"]    # ALL 阶: 不按具体职介
-                else:
-                    tab = CLASS_TABS.get(class_name, CLASS_TABS["OTHER"])
+            if tab is not None:
                 for _ in range(3):
                     self._tap(controller, tab[0], tab[1])
                     time.sleep(0.5)
-                mfaalog.info(f"[SupportAction] 点击职介筛选: {class_name} @ {tab}")
+                if attach.get("search_all_support_slots") is True:
+                    mfaalog.info(f"[SupportAction] 点击 MIX 跨全部助战栏查找指定英灵: {class_name} @ {tab}")
+                else:
+                    mfaalog.info(f"[SupportAction] 点击职介筛选: {class_name} @ {tab}")
 
             # 识别一次: 截图->YOLO检测->逐个框判定; 命中点击条目并返回 True(未命中 False)
             def try_match():

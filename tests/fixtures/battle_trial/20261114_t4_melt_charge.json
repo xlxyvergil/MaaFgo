@@ -1,0 +1,19 @@
+{
+  "source": "MaaMCP JP 2026-11-14 attempt1, debug/recognition-32968.log 02:15:52.819; original screenshot attempt1_t3.png shows Meltryllis NP46, but the model does not read that number",
+  "phase": 3,
+  "remainingColorAttacks": 2,
+  "sceneConfidence": 0.992107,
+  "cards": [
+    {"slot": 1, "color": "A", "ownerSlot": 1, "servantId": "304800", "confidence": 0.9631657},
+    {"slot": 2, "color": "Q", "ownerSlot": 3, "servantId": "504500", "confidence": 0.9406592},
+    {"slot": 3, "color": "A", "ownerSlot": 3, "servantId": "504500", "confidence": 0.9761031},
+    {"slot": 4, "color": "A", "ownerSlot": 2, "servantId": "1000200", "confidence": 0.9260104},
+    {"slot": 5, "color": "B", "ownerSlot": 3, "servantId": "504500", "confidence": 0.9591123}
+  ],
+  "npCards": [
+    {"slot": 1, "servantId": "304800", "confidence": 0.9065591, "available": true}
+  ],
+  "fixedNp": {"slot": 2, "actorInitialSlot": 1, "servantId": "1000200"},
+  "oldSelectedSlots": [2, 1, 3],
+  "expectedSelectedSlots": [3, 2, 4]
+}

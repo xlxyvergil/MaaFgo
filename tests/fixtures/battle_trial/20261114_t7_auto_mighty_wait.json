@@ -1,0 +1,22 @@
+{
+  "source": "MaaMCP JP attempt8 T7, debug/recognition-51004.log 2026-11-14 05:13:49.345; screenshot evidence/trial4_continue_20261114/attempt8_frames/frame_0656.png",
+  "phase": 4,
+  "remainingColorAttacks": 0,
+  "sceneConfidence": 0.992107,
+  "cards": [
+    {"slot": 1, "color": "A", "ownerSlot": 1, "servantId": "504500", "confidence": 0.9426464},
+    {"slot": 2, "color": "B", "ownerSlot": 2, "servantId": "1000200", "confidence": 0.9260930},
+    {"slot": 3, "color": "A", "ownerSlot": 1, "servantId": "504500", "confidence": 0.9640493},
+    {"slot": 4, "color": "A", "ownerSlot": 3, "servantId": "4000100", "confidence": 0.9458161},
+    {"slot": 5, "color": "B", "ownerSlot": 3, "servantId": "4000100", "confidence": 0.9484063}
+  ],
+  "npCards": [
+    {"slot": 1, "servantId": "504500", "confidence": 0.9089725, "available": true},
+    {"slot": 2, "servantId": "1000200", "confidence": 0.9026415, "available": true},
+    {"slot": 3, "servantId": "4000100", "confidence": 0.8577384, "available": true}
+  ],
+  "fixedNpSlots": [1, 2],
+  "autoSlots": 1,
+  "expectedWaitFaceSlots": [1, 3, 4],
+  "oldResult": "trial_mighty_chain_forbidden before any T7 selection"
+}

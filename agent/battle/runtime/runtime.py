@@ -161,6 +161,8 @@ class AutoBattleRuntime:
         while turns < self.profile.max_turns:
             self._turn_index = plan_turn
             state = self._observe(settle_main=True)
+            plan_turn = self._plan_turn_after_observation(plan_turn, state)
+            self._turn_index = plan_turn
             scene = state.scene
             mfaalog.info(f"[AutoBattle] Turn {turns+1} | scene={scene.name} | unknown={state.unknown_fields}")
 
@@ -362,7 +364,7 @@ class AutoBattleRuntime:
                 if waiting_action is not None:
                     opening_waits += 1
                 else:
-                    plan_turn += 1
+                    plan_turn = self._plan_turn_after_settlement(plan_turn)
                 continue
 
             # UNKNOWN / ANIMATION（非攻击后语境，如加载）：有界等待
@@ -376,6 +378,13 @@ class AutoBattleRuntime:
         return BattleResult.fail("max_turns_exceeded", turns)
 
     # ---- 内部 ----
+
+    def _plan_turn_after_observation(self, plan_turn, state):
+        """Default plans follow turns; encounter adapters may bind observed stages."""
+        return plan_turn
+
+    def _plan_turn_after_settlement(self, plan_turn):
+        return plan_turn + 1
 
     def _opening_roster_unchanged(self):
         self._ensure_member_tracking()
