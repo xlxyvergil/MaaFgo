@@ -46,7 +46,7 @@ class CapturedSequenceRunner(tea.TeapotRunner):
         index = self.observations
         self.observations += 1
         if index >= len(self.frames) or self.frames[index] is None:
-            # A missing eighth frame is a real failed memory screencap, not a
+            # A missing confirmation frame is a real failed screencap, not a
             # manufactured "absent" or a repeat of the previous valid frame.
             self.memory_controller.fail_capture = True
         else:
@@ -142,7 +142,7 @@ class SharedEmptyItemBarTests(unittest.TestCase):
         finally:
             tasker.post_stop().wait()
 
-    def test_generic_context_both_settings_require_eight_frames_and_no_input(self):
+    def test_generic_context_both_settings_require_three_frames_and_no_input(self):
         def check(context, controller):
             for desired in (False, True):
                 self.assertTrue(context.override_pipeline({tea.CONFIG_NODE: {
@@ -153,11 +153,11 @@ class SharedEmptyItemBarTests(unittest.TestCase):
                 self.assertEqual(config, {"use_teapot": desired})
                 image = self.page()
                 self.assertTrue(context.run_recognition(EMPTY_NODE, image).hit)
-                runner = CapturedSequenceRunner(context, controller, [image] * 8)
+                runner = CapturedSequenceRunner(context, controller, [image] * tea.ABSENT_STABLE_FRAMES)
                 self.assertTrue(runner.run())
-                self.assertEqual(runner.observations, 8)
-                self.assertEqual(runner.observed_kinds, ["absent"] * 8)
-                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * 8)
+                self.assertEqual(runner.observations, tea.ABSENT_STABLE_FRAMES)
+                self.assertEqual(runner.observed_kinds, ["absent"] * tea.ABSENT_STABLE_FRAMES)
+                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * tea.ABSENT_STABLE_FRAMES)
                 message = context.get_node_data(tea.NOTICE_NODE)["focus"]["Node.Recognition.Starting"]
                 self.assertIn("本关无法使用茶壶", message)
         self.run_in_context(check)
@@ -194,24 +194,34 @@ class SharedEmptyItemBarTests(unittest.TestCase):
                 self.assertEqual(runner.observe(), expected)
         self.run_in_context(check)
 
-    def test_seventh_frame_is_insufficient_if_eighth_is_unknown_storm_or_transition(self):
+    def test_two_frames_are_insufficient_if_followed_by_unknown_storm_or_transition(self):
         def check(context, controller):
             empty = self.page()
-            for eighth in (self.page(header=False), self.page(empty=False), self.page(item="bar_storm_on")):
-                runner = CapturedSequenceRunner(context, controller, [empty] * 7 + [eighth])
+            for third in (self.page(header=False), self.page(empty=False), self.page(item="bar_storm_on")):
+                runner = CapturedSequenceRunner(context, controller, [empty] * 2 + [third] * 6)
                 self.assertFalse(runner.run())
                 self.assertEqual(runner.observations, 8)
-                self.assertEqual(runner.observed_kinds[:7], ["absent"] * 7)
+                self.assertEqual(runner.observed_kinds[:2], ["absent"] * 2)
                 self.assertNotEqual(runner.observed_kinds[-1], "absent")
                 self.assertEqual(runner.tasks, [tea.WAIT_NODE] * 8)
         self.run_in_context(check)
 
-    def test_missing_eighth_capture_never_reuses_old_absent_as_confirmation(self):
+    def test_missing_third_capture_never_reuses_old_absent_as_confirmation(self):
         def check(context, controller):
-            runner = CapturedSequenceRunner(context, controller, [self.page()] * 7 + [None])
+            runner = CapturedSequenceRunner(context, controller, [self.page()] * 2 + [None])
             self.assertFalse(runner.run())
-            self.assertEqual(runner.observations, 8)
-            self.assertEqual(runner.observed_kinds, ["absent"] * 7)
+            self.assertEqual(runner.observations, 3)
+            self.assertEqual(runner.observed_kinds, ["absent"] * 2)
+        self.run_in_context(check)
+
+    def test_transient_frame_restarts_three_frame_confirmation_within_budget(self):
+        def check(context, controller):
+            empty = self.page()
+            runner = CapturedSequenceRunner(context, controller,
+                [empty] * 2 + [self.page(empty=False)] + [empty] * 3)
+            self.assertTrue(runner.run())
+            self.assertEqual(runner.observed_kinds, ["absent", "absent", "transition"] + ["absent"] * 3)
+            self.assertEqual(controller.inputs, 0)
         self.run_in_context(check)
 
 

@@ -50,6 +50,86 @@ def publish(store, root, token):
 
 
 class SessionTests(unittest.TestCase):
+    def test_teapot_cache_requires_confirmation_and_repeat_scope(self):
+        store = FormationSessions()
+        single = store.begin(1)
+        self.assertFalse(store.confirm_teapot(1, single, False))
+        self.assertFalse(store.teapot_confirmed(1, single, False))
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                token = store.begin(2, repeat=True)
+                self.assertFalse(store.teapot_confirmed(2, token, desired))
+                self.assertTrue(store.confirm_teapot(2, token, desired))
+                self.assertTrue(store.teapot_confirmed(2, token, desired))
+                for invalid in (None, 0, 1, "false"):
+                    self.assertFalse(store.confirm_teapot(2, token, invalid))
+                    self.assertFalse(store.teapot_confirmed(2, token, invalid))
+                self.assertTrue(store.teapot_confirmed(2, token, desired))
+
+    def test_teapot_cache_is_independent_of_battle_and_formation_lifecycle(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, False))
+        publish(store, 1, token)
+        store.prepare_continuation(1, token)
+        store.battle_started(1, token, 2)
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+        revision = store.begin_update(1, token)
+        store.abandon_update(1, token, revision)
+        store.begin_capture(1, token)
+        store.skip_capture(1, token)
+        store.set_support_fallback(1, token, True)
+        store.set_support_fallback(1, token, False)
+        store.invalidate(1, token, "formation_check_failed")
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+
+    def test_teapot_configuration_change_clears_old_confirmation(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, token, False))
+        # 新目标检查失败、用户改回原目标时，也必须重新确认。
+        self.assertFalse(store.teapot_confirmed(1, token, True))
+        self.assertTrue(store.confirm_teapot(1, token, False))
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+
+    def test_teapot_cache_rejects_foreign_expired_and_restarted_tokens(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        other = store.begin(2, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.confirm_teapot(2, token, True))
+        self.assertFalse(store.teapot_confirmed(2, token, True))
+        self.assertFalse(store.teapot_confirmed(2, other, True))
+        newer = store.begin(1, repeat=True)
+        self.assertFalse(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, newer, True))
+        self.assertTrue(store.confirm_teapot(1, newer, False))
+        store.finish(1, token)
+        self.assertTrue(store.teapot_confirmed(1, newer, False))
+        store.finish(1, newer)
+        self.assertFalse(store.teapot_confirmed(1, newer, False))
+        self.assertFalse(store.confirm_teapot(1, newer, False))
+
+    def test_task_start_and_owner_stop_clear_only_their_teapot_confirmations(self):
+        store = FormationSessions()
+        for root in (1, 2):
+            store.task_started(root, f"device-{root}")
+        first, second = store.begin(1, repeat=True), store.begin(2, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, first, False))
+        self.assertTrue(store.confirm_teapot(2, second, True))
+        store.stop_owner("device-1")
+        self.assertFalse(store.teapot_confirmed(1, first, False))
+        self.assertTrue(store.teapot_confirmed(2, second, True))
+        store.task_started(2, "device-2")
+        self.assertFalse(store.teapot_confirmed(2, second, True))
+        newer = store.begin(2, repeat=True)
+        self.assertFalse(store.teapot_confirmed(2, newer, True))
+        self.assertTrue(store.confirm_teapot(2, newer, False))
+        store.stop_owner("")
+        self.assertFalse(store.teapot_confirmed(2, newer, False))
+
     def test_repeat_reuses_initial_snapshot_without_mutating_positions(self):
         store = FormationSessions()
         token = store.begin(1, repeat=True)

@@ -109,45 +109,46 @@ class TeapotTests(unittest.TestCase):
                 self.assertEqual(runner.observe(), expected)
                 self.assertNotIn("茶壶-识别无自动道具栏", [call.args[0] for call in runner._hit.call_args_list])
 
-    def test_empty_full_strip_requires_all_eight_samples_and_makes_no_input(self):
+    def test_empty_full_strip_requires_three_samples_and_makes_no_input(self):
         hits = {"茶壶-识别编队页", "茶壶-识别无自动道具栏", "茶壶-识别交替过渡"}
         for desired in (False, True):
             runner = self.recognition_runner(hits, desired=desired)
             with self.subTest(desired=desired):
                 self.assertTrue(runner.run())
-                self.assertEqual(runner._capture.call_count, 8)
+                self.assertEqual(runner._capture.call_count, t.ABSENT_STABLE_FRAMES)
                 self.assertEqual(sum(call.args[0] == "茶壶-识别无自动道具栏"
-                                     for call in runner._hit.call_args_list), 8)
+                                     for call in runner._hit.call_args_list), t.ABSENT_STABLE_FRAMES)
                 runner.context.run_task.assert_called_once_with(t.NOTICE_NODE)
                 self.assertIn("本关无法使用茶壶", runner.context.override_pipeline.call_args.args[0]
                               [t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"])
                 runner.context.get_node_data.assert_called_with(t.CONFIG_NODE)
 
-    def test_late_real_transition_interrupts_absence_evidence(self):
+    def test_transition_before_third_sample_interrupts_absence_evidence(self):
         hits = {"茶壶-识别编队页", "茶壶-识别交替过渡"}
         runner = self.recognition_runner(hits)
         runner._hit.side_effect = lambda name, _: (
-            name in hits or name == "茶壶-识别无自动道具栏" and runner._capture.call_count < 8)
+            name in hits or name == "茶壶-识别无自动道具栏" and runner._capture.call_count < 3)
         self.assertFalse(runner.run())
         self.assertEqual(runner._capture.call_count, 8)
         self.assertIn("校验失败", runner.context.override_pipeline.call_args.args[0]
                       [t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"])
 
-    def test_eighth_non_absent_frame_cannot_confirm_empty_bar(self):
+    def test_two_absent_samples_then_uncertain_frames_cannot_confirm_empty_bar(self):
         for frame in (t.TeapotFrame("unknown"), t.TeapotFrame("transition"),
                       t.TeapotFrame("storm"), t.TeapotFrame("entry"),
                       t.TeapotFrame("bar", False), t.TeapotFrame("popup", False)):
             with self.subTest(frame=frame):
-                runner = ScriptedRunner([t.TeapotFrame("absent")] * 7 + [frame])
+                runner = ScriptedRunner([t.TeapotFrame("absent")] * 2 + [frame]
+                                        + [t.TeapotFrame("unknown")] * 5)
                 self.assertFalse(runner.run())
                 self.assertEqual(runner.observation_count, 8)
                 self.assertEqual(runner.actions, [])
 
     def test_two_real_bar_readings_after_empty_frames_take_precedence(self):
-        runner = ScriptedRunner([t.TeapotFrame("absent")] * 6
+        runner = ScriptedRunner([t.TeapotFrame("absent")] * 2
                                 + [t.TeapotFrame("bar", False)] * 2)
         self.assertEqual(runner._initial(), t.TeapotFrame("bar", False))
-        self.assertEqual(runner.observation_count, 8)
+        self.assertEqual(runner.observation_count, 4)
 
     def test_capture_uses_pipeline_wait_and_never_waits_for_screenshot_job_status(self):
         ctx = context()
@@ -271,7 +272,8 @@ class TeapotTests(unittest.TestCase):
                 self.assertEqual(runner.observation_count, t.OBSERVATION_ROUNDS)
                 self.assertEqual(runner.actions, [])
                 message = runner.context.override_pipeline.call_args.args[0][t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"]
-                self.assertIn("检测到茶壶入口", message)
+                self.assertIn("未能", message)
+                self.assertNotIn("检测到茶壶入口", message)
 
     def test_opposite_teapot_state_resets_transition_readings(self):
         frames = [t.TeapotFrame("bar", False), t.TeapotFrame("transition"),
@@ -335,7 +337,7 @@ class TeapotTests(unittest.TestCase):
         self.assertFalse(runner.run())
         self.assertEqual(runner.actions, [])
         message = runner.context.override_pipeline.call_args.args[0][t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"]
-        self.assertIn("检测到茶壶入口", message)
+        self.assertIn("道具栏", message)
 
     def test_storm_does_not_turn_one_teapot_reading_into_two(self):
         runner = ScriptedRunner([t.TeapotFrame("bar", False)] + [t.TeapotFrame("storm")] * 7)
@@ -462,19 +464,20 @@ class TeapotTests(unittest.TestCase):
         self.assertFalse(runner.run())
         self.assertEqual(runner.actions, ["茶壶-直接设为开启"])
 
-    def test_eight_clear_absent_samples_notify_and_continue_for_both_settings(self):
+    def test_three_clear_absent_samples_notify_and_continue_for_both_settings(self):
         for desired in (False, True):
             with self.subTest(desired=desired):
                 runner = ScriptedRunner([t.TeapotFrame("absent")] * 8, desired=desired)
                 self.assertTrue(runner.run())
-                self.assertEqual(runner.observation_count, 8)
+                self.assertEqual(runner.observation_count, 3)
                 self.assertEqual(runner.actions, [])
                 runner.context.run_task.assert_called_once_with(t.NOTICE_NODE)
                 message = runner.context.override_pipeline.call_args.args[0][t.NOTICE_NODE]["focus"]["Node.Recognition.Starting"]
                 self.assertIn("本关无法使用茶壶", message)
 
     def test_late_flashing_entry_cannot_be_misclassified_as_absent(self):
-        runner = ScriptedRunner([t.TeapotFrame("absent")] * 7 + [t.TeapotFrame("entry")])
+        runner = ScriptedRunner([t.TeapotFrame("absent")] * 2 + [t.TeapotFrame("entry")]
+                                + [t.TeapotFrame("unknown")] * 5)
         self.assertFalse(runner.run())
         self.assertEqual(runner.actions, [])
         self.assertEqual(runner.observation_count, 8)
@@ -487,9 +490,23 @@ class TeapotTests(unittest.TestCase):
         runner.context.override_pipeline.assert_not_called()
 
     def test_unknown_interruption_resets_absent_evidence(self):
-        runner = ScriptedRunner([t.TeapotFrame("absent")] * 3 + [t.TeapotFrame("unknown")] +
-                                [t.TeapotFrame("absent")] * 4)
+        runner = ScriptedRunner(([t.TeapotFrame("absent")] * 2 + [t.TeapotFrame("unknown")]) * 2
+                                + [t.TeapotFrame("absent")] * 2)
         self.assertFalse(runner.run())
+        self.assertEqual(runner.actions, [])
+
+    def test_empty_confirmation_recovers_from_a_transient_low_score(self):
+        runner = ScriptedRunner([t.TeapotFrame("absent")] * 2 + [t.TeapotFrame("transition")]
+                                + [t.TeapotFrame("absent")] * 3)
+        self.assertTrue(runner.run())
+        self.assertEqual(runner.observation_count, 6)
+        self.assertEqual(runner.actions, [])
+
+    def test_video_failure_sequence_now_confirms_without_waiting_for_all_eight(self):
+        runner = ScriptedRunner([t.TeapotFrame("absent")] * 4 + [t.TeapotFrame("transition")]
+                                + [t.TeapotFrame("absent")] * 3)
+        self.assertTrue(runner.run())
+        self.assertEqual(runner.observation_count, 3)
         self.assertEqual(runner.actions, [])
 
     def test_visible_entry_with_unreadable_state_never_continues_as_absent(self):
