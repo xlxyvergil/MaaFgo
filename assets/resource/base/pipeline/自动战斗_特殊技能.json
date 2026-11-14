@@ -15,8 +15,7 @@
         "doc": "tdTypeChanges=1，攻击型C.C.C.（2300601）；实际卡色为Arts。只在宝具菜单正向确认后点击OCR结果，尚待实机验收。",
         "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["攻撃タイプ|攻击类型|攻击型|攻擊類型|攻擊型"]}},
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -24,8 +23,7 @@
         "doc": "tdTypeChanges=2，防御型G.G.G.（2300698）；选择值2不表示Buster，实际仍是Arts。2026-11-14日服MaaMCP在完整父门禁后命中防御类型OCR并点击，选卡和宝具释放已验证；国服待实机。类型变化标签会遮挡选卡图的下部射线，正式合成卡识别对已标定身份屏蔽该HUD，保持0.80阈值。",
         "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["防御タイプ|防御类型|防御型|防禦類型|防禦型"]}},
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -48,8 +46,7 @@
             {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Arts宝具选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["Arts|Ａｒｔｓ|アーツ"]}}}
         ]}},
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -60,8 +57,7 @@
             {"sub_name": "base/自动战斗_特殊技能/战斗_卫宫3技能_Buster宝具选择/OCR1", "recognition": {"type": "OCR", "param": {"roi": [120, 300, 1040, 260], "expected": ["Buster|Ｂｕｓｔｅｒ|バスター"]}}}
         ]}},
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -107,8 +103,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_仇凛2技能_选B": {
         "action": {
@@ -120,8 +115,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_仇凛2技能_选Q": {
         "action": {
@@ -133,8 +127,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_岸波白野3技能_天之力选择": {
         "doc": "岸波白野3技能「天之力」选项：模板识别（ROI [428,386,221,77]，点识别位置）。命中即选天之力并关闭子屏；后续如需其他力选项（地之力等），新增对应模板节点挂入入口 next，顺序即优先级",
@@ -157,8 +150,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -185,8 +177,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -213,8 +204,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -265,8 +255,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -319,6 +308,7 @@
         "post_delay": 1000
     },
     "战斗_技能目标子屏": {
+        "doc": "选中我方目标后，三个选人节点均通过 post_delay 等待1秒，再由 Runtime 识别作战按钮，降低目标窗口关闭而技能动画尚未开始时提前放行的可能。",
         "recognition": {
             "type": "OCR",
             "param": {
@@ -353,8 +343,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_技能目标子屏_选从者2": {
         "action": {
@@ -366,8 +355,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_技能目标子屏_选从者3": {
         "action": {
@@ -379,8 +367,7 @@
                 ]
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500
+        "post_delay": 1000
     },
     "战斗_特殊技能_已回主界面": {
         "doc": "多步链终点：覆盖层处理完直接回了主界面（如库库尔坎 1/3 技能选完暴击星后无后续子屏）。DirectHit 立即命中结束，避免空等目标子屏的 timeout；与「无覆盖层」的区别是本节点处于链中（前面已处理过覆盖层）"
@@ -473,8 +460,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -501,8 +487,7 @@
                 "target": true
             }
         },
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": [
             "战斗_技能目标子屏",
             "战斗_特殊技能_已回主界面"
@@ -519,8 +504,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_马嘶1技能_毅力选择": {
@@ -534,8 +518,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_梵高矿工1技能_Quick选择": {
@@ -549,8 +532,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_梵高矿工1技能_Arts选择": {
@@ -564,8 +546,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_梵高矿工1技能_Buster选择": {
@@ -579,8 +560,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_莉莉丝3技能_不赋予选择": {
@@ -594,8 +574,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_莉莉丝3技能_赋予选择": {
@@ -609,8 +588,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_普雷拉蒂1技能_不换形态选择": {
@@ -624,8 +602,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_普雷拉蒂1技能_换形态选择": {
@@ -639,8 +616,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_夏洛特3技能_Arts选择": {
@@ -650,8 +626,7 @@
             "param": {"roi": [416, 386, 223, 72], "expected": ["Artsアップ"]}
         },
         "action": {"type": "Click", "param": {"target": [527, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_夏洛特3技能_暴击威力选择": {
@@ -661,8 +636,7 @@
             "param": {"roi": [658, 386, 223, 72], "expected": ["クリティカル威力アップ"]}
         },
         "action": {"type": "Click", "param": {"target": [770, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_夏洛特3技能_宝具威力选择": {
@@ -672,8 +646,7 @@
             "param": {"roi": [900, 386, 221, 72], "expected": ["宝具威力アップ"]}
         },
         "action": {"type": "Click", "param": {"target": [1010, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_芙萝拉3技能_通常状态选择": {
@@ -687,8 +660,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_芙萝拉3技能_冥界之花园状态选择": {
@@ -702,8 +674,7 @@
             }
         },
         "action": {"type": "Click", "param": {"target": true}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_安哥拉曼纽3技能_无毅力选择": {
@@ -713,8 +684,7 @@
             "param": {"roi": [416, 386, 223, 72], "expected": ["ガッツなし"]}
         },
         "action": {"type": "Click", "param": {"target": [527, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_安哥拉曼纽3技能_50%毅力选择": {
@@ -724,8 +694,7 @@
             "param": {"roi": [658, 386, 223, 72], "expected": ["ガッツ50%回復"]}
         },
         "action": {"type": "Click", "param": {"target": [770, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_安哥拉曼纽3技能_1HP毅力选择": {
@@ -735,8 +704,7 @@
             "param": {"roi": [900, 386, 221, 72], "expected": ["ガッツ1回復"]}
         },
         "action": {"type": "Click", "param": {"target": [1010, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_但丁2技能_天国Arts选择": {
@@ -746,8 +714,7 @@
             "param": {"roi": [493, 386, 294, 72], "expected": ["天国化(Arts強化)", "天国化"]}
         },
         "action": {"type": "Click", "param": {"target": [640, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_但丁2技能_地狱Buster选择": {
@@ -757,8 +724,7 @@
             "param": {"roi": [813, 386, 296, 72], "expected": ["地獄化(Buster強化)", "地獄化"]}
         },
         "action": {"type": "Click", "param": {"target": [961, 422]}},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"]
     },
     "战斗_特殊技能_未支持选项": {
@@ -776,8 +742,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["日輪|日轮|単体タイプ|单体宝具|單體寶具"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -787,8 +752,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["地の力|地之力"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -798,8 +762,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["人の力|人之力"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -809,8 +772,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["^Quick$|绿卡|綠卡"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -820,8 +782,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["^Arts$|蓝卡|藍卡"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     },
@@ -831,8 +792,7 @@
             "roi": [120, 350, 1040, 150], "expected": ["^単体化する$|^单体宝具$|^單體寶具$"]
         }},
         "action": {"type": "Click"},
-        "post_wait_freezes": 500,
-        "post_delay": 500,
+        "post_delay": 1000,
         "next": ["战斗_技能目标子屏", "战斗_特殊技能_已回主界面"],
         "on_error": []
     }
