@@ -166,8 +166,16 @@ class AutoBattleRepeatAction(CustomAction):
             # 在每场战斗前重置节点命中计数（修复 bug：Context.task_state_ 是共享的）
             _reset_hit_counts(context, reset_hit_nodes)
 
+            # 复用当前场次，在单场入口输出客户端可见提示，不受普通日志开关影响。
+            round_override = {
+                **battle_override,
+                entry: {
+                    **battle_override.get(entry, {}),
+                    "focus": {"Node.Action.Starting": f"当前第{current}场战斗。"},
+                },
+            }
             try:
-                detail = context.run_task(entry, pipeline_override=battle_override)
+                detail = context.run_task(entry, pipeline_override=round_override)
             except Exception as e:
                 last_error = f"异常: {e}"
                 mfaalog.error(f"[auto_battle_repeat] Battle {current} {last_error}")

@@ -203,6 +203,13 @@ class EntryTests(unittest.TestCase):
         self.assertTrue(r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param='{"battle_count":3}')).success)
         self.assertEqual([x[1] for x in snapshots], [1, 2, 3])
         self.assertTrue(all(x[0] is snapshots[0][0] for x in snapshots))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         [r._NODE_FIRST_BATTLE, r._NODE_NEXT_BATTLE, r._NODE_LAST_BATTLE])
+        self.assertEqual(
+            [call.kwargs["pipeline_override"][call.args[0]]["focus"]["Node.Action.Starting"]
+             for call in ctx.run_task.call_args_list],
+            [f"当前第{current}场战斗。" for current in range(1, 4)],
+        )
 
     def test_trial_repeat_uses_full_entry_and_own_count_attach(self):
         ctx = FakeContext()
@@ -215,7 +222,12 @@ class EntryTests(unittest.TestCase):
         self.assertTrue(result.success)
         self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
                          ["地狱的试炼-单场入口"] * 3)
-        self.assertTrue(all(call.kwargs["pipeline_override"] == {} for call in ctx.run_task.call_args_list))
+        self.assertEqual(
+            [call.kwargs["pipeline_override"] for call in ctx.run_task.call_args_list],
+            [{"地狱的试炼-单场入口": {
+                "focus": {"Node.Action.Starting": f"当前第{current}场战斗。"},
+            }} for current in range(1, 4)],
+        )
         self.assertEqual(ctx.clear_hit_count.call_count, 3)
 
     def test_trial_repeat_stops_on_failed_round_without_starting_next(self):
