@@ -91,6 +91,7 @@ from ..core.decider import RuleDecider
 from ..core.enums import CardColor, PrimitiveKind, Scene
 from ..core.models import BattleAction, BattleState, CardPick, ServantSkillAction
 from ..data.servant_identity import _servant_lookup, servant_name
+from ..perception import perception
 from ..strategies.hellish_trial import (
     DEFAULT_NP_INFO, SELF_CLEANSE_FINISHER_COLORS, NpInfo, NpRole, TrialProgress,
     confirm_submission, propose_cards,
@@ -772,7 +773,6 @@ class HellishTrialRuntime(AutoBattleRuntime):
         self._trial_selection_state: BattleState | None = None
         self._trial_confirmed_turns = 0
         self._trial_seen_cleanser_slots: dict[str, int] = {}
-        self._trial_reading_real_skills = False
 
     def run(self) -> BattleResult:
         try:
@@ -786,10 +786,12 @@ class HellishTrialRuntime(AutoBattleRuntime):
             return plan_turn
         return self.decider.plan_turn_for_phase(plan_turn)
 
-    def _has_active_plan(self):
-        if self._trial_reading_real_skills:
-            return False  # Repeated rows must observe real cooldowns, never patched availability.
-        return super()._has_active_plan()
+    def _should_read_skill_cooldowns(self):
+        # The phase is mapped after observing the current frame. Until then the
+        # previous row cannot prove that this is a fresh fixed-plan execution.
+        # Defer stage cooldowns until that mapping; waiting rows read the same
+        # frame below, while fresh fixed rows need no cooldown recognition.
+        return not self.decider.phase_plan_enabled and super()._should_read_skill_cooldowns()
 
     def _plan_turn_after_settlement(self, plan_turn):
         if self.decider.phase_plan_enabled:
@@ -814,15 +816,7 @@ class HellishTrialRuntime(AutoBattleRuntime):
         return hits[0]
 
     def _observe(self, *, settle_main=False, enemy_slots=None):
-        # This flag controls perception only. Fixed Master skills/order changes
-        # must still belong to an active plan after decide marks a row started.
-        self._trial_reading_real_skills = bool(self.decider.phase_plan_enabled
-            and self.decider.config.repeat_ready_skill_servant_ids
-            and self._turn_index in self.decider._started_skill_turns)
-        try:
-            state = super()._observe(settle_main=settle_main, enemy_slots=enemy_slots)
-        finally:
-            self._trial_reading_real_skills = False
+        state = super()._observe(settle_main=settle_main, enemy_slots=enemy_slots)
         self._check_cleanser_survival(state)
         if state.scene in (Scene.MAIN_BATTLE, Scene.COMMAND_SELECTION):
             phase = self._read_phase()
@@ -835,12 +829,16 @@ class HellishTrialRuntime(AutoBattleRuntime):
                 self._trial_deferred_phase = phase
             if self.decider.phase_plan_enabled and self._trial_pending is None:
                 mapped = self.decider.plan_turn_for_phase(self._turn_index)
-                if mapped != self._turn_index:
-                    self._turn_index = mapped
-                    if state.scene is Scene.MAIN_BATTLE and self._has_active_plan():
-                        # A Break may only become visible on this first new
-                        # main frame, after the parent's availability decision.
-                        state = self._patch_skills_available(state)
+                self._turn_index = mapped
+            if self.decider.phase_plan_enabled and state.scene is Scene.MAIN_BATTLE:
+                fixed_row = (self._trial_pending is None and self._has_active_plan()
+                             and self._turn_index not in self.decider._started_skill_turns
+                             and not getattr(self, "_opening_hand_pending", False))
+                if not fixed_row:
+                    # The parent only populated plan availability. Refresh it
+                    # from that exact frame for opening/stage waits and pending
+                    # submissions; never take another screenshot or reuse CD.
+                    state = perception.read_skill_cooldowns(self.ctx, self._observation_image, state)
         if state.scene is Scene.COMMAND_SELECTION:
             self._trial_selection_state = state
         return state

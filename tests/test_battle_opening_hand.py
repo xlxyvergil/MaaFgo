@@ -96,6 +96,14 @@ class OpeningHandRuntimeTests(unittest.TestCase):
     def test_waiting_uses_no_skill_or_np_and_keeps_plan_turn_zero_until_hand_is_ready(self):
         runtime, events = runtime_for([main(), command(ready=False), main(), command(), main(), command(),
                                        main(), command(), victory()])
+        frames = runtime._observe.side_effect
+        cooldown_modes = []
+
+        def observe(**_):
+            cooldown_modes.append(runtime._should_read_skill_cooldowns())
+            return next(frames)
+
+        runtime._observe.side_effect = observe
         result = runtime.run()
         self.assertTrue(result.ok, result.reason)
         self.assertEqual(result.turns, 3)
@@ -105,6 +113,7 @@ class OpeningHandRuntimeTests(unittest.TestCase):
         self.assertEqual(selected[1].picks[0].kind, Kind.SELECT_NP)
         self.assertEqual([call.kwargs["turn_index"] for call in runtime.decider.decide.call_args_list], [0, 0, 1, 1])
         self.assertEqual([event[1] for event in events if event[0] == "skills"], [0, 1])
+        self.assertEqual(cooldown_modes, [True, True, True, True, False, False, False, False, True])
         self.assertLess(next(i for i, event in enumerate(events) if event[0] == "cards"),
                         next(i for i, event in enumerate(events) if event[0] == "skills"))
 
