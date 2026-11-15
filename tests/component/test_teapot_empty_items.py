@@ -162,6 +162,23 @@ class SharedEmptyItemBarTests(unittest.TestCase):
                 self.assertIn("本关无法使用茶壶", message)
         self.run_in_context(check)
 
+    def test_skip_option_bypasses_all_observation_even_when_capture_is_unavailable(self):
+        option = json.loads((ROOT / "assets/options/原生自动战斗是否使用茶壶.json").read_text("utf-8"))
+        cases = option["option"]["原生自动战斗是否使用茶壶"]["cases"]
+        override = next(case["pipeline_override"] for case in cases if case["name"] == "Skip")
+
+        def check(context, controller):
+            self.assertTrue(context.override_pipeline(override))
+            self.assertEqual(tea._settings(context), "skip")
+            controller.fail_capture = True
+            runner = CapturedSequenceRunner(context, controller, [])
+            self.assertTrue(runner.run())
+            self.assertEqual(runner.observations, 0)
+            self.assertEqual(runner.observed_kinds, [])
+            self.assertEqual(runner.tasks, [])
+
+        self.run_in_context(check)
+
     def test_header_and_both_info_anchors_are_required_for_positive_empty_proof(self):
         def check(context, controller):
             frames = [self.page(header=False), self.page(info=False),

@@ -44,12 +44,13 @@ class NativeTeapotOptionTests(unittest.TestCase):
 
     def test_default_off_changes_configuration_without_disabling_detection(self):
         option = read(f"assets/options/{OPTION}.json")["option"][OPTION]
-        self.assertEqual(option["type"], "switch")
+        self.assertEqual(option["type"], "select")
         self.assertEqual(option["label"], "是否使用茶壶")
         self.assertEqual(option["default_case"], "No")
         cases = {case["name"]: case for case in option["cases"]}
-        self.assertEqual(set(cases), {"No", "Yes"})
-        for name, expected in (("No", False), ("Yes", True)):
+        self.assertEqual([case["label"] for case in option["cases"]], ["使用", "不使用", "不检测"])
+        self.assertEqual(set(cases), {"No", "Yes", "Skip"})
+        for name, expected in (("No", False), ("Yes", True), ("Skip", "skip")):
             self.assertEqual(cases[name]["pipeline_override"], {
                 CONFIG: {"attach": {"use_teapot": expected}},
             })

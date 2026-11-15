@@ -45,8 +45,8 @@ class TeapotUnconfirmed(RuntimeError):
 def _settings(context):
     node = context.get_node_data(CONFIG_NODE) or {}
     value = (node.get("attach") or {}).get("use_teapot", False)
-    if type(value) is not bool:
-        raise ValueError("是否使用茶壶必须为布尔值")
+    if type(value) is not bool and value != "skip":
+        raise ValueError("无法读取茶壶选项，不能确定是否需要调整茶壶。请在“是否使用茶壶”中重新选择“使用”“不使用”或“不检测”后重试")
     return value
 
 
@@ -227,6 +227,9 @@ class TeapotRunner:
         try:
             self._guard()
             desired = _settings(self.context)
+            if desired == "skip":
+                mfaalog.info("[茶壶] 已选择不检测，跳过茶壶检测和设置，沿用游戏内当前状态。")
+                return True
             repeat_session = self._repeat_session()
             if repeat_session and sessions.teapot_confirmed(*repeat_session, desired):
                 self._guard()

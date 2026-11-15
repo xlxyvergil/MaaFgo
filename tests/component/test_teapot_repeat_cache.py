@@ -101,6 +101,21 @@ class TeapotRepeatCacheTests(unittest.TestCase):
                 self.store.battle_started(context.root, token, 3)
                 self.assert_cached_without_observation(Context(context.root, token, desired))
 
+    def test_skip_never_observes_or_seeds_confirmation_in_single_or_repeat_session(self):
+        for repeat in (False, True):
+            with self.subTest(repeat=repeat):
+                context, token = self.begin(desired="skip", repeat=repeat)
+                runner = Runner(context)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observations, 0)
+                self.assertEqual(runner.actions, [])
+                context.run_task.assert_not_called()
+                for desired in (False, True):
+                    self.assertFalse(self.store.teapot_confirmed(context.root, token, desired))
+                checked = Runner(Context(context.root, token, False), self.bar(False))
+                self.assertTrue(checked.run())
+                self.assertEqual(checked.observations, tea.STABLE_FRAMES)
+
     def test_unavailable_first_quest_rechecks_next_party_page_then_reuses_success(self):
         for desired in (False, True):
             with self.subTest(desired=desired):

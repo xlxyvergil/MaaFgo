@@ -59,18 +59,40 @@ class TeapotTests(unittest.TestCase):
             patcher.start()
             self.addCleanup(patcher.stop)
 
-    def test_missing_setting_defaults_to_false_and_only_booleans_are_accepted(self):
+    def test_missing_setting_defaults_to_false_and_accepts_three_states(self):
         ctx = context()
         for node in ({}, {"attach": {}}, {"attach": {"use_teapot": False}}):
             ctx.get_node_data.return_value = node
             self.assertIs(t._settings(ctx), False)
         ctx.get_node_data.return_value = {"attach": {"use_teapot": True}}
         self.assertIs(t._settings(ctx), True)
+        ctx.get_node_data.return_value = {"attach": {"use_teapot": "skip"}}
+        self.assertEqual(t._settings(ctx), "skip")
         for invalid in (0, 1, None, "false", "true", [], {}):
             with self.subTest(value=invalid):
                 ctx.get_node_data.return_value = {"attach": {"use_teapot": invalid}}
                 with self.assertRaises(ValueError):
                     t._settings(ctx)
+
+    def test_skip_returns_before_any_teapot_capture_recognition_wait_or_action(self):
+        ctx = context("skip")
+        ctx.tasker.controller.post_screencap = Mock(side_effect=AssertionError("不检测时不能截图"))
+        ctx.run_recognition = Mock(side_effect=AssertionError("不检测时不能识别"))
+        runner = t.TeapotRunner(ctx)
+        runner._repeat_session = Mock(side_effect=AssertionError("不检测时不能复用确认状态"))
+        self.assertTrue(runner.run())
+        runner._repeat_session.assert_not_called()
+        ctx.tasker.controller.post_screencap.assert_not_called()
+        ctx.run_recognition.assert_not_called()
+        ctx.run_task.assert_not_called()
+        ctx.override_pipeline.assert_not_called()
+
+    def test_skip_still_respects_stop_request(self):
+        ctx = context("skip")
+        ctx.tasker.stopping = True
+        self.assertFalse(t.TeapotRunner(ctx).run())
+        ctx.get_node_data.assert_not_called()
+        ctx.run_task.assert_not_called()
 
     def recognition_runner(self, hits, *, desired=False, attach=None):
         ctx = context(desired)
