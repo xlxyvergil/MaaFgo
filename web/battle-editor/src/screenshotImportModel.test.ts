@@ -27,6 +27,23 @@ test('screenshot import writes only observed requirements, without invented skil
  assert.deepEqual(data,{team:{name:'截图导入编队',onFieldSvts:[{supportType:'friend',svtId:1,equip1:{id:2}},null,null],backupSvts:[null,null,null]},actions:[]});
  assert.deepEqual(rows,before);
 });
+test('screenshot mystic recognition is optional, independent and strictly validated',()=>{
+ const raw={slots:slots(),mysticCode:{id:210,status:'identified',score:.98,level:10},warnings:[]};
+ const result=readScreenshotResult(raw);
+ assert.deepEqual(result.mysticCode,{id:210,status:'identified',score:.98});
+ assert.notEqual(result.mysticCode,raw.mysticCode);
+ assert.deepEqual(readScreenshotResult({slots:slots(),mysticCode:{id:null,status:'unknown'}}).mysticCode,{id:null,status:'unknown'});
+ assert.equal(readScreenshotResult({slots:slots()}).mysticCode,undefined);
+ for(const mysticCode of [{id:0,status:'identified'},{id:'210',status:'identified'},{id:210,status:'unknown'},{id:null,status:'identified'},{status:'unknown'},{id:210,status:'identified',score:NaN},[]])assert.throws(()=>readScreenshotResult({slots:slots(),mysticCode}),/御主礼装/);
+});
+test('screenshot mystic choice writes the Chaldea identity without inventing its level',()=>{
+ const withMystics:Catalog={...catalog,mysticCodes:[{id:210,name:'决战用迦勒底制服'},{id:20,name:'迦勒底战斗服'}]};
+ const rows=slots(),before=structuredClone(rows);
+ for(const id of [210,20])assert.deepEqual(screenshotTeam(rows,withMystics,id).team.mysticCode,{mysticCodeId:id});
+ assert.equal('mysticCode' in screenshotTeam(rows,withMystics,null).team,false);
+ assert.deepEqual(rows,before);
+ for(const id of [999,0,-1,NaN,'210'])assert.throws(()=>screenshotTeam(rows,withMystics,id as number),/御主礼装/);
+});
 test('manual corrections support CE-only friend but reject owned CE without servant',()=>{
  const rows=slots();rows[0]={...rows[0],servantId:null,status:'unknown',equipId:2};
  assert.deepEqual(screenshotTeam(rows,catalog).team.onFieldSvts[0],{supportType:'friend',equip1:{id:2}});

@@ -132,6 +132,76 @@ class ScreenshotIndex:
             raise EditorError('image_resources', '从者或礼装识别模板缺失，请补齐桌面资源包。', 503)
         self.equip_index = self.index_type(self.equips)
         self.support = read(image_root / 'battle/助战标记.png')
+        # The same transparent templates and masked matcher used by native
+        # formation; importing it does not instantiate a controller or task.
+        try:
+            from custom.mystic_code import match_icon, THRESHOLD
+        except ModuleNotFoundError:
+            from ..custom.mystic_code import match_icon, THRESHOLD
+        self.match_mystic_icon = match_icon
+        self.mystic_threshold = THRESHOLD
+        self.mystic_icons = {}
+        data_path = self.root / 'agent/custom/mystic_code_data.json'
+        if data_path.is_file():
+            try:
+                data = json.loads(data_path.read_text(encoding='utf-8-sig'))
+            except (OSError, UnicodeError, ValueError):
+                data = {}
+            rows = data.get('mysticCodes', []) if isinstance(data, dict) else []
+            for row in rows if isinstance(rows, list) else []:
+                if not isinstance(row, dict) or type(row.get('id')) is not int or row['id'] <= 0:
+                    continue
+                icons, seen = [], set()
+                for key in ('maleImageId', 'femaleImageId'):
+                    image_id = row.get(key)
+                    if type(image_id) is not int or image_id <= 0:
+                        continue
+                    # A screenshot does not carry a region setting. Compete
+                    # both regions and genders under the same canonical ID.
+                    for pack in ('base', 'cn'):
+                        path = image_root.parent.parent / pack / 'image/MysticCodes' / f'masterequip{image_id:05d}.png'
+                        if not path.is_file():
+                            continue
+                        raw = path.read_bytes()
+                        if raw in seen:
+                            continue
+                        seen.add(raw)
+                        icon = cv2.imdecode(np.frombuffer(raw, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+                        if icon is not None and icon.ndim == 3 and icon.shape[2] == 4:
+                            icons.append((str(path), icon))
+                if icons:
+                    self.mystic_icons[row['id']] = icons
+
+    def recognize_mystic_code(self, original, layout):
+        """Only inspect the master-outfit button below the located party frame."""
+        x, y, width, height = layout['panel']
+        # The live six-card light frame spans 1256 pixels on a 1280px canvas.
+        # Preserve original pixels: the frame normalization used for servants
+        # shifts this bottom button, and resampling loses small clothing detail.
+        scale = width / 1256
+        left = max(0, round(x - 18 * scale))
+        top = max(0, round(y + height + 15 * scale))
+        right = min(original.shape[1], round(x + 97 * scale))
+        bottom = min(original.shape[0], top + round(100 * scale))
+        unknown = {'id': None, 'status': 'unknown'}
+        if right <= left or bottom <= top:
+            return unknown
+        roi = (left, top, right - left, bottom - top)
+        ranked = []
+        for code_id, icons in self.mystic_icons.items():
+            result = self.match_mystic_icon(original, icons, 'team', roi=roi, scale=(scale, scale))
+            if result is not None:
+                ranked.append((result.score, code_id))
+        ranked.sort(reverse=True)
+        if not ranked:
+            return unknown
+        score, code_id = ranked[0]
+        # Live formation checks an already requested outfit. Import must also
+        # distinguish it from every other ID before creating that requirement.
+        accepted = score >= self.mystic_threshold and (len(ranked) < 2 or score - ranked[1][0] >= .08)
+        return {'id': code_id if accepted else None,
+                'status': 'identified' if accepted else 'unknown',
+                'score': round(max(0., min(1., float(score))), 4)}
 
     @staticmethod
     def rank(image, roi, templates, ids):
@@ -210,7 +280,10 @@ class ScreenshotIndex:
         if sum(slot['support'] for slot in slots)>1:
             for slot in slots: slot['support']=False
             warnings.append('助战标记有歧义，请手动指定助战位置。')
-        return {'slots':slots,'warnings':warnings,'layout':layout,
+        mystic_code = self.recognize_mystic_code(original, layout)
+        if mystic_code['status'] != 'identified':
+            warnings.append('未可靠识别御主礼装，请在导入预览中手动选择；不选择则不填写御主礼装。')
+        return {'slots':slots,'warnings':warnings,'layout':layout,'mysticCode':mystic_code,
                 'sourceSize':[original.shape[1],original.shape[0]],
                 'elapsedMs':round((time.perf_counter()-started)*1000)}
 

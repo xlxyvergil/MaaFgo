@@ -37,6 +37,7 @@ class MxuPackagingTests(unittest.TestCase):
             "agent/battle_editor/equip_filters.py",
             "agent/battle_editor/np_cards.py", "agent/battle_editor/np_card_metadata.py",
             "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
+            "agent/custom/mystic_code.py", "agent/custom/mfaalog.py",
             "agent/battle_editor/share_image.py",
             "agent/battle_editor/chaldea_image.py",
             "agent/battle_editor/common_teams.py",
@@ -76,6 +77,18 @@ class MxuPackagingTests(unittest.TestCase):
         self.document("agent/battle_editor/data/equip_filters_sources.json", {
             "schemaVersion": 1, "indexSha256": hashlib.sha256(filter_bytes).hexdigest()})
         self.document("agent/custom/equip_categories.json", {"schemaVersion": 1, "equips": {}})
+        self.mystic_record = {
+            "id": 20, "maleImageId": 21, "femaleImageId": 22,
+            "sources": {"male": self.metadata(b"male-outfit"),
+                        "female": self.metadata(b"female-outfit"),
+                        "femaleCn": self.metadata(b"female-cn-outfit")},
+        }
+        self.document("agent/custom/mystic_code_data.json", {
+            "schemaVersion": 1, "mysticCodes": [self.mystic_record]})
+        self.document("agent/battle_editor/data/catalog.json", {"mysticCodes": [{"id": 20}]})
+        self.write("assets/resource/base/image/MysticCodes/masterequip00021.png", b"male-outfit")
+        self.write("assets/resource/base/image/MysticCodes/masterequip00022.png", b"female-outfit")
+        self.write("assets/resource/cn/image/MysticCodes/masterequip00022.png", b"female-cn-outfit")
 
     @staticmethod
     def metadata(raw):
@@ -108,6 +121,12 @@ class MxuPackagingTests(unittest.TestCase):
         self.assertTrue((self.output / "options/编队与战斗编辑器.json").is_file())
         self.assertTrue((self.output / "agent/battle_editor/common_teams.py").is_file())
         self.assertTrue((self.output / "agent/battle_editor/data/grand_quests.json").is_file())
+        for relative in ("agent/custom/mystic_code.py", "agent/custom/mfaalog.py",
+                         "agent/custom/mystic_code_data.json",
+                         "resource/base/image/MysticCodes/masterequip00021.png",
+                         "resource/base/image/MysticCodes/masterequip00022.png",
+                         "resource/cn/image/MysticCodes/masterequip00022.png"):
+            self.assertTrue((self.output / relative).is_file(), relative)
         self.assertFalse(any(path.name in {"__pycache__", ".pytest_cache"} or path.suffix in {".pyc", ".pyo"}
                              for path in (self.output / "agent").rglob("*")))
         for relative in ("config", "node_modules", "web/battle-editor/src"):
@@ -139,6 +158,8 @@ class MxuPackagingTests(unittest.TestCase):
                          "agent/support_ce.py",
                          "agent/battle/card_composer.py", "agent/custom/bond_matcher.py",
                          "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
+                         "agent/custom/mystic_code.py", "agent/custom/mfaalog.py",
+                         "agent/custom/mystic_code_data.json",
                          "agent/battle_editor/share_image.py",
                          "agent/battle_editor/chaldea_image.py",
                          "agent/battle_editor/common_teams.py", "agent/battle_editor/data/grand_quests.json",
@@ -156,7 +177,10 @@ class MxuPackagingTests(unittest.TestCase):
     def test_all_registered_ui_skill_and_np_assets_are_hash_checked(self):
         for relative in ("agent/battle_editor/data/ui/media/formation.webp",
                          "agent/battle_editor/data/media/skill/skill.png",
-                         "assets/resource/base/image/CommandCards/_composition/shared/frame.png"):
+                         "assets/resource/base/image/CommandCards/_composition/shared/frame.png",
+                         "assets/resource/base/image/MysticCodes/masterequip00021.png",
+                         "assets/resource/base/image/MysticCodes/masterequip00022.png",
+                         "assets/resource/cn/image/MysticCodes/masterequip00022.png"):
             with self.subTest(relative=relative):
                 path = self.source / relative
                 original = path.read_bytes()
@@ -164,6 +188,38 @@ class MxuPackagingTests(unittest.TestCase):
                 with self.assertRaisesRegex(RuntimeError, "哈希"):
                     mxu.validate_editor_bundle(self.source)
                 path.write_bytes(original)
+
+    def test_registered_mystic_templates_are_required_but_unregistered_cn_overrides_are_optional(self):
+        # The fixture intentionally has no male CN override. Base remains valid.
+        mxu.validate_editor_bundle(self.source)
+        for relative in ("assets/resource/base/image/MysticCodes/masterequip00021.png",
+                         "assets/resource/base/image/MysticCodes/masterequip00022.png",
+                         "assets/resource/cn/image/MysticCodes/masterequip00022.png"):
+            with self.subTest(relative=relative):
+                path = self.source / relative
+                original = path.read_bytes()
+                path.unlink()
+                with self.assertRaisesRegex(RuntimeError, "缺失"):
+                    mxu.validate_editor_bundle(self.source)
+                path.write_bytes(original)
+
+    def test_mystic_catalog_rejects_unsupported_choices_and_invalid_or_duplicate_ids(self):
+        self.document("agent/battle_editor/data/catalog.json", {"mysticCodes": [{"id": 999}]})
+        with self.assertRaisesRegex(RuntimeError, "缺少对应识别资源"):
+            mxu.validate_editor_bundle(self.source)
+        self.document("agent/battle_editor/data/catalog.json", {"mysticCodes": [{"id": 20}]})
+        for record in ({**self.mystic_record, "id": True},
+                       {**self.mystic_record, "maleImageId": 0},
+                       {**self.mystic_record, "femaleImageId": 21},
+                       {**self.mystic_record, "sources": {"male": self.metadata(b"male-outfit")}}):
+            with self.subTest(record=record):
+                self.document("agent/custom/mystic_code_data.json", {"schemaVersion": 1, "mysticCodes": [record]})
+                with self.assertRaises(RuntimeError):
+                    mxu.validate_editor_bundle(self.source)
+        self.document("agent/custom/mystic_code_data.json", {
+            "schemaVersion": 1, "mysticCodes": [self.mystic_record, self.mystic_record]})
+        with self.assertRaisesRegex(RuntimeError, "重复"):
+            mxu.validate_editor_bundle(self.source)
 
     def test_manifest_traversal_cannot_read_other_install_files(self):
         self.document("agent/battle_editor/data/ui/manifest.json", {
