@@ -4,7 +4,7 @@
   "sourceLabel": "用户本地 FGO 整包及 Atlas Academy 原始图片缓存；仅供 MaaFGO 本地界面使用，版权归原权利方",
   "sources": {
     "catalog.json": {
-      "sha256": "4c5182a09cef17d6e991a4c316d5b473e2ac6204009e7180fa3797b83876db51"
+      "sha256": "8de80c6e6b47b00d5036d7772cc1d35304e6329abc75a7788bb3f74958786aa8"
     },
     "JP_nice_servant.json": {
       "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697"
@@ -36,11 +36,15 @@
     },
     "incremental/JP_servant_705500": {
       "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
-      "sha256": "80e3078a38ed70795faa9322983895b5d1b4fd1335b1d4996d3fc2b2a4eb1861"
+      "sha256": "409c3304ae99173ccdca5b23442f4d70d3e91d986599615a00fa59f6165cc8ee"
     },
     "incremental/JP_servant_204700": {
       "url": "https://api.atlasacademy.io/nice/JP/servant/204700",
       "sha256": "b9a5645a8d0db21a65d44b196df5436d28ff3a5db577b0aafc7c1fec3aa18ef8"
+    },
+    "incremental/JP_servant_2501700": {
+      "url": "https://api.atlasacademy.io/nice/JP/servant/2501700",
+      "sha256": "9b0e64f6dd9a619ded65fdd156f60f682bebff8e2b11fb6831902b068a77c3d7"
     }
   },
   "files": {
@@ -19887,6 +19891,43 @@
           "mode": "RGB"
         },
         "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/705500/705500b@1.png",
+        "ascension": 3
+      },
+      "mode": "RGB",
+      "encoding": {
+        "format": "WEBP",
+        "lossless": false,
+        "quality": 90,
+        "method": 6,
+        "libwebp_version": "1.5.0",
+        "input_mode": "RGB",
+        "alpha": "discardBeforeResizePreserveRGB"
+      }
+    },
+    "formation_2501700_0d34ac73f6668e21.webp": {
+      "width": 358,
+      "height": 507,
+      "sha256": "1469345ec7230270939cdac9b6c5fbeb921f21fcd2a853ee75ad5cc312ba69bf",
+      "source": {
+        "kind": "atlas-cache",
+        "path": "从者立绘/CharaGraph/2501700/2501700b@1.png",
+        "sha256": "e079eafee971221f0105e33bdbc0c393507b3945a64466f270faa6d250e3c8f9",
+        "width": 512,
+        "height": 724,
+        "crop": [
+          0,
+          0,
+          512,
+          724
+        ],
+        "resize": {
+          "width": 358,
+          "height": 507,
+          "scale": 0.7,
+          "resample": "LANCZOS",
+          "mode": "RGB"
+        },
+        "atlasURL": "https://static.atlasacademy.io/JP/CharaGraph/2501700/2501700b@1.png",
         "ascension": 3
       },
       "mode": "RGB",
@@ -51546,6 +51587,68 @@
       "portraitAscension": 3,
       "formationPortrait": "formation_705500_59b1762b09ab7f83.webp",
       "formationPortraitAscension": 3
+    },
+    "2501700": {
+      "activeSkills": [
+        {
+          "id": 2727650,
+          "num": 1,
+          "name": "セクシー＆ビューティ EX",
+          "icon": "skill_00306.png"
+        },
+        {
+          "id": 2728550,
+          "num": 2,
+          "name": "悠遠なる黒 A",
+          "icon": "skill_00513.png"
+        },
+        {
+          "id": 2729450,
+          "num": 3,
+          "name": "Re/Q B",
+          "icon": "skill_00609.png"
+        }
+      ],
+      "appendSkills": [
+        {
+          "id": 3001000,
+          "num": 1,
+          "name": "追击技巧提升",
+          "nameJp": "追撃技巧向上",
+          "icon": "skill_00301.png"
+        },
+        {
+          "id": 3002000,
+          "num": 2,
+          "name": "魔力装填",
+          "nameJp": "魔力装填",
+          "icon": "skill_00601.png"
+        },
+        {
+          "id": 3009000,
+          "num": 3,
+          "name": "对狂战士攻击适性",
+          "nameJp": "対バーサーカー攻撃適性",
+          "icon": "skill_00300.png"
+        },
+        {
+          "id": 3033000,
+          "num": 4,
+          "name": "特击技巧提升",
+          "nameJp": "特撃技巧向上",
+          "icon": "skill_00303.png"
+        },
+        {
+          "id": 3034000,
+          "num": 5,
+          "name": "技能再装填",
+          "nameJp": "スキル再装填",
+          "icon": "skill_00613.png"
+        }
+      ],
+      "portraitAscension": 3,
+      "formationPortrait": "formation_2501700_0d34ac73f6668e21.webp",
+      "formationPortraitAscension": 3
     }
   },
   "equips": {},
@@ -51788,15 +51891,15 @@
   },
   "stats": {
     "portraits": 1,
-    "formationPortraits": 476,
-    "servants": 477,
+    "formationPortraits": 477,
+    "servants": 478,
     "addedEquipImages": 0,
-    "activeSkillMappings": 1795,
-    "appendSkillMappings": 2370,
+    "activeSkillMappings": 1798,
+    "appendSkillMappings": 2375,
     "classes": 17,
     "classVariantMappings": 102,
-    "mediaFiles": 649,
-    "mediaBytes": 31199948,
+    "mediaFiles": 650,
+    "mediaBytes": 31251726,
     "formPortraitMappings": 6,
     "formPortraitImages": 3
   }

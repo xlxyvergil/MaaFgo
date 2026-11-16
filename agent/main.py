@@ -29,6 +29,7 @@ if not IS_ANDROID:
     import battle_editor_action
 import box_action
 import expball_action
+import ticket_summon_action
 import formation_action
 import teapot_action
 import bond_completion_action

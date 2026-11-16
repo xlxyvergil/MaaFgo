@@ -49,7 +49,7 @@
       "bytes": 193947
     }
   ],
-  "servantCatalogSha256": "7a3c178b0aec812f58e394f939ff83e88c14cf54fe9f282d54eeac6e6acbdedf",
+  "servantCatalogSha256": "505c486ebc716884c2419a45b5a72ba0d5c46e60b9d26d93d1e6bb6c741751a5",
   "missingServantIds": [],
   "noActiveSkillMetadataIds": [
     1700100,
@@ -882,6 +882,41 @@
         "reason": "Atlas HTTP 404; user approved regular forms only"
       },
       "method": "incremental; no existing facts overwritten"
+    },
+    {
+      "date": "2026-11-16",
+      "servantIds": [
+        2501700
+      ],
+      "costumeServantIds": [
+        705500
+      ],
+      "equipIds": [
+        9312650
+      ],
+      "sourceOnlyEquipIds": [],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/2501700",
+          "sha256": "9b0e64f6dd9a619ded65fdd156f60f682bebff8e2b11fb6831902b068a77c3d7"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
+          "sha256": "409c3304ae99173ccdca5b23442f4d70d3e91d986599615a00fa59f6165cc8ee"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312650",
+          "sha256": "e2368bbd4b3648ba922eec4d7a3fcfe9cfc7e49070944efe066dcc0f506de692"
+        }
+      ],
+      "resolvedCostumes": [
+        {
+          "servantId": 705500,
+          "costumeId": 705530,
+          "previousMissingDate": "2026-11-12"
+        }
+      ],
+      "method": "incremental; existing facts preserved except explicitly appended costume assets"
     }
   ]
 }

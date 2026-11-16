@@ -1,0 +1,43 @@
+{
+    "option": {
+        "自动抽护符-抽取次数": {
+            "type": "input",
+            "label": "抽取次数",
+            "description": "填写要消耗的护符张数（1～9999）。2回召唤只消耗1张护符，也计为1次。",
+            "inputs": [
+                {
+                    "name": "ticket_count",
+                    "label": "次数",
+                    "default": "1",
+                    "pipeline_type": "int",
+                    "verify": "^[1-9]\\d{0,3}$"
+                }
+            ],
+            "pipeline_override": {
+                "自动抽护符开始": {"attach": {"ticket_count": "{ticket_count}"}}
+            }
+        },
+        "自动抽护符-抽卡完后是否保存截图": {
+            "type": "select",
+            "label": "自动抽护符：抽卡完后是否保存截图",
+            "description": "选择‘保存’后，每次在抽卡结果页保存一张截图，再返回卡池。截图保存在 debug/screencap/ 目录。",
+            "default": "no",
+            "cases": [
+                {
+                    "name": "yes",
+                    "label": "保存",
+                    "pipeline_override": {
+                        "自动抽护符-结果截图": {"action": "Screencap"}
+                    }
+                },
+                {
+                    "name": "no",
+                    "label": "不保存",
+                    "pipeline_override": {
+                        "自动抽护符-结果截图": {"action": "DoNothing"}
+                    }
+                }
+            ]
+        }
+    }
+}

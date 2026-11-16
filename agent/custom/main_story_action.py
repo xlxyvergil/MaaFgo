@@ -442,22 +442,69 @@ class StoryRunner:
                 raise StoryStopped("查找主线关卡时离开了副本列表")
 
     def open_panel(self, result, node="主线-地图NEXT"):
-        for _ in range(3):
+        recovered = False
+        attempts = 0
+        while attempts < 3:
+            attempts += 1
             self.action(node, result)
             until = self.clock() + 5
             while self.clock() < until:
                 self.pause()
                 image = self.frame()
+                # 资料页也有左上关闭和经验条 NEXT，必须先于列表判断。
+                profile = self.reco("主线-御主资料返回", image)
+                if profile:
+                    if recovered:
+                        raise StoryStopped("地图居中后仍误入御主资料，无法打开副本列表。请手动关闭资料页，将 NEXT 所在地图点拖离左下头像后重试。")
+                    result = self.recover_map_profile(profile, node)
+                    recovered = True
+                    attempts = 0
+                    break
                 if self.panel(image):
                     return
-            # 每次重试刷新位置，不重复点击过期坐标。
+            else:
+                # 每次重试刷新位置，不重复点击过期坐标。
+                image = self.frame()
+                if not self.on_map(image):
+                    break
+                result = self.reco(node, image)
+                if not result:
+                    break
+                continue
+            # 恢复已重新定位目标，下一次循环再点击。
+        raise StoryStopped("点击主线节点后未打开副本列表。请确认当前画面，回到主线地图后重试。")
+
+    def recover_map_profile(self, profile, node):
+        """只在资料页被确认后返回；拖动起点取标记，避开遮挡点击点的头像。"""
+        mfaalog.warning("[自动推主线] 点击地图点后误入御主资料，返回地图并将目标拖到中心后重试")
+        self.action("主线-御主资料返回", profile)
+        deadline = self.clock() + min(self.timeout, 15)
+        marker_node = "主线-地图NEXT标记" if node == "主线-地图NEXT" else node
+        saw_map = False
+        while self.clock() < deadline:
+            self.pause()
             image = self.frame()
-            if not self.on_map(image):
-                break
-            result = self.reco(node, image)
-            if not result:
-                break
-        raise StoryStopped("点击主线节点后未打开副本列表")
+            if not self.panel(image) and self.on_map(image):
+                saw_map = True
+                marker = self.reco(marker_node, image)
+                if marker:
+                    break
+        else:
+            if saw_map:
+                raise StoryStopped("已返回地图，但未找到刚才的主线目标，无法居中。请将 NEXT 所在地图点移到可见区域后重试。")
+            raise StoryStopped("关闭御主资料后未能确认主线地图，无法拖动目标。请手动回到主线地图后重试。")
+        # 复用轮巡的拖到中心动作，只执行动作，不进入其 OCR / next 链。
+        self.action("巡-找到目标-设为中心", marker)
+        self.pause(1)
+        deadline = self.clock() + 5
+        while self.clock() < deadline:
+            image = self.frame()
+            if not self.panel(image) and self.on_map(image):
+                result = self.reco(node, image)
+                if result:
+                    return result
+            self.pause()
+        raise StoryStopped("拖动地图后未重新找到主线目标，无法继续点击。请将 NEXT 所在地图点移到可见区域后重试。")
 
     def enter(self, result):
         self.action("主线-列表NEXT", result)
@@ -630,9 +677,13 @@ class StoryRunner:
             # 字符串整体替换，不能用空对象深合并后遗留原 plan/share/source。
             use_default = self.current_restricted or self._spirit_stones_used > 0
             while True:
-                battle_override = {"原生自动战斗入口": {"action": {"param": {
-                    "custom_action_param": '{"native_battle_formation_reset":true}'
-                }}}} if use_default else None
+                # 仅本关原生入口允许预设执行失败后改用默认战斗，不污染其他任务。
+                battle_node = {"attach": {"native_battle_preset_fallback": True}}
+                if use_default:
+                    battle_node["action"] = {"param": {
+                        "custom_action_param": '{"native_battle_formation_reset":true}'
+                    }}
+                battle_override = {"原生自动战斗入口": battle_node}
                 self.task("原生自动战斗入口", battle_override)
                 if not self.use_spirit_stone and not self.retry_without_spirit_stone:
                     return

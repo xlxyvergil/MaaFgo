@@ -840,7 +840,7 @@ class BundledCatalogTests(unittest.TestCase):
         self.assertEqual(sum(equip["common"] and equip["recognizable"]
                              for equip in catalog["equips"]), 48)
         recognized = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
-        self.assertEqual(len(recognized), 1165)
+        self.assertEqual(len(recognized), 1166)
         expected_equip_ids = {int(row["id"]) for row in recognized
                               if any(resolve_media(ROOT, "equip", image) for image in row.get("images", []))}
         self.assertEqual({equip["id"] for equip in catalog["equips"] if equip["recognizable"]}, expected_equip_ids)
@@ -920,6 +920,7 @@ class BundledCatalogTests(unittest.TestCase):
             (2801400, 484, "pretender", 2801401, 1),
             (406100, 485, "rider", 406101, 3),
             (705500, 486, "berserker", 705501, 2),
+            (2501700, 487, "foreigner", 2501701, 2),
         ):
             with self.subTest(servant=sid):
                 row = servants[sid]
@@ -930,7 +931,7 @@ class BundledCatalogTests(unittest.TestCase):
         equips = {row["id"]: row for row in catalog["equips"]}
         local = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
         local_by_id = {int(row["id"]): row for row in local}
-        for eid in (9409660, 9409670, 9409680, 9409690, 9312640, 9312670, 9312660):
+        for eid in (9409660, 9409670, 9409680, 9409690, 9312640, 9312670, 9312660, 9312650):
             with self.subTest(equip=eid):
                 self.assertTrue(equips[eid]["recognizable"])
                 self.assertFalse(equips[eid]["common"])

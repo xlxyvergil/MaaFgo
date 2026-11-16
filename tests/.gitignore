@@ -27,3 +27,7 @@
 !fixtures/bond_stop/jp_bond_upgrade_banner_occluded.png
 !fixtures/bond_stop/jp_bond_before_upgrade.png
 !fixtures/bond_stop/jp_bond_upgrade_panel.png
+# Retained CN partial-card cancellation and preset-recovery regressions.
+!fixtures/battle_preset_fallback_cn/
+!fixtures/battle_preset_fallback_cn/partial_cards.png
+!fixtures/battle_preset_fallback_cn/main_after_cancel.png

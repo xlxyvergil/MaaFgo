@@ -12888,6 +12888,17 @@
                             }
                         }
                     }
+                },
+                {
+                    "name": "support-ce:9312650",
+                    "label": "利休＆駒姫ストラップ",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-满破-扩展候选:support-ce:9312650": true
+                            }
+                        }
+                    }
                 }
             ]
         },
@@ -26348,6 +26359,17 @@
                         "助战action": {
                             "attach": {
                                 "冠位助战-2号礼装-非满破-扩展候选:support-ce:9312660": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9312650",
+                    "label": "利休＆駒姫ストラップ",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-2号礼装-非满破-扩展候选:support-ce:9312650": true
                             }
                         }
                     }

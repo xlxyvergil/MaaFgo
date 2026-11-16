@@ -11,6 +11,7 @@ import copy
 import json
 import os
 import sys
+from dataclasses import replace
 
 # 让 agent/battle 可作为顶层包导入（main.py 只把 custom 目录加进了 path）
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -38,7 +39,8 @@ from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.data.servant_identity import canonical_servant_id
-from battle.runtime.runtime import AutoBattleRuntime
+from battle.runtime.runtime import AutoBattleRuntime, BattleResult
+from battle.runtime.preset_fallback import recover_for_default_battle
 from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRuntime,
                                          trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
@@ -183,11 +185,20 @@ class AutoBattleAction(CustomAction):
             f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
         )
         try:
-            result = runtime_class(
+            runtime = runtime_class(
                 context, controller, decider, profile, battle_policy,
                 initial_formation=initial_formation, formation_battle=formation_battle,
                 roster_servant_ids=roster_servant_ids,
-            ).run()
+            )
+            result = runtime.run()
+            preset_active = (trial_config is not None or (
+                isinstance(plan, BattlePlan) and bool(plan.turns) and runtime._has_active_plan()))
+            result = _continue_without_preset(
+                context, controller, runtime, result, profile,
+                enabled=(trial_node.get("attach") or {}).get("native_battle_preset_fallback") is True,
+                preset_active=preset_active,
+                trial_mode=trial_config is not None,
+            )
         except Exception:
             if token and sessions.valid(root, token):
                 sessions.invalidate(root, token, "battle_runtime_exception")
@@ -210,6 +221,78 @@ class AutoBattleAction(CustomAction):
 
         # TODO(save_evidence)：失败时保存截图/状态证据
         return CustomAction.RunResult(success=result.ok)
+
+
+_PRESET_RECOVERABLE_ERRORS = frozenset({
+    "skill_execution_failed", "card_actor_identity_mismatch",
+    "unexpected_dialog", "unexpected_order_change_scene",
+    "open_cards_failed", "open_cards_confirm_failed",
+    "selection_confirm_failed", "card_selection_not_submitted",
+    "stuck_unknown_scene",
+})
+
+
+def _continue_without_preset(context, controller, runtime, result, profile, *,
+                             enabled: bool, preset_active: bool, trial_mode: bool = False):
+    """Only explicitly opted-in story/trial battles may discard a broken plan.
+
+    No recursive fallback: a failure of the fresh default runtime is final.
+    Configuration, controller exceptions, stop requests and terminal results keep
+    their existing paths. An uncertain card submission reserves one turn of the
+    existing budget without claiming that it was a confirmed completed turn.
+    """
+    if (enabled is not True or not preset_active or result.ok or context.tasker.stopping
+            or not isinstance(result.reason, str)):
+        return result
+    reason = result.reason
+    if (reason not in _PRESET_RECOVERABLE_ERRORS and not reason.startswith((
+            "trial_", "opening_hand_", "invalid_main_action:", "invalid_card_action:"))):
+        return result
+
+    default_param = advanced_strategy_to_param()
+    default_profile = _parse_strategy_profile(default_param)
+    reserved = int(getattr(runtime, "_selection_in_flight", False) is True)
+    remaining = min(profile.max_turns - result.turns - reserved, default_profile.max_turns)
+    if remaining <= 0:
+        mfaalog.error("[战斗回退] 本场已用完战斗回合预算，无法再启动默认战斗。请检查战斗方案，或调整“最大战斗回合”后重新挑战。")
+        return BattleResult.fail("max_turns_exceeded", result.turns)
+
+    mfaalog.warning(
+        "[战斗回退] 预设技能或出卡流程无法继续，正在关闭误开的战斗弹窗。"
+        "确认返回战斗后，本场将清除预设方案，改为自动释放可用从者技能、优先使用可用宝具；下一场恢复原方案。"
+    )
+    if trial_mode:
+        mfaalog.warning("[试炼战斗回退] 本场优先继续战斗，不再按原方案保证颜色、击破职阶或无焦热等附加任务条件；请在战后核对任务进度。")
+    mfaalog.info(f"[战斗回退] reason={reason} confirmed_turns={result.turns} "
+                 f"reserved_unconfirmed_turns={reserved} remaining_budget={remaining}")
+    if not recover_for_default_battle(runtime):
+        mfaalog.error(
+            "[战斗回退] 未能确认返回可操作的战斗界面，无法切换默认战斗，已保留现场停止。"
+            "请手动关闭游戏内弹窗并检查当前画面后重试。"
+        )
+        return BattleResult.fail("preset_fallback_recovery_failed", result.turns)
+    if context.tasker.stopping:
+        return result
+
+    policy = _parse_battle_policy(default_param)
+    fallback = AutoBattleRuntime(
+        context, controller, RuleDecider(policy),
+        replace(default_profile, max_turns=remaining), policy,
+        initial_formation=None, roster_servant_ids=(None,) * 6,
+    )
+    # Old IDs are unordered visual candidates only. No original frontline slots,
+    # retired instances, actor bindings or special-choice queues survive.
+    candidates = set()
+    for name in ("candidate_servant_ids", "roster_servant_ids", "_initial_servant_ids"):
+        values = getattr(runtime, name, ())
+        if isinstance(values, (tuple, list)):
+            for value in values:
+                sid = canonical_servant_id(value)
+                if sid:
+                    candidates.add(sid)
+    fallback.candidate_servant_ids = tuple(sorted(candidates))
+    resumed = fallback.run()
+    return BattleResult(resumed.ok, resumed.reason, result.turns + resumed.turns)
 
 
 def _canonical_native_strategy_param(param: dict) -> dict:

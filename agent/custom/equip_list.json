@@ -22874,6 +22874,27 @@
         "atlas_effects": []
       },
       "bondOwner": 705500
+    },
+    {
+      "id": "9312650",
+      "collection_no": 2719,
+      "name": "利休＆駒姫ストラップ",
+      "rarity": 4,
+      "important": 0,
+      "images": [
+        "f_93126500.png"
+      ],
+      "name_jp": "利休＆駒姫ストラップ",
+      "acquisition_category_jp": "絆礼装",
+      "filter_tag": "羁绊礼装",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": "",
+        "atlas_effects": []
+      },
+      "bondOwner": 2501700
     }
   ]
 }
