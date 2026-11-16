@@ -6239,6 +6239,19 @@
           },
           "icon": "resource/base/image/servant_face/f_7055000.png",
           "description": "松永久秀 · ID 705500\n\n<img src=\"resource/base/image/servant_face/f_7055000.png\" width=\"79\" alt=\"松永久秀\" />"
+        },
+        {
+          "name": "2501700",
+          "label": "487. 炸药利休（5星·降(foreigner)）[2501700]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_4_id": "2501700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25017000.png",
+          "description": "炸药利休 · ID 2501700\n\n<img src=\"resource/base/image/servant_face/f_25017000.png\" width=\"79\" alt=\"炸药利休\" />"
         }
       ],
       "description": "可搜索名称或 ID。目录复用工程已有资料；缺少可用识别图的保留目标会在启动前说明并停止。"
@@ -38486,6 +38499,19 @@
           },
           "icon": "resource/base/image/EquipFaces/team/f_93126600.png",
           "description": "平蜘蛛くん · ID 9312660\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126600.png\" width=\"79\" alt=\"平蜘蛛くん\" />"
+        },
+        {
+          "name": "9312650",
+          "label": "2719. 利休＆駒姫ストラップ（4星）[9312650]",
+          "pipeline_override": {
+            "执行搓丸子": {
+              "attach": {
+                "target_4_id": "9312650"
+              }
+            }
+          },
+          "icon": "resource/base/image/EquipFaces/team/f_93126500.png",
+          "description": "利休＆駒姫ストラップ · ID 9312650\n\n<img src=\"resource/base/image/EquipFaces/team/f_93126500.png\" width=\"79\" alt=\"利休＆駒姫ストラップ\" />"
         },
         {
           "name": "90086002",

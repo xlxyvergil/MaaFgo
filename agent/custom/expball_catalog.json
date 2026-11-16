@@ -10258,6 +10258,16 @@
       ]
     },
     {
+      "id": "9312650",
+      "name": "利休＆駒姫ストラップ",
+      "name_jp": "利休＆駒姫ストラップ",
+      "rarity": 4,
+      "images": [
+        "EquipFaces/list/f_93126500.png",
+        "EquipFaces/team/f_93126500.png"
+      ]
+    },
+    {
       "id": "9312660",
       "name": "平蜘蛛くん",
       "name_jp": "平蜘蛛くん",
@@ -31164,10 +31174,30 @@
         "servant_face/f_7055001.png",
         "servant_face/f_7055002.png",
         "servant_face/f_7055003.png",
+        "servant_face/f_7055300.png",
         "NarrowFigures/f_7055000.png",
         "NarrowFigures/f_7055001.png",
         "NarrowFigures/f_7055002.png",
-        "NarrowFigures/f_7055003.png"
+        "NarrowFigures/f_7055003.png",
+        "NarrowFigures/f_7055300.png"
+      ]
+    },
+    {
+      "id": "2501700",
+      "name": "炸药利休",
+      "name_jp": "ダイナマイト利休",
+      "rarity": 5,
+      "images": [
+        "servant_face/f_25017000.png",
+        "servant_face/f_25017001.png",
+        "servant_face/f_25017002.png",
+        "servant_face/f_25017003.png",
+        "servant_face/f_25017300.png",
+        "NarrowFigures/f_25017000.png",
+        "NarrowFigures/f_25017001.png",
+        "NarrowFigures/f_25017002.png",
+        "NarrowFigures/f_25017003.png",
+        "NarrowFigures/f_25017300.png"
       ]
     }
   ]

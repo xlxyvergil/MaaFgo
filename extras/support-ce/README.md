@@ -24,6 +24,10 @@ python -m unittest discover -s tests -p test_support_extension_generator.py -v
 
 - `sources/`：从游戏解包的真实 `150×68 RGBA EquipFaces` 原图按运行清单 ID
   精确筛选，文件名为 `f_<equipId>0.png`；初始收录 1,110 张，23,492,809 字节。
+  2026-11-16按Atlas的准确`equipFace`声明新增No.2719「利休＆駒姫ストラップ」
+  （`9312650`）的150×68 RGBA原图，来源为
+  `https://static.atlasacademy.io/JP/EquipFaces/f_93126500.png`；该新增项不再属于缺图，
+  原有8项已审阅缺图保持。原始下载SHA-256及验证见本轮资源更新回执。
 - `limit-star.png`：真实 20×20 RGBA 满破星标。
 - `builtin.json`：47 种现有内置助战礼装的中文文件名到源图文件名映射，沿用本地
   礼装流水线已核验的映射，用于排除内置礼装。新增内置模板时须同步该映射。

@@ -7,11 +7,11 @@
       "dataVer": 2691,
       "dateVer": 1793264400
     },
-    "curatedSha256": "cda620e6fedce4a14e1c40e8c2da97bfaf3267b9859e8738f55f9301437227f3",
+    "curatedSha256": "e155b547ad9d78279d41f20811d651daf95a26ea1fe57c1bfde6f53376dfef5f",
     "niceEquipSha256": "3c8d444a3f0d828ef14eb3439fced34503955a659434910e77dcee0494ca72ad"
   },
-  "curatedCount": 1165,
-  "indexSha256": "d9609e38b7bdf0ea4ee01dd1025b0c087c746c12d75e0508b530a7113cfcc190",
+  "curatedCount": 1166,
+  "indexSha256": "288684bc51752379fe5f3e379b1ce7ff008a7791547f6a28f152d46290256895",
   "sources": [
     {
       "file": "JP_info.json",
@@ -674,6 +674,20 @@
           "url": "https://api.atlasacademy.io/nice/JP/skill/995526",
           "sha256": "db0fbea92c36094328f7d0a036f4e263167e4f8a4cc159140b384c27b8d5c626",
           "bytes": 630
+        }
+      ]
+    },
+    {
+      "date": "2026-11-16",
+      "equipIds": [
+        9312650
+      ],
+      "sources": [
+        {
+          "file": "incremental-20261116/equip-9312650.json",
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312650",
+          "sha256": "e2368bbd4b3648ba922eec4d7a3fcfe9cfc7e49070944efe066dcc0f506de692",
+          "bytes": 7296
         }
       ]
     }
