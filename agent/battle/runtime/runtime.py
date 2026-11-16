@@ -116,6 +116,7 @@ class AutoBattleRuntime:
         self.executor = Executor(context, controller)
         self._turn_index = 0
         self._selection_cards = ()
+        self._selection_in_flight = False
 
     def _has_active_plan(self) -> bool:
         plan = getattr(self.decider, "plan", None)
@@ -350,6 +351,7 @@ class AutoBattleRuntime:
                     )
                     
                 mfaalog.info("[AutoBattle] Executing picks...")
+                self._selection_in_flight = True
                 if not self._execute_selection(action):
                     mfaalog.info("[AutoBattle] Execution failed (confirmation error).")
                     return BattleResult.fail("selection_confirm_failed", turns)
@@ -365,6 +367,7 @@ class AutoBattleRuntime:
                     return BattleResult(True, "story_returned_to_map", turns + 1)
                 mfaalog.info(f"[AutoBattle] Turn {turns+1} settled, advancing to turn {turns+2}")
                 turns += 1
+                self._selection_in_flight = False
                 if waiting_action is not None:
                     opening_waits += 1
                 else:

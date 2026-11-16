@@ -677,9 +677,13 @@ class StoryRunner:
             # 字符串整体替换，不能用空对象深合并后遗留原 plan/share/source。
             use_default = self.current_restricted or self._spirit_stones_used > 0
             while True:
-                battle_override = {"原生自动战斗入口": {"action": {"param": {
-                    "custom_action_param": '{"native_battle_formation_reset":true}'
-                }}}} if use_default else None
+                # 仅本关原生入口允许预设执行失败后改用默认战斗，不污染其他任务。
+                battle_node = {"attach": {"native_battle_preset_fallback": True}}
+                if use_default:
+                    battle_node["action"] = {"param": {
+                        "custom_action_param": '{"native_battle_formation_reset":true}'
+                    }}
+                battle_override = {"原生自动战斗入口": battle_node}
                 self.task("原生自动战斗入口", battle_override)
                 if not self.use_spirit_stone and not self.retry_without_spirit_stone:
                     return

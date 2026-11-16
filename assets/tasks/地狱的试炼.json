@@ -30,7 +30,8 @@
         "原生自动战斗入口": {
           "attach": {
             "native_battle_config_node": "原生自动战斗-高级策略配置",
-            "native_battle_trial_profile": "hellish_202611"
+            "native_battle_trial_profile": "hellish_202611",
+            "native_battle_preset_fallback": true
           },
           "on_error": [
             "地狱的试炼-运行失败判分"
