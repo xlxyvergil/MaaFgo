@@ -162,6 +162,23 @@ class SharedEmptyItemBarTests(unittest.TestCase):
                 self.assertIn("本关无法使用茶壶", message)
         self.run_in_context(check)
 
+    def test_skip_option_bypasses_all_observation_even_when_capture_is_unavailable(self):
+        option = json.loads((ROOT / "assets/options/原生自动战斗是否使用茶壶.json").read_text("utf-8"))
+        cases = option["option"]["原生自动战斗是否使用茶壶"]["cases"]
+        override = next(case["pipeline_override"] for case in cases if case["name"] == "Skip")
+
+        def check(context, controller):
+            self.assertTrue(context.override_pipeline(override))
+            self.assertEqual(tea._settings(context), "skip")
+            controller.fail_capture = True
+            runner = CapturedSequenceRunner(context, controller, [])
+            self.assertTrue(runner.run())
+            self.assertEqual(runner.observations, 0)
+            self.assertEqual(runner.observed_kinds, [])
+            self.assertEqual(runner.tasks, [])
+
+        self.run_in_context(check)
+
     def test_header_and_both_info_anchors_are_required_for_positive_empty_proof(self):
         def check(context, controller):
             frames = [self.page(header=False), self.page(info=False),
@@ -224,7 +241,7 @@ class SharedEmptyItemBarTests(unittest.TestCase):
             self.assertEqual(controller.inputs, 0)
         self.run_in_context(check)
 
-    def test_live_carousel_sequence_preserves_real_bar_across_empty_fade(self):
+    def test_live_carousel_sequence_passes_on_first_real_bar(self):
         def check(context, controller):
             for desired, crop in ((False, "bar_tea_off"), (True, "bar_tea_on")):
                 self.assertTrue(context.override_pipeline({tea.CONFIG_NODE:{"attach":{"use_teapot":desired}}}))
@@ -235,24 +252,50 @@ class SharedEmptyItemBarTests(unittest.TestCase):
                 runner = CapturedSequenceRunner(context, controller,
                     [storm, transition, bar, empty, storm, transition, bar, transition])
                 self.assertTrue(runner.run())
-                self.assertEqual(runner.observations, 7)
-                self.assertEqual(runner.observed_kinds,
-                    ["storm", "transition", "bar", "absent", "storm", "transition", "bar"])
-                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * 7)
+                self.assertEqual(runner.observations, 3)
+                self.assertEqual(runner.observed_kinds, ["storm", "transition", "bar"])
+                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * 3)
         self.run_in_context(check)
 
-    def test_single_real_bar_then_empty_strip_never_verifies_or_skips_as_absent(self):
+    def test_single_real_bar_passes_without_a_second_capture_or_absent_notice(self):
         def check(context, controller):
             for desired, crop in ((False, "bar_tea_off"), (True, "bar_tea_on")):
                 self.assertTrue(context.override_pipeline({tea.CONFIG_NODE:{"attach":{"use_teapot":desired}}}))
                 runner = CapturedSequenceRunner(context, controller,
-                    [self.page(item=crop)] + [self.page()] * 7)
-                self.assertFalse(runner.run())
-                self.assertEqual(runner.observations, tea.OBSERVATION_ROUNDS)
-                self.assertEqual(runner.observed_kinds, ["bar"] + ["absent"] * 7)
-                self.assertEqual(runner.tasks, [tea.WAIT_NODE] * tea.OBSERVATION_ROUNDS)
-                message = context.get_node_data(tea.NOTICE_NODE)["focus"]["Node.Recognition.Starting"]
-                self.assertNotIn("本关无法使用茶壶", message)
+                    [self.page(item=crop), None])
+                notice = context.get_node_data(tea.NOTICE_NODE)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observations, 1)
+                self.assertEqual(runner.observed_kinds, ["bar"])
+                self.assertEqual(runner.tasks, [tea.WAIT_NODE])
+                self.assertEqual(context.get_node_data(tea.NOTICE_NODE), notice)
+        self.run_in_context(check)
+
+    def test_direct_switch_rechecks_real_target_after_input_without_requiring_two_hits(self):
+        def check(context, controller):
+            for desired, before, after in ((False, "bar_tea_on", "bar_tea_off"),
+                                            (True, "bar_tea_off", "bar_tea_on")):
+                self.assertTrue(context.override_pipeline({tea.CONFIG_NODE: {"attach": {"use_teapot": desired}}}))
+                action = "茶壶-直接设为开启" if desired else "茶壶-直接设为关闭"
+                # Only substitute the physical click. Capture, recognition and
+                # the production post-operation verification remain real.
+                runner = CapturedSequenceRunner(context, controller,
+                    [self.page(item=before), self.page(item=before),
+                     self.page(item="bar_storm_on"), self.page(item=after), None])
+                original_act = runner._act
+                switches = []
+
+                def act(name):
+                    if name == action:
+                        switches.append(name)
+                    else:
+                        original_act(name)
+
+                with patch.object(runner, "_act", side_effect=act):
+                    self.assertTrue(runner.run())
+                self.assertEqual(switches, [action])
+                self.assertEqual(runner.observations, 4)
+                self.assertEqual(runner.observed_kinds, ["bar", "bar", "storm", "bar"])
         self.run_in_context(check)
 
 

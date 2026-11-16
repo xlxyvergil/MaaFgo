@@ -522,15 +522,98 @@ class TrialRepeatReadySkillTests(unittest.TestCase):
             servants=(ServantState(3, skills, Confidence(1), "504500"),))
         observed_plan_flags = []
         def parent_observe(**_):
-            observed_plan_flags.append(run._has_active_plan())
-            return main
+            observed_plan_flags.append((run._has_active_plan(), run._should_read_skill_cooldowns()))
+            return run._patch_skills_available(main)
         with patch.object(AutoBattleRuntime, "_observe", side_effect=parent_observe), \
              patch.object(run, "_read_phase", return_value=2):
             observed = run._observe()
-        self.assertEqual(observed_plan_flags, [False])
+        self.assertEqual(observed_plan_flags, [(True, False)])
         self.assertEqual(run._turn_index, 1)
         self.assertTrue(run._has_active_plan())
         self.assertTrue(all(skill.available for skill in observed.servants[0].skills))
+
+    def test_waiting_rows_keep_real_cooldowns_without_a_repeat_whitelist(self):
+        for repeat_ids in ((), ("504500",)):
+            with self.subTest(repeat_ids=repeat_ids):
+                candidate = decider(1)
+                candidate.config = replace(candidate.config, repeat_ready_skill_servant_ids=repeat_ids)
+                candidate._started_skill_turns.add(0)
+                run = HellishTrialRuntime(NS(tasker=NS(stopping=False)), Mock(), candidate, StrategyProfile())
+                run._observation_image = object()
+                skills = (SkillState(False, Confidence(1)),) * 3
+                main = replace(hand(), scene=Scene.MAIN_BATTLE,
+                    servants=(ServantState(3, skills, Confidence(1), "504500"),), master_skills=skills)
+                planned = run._patch_skills_available(main)
+                self.assertFalse(run._should_read_skill_cooldowns())
+                with patch.object(AutoBattleRuntime, "_observe", return_value=planned), \
+                     patch.object(run, "_read_phase", return_value=1), \
+                     patch("battle.runtime.hellish_trial.perception.read_skill_cooldowns", return_value=main) as read_cd:
+                    observed = run._observe()
+                read_cd.assert_called_once_with(run.ctx, run._observation_image, planned)
+                self.assertEqual(observed, main)
+                self.assertEqual(candidate.decide(observed).servant_skills, ())
+                self.assertTrue(run._has_active_plan())
+
+    def test_phase_mapping_to_started_row_cannot_patch_cooldowns_from_previous_fresh_row(self):
+        candidate = decider(2)
+        candidate._started_skill_turns.add(1)
+        run = HellishTrialRuntime(NS(tasker=NS(stopping=False)), Mock(), candidate, StrategyProfile())
+        run._observation_image = object()
+        self.assertEqual(run._turn_index, 0)  # Stale previous-phase/fallback row has not been executed.
+        skills = (SkillState(False, Confidence(1)),) * 3
+        main = replace(hand(), scene=Scene.MAIN_BATTLE,
+            servants=(ServantState(3, skills, Confidence(1), "504500"),), master_skills=skills)
+        planned = run._patch_skills_available(main)
+        with patch.object(AutoBattleRuntime, "_observe", return_value=planned), \
+             patch.object(run, "_read_phase", return_value=2), \
+             patch("battle.runtime.hellish_trial.perception.read_skill_cooldowns", return_value=main) as read_cd:
+            observed = run._observe()
+        read_cd.assert_called_once_with(run.ctx, run._observation_image, planned)
+        self.assertEqual(run._turn_index, 1)
+        self.assertEqual(observed, main)
+
+    def test_opening_wait_does_not_patch_a_fresh_phase_row(self):
+        candidate = decider(1)
+        run = HellishTrialRuntime(NS(tasker=NS(stopping=False)), Mock(), candidate, StrategyProfile())
+        run._observation_image = object()
+        run._opening_hand_pending = True
+        skills = (SkillState(False, Confidence(1)),) * 3
+        main = replace(hand(), scene=Scene.MAIN_BATTLE,
+            servants=(ServantState(3, skills, Confidence(1), "504500"),), master_skills=skills)
+        planned = run._patch_skills_available(main)
+        with patch.object(AutoBattleRuntime, "_observe", return_value=planned), \
+             patch.object(run, "_read_phase", return_value=1), \
+             patch("battle.runtime.hellish_trial.perception.read_skill_cooldowns", return_value=main) as read_cd:
+            self.assertEqual(run._observe(), main)
+            run._opening_hand_pending = False
+            observed = run._observe()
+        read_cd.assert_called_once_with(run.ctx, run._observation_image, planned)
+        self.assertEqual(observed, planned)
+
+    def test_stage_rows_skip_cd_until_waiting_and_remap_before_reading_the_same_frame(self):
+        candidate = decider(1)
+        context = NS(tasker=NS(stopping=False), run_recognition=Mock(side_effect=lambda name, image: NS(
+            hit=name == "战斗_从者1技能1_CD", best_result=NS(score=1))))
+        frames = [object() for _ in range(3)]
+        controller = Mock()
+        controller.post_screencap.return_value.wait.return_value.get.side_effect = frames
+        run = HellishTrialRuntime(context, controller, candidate, StrategyProfile())
+        with patch("battle.runtime.runtime.perception._detect_scene", return_value=(Scene.MAIN_BATTLE, 1)), \
+             patch("battle.runtime.runtime.perception._detect_enemies", return_value=()), \
+             patch.object(run, "_read_phase", side_effect=(1, 1, 2)):
+            first = run._observe()
+            self.assertEqual(context.run_recognition.call_count, 0)
+            self.assertTrue(first.servants[0].skills[0].available)
+            candidate._started_skill_turns.add(0)
+            waiting = run._observe()
+            self.assertEqual(context.run_recognition.call_count, 12)
+            self.assertFalse(waiting.servants[0].skills[0].available)
+            self.assertTrue(all(call.args[1] is frames[1] for call in context.run_recognition.call_args_list))
+            candidate.may_advance = True
+            next_phase = run._observe()
+            self.assertEqual(run._turn_index, 1)
+            self.assertEqual(context.run_recognition.call_count, 12)
+            self.assertTrue(next_phase.servants[0].skills[0].available)
 
     def test_first_fixed_master_sequence_and_swap_execute_with_auto_master_disabled(self):
         swap = OrderChangeAction(3, 4)

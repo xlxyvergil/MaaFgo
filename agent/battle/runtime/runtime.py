@@ -122,6 +122,10 @@ class AutoBattleRuntime:
         return (isinstance(plan, BattlePlan)
                 and plan.active_turn(self._turn_index) is not None)
 
+    def _should_read_skill_cooldowns(self) -> bool:
+        """只有实际执行固定计划时跳过 CD；计划外及策略等待仍读取真实状态。"""
+        return getattr(self, "_opening_hand_pending", False) or not self._has_active_plan()
+
     def run(self) -> BattleResult:
         scope = getattr(self, "_special_skill_servant_ids", None)
         mfaalog.info(
@@ -148,11 +152,11 @@ class AutoBattleRuntime:
         opening_waits = 0
         native = self.battle_policy.card.native_strategy
         opening = native.opening_hand
-        opening_pending = native.enabled and opening.enabled
-        opening_used = opening_pending
+        self._opening_hand_pending = native.enabled and opening.enabled
+        opening_used = self._opening_hand_pending
         opening_preview_started = False
         opening_plan = getattr(self.decider, "plan", None)
-        if opening_pending and (
+        if self._opening_hand_pending and (
             not opening.required_colors or not 0 <= opening.max_wait_turns <= 5
             or not (opening.servant_id or opening.servant_slot)
             or not isinstance(opening_plan, BattlePlan) or opening_plan.active_turn(0) is None
@@ -183,7 +187,7 @@ class AutoBattleRuntime:
             if scene is Scene.MAIN_BATTLE:
                 if opening_used and plan_turn == 0 and not self._opening_roster_unchanged():
                     return BattleResult.fail("opening_hand_roster_changed_or_unknown", turns)
-                if opening_pending and plan_turn == 0:
+                if self._opening_hand_pending and plan_turn == 0:
                     # Observe the real five cards before the first skill. The
                     # existing Executor owns Attack; the return lives in Pipeline.
                     mfaalog.info(f"[OpeningHand] 实际回合{turns+1}，释放任何计划技能前查看手牌")
@@ -281,7 +285,7 @@ class AutoBattleRuntime:
 
             if scene is Scene.COMMAND_SELECTION:
                 waiting_action = None
-                if opening_pending and plan_turn == 0:
+                if self._opening_hand_pending and plan_turn == 0:
                     if not opening_preview_started:
                         return BattleResult.fail("opening_hand_requires_main_battle_start", turns)
                     if not self._opening_roster_unchanged():
@@ -295,7 +299,7 @@ class AutoBattleRuntime:
                         detail = self.ctx.run_task("战斗_选卡返回主界面")
                         if not (detail and detail.status.succeeded):
                             return BattleResult.fail("opening_hand_return_failed", turns)
-                        opening_pending = False
+                        self._opening_hand_pending = False
                         continue
                     if opening_waits >= opening.max_wait_turns:
                         return BattleResult.fail("opening_hand_wait_exhausted", turns)
@@ -459,6 +463,9 @@ class AutoBattleRuntime:
         if enemy_slots is not None:
             # 目标复核仍取新截图，只省去另外两个无关敌人的 OCR。
             perception_args["enemy_slots"] = enemy_slots
+        read_skill_cooldowns = self._should_read_skill_cooldowns()
+        if not read_skill_cooldowns:
+            perception_args["read_skill_cooldowns"] = False
         result = perception.build(self.ctx, img, **perception_args)
         for frame_index in range(1, _NP_GLARE_MAX_FRAMES):
             uncertain = tuple(field for field in getattr(result, "unknown_fields", ())
@@ -481,13 +488,14 @@ class AutoBattleRuntime:
         if result.scene is Scene.COMMAND_SELECTION and unresolved:
             mfaalog.error(f"[NPGlare] {_NP_GLARE_MAX_FRAMES}帧仍无法确认 {unresolved}，保留选卡现场停止")
             raise RuntimeError("np_glare_unresolved")
+        # 阶段策略可能在确定本帧计划行后才决定补读 CD，必须使用同一张感知截图。
+        self._observation_image = img
         if result.scene is Scene.MAIN_BATTLE and any(candidates):
             self._update_frontline(result.servants)
 
-        # 当前回合有 Chaldea 计划时：技能 CD 检测无意义（计划已精确指定何时放技能），
-        # 且 ColorMatch ROI 可能因分辨率/缩放偏移导致误判为 CD。
-        # 将所有技能标记为可用，避免被安全门过滤掉。
-        if self._has_active_plan():
+        # 计划执行时已在感知入口跳过 CD；保留计划可用状态和空位过滤。
+        # 计划外、开局等牌及策略等待不得覆盖本帧实际冷却。
+        if not read_skill_cooldowns:
             result = self._patch_skills_available(result)
             mfaalog.diagnostic("[AutoBattle] _observe() -> plan active, present servants' skills patched to available")
 

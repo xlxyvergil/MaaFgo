@@ -159,6 +159,88 @@ class ScreenshotRecognitionTests(unittest.TestCase):
                 except OSError:pass
 
 
+class ScreenshotMysticCodeTests(unittest.TestCase):
+    """Real saved clothing crops on an explicit synthetic full-game canvas."""
+    @classmethod
+    def setUpClass(cls):
+        from agent.custom.mystic_code import match_icon, THRESHOLD
+        cls.repository = Path(__file__).resolve().parents[1]
+        cls.fixtures = cls.repository / 'tests/fixtures/mystic_code'
+        cls.index = ScreenshotIndex.__new__(ScreenshotIndex)
+        cls.index.match_mystic_icon = match_icon
+        cls.index.mystic_threshold = THRESHOLD
+        cls.index.mystic_icons = {}
+        data = json.loads((cls.repository / 'agent/custom/mystic_code_data.json').read_text(encoding='utf-8'))
+        for row in data['mysticCodes']:
+            icons, seen = [], set()
+            for key in ('maleImageId', 'femaleImageId'):
+                for pack in ('base', 'cn'):
+                    path = cls.repository / f"assets/resource/{pack}/image/MysticCodes/masterequip{row[key]:05d}.png"
+                    if not path.is_file():
+                        continue
+                    raw = path.read_bytes()
+                    if raw in seen:
+                        continue
+                    seen.add(raw)
+                    icons.append((str(path), cv2.imdecode(np.frombuffer(raw, np.uint8), cv2.IMREAD_UNCHANGED)))
+            cls.index.mystic_icons[row['id']] = icons
+
+    def canvas(self, name):
+        # The repository intentionally stores only each real icon's crop, not
+        # a full account screenshot. Preserve original crop pixels and geometry.
+        image = Image.new('RGB', (1280, 720), (15, 100, 190))
+        image.paste((235, 235, 235), (12, 108, 1268, 616))
+        with Image.open(self.fixtures / name) as icon:
+            image.paste(icon.convert('RGB'), (10, 640))
+        return image
+
+    def recognize(self, image):
+        original = decode_image(encode(image))
+        _, layout = locate_panel(original)
+        return self.index.recognize_mystic_code(original, layout)
+
+    def test_real_jp_cn_both_genders_compete_by_outfit_identity(self):
+        for name, expected in (
+            ('team_1.png', 1), ('male_team_1.png', 1),
+            ('female_team_20.png', 20), ('male_team_20.png', 20),
+            ('female_team_210.png', 210), ('male_team_210.png', 210),
+            ('cn_female_team_20.png', 20),
+            ('synthetic_male_team_240.png', 240),
+        ):
+            with self.subTest(name=name):
+                result = self.recognize(self.canvas(name))
+                self.assertEqual(result['id'], expected, result)
+                self.assertEqual(result['status'], 'identified')
+                self.assertGreaterEqual(result['score'], .90)
+                self.assertNotIn('level', result)
+
+    def test_scaling_and_black_borders_use_panel_not_total_image_dimensions(self):
+        for name, expected in (('team_1.png', 1), ('female_team_20.png', 20)):
+            source = self.canvas(name)
+            for image in (source.resize((960, 540)), source.resize((1920, 1080)),
+                          ImageOps.expand(source, border=(170, 80, 250, 110), fill='black')):
+                with self.subTest(name=name, size=image.size):
+                    self.assertEqual(self.recognize(image)['id'], expected)
+
+    def test_cropped_or_obscured_outfit_is_unknown_without_lowering_threshold(self):
+        source = self.canvas('female_team_20.png')
+        obscured = source.copy()
+        obscured.paste('black', (0, 625, 120, 720))
+        for image in (source.crop((0, 0, 1280, 620)), obscured):
+            with self.subTest(size=image.size):
+                result = self.recognize(image)
+                self.assertIsNone(result['id'])
+                self.assertEqual(result['status'], 'unknown')
+
+    def test_two_different_ids_with_equal_visual_evidence_are_not_guessed(self):
+        icons = self.index.mystic_icons[1]
+        with patch.object(self.index, 'mystic_icons', {1: icons, 999: icons}):
+            result = self.recognize(self.canvas('team_1.png'))
+        self.assertGreaterEqual(result['score'], .90)
+        self.assertIsNone(result['id'])
+        self.assertEqual(result['status'], 'unknown')
+
+
 class ScreenshotHTTPTests(unittest.TestCase):
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.addCleanup(self.temp.cleanup)

@@ -10,6 +10,7 @@ on:
       - ".github/workflows/android.yml"
       - "assets/**"
       - "web/battle-editor/**"
+      - "extras/support-ce/**"
       - "打开编队编辑器.cmd"
       - "**.py"
   workflow_dispatch:
@@ -185,6 +186,32 @@ jobs:
           path: "./install-mxu/*"
 
 
+  build-support-ce:
+    name: Build support CE DLC
+    needs: meta
+    runs-on: ubuntu-latest
+    env:
+      RELEASE_TAG: ${{ needs.meta.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.12'
+      - name: Install DLC build dependency
+        run: python -m pip install -r extras/support-ce/requirements.txt
+      - name: Test DLC generator
+        run: python -m unittest discover -s tests -p 'test_support_extension_generator.py' -v
+      - name: Build and verify support CE DLC
+        run: |
+          python tools/build_support_extension.py --version "$RELEASE_TAG" --check-missing extras/support-ce/missing.json --output "build/support-ce/MaaFGO-SupportCE-DLC-${RELEASE_TAG}.zip"
+          python tools/build_support_extension.py --verify "build/support-ce/MaaFGO-SupportCE-DLC-${RELEASE_TAG}.zip"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: MaaFGO-SupportCE-DLC-${{ needs.meta.outputs.tag }}
+          path: build/support-ce/*.zip
+          if-no-files-found: error
+          compression-level: 0
+
   build-android:
     name: Build Android APKs
     if: startsWith(github.ref, 'refs/tags/v')
@@ -226,7 +253,7 @@ jobs:
   debug:
     if: ${{ needs.meta.outputs.is_release == 'false' }}
     runs-on: ubuntu-slim
-    needs: [meta, build-mxu, changelog]
+    needs: [meta, build-mxu, build-support-ce, changelog]
     steps:
       - name: Show Outputs
         run: |
@@ -238,7 +265,7 @@ jobs:
 
   release:
     if: ${{ needs.meta.outputs.is_release == 'true' }}
-    needs: [meta, build-mxu, build-android, changelog]
+    needs: [meta, build-mxu, build-support-ce, build-android, changelog]
     runs-on: ubuntu-latest
     env:
       RELEASE_TAG: ${{ needs.meta.outputs.tag }}
@@ -256,6 +283,12 @@ jobs:
           pattern: MaaFGO-android-*-release
           path: assets/android
           merge-multiple: true
+
+      - name: Download support CE DLC
+        uses: actions/download-artifact@v8.0.1
+        with:
+          name: MaaFGO-SupportCE-DLC-${{ needs.meta.outputs.tag }}
+          path: assets/support-ce
 
       - name: Compress artifacts
         working-directory: assets/mxu
@@ -275,6 +308,7 @@ jobs:
           files: |
             assets/mxu/*.zip
             assets/android/*.apk
+            assets/support-ce/*.zip
           fail_on_unmatched_files: true
           tag_name: ${{ needs.meta.outputs.tag }}
           body: ${{ needs.changelog.outputs.release_body }}

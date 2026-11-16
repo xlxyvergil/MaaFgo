@@ -147,6 +147,8 @@ jobs:
           --tests 'com.aliothmoon.maafw.runner.ForegroundDisplayPrecheckTest'
           --tests 'com.aliothmoon.maafw.remote.internal.PrimaryInputGuardTest'
           --tests 'com.aliothmoon.maafw.bridge.DriverPrimaryInputGuardTest'
+          --tests 'com.aliothmoon.maafw.bridge.TapHoldPolicyTest'
+          --tests 'com.aliothmoon.maafw.bridge.DriverTapHoldTest'
           --tests 'com.aliothmoon.maafw.bridge.InputControlGestureDisplayTest'
           --tests 'com.aliothmoon.maafw.runner.MaaFrameworkRunnerPortTest'
       - name: Verify Android shell source stays clean

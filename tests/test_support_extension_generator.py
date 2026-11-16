@@ -9,14 +9,12 @@ import tempfile
 import unittest
 import zipfile
 
-import numpy as np
 from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPTS = ROOT / "skills/fgo-equip-icon-pipeline/scripts"
-if not all((SCRIPTS / name).is_file() for name in ("build_support_extension.py", "sync_equip_icons.py")):
-    raise unittest.SkipTest("本地礼装资源生成 skill 未安装；安装该 skill 后可运行生成器回归")
+SCRIPTS = ROOT / "tools"
+FORMAL = ROOT / "skills/fgo-equip-icon-pipeline/scripts/sync_equip_icons.py"
 
 
 def module(name, path):
@@ -27,7 +25,7 @@ def module(name, path):
 
 
 generator = module("support_extension_generator", SCRIPTS / "build_support_extension.py")
-formal = module("support_extension_formal", SCRIPTS / "sync_equip_icons.py")
+formal = module("support_extension_formal", FORMAL) if FORMAL.is_file() else None
 
 
 class SupportExtensionGeneratorTests(unittest.TestCase):
@@ -37,11 +35,11 @@ class SupportExtensionGeneratorTests(unittest.TestCase):
         self.root = Path(self.temp.name)
         self.sources = self.root / "sources"
         self.sources.mkdir()
-        y, x = np.mgrid[:68, :150]
-        pixels = np.stack((x % 256, (x * 3 + y * 2) % 256, y * 3 % 256,
-                           np.full_like(x, 255)), axis=-1).astype("uint8")
+        image = Image.new("RGBA", (150, 68))
+        image.putdata([(x % 256, (x * 3 + y * 2) % 256, y * 3 % 256, 255)
+                       for y in range(68) for x in range(150)])
         for eid in (101, 102):
-            Image.fromarray(pixels).save(self.sources / f"f_{eid}0.png")
+            image.save(self.sources / f"f_{eid}0.png")
         self.star = self.root / "star.png"
         Image.new("RGBA", (20, 20), (50, 255, 100, 180)).save(self.star)
         self.catalog = self.root / "catalog.json"
@@ -63,6 +61,7 @@ class SupportExtensionGeneratorTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "999"):
             self.plan(ids=[999])
 
+    @unittest.skipUnless(formal, "未安装本地正式模板生成 skill；其余发布测试照常执行")
     def test_produced_images_match_formal_support_builder(self):
         source = self.sources / "f_1020.png"
         normal, maximum = self.root / "normal.png", self.root / "maximum.png"
@@ -73,7 +72,7 @@ class SupportExtensionGeneratorTests(unittest.TestCase):
         for state, reference in (("非满破", normal), ("满破", maximum)):
             with Image.open(reference) as expected, Image.open(io.BytesIO(generated[state])) as actual:
                 self.assertEqual(actual.mode, expected.mode)
-                np.testing.assert_array_equal(np.array(actual.convert("RGBA")), np.array(expected.convert("RGBA")))
+                self.assertEqual(actual.convert("RGBA").tobytes(), expected.convert("RGBA").tobytes())
 
     def test_archive_reproducible_and_manifest_hashes_protect_images(self):
         selected = self.plan()["selected"]
@@ -112,6 +111,71 @@ class SupportExtensionGeneratorTests(unittest.TestCase):
         Image.new("RGBA", (128, 128)).save(self.sources / "f_1020.png")
         with self.assertRaisesRegex(ValueError, "150×68"):
             self.plan()
+
+    def test_reviewed_missing_list_rejects_new_and_resolved_gaps(self):
+        selection = self.plan()
+        expected = self.root / "missing.json"
+        expected.write_text(json.dumps(selection["missing"]), encoding="utf8")
+        generator.check_missing(selection, expected)
+        for missing in ([], selection["missing"] + [{"id": 104, "name": "新礼装"}]):
+            with self.subTest(missing=missing), self.assertRaisesRegex(ValueError, "缺失项"):
+                generator.check_missing({"missing": missing}, expected)
+
+    def test_cli_missing_check_stops_before_output(self):
+        expected = self.root / "missing.json"
+        expected.write_text("[]", encoding="utf8")
+        output = self.root / "not-created/extension.zip"
+        result = subprocess.run([
+            sys.executable, "-X", "utf8", str(SCRIPTS / "build_support_extension.py"),
+            "--catalog", str(self.catalog), "--source-dir", str(self.sources),
+            "--star", str(self.star), "--builtin-manifest", str(self.builtin),
+            "--check-missing", str(expected), "--output", str(output),
+        ], capture_output=True, encoding="utf8")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertIn("缺失项", result.stderr)
+        self.assertFalse(output.parent.exists())
+
+    def test_archive_installs_with_runtime_and_preserves_chinese_names(self):
+        from agent.support_ce import install_extension, read_manifest, resolve_external_templates
+
+        output = self.root / "MaaFGO-SupportCE-DLC-v1.2.3-beta.1.zip"
+        generator.build_archive(output, self.plan()["selected"], self.sources, self.star,
+                                version="v1.2.3-beta.1")
+        installation = self.root / "MaaFGO 中文目录"
+        result = install_extension(installation, output.read_bytes())
+        self.assertEqual((result["installed"], result["images"]), (1, 2))
+        manifest = read_manifest(installation)
+        self.assertEqual(manifest["version"], "v1.2.3-beta.1")
+        self.assertEqual(manifest["equips"][0]["name"], "礼装102")
+        self.assertEqual(len(resolve_external_templates(installation, "support-ce:102", "任意")), 2)
+
+
+class CheckedInReleaseInputsTests(unittest.TestCase):
+    def test_catalog_has_no_unreviewed_missing_source(self):
+        selection = generator.plan(ROOT / "agent/custom/equip_list.json",
+                                   generator.DEFAULT_SOURCES, generator.INPUTS / "builtin.json")
+        generator.check_missing(selection, generator.INPUTS / "missing.json")
+        self.assertTrue(selection["selected"])
+        selected = {row["source"] for row in selection["selected"]}
+        self.assertEqual(selected, {path.name for path in generator.DEFAULT_SOURCES.glob("*.png")})
+
+    def test_builtin_exclusions_match_shipped_templates(self):
+        mapping = json.loads((generator.INPUTS / "builtin.json").read_text("utf8"))
+        self.assertEqual(len(mapping.values()), len(set(mapping.values())))
+        for state in generator.STATUSES:
+            directory = ROOT / "assets/resource/base/image/lizhuang" / state
+            self.assertEqual(set(mapping), {path.name for path in directory.glob("*.png")} - {"0_空.png"})
+
+    def test_release_waits_for_dlc_and_uploads_separate_zip(self):
+        workflow = (ROOT / ".github/workflows/install.yml").read_text("utf8")
+        job = workflow.split("  build-support-ce:\n", 1)[1].split("\n  build-android:", 1)[0]
+        self.assertIn('--version "$RELEASE_TAG" --check-missing extras/support-ce/missing.json', job)
+        self.assertIn("if-no-files-found: error", job)
+        release = workflow.split("\n  release:\n", 1)[1]
+        self.assertIn("needs: [meta, build-mxu, build-support-ce, build-android, changelog]", release)
+        self.assertIn("name: MaaFGO-SupportCE-DLC-${{ needs.meta.outputs.tag }}", release)
+        self.assertIn("            assets/support-ce/*.zip", release)
+        self.assertIn("fail_on_unmatched_files: true", release)
 
 
 if __name__ == "__main__":

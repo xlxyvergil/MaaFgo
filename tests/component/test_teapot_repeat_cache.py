@@ -77,7 +77,7 @@ class TeapotRepeatCacheTests(unittest.TestCase):
         return Context(root, token, desired), token
 
     def bar(self, desired):
-        return [tea.TeapotFrame("bar", desired)] * tea.STABLE_FRAMES
+        return [tea.TeapotFrame("bar", desired)]
 
     def assert_cached_without_observation(self, context):
         runner = Runner(context)
@@ -93,13 +93,28 @@ class TeapotRepeatCacheTests(unittest.TestCase):
                 context, token = self.begin(desired=desired)
                 first = Runner(context, self.bar(desired))
                 self.assertTrue(first.run())
-                self.assertEqual(first.observations, tea.STABLE_FRAMES)
+                self.assertEqual(first.observations, 1)
                 self.assertTrue(self.store.teapot_confirmed(context.root, token, desired))
                 self.store.battle_started(context.root, token, 2)
                 second = Context(context.root, token, desired)
                 self.assert_cached_without_observation(second)
                 self.store.battle_started(context.root, token, 3)
                 self.assert_cached_without_observation(Context(context.root, token, desired))
+
+    def test_skip_never_observes_or_seeds_confirmation_in_single_or_repeat_session(self):
+        for repeat in (False, True):
+            with self.subTest(repeat=repeat):
+                context, token = self.begin(desired="skip", repeat=repeat)
+                runner = Runner(context)
+                self.assertTrue(runner.run())
+                self.assertEqual(runner.observations, 0)
+                self.assertEqual(runner.actions, [])
+                context.run_task.assert_not_called()
+                for desired in (False, True):
+                    self.assertFalse(self.store.teapot_confirmed(context.root, token, desired))
+                checked = Runner(Context(context.root, token, False), self.bar(False))
+                self.assertTrue(checked.run())
+                self.assertEqual(checked.observations, 1)
 
     def test_unavailable_first_quest_rechecks_next_party_page_then_reuses_success(self):
         for desired in (False, True):
@@ -112,14 +127,14 @@ class TeapotRepeatCacheTests(unittest.TestCase):
                 self.store.battle_started(context.root, token, 2)
                 second = Runner(Context(context.root, token, desired), self.bar(desired))
                 self.assertTrue(second.run())
-                self.assertEqual(second.observations, tea.STABLE_FRAMES)
+                self.assertEqual(second.observations, 1)
                 self.store.battle_started(context.root, token, 3)
                 self.assert_cached_without_observation(Context(context.root, token, desired))
 
     def test_popup_is_cached_only_after_switch_close_and_outer_bar_verification(self):
         context, token = self.begin(desired=True)
-        frames = ([tea.TeapotFrame("popup", False)] * tea.STABLE_FRAMES
-                  + [tea.TeapotFrame("popup", True)] * tea.STABLE_FRAMES
+        frames = ([tea.TeapotFrame("popup", False)]
+                  + [tea.TeapotFrame("popup", True)]
                   + self.bar(True))
         first = Runner(context, frames)
         self.assertTrue(first.run())
@@ -133,7 +148,7 @@ class TeapotRepeatCacheTests(unittest.TestCase):
             (False, [tea.TeapotFrame("unknown")] * tea.OBSERVATION_ROUNDS, None),
             (False, [tea.TeapotFrame("popup")] * tea.OBSERVATION_ROUNDS, None),
             (True, self.bar(False), "茶壶-直接设为开启"),
-            (False, [tea.TeapotFrame("popup", False)] * tea.STABLE_FRAMES, "茶壶-关闭弹窗"),
+            (False, [tea.TeapotFrame("popup", False)], "茶壶-关闭弹窗"),
             (True, self.bar(False) + [tea.TeapotFrame("unknown")] * tea.OBSERVATION_ROUNDS, None),
         ]
         for desired, frames, failed in cases:
@@ -145,7 +160,7 @@ class TeapotRepeatCacheTests(unittest.TestCase):
                 self.store.battle_started(context.root, token, 2)
                 next_run = Runner(Context(context.root, token, desired), self.bar(desired))
                 self.assertTrue(next_run.run())
-                self.assertEqual(next_run.observations, tea.STABLE_FRAMES)
+                self.assertEqual(next_run.observations, 1)
 
     def test_stop_before_or_during_setting_change_does_not_seed_cache(self):
         for when in ("before", "toggle"):
@@ -158,7 +173,7 @@ class TeapotRepeatCacheTests(unittest.TestCase):
                 self.assertFalse(self.store.teapot_confirmed(context.root, token, True))
                 retry = Runner(Context(context.root, token, True), self.bar(True))
                 self.assertTrue(retry.run())
-                self.assertEqual(retry.observations, tea.STABLE_FRAMES)
+                self.assertEqual(retry.observations, 1)
 
     def test_changed_target_failed_attempt_does_not_revive_old_confirmation(self):
         context, token = self.begin(desired=False)
@@ -170,7 +185,7 @@ class TeapotRepeatCacheTests(unittest.TestCase):
         self.store.battle_started(context.root, token, 3)
         reverted = Runner(Context(context.root, token, False), self.bar(False))
         self.assertTrue(reverted.run())
-        self.assertEqual(reverted.observations, tea.STABLE_FRAMES)
+        self.assertEqual(reverted.observations, 1)
 
     def test_finish_restart_and_other_root_always_need_their_own_confirmation(self):
         context, token = self.begin(desired=False)
@@ -178,25 +193,25 @@ class TeapotRepeatCacheTests(unittest.TestCase):
         other, _ = self.begin(root=202, desired=False)
         other_run = Runner(other, self.bar(False))
         self.assertTrue(other_run.run())
-        self.assertEqual(other_run.observations, tea.STABLE_FRAMES)
+        self.assertEqual(other_run.observations, 1)
         self.assert_cached_without_observation(Context(context.root, token, False))
         self.store.finish(context.root, token)
         renewed, new_token = self.begin(root=context.root, desired=False)
         self.assertNotEqual(token, new_token)
         stale = Runner(Context(context.root, token, False), self.bar(False))
         self.assertTrue(stale.run())
-        self.assertEqual(stale.observations, tea.STABLE_FRAMES)
+        self.assertEqual(stale.observations, 1)
         self.assertFalse(self.store.teapot_confirmed(renewed.root, new_token, False))
         current = Runner(renewed, self.bar(False))
         self.assertTrue(current.run())
-        self.assertEqual(current.observations, tea.STABLE_FRAMES)
+        self.assertEqual(current.observations, 1)
 
     def test_single_battle_session_never_skips_a_later_check(self):
         context, token = self.begin(repeat=False)
         for _ in range(2):
             runner = Runner(Context(context.root, token, False), self.bar(False))
             self.assertTrue(runner.run())
-            self.assertEqual(runner.observations, tea.STABLE_FRAMES)
+            self.assertEqual(runner.observations, 1)
 
 
 if __name__ == "__main__":
