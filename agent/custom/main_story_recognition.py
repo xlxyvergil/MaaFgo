@@ -70,5 +70,6 @@ class MainStoryNext(CustomRecognition):
         result = match_next(argv.image, template, mask, panel=params.get("panel", False),
                             stopped=lambda: tasker.stopping)
         if result:
-            return CustomRecognition.AnalyzeResult(box=result[0], detail=result[1])
+            box = result[1]["marker_box"] if params.get("marker_only", False) else result[0]
+            return CustomRecognition.AnalyzeResult(box=box, detail=result[1])
         return None
