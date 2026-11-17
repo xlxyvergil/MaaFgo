@@ -82,15 +82,31 @@ class FreeQuestRunner:
                     matches.append(result)
             if not matches:
                 break
-            result = min(matches, key=lambda match: match.box.y)
+            first = min(matches, key=lambda match: match.box.y)
+            # 同一文字可能命中多个裁剪范围不同的模板。先限定最上面
+            # 这一行，再选匹配分最高的样式，避免较低分的大框抢走锚点。
+            result = max((match for match in matches
+                          if match.box.y < first.box.y + first.box.h),
+                         key=lambda match: match.raw_detail.get("best", {}).get("score", 0))
             box = result.box
-            clear = local.run_recognition("Free-完成角标", image, {
+            attach = (self.ctx.get_node_data(result.name) or {}).get("attach", {})
+            dx, dy, width, height = attach.get("clear_roi_offset", [-30, 75, 180, 65])
+            roi = [max(620, box.x+dx), box.y+dy, width, height]
+            clear_image = image
+            if "clear_roi_offset" in attach:
+                # 旧版文字约为标准模板的0.89倍。只归一化当前行的完成角标
+                # 区域，不扩大到其他行，也不改变实际点击坐标。
+                x, y, w, h = roi
+                clear_image = cv2.resize(image[y:y+h, x:x+w], (180, 65))
+                roi = [0, 0, 180, 65]
+            clear = local.run_recognition("Free-完成角标", clear_image, {
                 "Free-完成角标": {"recognition": {"param": {
-                    "roi": [max(620, box.x-30), box.y+75, 180, 65]
+                    "roi": roi
                 }}}
             })
             yield result, bool(clear and clear.hit)
-            top = box.y + 140
+            # 按实际标记下沿推进，兼容旧版较小行距；固定跳140px会漏行。
+            top = box.y + box.h
 
     def find_in_panel(self, image):
         for step in range(9):
@@ -134,7 +150,10 @@ class FreeQuestRunner:
         dx, dy, width, height = node.get(
             "attach", {}).get("title_roi_offset", [125, -35, 290, 40])
         x, y = box.x + dx, box.y + dy
-        return image[y:y+height, x:x+width].copy()
+        patch = image[y:y+height, x:x+width].copy()
+        if patch.size and patch.shape[:2] == (height, width) and (width, height) != (290, 40):
+            patch = cv2.resize(patch, (290, 40))
+        return patch
 
     def same_quest(self, image, result):
         if self.current_title is None:
