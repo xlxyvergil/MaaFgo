@@ -1,4 +1,4 @@
-"""国服强化列表真实OCR回放；无设备、无触控。"""
+"""国日服强化列表真实OCR回放；无设备、无触控。"""
 import json
 from pathlib import Path
 import sys
@@ -19,8 +19,8 @@ from test_main_story_framework import FrameworkResources, ScreenController
 
 
 class StrengtheningFrameworkTests(FrameworkResources, unittest.TestCase):
-    def probe(self, image, callback):
-        resource = self.resource("cn")
+    def probe(self, image, callback, server="cn"):
+        resource = self.resource(server)
         resource.register_custom_recognition("strengthening_entry", StrengtheningEntry())
         resource.register_custom_recognition("strengthening_scan", StrengtheningScan())
         outcomes, errors = [], []
@@ -51,8 +51,40 @@ class StrengtheningFrameworkTests(FrameworkResources, unittest.TestCase):
         finally:
             tasker.post_stop().wait()
 
-    def fixture(self):
-        return cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/strengthening/cn_list.png", np.uint8), 1)
+    def fixture(self, name="cn_list.png"):
+        return cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/strengthening" / name, np.uint8), 1)
+
+    def test_jp_list_reads_discounted_and_regular_ap_without_defaulting_to_zero(self):
+        image = self.fixture("jp_list.png")
+        def check(ctx):
+            runner = StrengtheningRunner(ctx)
+            self.assertTrue(runner.panel(image))
+            self.assertEqual(runner.list_label, "強化クエスト")
+            result = ctx.run_recognition("强化-条目扫描", image)
+            raw = result.best_result.detail
+            report = json.loads(raw) if isinstance(raw, str) else raw
+            self.assertEqual([e["ap_cost"] for e in report["entries"]], [11, 23, 23], report)
+            self.assertEqual(report["uncertain_count"], 0, report)
+            self.assertIn("沖田", report["entries"][0]["title"])
+        self.probe(image, check, "jp")
+
+    def test_cn_and_jp_list_titles_do_not_cross_match(self):
+        for server, name in (("cn", "jp_list.png"), ("jp", "cn_list.png")):
+            image = self.fixture(name)
+            self.probe(image, lambda ctx: self.assertFalse(StrengtheningRunner(ctx).panel(image)), server)
+
+    def test_jp_completed_servant_disappears_and_next_entries_keep_their_ap_costs(self):
+        image = self.fixture("jp_list_after_completion.png")
+        def check(ctx):
+            self.assertTrue(StrengtheningRunner(ctx).panel(image))
+            result = ctx.run_recognition("强化-条目扫描", image)
+            raw = result.best_result.detail
+            report = json.loads(raw) if isinstance(raw, str) else raw
+            self.assertEqual([e["ap_cost"] for e in report["entries"]], [23, 23, 21], report)
+            self.assertIn("玉藻", report["entries"][0]["title"])
+            self.assertTrue(all("沖田" not in e["title"] for e in report["entries"]))
+            self.assertEqual(report["uncertain_count"], 0, report)
+        self.probe(image, check, "jp")
 
     def test_real_list_selects_first_unfinished_small_quest(self):
         def check(ctx):

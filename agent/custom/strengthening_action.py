@@ -21,6 +21,9 @@ class StrengtheningRunner(StoryRunner):
         }}})
         super().__init__(isolated, clock=clock, sleep=sleep)
         self.config = (context.get_node_data("强化-配置") or {}).get("attach", {})
+        self.list_label = "強化クエスト" if self.config.get("server") == "jp" else "强化任务"
+        self.list_path = ("カルデアゲート → 強化クエスト" if self.config.get("server") == "jp"
+                          else "迦勒底之门 → 强化任务")
         self.limit = self.config.get("quest_limit", 999)
         self.timeout = self.config.get("transition_timeout", 120)
         if type(self.limit) is not int or not 1 <= self.limit <= 999:
@@ -42,7 +45,7 @@ class StrengtheningRunner(StoryRunner):
             retry = self.reco("进本-断网重连", image)
             if retry:
                 if self._network_retries >= 3:
-                    raise StoryStopped("本关加载时已重试连接3次，仍未能继续。请检查游戏网络，点击游戏中的“重试”；恢复后回到“强化任务”列表再启动任务。")
+                    raise StoryStopped(f"本关加载时已重试连接3次，仍未能继续。请检查游戏网络，点击游戏中的重试按钮；恢复后回到“{self.list_label}”列表再启动任务。")
                 self._network_retries += 1
                 mfaalog.warning(f"[挑战强化本] 加载连接中断，点击重试（本关第{self._network_retries}/3次）")
                 self.action("进本-断网重连", retry)
@@ -58,7 +61,7 @@ class StrengtheningRunner(StoryRunner):
 
     def _ensure_list(self, image):
         if not self.panel(image):
-            raise StoryStopped("查找强化本时已离开强化任务列表，无法继续选关。请打开“迦勒底之门 → 强化任务”列表后重新启动“挑战强化本”。")
+            raise StoryStopped(f"查找强化本时已离开强化任务列表，无法继续选关。请打开“{self.list_path}”列表后重新启动“挑战强化本”。")
 
     def _uncertain(self, image):
         result = self.reco("强化-条目扫描", image)
@@ -112,7 +115,8 @@ class StrengtheningRunner(StoryRunner):
         raise StoryStopped("强化任务列表查找超过上限，尚未扫描完。请将列表拉到顶部后重试。")
 
     def enter(self, result):
-        mfaalog.info(f"[挑战强化本] 选择：{recognition_detail(result).get('title', '已开启强化关卡')}")
+        detail = recognition_detail(result)
+        mfaalog.info(f"[挑战强化本] 选择：{detail.get('title', '已开启强化关卡')}，AP消耗={detail.get('ap_cost')}")
         self.action("强化-可挑战条目", result)
         deadline = self.clock() + self.timeout
         while self.clock() < deadline:
@@ -123,14 +127,14 @@ class StrengtheningRunner(StoryRunner):
                 continue
             if self.battle_ready(image):
                 return
-        raise StoryStopped("点击强化关卡后未确认助战、编队或战斗界面，无法继续。请检查当前画面，手动返回“强化任务”列表后重试。")
+        raise StoryStopped(f"点击强化关卡后未确认助战、编队或战斗界面，无法继续。请检查当前画面，手动返回“{self.list_label}”列表后重试。")
 
     def settle(self):
         try:
             return super().settle()
         except StoryStopped as exc:
             if str(exc) == "战后结算超时，未确认返回地图或副本列表":
-                raise StoryStopped("战后结算超时，未确认返回“强化任务”列表，无法继续选关。请检查当前奖励或提示窗口，手动处理并回到强化任务列表后重试。") from exc
+                raise StoryStopped(f"战后结算超时，未确认返回“{self.list_label}”列表，无法继续选关。请检查当前奖励或提示窗口，手动处理并回到该列表后重试。") from exc
             raise
 
     def run(self):

@@ -43,6 +43,42 @@ class StrengtheningRecognitionTests(unittest.TestCase):
         self.assertEqual(len(report["entries"]), 1)
         self.assertEqual(report["entries"][0]["box"], [950, 194, 1, 1])
 
+    def test_actual_ap_is_preserved_for_zero_discounted_and_regular_costs(self):
+        for ap in (0, 5, 11, 20, 23, 40):
+            for title, progress in (("强化关卡 测试", "任务进行度"), ("強化クエスト テスト", "クエスト進行度")):
+                with self.subTest(ap=ap, title=title):
+                    report = self.scan([title, progress, f"AP{ap}"])
+                    self.assertEqual(report["entries"][0]["ap_cost"], ap)
+
+    def test_missing_ap_is_uncertain_not_zero(self):
+        for ap in ("AP", "AP?", "消費AP"):
+            report = self.scan(["強化クエスト テスト", "クエスト進行度", ap])
+            self.assertFalse(report["entries"])
+            self.assertIsNone(report["rows"][0]["ap_cost"])
+            self.assertEqual(report["uncertain_count"], 1)
+
+    def test_jp_locked_conditions_and_temporary_relaxation_are_distinct(self):
+        for condition in ("最終再臨後に開放", "絆Lv.4で開放", "未開放"):
+            report = self.scan(["強化クエスト テスト", "クエスト進行度", "AP23", condition])
+            self.assertFalse(report["entries"])
+            self.assertEqual(report["locked_count"], 1)
+        report = self.scan(["強化クエスト テスト", "クエスト進行度", "AP23", "開放条件緩和中"])
+        self.assertEqual(report["entries"][0]["ap_cost"], 23)
+
+    def test_fullwidth_ap_digits_are_parsed(self):
+        report = self.scan(["強化クエスト テスト", "クエスト進行度", "ＡＰ２３"])
+        self.assertEqual(report["entries"][0]["ap_cost"], 23)
+
+    def test_unrelated_ocr_digit_does_not_append_to_ap_cost(self):
+        report = self.scan(["強化クエスト テスト", "クエスト進行度", "AP23", "1"])
+        self.assertEqual(report["entries"][0]["ap_cost"], 23)
+
+    def test_conflicting_costs_are_uncertain_instead_of_guessed(self):
+        report = self.scan(["強化クエスト テスト", "クエスト進行度", "AP11", "AP23"])
+        self.assertFalse(report["entries"])
+        self.assertIsNone(report["rows"][0]["ap_cost"])
+        self.assertEqual(report["uncertain_count"], 1)
+
     def test_rejects_free_and_interlude_even_with_ap_and_progress(self):
         for marker in ("Free Quest", "Interlude"):
             report = self.scan([marker, "任务进行度", "AP10"])
