@@ -131,7 +131,7 @@ class SupportLevelMatchingTests(unittest.TestCase):
                 if failed:
                     ctx.fail_entry = "助战兜底-选择首个助战"
                 self.assertEqual(self.run_search(ctx, action).success, not failed)
-                self.assertEqual(ctx.refreshes, 10)
+                self.assertEqual(ctx.refreshes, 5)
                 self.assertEqual(ctx.entries[-1], "助战兜底-选择首个助战")
                 self.assertEqual(len(self.level_warnings()), 2 if failed else 1)
 

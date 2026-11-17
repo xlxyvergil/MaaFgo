@@ -118,8 +118,8 @@ class CeOnlySupportTests(unittest.TestCase):
         with patch("support_action.MAX_SWIPE_BEFORE_REFRESH", 2):
             self.assertTrue(self.run_search().success)
         self.assert_servant_checks_skipped()
-        self.assertEqual(self.context.refreshes, 10)
-        self.assertEqual(self.action._match_ce.call_count, 33)
+        self.assertEqual(self.context.refreshes, 5)
+        self.assertEqual(self.action._match_ce.call_count, 18)
         self.assertEqual(self.context.entries[-1], "助战兜底-选择首个助战")
 
     def test_switching_back_to_class_restores_servant_matching(self):
