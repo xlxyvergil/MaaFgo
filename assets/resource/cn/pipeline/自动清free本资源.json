@@ -1,6 +1,9 @@
 {
+  "Free-配置": {
+    "attach": {"label_nodes": ["Free-列表标记", "Free-列表英文标记", "Free-列表旧版中文2", "Free-列表旧版英文3", "Free-列表旧版中文4"]}
+  },
   "Free-列表标记": {
-    "doc": "2026-11-01 国服卡美洛圣都市街实测：左侧标记为“自由关卡”，英文模板最高分仅 0.3531。使用国服字样，标题区域相对左侧模板向上15px；CLEAR 识别仍沿用逐行限制，参见 base 自动清free本.json。 国服三场连续首通验证通过，补图后匹配分 0.9921；上次执行标签出现后仍能认回同一关。",
+    "doc": "2026-11-01 国服卡美洛圣都市街实测：左侧标记为“自由关卡”，英文模板最高分仅 0.3531。中文模板使用独立文件名，防止资源层叠加匹配英文同名模板后误用中文标题偏移。标题区域相对左侧模板向上15px；CLEAR 识别仍沿用逐行限制，参见 base 自动清free本.json。国服三场连续首通验证通过，匹配分 0.9921；奏章英文样式另见 Free-列表英文标记。",
     "attach": {
       "title_roi_offset": [
         125,
@@ -11,9 +14,15 @@
     },
     "recognition": {
       "param": {
-        "template": "free_quest/free_label.png"
+        "template": "free_quest/free_label_cn.png"
       }
     }
+  },
+  "Free-列表英文标记": {
+    "doc": "国服奏章Ⅰ详情使用英文 Free Quest。2026-11-17 用户素材农场截图实测：中文模板 0.3420，base 英文模板 0.9878。英文模板以独立文件名放在 base，避免被国服同名中文模板覆盖；标题偏移沿用英文样式，不使用中文样式的 -15。",
+    "attach": {"title_roi_offset": [125, -35, 290, 40]},
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/free_label_en.png", "threshold": 0.88, "roi": [620, 80, 610, 510], "order_by": "Vertical"}},
+    "action": {"type": "Click"}
   },
   "Free-完成角标": {
     "doc": "国服自由关卡使用“完成”角标，复用已有 通用大活动-已完成副本 检查所用的 event/已完成的副本标签.png；按 FreeQuestRunner.rows 逐行限定下沿 ROI，避免读到别行。 2026-11-01 卡美洛理想都市第三场后实测分数 0.9372（阈值 0.88），确认后复用 主线-列表后退 返回地图，继续找到死之荒野的未完成关卡。",
@@ -22,5 +31,23 @@
         "template": "event/已完成的副本标签.png"
       }
     }
+  },
+  "Free-列表旧版中文2": {
+    "doc": "复用国服日常导航 map/关卡归位2.png，独立文件名隔离 base 同名英文图。文字与标准中文模板约0.89倍对应，文字左上相对本图为(11,23)，缩放对齐分0.9805。标题及完成区域按此坐标换算；完成区域放大至180×65后识别。该几何关系经模板合成回归验证，尚无该旧版完整实拍用于实机验收。",
+    "attach": {"title_roi_offset": [122, 10, 258, 36], "clear_roi_offset": [-16, 90, 160, 58]},
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/free_label_cn_legacy2.png", "threshold": 0.88, "roi": [620, 80, 610, 510], "order_by": "Vertical"}},
+    "action": {"type": "Click"}
+  },
+  "Free-列表旧版英文3": {
+    "doc": "复用国服日常导航 map/关卡归位3.png 的英文 Free Quest，独立文件名隔离 base 同名图。文字与标准英文模板约0.89倍对应，文字左上相对本图为(9,19)，缩放对齐分0.9774。标题及完成区域按此坐标换算；完成区域放大至180×65后识别。该几何关系经模板合成回归验证，尚无该旧版完整实拍用于实机验收。",
+    "attach": {"title_roi_offset": [120, -12, 258, 36], "clear_roi_offset": [-18, 86, 160, 58]},
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/free_label_cn_legacy3.png", "threshold": 0.88, "roi": [620, 80, 610, 510], "order_by": "Vertical"}},
+    "action": {"type": "Click"}
+  },
+  "Free-列表旧版中文4": {
+    "doc": "复用国服日常导航 map/关卡归位4.png，独立文件名隔离 base 同名英文图。文字与标准中文模板约0.89倍对应，文字左上相对本图为(8,19)，缩放对齐分0.9756。标题及完成区域按此坐标换算；完成区域放大至180×65后识别。该几何关系经模板合成回归验证，尚无该旧版完整实拍用于实机验收。",
+    "attach": {"title_roi_offset": [119, 6, 258, 36], "clear_roi_offset": [-19, 86, 160, 58]},
+    "recognition": {"type": "TemplateMatch", "param": {"template": "free_quest/free_label_cn_legacy4.png", "threshold": 0.88, "roi": [620, 80, 610, 510], "order_by": "Vertical"}},
+    "action": {"type": "Click"}
   }
 }

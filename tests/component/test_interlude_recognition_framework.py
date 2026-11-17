@@ -11,7 +11,8 @@ from maa.tasker import Tasker
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
-from interlude_recognition import InterludeEntry, InterludeQuest, InterludeScan
+from interlude_action import InterludeRunner
+from interlude_recognition import InterludeEntry, InterludeMap, InterludeQuest, InterludeScan
 from test_main_story_framework import FrameworkResources, ScreenController
 
 
@@ -31,6 +32,7 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         resource.register_custom_recognition("interlude_scan", InterludeScan())
         resource.register_custom_recognition("interlude_entry", InterludeEntry())
         resource.register_custom_recognition("interlude_quest", InterludeQuest())
+        resource.register_custom_recognition("interlude_map", InterludeMap())
         outcomes, errors = [], []
 
         class Probe(CustomAction):
@@ -131,6 +133,82 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             return bool(visible and visible.hit), bool(dimmed and dimmed.hit)
         self.assertEqual(self.probe(image, callback), (True, False))
 
+    def test_close_map_from_log_is_recognized_without_return_button(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            self.assertIsNone(runtime.reco("幕间-返回列表", image))
+            self.assertTrue(runtime.on_map(image))
+            # 仅改变关闭按钮亮度；图片仍能匹配时不加独立白色像素门槛。
+            dim_close = image.copy()
+            dim_close[:100, :230] = (dim_close[:100, :230] * .55).astype(np.uint8)
+            self.assertTrue(runtime.on_map(dim_close))
+            result = runtime.reco("幕间-地图关卡", image)
+            self.assertIsNotNone(result)
+            self.assertEqual(detail(result)["title"], "龙之圣女，海边圣女")
+            self.assertLess(result.box[1], 280)
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_close_map_rejects_missing_button_and_non_map_pages(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+        no_close = image.copy()
+        no_close[:100, :230] = 0
+        close_only = np.zeros_like(image)
+        close_only[:100, :230] = image[:100, :230]
+        no_interlude = image.copy()
+        # 保留AP和亮棕卡，但去掉Interlude；同时去掉绿色Free，不能凭AP确认地图。
+        no_interlude[158:183, 765:1100] = 0
+        no_interlude[295:] = 0
+        list_image = self.fixture("cn_list_direct.png")
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            return [runtime.on_map(screenshot) for screenshot in (
+                no_close, close_only,
+                no_interlude, list_image,
+            )]
+
+        self.assertEqual(self.probe(image, callback), [False] * 4)
+
+    def test_close_map_supports_completed_interlude_and_free_only_after_clear(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+        marker = cv2.imdecode(np.fromfile(
+            ROOT / "assets/resource/cn/image/event/已完成的副本标签.png", np.uint8), 1)
+        completed = image.copy()
+        h, w = marker.shape[:2]
+        completed[235:235 + h, 635:635 + w] = marker
+        free_only = image.copy()
+        free_only[100:295] = 0
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            for screenshot in (completed, free_only):
+                self.assertTrue(runtime.on_map(screenshot))
+                self.assertIsNone(runtime.reco("幕间-地图关卡", screenshot))
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_jp_existing_close_template_confirms_locked_interlude_map(self):
+        image = self.fixture("jp_map_locked_free.png")
+        no_return = image.copy()
+        no_return[90:180, :200] = 0
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            self.assertIsNone(runtime.reco("幕间-返回列表", no_return))
+            self.assertTrue(runtime.on_map(no_return))
+            dim_close = no_return.copy()
+            dim_close[:100, :230] = (dim_close[:100, :230] * .55).astype(np.uint8)
+            self.assertTrue(runtime.on_map(dim_close))
+            self.assertFalse(runtime.on_map(self.fixture("jp_list_direct_locked.png")))
+            return True
+
+        self.assertTrue(self.probe(image, callback, "jp"))
+
     def test_real_jp_direct_entries_and_locked_stage_are_separate(self):
         image = self.fixture("jp_list_direct_locked.png")
         report = self.scan(image, server="jp")
@@ -209,6 +287,201 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         self.assertTrue(any("画面をタッチ" in value for value in expected))
         self.assertTrue(any("请点击" in value for value in expected))
         self.assertEqual(reward["action"]["type"], "Click")
+
+    def test_cn_gate_requires_title_and_close_button_together(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        no_close = image.copy()
+        no_close[:100, :230] = 0
+        no_title = image.copy()
+        no_title[:95, 950:] = 0
+
+        def callback(context):
+            results = []
+            for screenshot in (image, no_close, no_title,
+                               self.fixture("cn_list_direct.png")):
+                result = context.run_recognition("幕间-迦勒底之门界面", screenshot)
+                results.append(bool(result and result.hit))
+            return results
+
+        self.assertEqual(self.probe(image, callback), [True, False, False, False])
+
+    def test_cn_gate_interlude_tab_matches_real_screenshot(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+
+        def callback(context):
+            result = context.run_recognition("幕间-选择幕间页签", image)
+            self.assertTrue(result and result.hit)
+            node = context.get_node_data("幕间-选择幕间页签")
+            self.assertEqual(node["recognition"]["type"], "TemplateMatch")
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_cn_gate_tab_ignores_four_corner_badges_and_event_caption(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        # 合成角标变化，只修改页签四角及下沿说明，保留中央标题和底纹。
+        variants = []
+        for color in ((0, 0, 0), (40, 170, 240)):
+            changed = image.copy()
+            for x, y, w, h in ((650, 180, 100, 35), (1120, 165, 115, 50),
+                               (650, 270, 100, 45), (1100, 270, 135, 45),
+                               (850, 280, 385, 45)):
+                changed[y:y+h, x:x+w] = color
+            variants.append(changed)
+
+        def callback(context):
+            return [bool(result and result.hit) for result in (
+                context.run_recognition("幕间-选择幕间页签", screenshot)
+                for screenshot in variants
+            )]
+
+        self.assertEqual(self.probe(image, callback), [True, True])
+
+    def test_cn_gate_tab_remains_recognizable_after_vertical_scroll(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        card = image[180:320, 640:1235].copy()
+        # 从原实图取页签卡片，合成不同滚动位置；不代表已经实机滚动验收。
+        variants = []
+        for top in (105, 390, 540):
+            moved = image.copy()
+            moved[95:710, 640:1235] = 0
+            moved[top:top+card.shape[0], 640:1235] = card
+            variants.append(moved)
+
+        def callback(context):
+            return [bool(result and result.hit) for result in (
+                context.run_recognition("幕间-选择幕间页签", screenshot)
+                for screenshot in variants
+            )]
+
+        self.assertEqual(self.probe(image, callback), [True, True, True])
+
+    def test_cn_gate_rankup_and_advanced_tabs_are_not_interlude(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        no_interlude = image.copy()
+        no_interlude[180:325, 640:1235] = 0
+
+        def callback(context):
+            # 下方强化任务及进阶关卡保留真实画面，不能命中幕间入口。
+            result = context.run_recognition("幕间-选择幕间页签", no_interlude)
+            return bool(result and result.hit)
+
+        self.assertFalse(self.probe(image, callback))
+
+    def test_jp_gate_title_uses_japanese_ocr_and_tab_uses_template_contract(self):
+        resource = self.resource("jp")
+        gate = resource.get_node_data("幕间-迦勒底之门界面")
+        self.assertEqual(gate["recognition"]["type"], "And")
+        self.assertIn("カルデアゲート", json.dumps(gate, ensure_ascii=False))
+        tab = resource.get_node_data("幕间-选择幕间页签")
+        self.assertEqual(tab["recognition"]["type"], "TemplateMatch")
+        self.assertEqual(tab["recognition"]["param"]["template"],
+                         ["chaldea_gate/幕间物语_日服.png"])
+        self.assertEqual(tab["action"]["type"], "Click")
+
+    def test_jp_gate_requires_title_and_close_button_together(self):
+        image = self.fixture("jp_gate_interlude_tab.png")
+        no_close = image.copy()
+        no_close[:100, :230] = 0
+        no_title = image.copy()
+        no_title[:95, 880:] = 0
+
+        def callback(context):
+            results = []
+            for screenshot in (image, no_close, no_title,
+                               self.fixture("jp_list_direct_locked.png")):
+                result = context.run_recognition("幕间-迦勒底之门界面", screenshot)
+                results.append(bool(result and result.hit))
+            return results
+
+        self.assertEqual(self.probe(image, callback, "jp"), [True, False, False, False])
+
+    def test_jp_gate_interlude_tab_matches_real_screenshot(self):
+        image = self.fixture("jp_gate_interlude_tab.png")
+
+        def callback(context):
+            result = context.run_recognition("幕间-选择幕间页签", image)
+            self.assertTrue(result and result.hit)
+            self.assertEqual(list(result.box), [750, 320, 250, 70])
+            return True
+
+        self.assertTrue(self.probe(image, callback, "jp"))
+
+    def test_jp_gate_tab_ignores_four_corner_badges_and_event_caption(self):
+        image = self.fixture("jp_gate_interlude_tab.png")
+        # 修改四角角标及下沿活动说明，中央日文标题与英文条保持原样。
+        variants = []
+        for color in ((0, 0, 0), (40, 170, 240)):
+            changed = image.copy()
+            for x, y, w, h in ((650, 285, 95, 35), (1120, 280, 115, 50),
+                               (650, 390, 95, 45), (1100, 390, 135, 45),
+                               (750, 395, 485, 40)):
+                changed[y:y+h, x:x+w] = color
+            variants.append(changed)
+
+        def callback(context):
+            return [bool(result and result.hit) for result in (
+                context.run_recognition("幕间-选择幕间页签", screenshot)
+                for screenshot in variants
+            )]
+
+        self.assertEqual(self.probe(image, callback, "jp"), [True, True])
+
+    def test_jp_gate_tab_remains_recognizable_after_vertical_scroll(self):
+        image = self.fixture("jp_gate_interlude_tab.png")
+        card = image[285:435, 640:1235].copy()
+        # 由真实卡片合成三个列表位置；不代表已执行日服实机滚动。
+        variants = []
+        for top in (120, 325, 525):
+            moved = image.copy()
+            moved[95:700, 640:1235] = 0
+            moved[top:top+card.shape[0], 640:1235] = card
+            variants.append((top, moved))
+
+        def callback(context):
+            for top, screenshot in variants:
+                result = context.run_recognition("幕间-选择幕间页签", screenshot)
+                self.assertTrue(result and result.hit, top)
+                self.assertEqual(list(result.box), [750, top + 35, 250, 70])
+            return True
+
+        self.assertTrue(self.probe(image, callback, "jp"))
+
+    def test_jp_daily_and_rank_up_tabs_are_not_interlude(self):
+        image = self.fixture("jp_gate_interlude_tab.png")
+        no_interlude = image.copy()
+        no_interlude[280:435, 640:1235] = 0
+
+        def callback(context):
+            # 上方曜日クエスト和下方強化クエスト保留实图，不能误作幕间入口。
+            result = context.run_recognition("幕间-选择幕间页签", no_interlude)
+            return bool(result and result.hit)
+
+        self.assertFalse(self.probe(image, callback, "jp"))
+
+    def test_cn_and_jp_gate_tab_layers_keep_own_boxes_and_title_gate(self):
+        images = [self.fixture(f"{server}_gate_interlude_tab.png")
+                  for server in ("cn", "jp")]
+
+        for server, own_index, template, expected_box, expected in (
+                ("cn", 0, "chaldea_gate/幕间物语.png", [776, 210, 200, 68], [True, False]),
+                ("jp", 1, "chaldea_gate/幕间物语_日服.png", [750, 320, 250, 70], [False, True])):
+            with self.subTest(server=server):
+                def callback(context):
+                    node = context.get_node_data("幕间-选择幕间页签")
+                    self.assertEqual(node["recognition"]["param"]["template"],
+                                     [template])
+                    own_tab = context.run_recognition("幕间-选择幕间页签", images[own_index])
+                    self.assertTrue(own_tab and own_tab.hit)
+                    # 本服实图命中各自中央标题模板，尺寸不同可定位资源来源。
+                    self.assertEqual(list(own_tab.box), expected_box)
+                    # 实际点击叶子要求同一画面的本服门标题和页签同时命中。
+                    return [bool(result and result.hit) for result in (
+                        context.run_recognition("幕间-确认并选择页签", screenshot)
+                        for screenshot in images
+                    )]
+
+                self.assertEqual(self.probe(images[0], callback, server), expected)
 
     def test_clear_template_is_limited_to_the_interlude_row(self):
         image = self.fixture("cn_map_interlude.png")
