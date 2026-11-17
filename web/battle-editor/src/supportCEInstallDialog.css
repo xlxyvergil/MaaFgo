@@ -6,8 +6,10 @@
 .support-ce-download-info>p{font-size:12px;line-height:1.8;color:var(--muted);margin:0 0 14px}
 .support-ce-download-info strong{color:var(--text)}
 .support-ce-download-info code{font-size:11px;overflow-wrap:anywhere}
-.support-ce-quark-link{width:100%;justify-content:center;text-decoration:none;font-size:13px;padding:13px 10px}
+.support-ce-download-links{display:grid;gap:9px}
+.support-ce-download-link{width:100%;justify-content:center;text-decoration:none;font-size:13px;padding:13px 10px;white-space:normal}
 .support-ce-download-info>.support-ce-extraction-code{margin:12px 0 0;font-size:13px}
+.support-ce-download-info>.support-ce-github-help{margin:12px 0 0}
 .support-ce-extraction-code>strong{display:inline-block;letter-spacing:2px;margin-left:5px;color:var(--purple);font-family:Consolas,monospace;font-size:17px}
 .support-ce-download-qr{margin:0;text-align:center;min-width:0}
 .support-ce-download-qr>img{display:block;width:196px;max-width:100%;height:auto;margin:0 auto;background:#fff;border-radius:4px}
