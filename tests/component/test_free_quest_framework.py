@@ -16,6 +16,65 @@ from test_main_story_framework import FrameworkResources, ScreenController
 
 
 class FreeQuestFrameworkTests(FrameworkResources, unittest.TestCase):
+    def test_cn_ordeal_english_label_uses_english_title_offset(self):
+        resource = self.resource("cn")
+        card = cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/free_quest_cn_ordeal_card.png", np.uint8), 1)
+        image = np.zeros((720, 1280, 3), np.uint8)
+        image[110:290, 620:1240] = card
+        # 在真实卡面下方加入另一行中文标记及完成角标，验证混合样式
+        # 按屏幕顺序读取，且不能把下一行的完成状态归给奏章目标。
+        def template(path):
+            return cv2.imdecode(np.fromfile(ROOT / path, np.uint8), 1)
+        label = template("assets/resource/cn/image/free_quest/free_label.png")
+        clear = template("assets/resource/cn/image/event/已完成的副本标签.png")
+        image[357:357+label.shape[0], 650:650+label.shape[1]] = label
+        image[451:451+clear.shape[0], 642:642+clear.shape[1]] = clear
+        controller = ScreenController(image)
+        self.assertTrue(controller.post_connection().wait().succeeded)
+        checks, errors = [], []
+
+        class Probe(CustomAction):
+            def run(self, ctx, argv):
+                try:
+                    runner = FreeQuestRunner(ctx.clone())
+                    rows = list(runner.rows(image))
+                    checks.append([(row.name, row.box.y, cleared) for row, cleared in rows])
+                    english, chinese = rows[0][0], rows[1][0]
+                    checks.append(np.array_equal(runner.title_patch(image, english), image[122:162, 775:1065]))
+                    checks.append(np.array_equal(runner.title_patch(image, chinese), image[342:382, 775:1065]))
+                    runner.current_title = runner.title_patch(image, english)
+                    checks.append(runner.same_quest(image, english))
+                    changed = image.copy()
+                    changed[122:162, 775:1065] = 0
+                    checks.append(runner.same_quest(changed, english))
+                    checks.append(runner.find_in_panel(image).name)
+                    # 无信息按钮时，英文标记也应可独立配合关闭按钮确认详情。
+                    image[200:250, 1180:1230] = 0
+                    back = template("assets/resource/cn/image/后退按钮.png")
+                    image[27:27+back.shape[0], 29:29+back.shape[1]] = back
+                    checks.append(runner.panel(image))
+                    return True
+                except Exception as exc:
+                    errors.append(repr(exc))
+                    return False
+
+        resource.register_custom_action("free_cn_ordeal_probe", Probe())
+        tasker = Tasker()
+        self.assertTrue(tasker.bind(resource, controller))
+        try:
+            status = tasker.post_task("free_cn_ordeal_probe", {"free_cn_ordeal_probe": {
+                "action": {"type": "Custom", "param": {"custom_action": "free_cn_ordeal_probe"}}, "on_error": []
+            }}).wait()
+            self.assertTrue(status.succeeded, errors)
+            self.assertEqual(checks, [
+                [("Free-列表英文标记", 157, False), ("Free-列表标记", 357, True)],
+                True, True, True, False, "Free-列表英文标记", True,
+            ])
+            self.assertEqual(controller.clicks, [])
+            self.assertEqual(controller.swipes, [])
+        finally:
+            tasker.post_stop().wait()
+
     def test_real_badge_digit_is_not_mistaken_for_outer_ring_zero(self):
         resource = self.resource("jp")
         resource.register_custom_recognition("free_quest_badge", FreeQuestBadge())

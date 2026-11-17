@@ -37,6 +37,7 @@ class FreeQuestRunner:
         self.timeout = int(config.get("transition_timeout", 120))
         self.mode = config.get("battle_mode", "native")
         self.horizontal_repeat = int(config.get("map_horizontal_repeat", 2))
+        self.label_nodes = config.get("label_nodes", ["Free-列表标记"])
         if not 1 <= self.limit <= 999 or not 10 <= self.timeout <= 600 or self.mode not in ("native", "bbc"):
             raise ValueError("Free 本参数无效")
         if not 1 <= self.horizontal_repeat <= 4:
@@ -47,7 +48,8 @@ class FreeQuestRunner:
 
     def panel(self, image):
         return bool(self.reco("主线-列表后退", image) and (
-            self.reco("Free-列表标记", image) or self.reco("主线-副本列表信息", image)))
+            any(self.reco(name, image) for name in self.label_nodes)
+            or self.reco("主线-副本列表信息", image)))
 
     def interrupt(self, image, *, entering=False, forming=False):
         if entering and self.reco("全局-战前吃体力", image):
@@ -69,11 +71,18 @@ class FreeQuestRunner:
         local = self.ctx.clone()
         top = 80
         while top < 590:
-            result = local.run_recognition("Free-列表标记", image, {
-                "Free-列表标记": {"recognition": {"param": {"roi": [620, top, 610, 590-top]}}}
-            })
-            if not result or not result.hit:
+            # 国服普通章节与奏章分别使用中文、英文标记；按行排序，
+            # 保留命中的节点名，让标题取样使用该样式自己的偏移。
+            matches = []
+            for name in self.label_nodes:
+                result = local.run_recognition(name, image, {
+                    name: {"recognition": {"param": {"roi": [620, top, 610, 590-top]}}}
+                })
+                if result and result.hit:
+                    matches.append(result)
+            if not matches:
                 break
+            result = min(matches, key=lambda match: match.box.y)
             box = result.box
             clear = local.run_recognition("Free-完成角标", image, {
                 "Free-完成角标": {"recognition": {"param": {
@@ -121,7 +130,8 @@ class FreeQuestRunner:
 
     def title_patch(self, image, result):
         box = result.box
-        dx, dy, width, height = (self.ctx.get_node_data("Free-列表标记") or {}).get(
+        node = self.ctx.get_node_data(getattr(result, "name", "Free-列表标记")) or {}
+        dx, dy, width, height = node.get(
             "attach", {}).get("title_roi_offset", [125, -35, 290, 40])
         x, y = box.x + dx, box.y + dy
         return image[y:y+height, x:x+width].copy()
