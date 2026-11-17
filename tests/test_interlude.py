@@ -1,5 +1,6 @@
 """幕间任务配置、跨幕间小关计数与中断边界；不连接设备。"""
 import json
+from contextlib import contextmanager
 from pathlib import Path
 import sys
 import unittest
@@ -21,6 +22,9 @@ def load(relative):
 
 LIST = {"幕间-列表界面"}
 MAP = {"幕间-返回列表"}
+HOME = {"幕间-主界面确认"}
+GATE = {"幕间-迦勒底之门界面"}
+CLOSE_MAP = {"幕间-关闭按钮地图"}
 
 
 class InterludeContext(CloneContext):
@@ -222,11 +226,20 @@ class NavigationSafetyTests(unittest.TestCase):
         self.assertEqual((runtime.completed, runtime.battles), (2, 2))
         self.assertEqual([name for name, _ in context.actions], ["幕间-地图列表复位"])
 
-    def test_missing_return_button_preserves_map_and_explains_manual_return(self):
-        runtime, context = runner([{"幕间-关闭按钮地图"}])
-        with self.assertRaisesRegex(StoryStopped, "没有可用的“前往幕间物语”按钮.*手动打开“幕间物语”"):
+    def test_return_page_change_never_starts_home_recovery(self):
+        runtime, context = runner([set()])
+        with self.assertRaisesRegex(StoryStopped, "列表界面发生变化"):
             runtime.return_to_list()
         self.assertEqual(context.actions, [])
+        self.assertEqual(context.tasks, [])
+
+    def test_return_scan_becoming_uncertain_never_starts_home_recovery(self):
+        runtime, context = runner([CLOSE_MAP])
+        runtime.ctx.scan_detail = {"row_count": 1, "uncertain_count": 1}
+        with self.assertRaisesRegex(StoryStopped, "返回前的地图列表出现了无法确认"):
+            runtime.return_to_list()
+        self.assertEqual(context.actions, [])
+        self.assertEqual(context.tasks, [])
 
     def test_only_total_list_or_interlude_stage_is_a_valid_entry(self):
         runtime, _ = runner()
@@ -413,6 +426,179 @@ class NavigationSafetyTests(unittest.TestCase):
         runtime.ctx.nodes["全局-战前吃体力"]["next"] = ["全局-体力不足"]
         with self.assertRaisesRegex(StoryStopped, "AP"):
             runtime.interrupt({"全局-战前吃体力"}, entering=True)
+        self.assertEqual(context.tasks, [])
+
+
+class ReentryNavigationTests(unittest.TestCase):
+    @contextmanager
+    def navigation(self, transitions=None):
+        runtime, context = runner(config={"transition_timeout": 10})
+        state = [CLOSE_MAP]
+        base_task = runtime.ctx.run_task
+        transitions = {
+            "回主界面": HOME, "幕间-查找迦门入口": GATE,
+            "幕间-查找幕间页签": LIST,
+        } if transitions is None else transitions
+
+        def task(name, pipeline_override=None):
+            detail = base_task(name, pipeline_override)
+            if detail.status.succeeded and name in transitions:
+                state[0] = transitions[name]
+            return detail
+
+        with patch.object(runtime, "frame", side_effect=lambda: state[0]), \
+             patch.object(runtime.ctx, "run_task", side_effect=task):
+            yield runtime, context, state
+
+    def test_missing_button_recovers_preserving_progress_and_configuration(self):
+        with self.navigation() as (runtime, context, state):
+            original = runtime.ctx
+            runtime.completed, runtime.battles = 3, 2
+            runtime._map_opened_at, runtime._skip_next_reset = 1, True
+            runtime.return_to_list()
+            self.assertIs(runtime.ctx, original)
+            self.assertEqual((runtime.completed, runtime.battles, runtime.limit), (3, 2, 999))
+            self.assertIsNone(runtime._map_opened_at)
+            self.assertFalse(runtime._skip_next_reset)
+            self.assertEqual(state[0], LIST)
+            self.assertEqual([name for name, _ in context.tasks], [
+                "回主界面", "幕间-导航列表归位", "幕间-查找迦门入口",
+                "幕间-导航列表归位", "幕间-查找幕间页签",
+            ])
+            self.assertEqual(context.actions, [])
+            self.assertIn("初始化界面", context.cleared)
+            self.assertIn("幕间-主界面查找下滑", context.cleared)
+            self.assertIn("幕间-迦门查找下滑", context.cleared)
+            # 共享返回链的上限只作用于本次克隆，不改变其他任务的节点。
+            self.assertNotIn("max_hit", original.nodes["回主界面"])
+            home_override = context.tasks[0][1]
+            self.assertEqual(home_override["回主界面"]["max_hit"], 6)
+            self.assertEqual(home_override["回主界面"]["on_error"], [])
+
+    def test_direct_return_button_uses_existing_path(self):
+        runtime, context = runner([MAP, LIST])
+        runtime._skip_next_reset = True
+        runtime.return_to_list()
+        self.assertEqual([name for name, _ in context.actions], ["幕间-返回列表"])
+        self.assertEqual(context.tasks, [])
+
+    def test_no_progress_blocks_second_reentry_but_new_progress_allows_it(self):
+        with self.navigation() as (runtime, context, state):
+            runtime.return_to_list()
+            tasks = len(context.tasks)
+            state[0] = CLOSE_MAP
+            with self.assertRaisesRegex(StoryStopped, "没有完成新的小关"):
+                runtime.return_to_list()
+            self.assertEqual(len(context.tasks), tasks)
+            runtime.completed += 1
+            runtime.return_to_list()
+            self.assertEqual(state[0], LIST)
+            self.assertEqual(len(context.tasks), tasks * 2)
+
+    def test_fresh_empty_map_without_return_button_gets_one_reentry(self):
+        with self.navigation() as (runtime, context, _):
+            runtime._map_opened_at = runtime.completed
+            with patch.object(runtime, "scan_entries", side_effect=(None, TARGET)) as scan:
+                self.assertIs(runtime.locate(), TARGET)
+            self.assertEqual([call.kwargs for call in scan.call_args_list], [{"map_mode": True}, {}])
+            self.assertEqual([name for name, _ in context.tasks].count("回主界面"), 1)
+
+    def test_reentered_total_list_resets_to_top_before_selecting(self):
+        with self.navigation() as (runtime, context, state):
+            runtime._skip_next_reset = True
+            runtime.return_to_list()
+            state[0] = LIST | {"幕间-可挑战条目"}
+            with patch("interlude_action.same_list", return_value=True):
+                self.assertEqual(runtime.scan_entries(state[0])[0], "幕间-可挑战条目")
+            self.assertEqual([name for name, _ in context.actions], ["幕间-列表复位"])
+        self.assertFalse(runtime._skip_next_reset)
+
+    def test_same_progress_recovers_only_once_then_new_progress_allows_recovery(self):
+        with self.navigation() as (runtime, context, state):
+            runtime.return_to_list()
+            state[0] = CLOSE_MAP
+            with self.assertRaisesRegex(StoryStopped, "没有完成新的小关"):
+                runtime.return_to_list()
+            self.assertEqual(sum(name == "回主界面" for name, _ in context.tasks), 1)
+            runtime.completed += 1
+            runtime.return_to_list()
+            self.assertEqual(sum(name == "回主界面" for name, _ in context.tasks), 2)
+
+    def test_newly_opened_empty_map_without_button_can_recover_once(self):
+        with self.navigation() as (runtime, context, _):
+            runtime._map_opened_at = runtime.completed
+            with patch.object(runtime, "scan_entries", side_effect=[None, TARGET]) as scan:
+                self.assertIs(runtime.locate(), TARGET)
+            self.assertEqual(scan.call_args_list[0].kwargs, {"map_mode": True})
+            self.assertEqual(scan.call_args_list[1].kwargs, {})
+            self.assertEqual(context.tasks[0][0], "回主界面")
+
+    def test_restored_total_list_resets_to_top_before_selecting(self):
+        with self.navigation() as (runtime, context, state):
+            runtime._skip_next_reset = True
+            runtime.return_to_list()
+            state[0] = LIST | {"幕间-可挑战条目"}
+            with patch("interlude_action.same_list", return_value=True):
+                self.assertEqual(runtime.scan_entries(state[0])[0], "幕间-可挑战条目")
+            self.assertEqual([name for name, _ in context.actions], ["幕间-列表复位"])
+
+    def test_uncertain_map_or_remaining_quest_never_starts_recovery(self):
+        runtime, context = runner([CLOSE_MAP])
+        with patch.object(runtime, "scan_entries", side_effect=StoryStopped("未确认条目")), \
+             self.assertRaises(StoryStopped):
+            runtime.locate()
+        self.assertEqual(context.tasks, [])
+        with patch.object(runtime, "scan_entries", return_value=TARGET):
+            self.assertIs(runtime.locate(), TARGET)
+        self.assertEqual(context.tasks, [])
+
+    def test_quest_appearing_after_scan_is_selected_before_any_recovery(self):
+        runtime, context = runner([CLOSE_MAP | {"幕间-地图关卡"}])
+        runtime.return_to_list()
+        self.assertEqual(context.tasks, [])
+
+    def test_home_task_failure_is_explained_and_context_restored(self):
+        with self.navigation() as (runtime, context, _):
+            original = runtime.ctx
+            context.fail_tasks.add("回主界面")
+            with self.assertRaisesRegex(StoryStopped, "未能返回主界面"):
+                runtime.return_to_list()
+            self.assertIs(runtime.ctx, original)
+            self.assertEqual(len(context.tasks), 1)
+
+    def test_successful_task_without_expected_page_is_not_navigation_success(self):
+        cases = [
+            ({}, "未能返回主界面"),
+            ({"回主界面": HOME}, "点击“迦勒底之门”后未确认"),
+            ({"回主界面": HOME, "幕间-查找迦门入口": GATE}, "点击“幕间物语”后未确认"),
+        ]
+        for transitions, message in cases:
+            with self.subTest(message=message), self.navigation(transitions) as (runtime, context, _):
+                original = runtime.ctx
+                with self.assertRaisesRegex(StoryStopped, message):
+                    runtime.return_to_list()
+                self.assertIs(runtime.ctx, original)
+                self.assertEqual((runtime.completed, runtime.battles), (0, 0))
+
+    def test_search_failure_reports_correct_stage(self):
+        for task, message in (("幕间-查找迦门入口", "未找到主界面的“迦勒底之门”"),
+                              ("幕间-查找幕间页签", "未找到“幕间物语”页签")):
+            with self.subTest(task=task), self.navigation() as (runtime, context, _):
+                context.fail_tasks.add(task)
+                with self.assertRaisesRegex(StoryStopped, message):
+                    runtime.return_to_list()
+
+    def test_stop_request_is_preserved_and_never_becomes_navigation_error(self):
+        with self.navigation() as (runtime, context, _):
+            context.tasker.stopping = True
+            with self.assertRaisesRegex(StoryStopped, "用户已停止"):
+                runtime.return_to_list()
+            self.assertEqual(context.tasks, [])
+
+    def test_reached_limit_never_starts_navigation(self):
+        runtime, context = runner([CLOSE_MAP], {"quest_limit": 1})
+        runtime.completed = 1
+        runtime.run()
         self.assertEqual(context.tasks, [])
 
 

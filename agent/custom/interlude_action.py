@@ -57,6 +57,70 @@ class InterludeRunner(StoryRunner):
         self.auto_handle_restrictions = self.config.get("auto_handle_restrictions", True) is True
         self._map_opened_at = None
         self._skip_next_reset = False
+        self._reentered_at = None
+
+    def _returned_to_list(self):
+        self._map_opened_at = None
+        self._skip_next_reset = False
+
+    def _wait_navigation(self, node, message):
+        deadline = self.clock() + self.timeout
+        while self.clock() < deadline:
+            image = self.frame()
+            if self.interrupt(image):
+                continue
+            if self.reco(node, image):
+                return image
+            self.pause(.6)
+        raise StoryStopped(message)
+
+    def _find_navigation_entry(self, panel, search, scroll, message):
+        # 固定查找/翻页循环在Pipeline中执行，命中计数随每轮导航重置。
+        self._wait_navigation(panel, message)
+        self.ctx.clear_hit_count(scroll)
+        try:
+            self.task("幕间-导航列表归位")
+            self._wait_navigation(panel, message)
+            self.task(search)
+        except StoryStopped as exc:
+            self.check_stop()
+            raise StoryStopped(message) from exc
+
+    def reenter_from_home(self):
+        if self._reentered_at == self.completed:
+            raise StoryStopped("重新进入幕间列表后没有完成新的小关，又遇到无可挑战幕间的地图，已停止重复返回。请检查该幕间的开启条件，并手动打开“幕间物语”列表后重试。")
+        self._reentered_at = self.completed
+        mfaalog.info("[自动幕间副本] 地图已扫描完且没有“前往幕间物语”，回主界面重新进入幕间列表")
+        original = self.ctx
+        self.ctx = original.clone()
+        try:
+            # 命中计数属于同一任务；每轮重置，并只在本次克隆中限制共享返回链。
+            home_nodes = ("回主界面", "主界面判断-main-ui", "主界面判断-返回",
+                          "回主界面的指引", "无弹窗", "有弹窗返回",
+                          "判断是否要初始化", "初始化界面", "初始化完成")
+            override = {}
+            for name in home_nodes:
+                self.ctx.clear_hit_count(name)
+                data = self.ctx.get_node_data(name) or {}
+                override[name] = {"on_error": [], "timeout": min(self.timeout * 1000, 10000),
+                                  "max_hit": min(data.get("max_hit", 6), 6)}
+            home_error = "未能返回主界面，无法重新进入幕间列表。请手动回到主界面，打开“迦勒底之门”中的“幕间物语”后重新启动任务。"
+            try:
+                self.task("回主界面", override)
+            except StoryStopped as exc:
+                self.check_stop()
+                raise StoryStopped(home_error) from exc
+            self._wait_navigation("幕间-主界面确认", home_error)
+            gate_error = "未找到主界面的“迦勒底之门”入口，无法继续导航。请手动打开“迦勒底之门”中的“幕间物语”后重新启动任务。"
+            self._find_navigation_entry("幕间-主界面确认", "幕间-查找迦门入口", "幕间-主界面查找下滑", gate_error)
+            self._wait_navigation("幕间-迦勒底之门界面", "点击“迦勒底之门”后未确认进入该页面。请检查游戏画面，手动打开“幕间物语”列表后重新启动任务。")
+            tab_error = "在“迦勒底之门”中未找到“幕间物语”页签，无法继续导航。请手动打开该页签后重新启动“自动幕间副本”。"
+            self._find_navigation_entry("幕间-迦勒底之门界面", "幕间-查找幕间页签", "幕间-迦门查找下滑", tab_error)
+            self._wait_navigation("幕间-列表界面", "点击“幕间物语”后未确认进入幕间列表。请检查游戏画面，手动打开“幕间物语”列表后重新启动任务。")
+            self._returned_to_list()
+            mfaalog.info(f"[自动幕间副本] 已重新进入幕间列表，继续查找；累计完成 {self.completed}/{self.limit} 个小关")
+        finally:
+            self.ctx = original
 
     def total_list(self, image):
         return bool(self.reco("幕间-列表界面", image))
@@ -154,9 +218,20 @@ class InterludeRunner(StoryRunner):
         raise StoryStopped("幕间列表查找超过上限，尚未确认全部条目。请将列表拉到顶部后重试。")
 
     def return_to_list(self):
-        result = self.reco("幕间-返回列表", self.frame())
+        image = self.frame()
+        if self.total_list(image):
+            self._returned_to_list()
+            return
+        result = self.reco("幕间-返回列表", image)
         if not result:
-            raise StoryStopped("当前地图没有可用的“前往幕间物语”按钮，无法自动返回幕间列表。请手动打开“幕间物语”列表后重新启动“自动幕间副本”。")
+            self._ensure_list(image, True)
+            # 扫描结束与返回前可能有加载/条目更新；出现新目标则交回locate继续扫描。
+            if self.reco("幕间-地图关卡", image):
+                return
+            if self._scan_uncertain(image, True):
+                raise StoryStopped("返回前的地图列表出现了无法确认的幕间，无法确定是否已扫描完成。请检查当前条目，手动打开“幕间物语”列表后重新启动任务。")
+            self.reenter_from_home()
+            return
         self.action("幕间-返回列表", result)
         deadline = self.clock() + self.timeout
         while self.clock() < deadline:
@@ -165,7 +240,7 @@ class InterludeRunner(StoryRunner):
             if self.interrupt(image):
                 continue
             if self.total_list(image):
-                self._map_opened_at = None
+                self._returned_to_list()
                 return
         raise StoryStopped("点击“前往幕间物语”后未返回幕间列表。请检查游戏画面并手动返回后重试。")
 
@@ -181,7 +256,8 @@ class InterludeRunner(StoryRunner):
                 target = self.scan_entries(image, map_mode=True)
                 if target:
                     return target
-                if self._map_opened_at == self.completed:
+                if (self._map_opened_at == self.completed
+                        and self.reco("幕间-返回列表", image)):
                     raise StoryStopped("已到达故事舞台，但没有找到可挑战的幕间关卡。请检查地图中的幕间及开启条件后重试。")
                 self.return_to_list()
                 deadline = self.clock() + self.timeout

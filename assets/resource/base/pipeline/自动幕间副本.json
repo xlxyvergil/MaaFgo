@@ -8,6 +8,69 @@
     "attach": {"quest_limit": 999, "transition_timeout": 120, "battle_mode": "native", "auto_handle_restrictions": true}
   },
   "幕间-结果提示": {},
+  "幕间-主界面确认": {
+    "doc": "只复核，不执行共享节点的next；回主界面任务成功后还须确认主界面标记与无弹窗标记，再进入迦门。",
+    "recognition": {"type": "And", "param": {"all_of": ["主界面判断-main-ui", "无弹窗"]}},
+    "on_error": []
+  },
+  "幕间-进入迦勒底之门": {
+    "doc": "复用迦勒底之门进入的国日服模板，仅点击入口，不连接迦门-日常副本或通用战斗调度。2026-11-17国服MCP归位后匹配框[727,352,210,45]、分数0.978204，已进入迦门并最终返回幕间总列表。后续由InterludeRunner确认门页面并查找幕间页签。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "幕间-主界面确认",
+      {"recognition": {"type": "TemplateMatch", "param": {
+        "template": "chaldea_gate/主界面页签-迦勒底之门.png", "roi": [620, 90, 615, 620], "threshold": 0.8
+      }}}
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 1200, "on_error": []
+  },
+  "幕间-迦勒底之门界面": {
+    "doc": "右上迦门标题与左上关闭模板共同确认；标题沿用剧情奖励前景白字过滤，避免在未关闭的奖励遮罩下滚动背景页。2026-11-17国服MCP完整导航中标题OCR为0.920866、关闭图片0.983354；页面确认后已点击幕间页签并确认总列表。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "主线-列表后退",
+      {"sub_name": "base/自动幕间副本/幕间-迦勒底之门界面/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [940, 0, 340, 90], "expected": ["^迦勒底之门$"], "threshold": 0.8, "color_filter": "剧情奖励-前景白字过滤"
+      }}}
+    ]}}, "on_error": []
+  },
+  "幕间-选择幕间页签": {
+    "doc": "日服暂无迦门页签实图，先限定右侧列表以完整日文标题OCR识别后点击；等待MCP补图验证，不能视为日服导航已实测。国服由cn层覆盖为用户截图中央标题模板，避开四角角标。调用前必须确认幕间-迦勒底之门界面。",
+    "recognition": {"type": "OCR", "param": {
+      "roi": [650, 95, 585, 605], "expected": ["^幕間の物語$"], "threshold": 0.8
+    }},
+    "action": {"type": "Click"}, "post_delay": 1200, "on_error": []
+  },
+  "幕间-导航列表归位": {
+    "doc": "参考迦门-先上滑到最上面_副本2；主界面入口列表和迦门页签列表先拉回顶部，再查找目标。调用前后分别确认对应页面；最多四次单向归位，不点击滚动条或卡片角标。",
+    "action": {"type": "Swipe", "param": {"begin": [929, 130, 1, 1], "end": [929, 600, 1, 1], "duration": 500}},
+    "repeat": 4, "repeat_delay": 500, "post_delay": 1800, "on_error": []
+  },
+  "幕间-查找迦门入口": {
+    "doc": "有界JumpBack查找；命中入口即结束子任务，未命中才执行一次下滑。每次点击和滑动都要求主界面特征仍成立。",
+    "next": ["幕间-进入迦勒底之门", "[JumpBack]幕间-主界面查找下滑"],
+    "timeout": 3000, "on_error": []
+  },
+  "幕间-主界面查找下滑": {
+    "doc": "参考迦门-不匹配下滑；最多20次，外层每轮导航重置命中计数；超限或页面变化时保留现场。",
+    "recognition": {"type": "And", "param": {"all_of": ["幕间-主界面确认"]}},
+    "action": {"type": "Swipe", "param": {"begin": [941, 520, 1, 1], "end": [941, 220, 1, 1], "duration": 700}},
+    "max_hit": 20, "post_delay": 1200, "on_error": []
+  },
+  "幕间-查找幕间页签": {
+    "doc": "有界JumpBack查找幕间页签；成功仅执行识别后的页签点击，再由外层确认幕间总列表，不进入日常本。",
+    "next": ["幕间-确认并选择页签", "[JumpBack]幕间-迦门查找下滑"],
+    "timeout": 3000, "on_error": []
+  },
+  "幕间-确认并选择页签": {
+    "doc": "查找循环的点击叶子：门页面标题与页签必须在同一截图命中，使用页签识别框点击，防止翻页后页面已变化仍操作旧目标。",
+    "recognition": {"type": "And", "param": {"all_of": ["幕间-迦勒底之门界面", "幕间-选择幕间页签"], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 1200, "on_error": []
+  },
+  "幕间-迦门查找下滑": {
+    "doc": "每次只前进一段；滑动前确认仍在迦勒底之门，20次上限，下一轮导航重新计数。",
+    "recognition": {"type": "And", "param": {"all_of": ["幕间-迦勒底之门界面"]}},
+    "action": {"type": "Swipe", "param": {"begin": [941, 520, 1, 1], "end": [941, 220, 1, 1], "duration": 700}},
+    "max_hit": 20, "post_delay": 1200, "on_error": []
+  },
   "幕间-列表界面": {
     "doc": "复用结算-已返回幕间列表的右上前景白字标题与左上关闭组合，拒绝奖励遮罩下透出的背景列表。扫描前先处理已知奖励；本节点不点击。",
     "recognition": {"type": "And", "param": {"all_of": [

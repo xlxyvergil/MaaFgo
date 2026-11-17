@@ -288,6 +288,97 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         self.assertTrue(any("请点击" in value for value in expected))
         self.assertEqual(reward["action"]["type"], "Click")
 
+    def test_cn_gate_requires_title_and_close_button_together(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        no_close = image.copy()
+        no_close[:100, :230] = 0
+        no_title = image.copy()
+        no_title[:95, 950:] = 0
+
+        def callback(context):
+            results = []
+            for screenshot in (image, no_close, no_title,
+                               self.fixture("cn_list_direct.png")):
+                result = context.run_recognition("幕间-迦勒底之门界面", screenshot)
+                results.append(bool(result and result.hit))
+            return results
+
+        self.assertEqual(self.probe(image, callback), [True, False, False, False])
+
+    def test_cn_gate_interlude_tab_matches_real_screenshot(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+
+        def callback(context):
+            result = context.run_recognition("幕间-选择幕间页签", image)
+            self.assertTrue(result and result.hit)
+            node = context.get_node_data("幕间-选择幕间页签")
+            self.assertEqual(node["recognition"]["type"], "TemplateMatch")
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_cn_gate_tab_ignores_four_corner_badges_and_event_caption(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        # 合成角标变化，只修改页签四角及下沿说明，保留中央标题和底纹。
+        variants = []
+        for color in ((0, 0, 0), (40, 170, 240)):
+            changed = image.copy()
+            for x, y, w, h in ((650, 180, 100, 35), (1120, 165, 115, 50),
+                               (650, 270, 100, 45), (1100, 270, 135, 45),
+                               (850, 280, 385, 45)):
+                changed[y:y+h, x:x+w] = color
+            variants.append(changed)
+
+        def callback(context):
+            return [bool(result and result.hit) for result in (
+                context.run_recognition("幕间-选择幕间页签", screenshot)
+                for screenshot in variants
+            )]
+
+        self.assertEqual(self.probe(image, callback), [True, True])
+
+    def test_cn_gate_tab_remains_recognizable_after_vertical_scroll(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        card = image[180:320, 640:1235].copy()
+        # 从原实图取页签卡片，合成不同滚动位置；不代表已经实机滚动验收。
+        variants = []
+        for top in (105, 390, 540):
+            moved = image.copy()
+            moved[95:710, 640:1235] = 0
+            moved[top:top+card.shape[0], 640:1235] = card
+            variants.append(moved)
+
+        def callback(context):
+            return [bool(result and result.hit) for result in (
+                context.run_recognition("幕间-选择幕间页签", screenshot)
+                for screenshot in variants
+            )]
+
+        self.assertEqual(self.probe(image, callback), [True, True, True])
+
+    def test_cn_gate_rankup_and_advanced_tabs_are_not_interlude(self):
+        image = self.fixture("cn_gate_interlude_tab.png")
+        no_interlude = image.copy()
+        no_interlude[180:325, 640:1235] = 0
+
+        def callback(context):
+            # 下方强化任务及进阶关卡保留真实画面，不能命中幕间入口。
+            result = context.run_recognition("幕间-选择幕间页签", no_interlude)
+            return bool(result and result.hit)
+
+        self.assertFalse(self.probe(image, callback))
+
+    def test_jp_gate_and_interlude_tab_use_japanese_ocr_contract(self):
+        # 日服页签尚无本轮实图；仅检查覆盖契约，不计作日服现场识别通过。
+        resource = self.resource("jp")
+        gate = resource.get_node_data("幕间-迦勒底之门界面")
+        self.assertEqual(gate["recognition"]["type"], "And")
+        self.assertIn("カルデアゲート", json.dumps(gate, ensure_ascii=False))
+        tab = resource.get_node_data("幕间-选择幕间页签")
+        self.assertEqual(tab["recognition"]["type"], "OCR")
+        self.assertTrue(any("幕間" in expected
+                            for expected in tab["recognition"]["param"]["expected"]))
+
     def test_clear_template_is_limited_to_the_interlude_row(self):
         image = self.fixture("cn_map_interlude.png")
         path = ROOT / "assets/resource/cn/image/event/已完成的副本标签.png"
