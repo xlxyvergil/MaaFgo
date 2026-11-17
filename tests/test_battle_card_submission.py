@@ -16,7 +16,7 @@ from battle.runtime.runtime import AutoBattleRuntime
 
 class CardSubmissionTests(unittest.TestCase):
     def runtime(self):
-        context = NS(tasker=NS(stopping=False))
+        context = NS(tasker=NS(stopping=False), run_recognition=Mock(return_value=None))
         image = object()
         controller = NS(post_screencap=lambda: NS(wait=lambda: NS(get=lambda: image)))
         action = BattleAction(None, tuple(CardPick(PrimitiveKind.SELECT_CARD, i) for i in (1, 2, 3)))
@@ -108,6 +108,74 @@ class CardSubmissionTests(unittest.TestCase):
         self.assertFalse(ok)
         self.assertLess(elapsed, 3)
         runtime.executor.tap_top_right_close.assert_not_called()
+
+    def test_download_retry_runs_only_after_scene_miss_then_resumes_polling(self):
+        runtime = self.runtime()
+        runtime.ctx.run_recognition.return_value = NS(hit=True)
+        runtime.ctx.run_task = Mock(return_value=NS(status=NS(succeeded=True)))
+        with patch('battle.runtime.runtime.perception.detect_scene',
+                   side_effect=[Scene.UNKNOWN, Scene.MAIN_BATTLE]) as detect:
+            self.assertTrue(runtime._wait_turn_settled())
+        runtime.ctx.run_task.assert_called_once_with('战斗-出卡后下载重试')
+        runtime.ctx.run_recognition.assert_called_once()
+        self.assertEqual(detect.call_count, 2)
+        runtime.executor.tap_top_right_close.assert_not_called()
+
+    def test_next_turn_victory_and_defeat_skip_download_retry_recognition(self):
+        for scene in (Scene.MAIN_BATTLE, Scene.VICTORY, Scene.DEFEAT):
+            with self.subTest(scene=scene):
+                runtime = self.runtime()
+                runtime.ctx.run_recognition.return_value = NS(hit=True)
+                runtime.ctx.run_task = Mock()
+                with patch('battle.runtime.runtime.perception.detect_scene', return_value=scene):
+                    self.assertTrue(runtime._wait_turn_settled())
+                runtime.ctx.run_recognition.assert_not_called()
+                runtime.ctx.run_task.assert_not_called()
+
+    def test_download_retry_failure_preserves_screen_and_stops(self):
+        runtime = self.runtime()
+        runtime.ctx.run_recognition.return_value = NS(hit=True)
+        runtime.ctx.run_task = Mock(return_value=NS(status=NS(succeeded=False)))
+        with patch('battle.runtime.runtime.perception.detect_scene', return_value=Scene.UNKNOWN) as detect:
+            self.assertFalse(runtime._wait_turn_settled())
+        self.assertEqual(runtime._post_attack_failure_reason, 'download_retry_failed')
+        detect.assert_called_once()
+        runtime.executor.tap_top_right_close.assert_not_called()
+
+    def test_repeated_download_failures_do_not_extend_total_wait_timeout(self):
+        runtime = self.runtime()
+        runtime.ctx.run_recognition.return_value = NS(hit=True)
+        clock = [0.0]
+        def retry(_name):
+            clock[0] += 1
+            return NS(status=NS(succeeded=True))
+        runtime.ctx.run_task = Mock(side_effect=retry)
+        with patch('battle.runtime.runtime._ANIMATION_TIMEOUT_S', 3), \
+             patch('battle.runtime.runtime.perception.detect_scene', return_value=Scene.UNKNOWN), \
+             patch('battle.runtime.runtime.time.monotonic', side_effect=lambda: clock[0]):
+            self.assertFalse(runtime._wait_turn_settled())
+        self.assertEqual(runtime.ctx.run_task.call_count, 3)
+        self.assertEqual(clock[0], 3)
+        runtime.executor.tap_top_right_close.assert_not_called()
+
+    def test_other_waits_do_not_poll_or_click_download_retry(self):
+        runtime = self.runtime()
+        runtime.ctx.run_task = Mock()
+        with patch('battle.runtime.runtime.perception.detect_scene', return_value=Scene.MAIN_BATTLE):
+            self.assertTrue(runtime._wait_until((Scene.MAIN_BATTLE,), 3))
+        runtime.ctx.run_recognition.assert_not_called()
+        runtime.ctx.run_task.assert_not_called()
+
+    def test_stop_after_detecting_retry_does_not_click(self):
+        runtime = self.runtime()
+        runtime.ctx.run_task = Mock()
+        def detect_retry(*_args):
+            runtime.ctx.tasker.stopping = True
+            return NS(hit=True)
+        runtime.ctx.run_recognition.side_effect = detect_retry
+        with patch('battle.runtime.runtime.perception.detect_scene', return_value=Scene.UNKNOWN):
+            self.assertFalse(runtime._wait_turn_settled())
+        runtime.ctx.run_task.assert_not_called()
 
 
 if __name__ == '__main__':

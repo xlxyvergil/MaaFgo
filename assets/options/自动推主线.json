@@ -62,6 +62,7 @@
       "type": "select",
       "label": "战斗方式",
       "default": "native",
+      "default_case": "native",
       "cases": [
         {
           "name": "native",

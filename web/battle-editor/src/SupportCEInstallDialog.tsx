@@ -1,9 +1,10 @@
 import {useEffect,useRef,useState} from 'react';
-import {ArrowLeft,CloudDownload,ExternalLink,FolderOpen,LoaderCircle,PackageCheck} from 'lucide-react';
+import {ArrowLeft,CloudDownload,ExternalLink,FolderOpen,Github,LoaderCircle,PackageCheck} from 'lucide-react';
 import {Modal} from './EditorModal';
 import './supportCEInstallDialog.css';
 
 const DOWNLOAD_URL='https://pan.quark.cn/s/e95d5e1d5056?pwd=P38F';
+const GITHUB_RELEASES_URL='https://github.com/xlxyvergil/MaaFgo/releases';
 const ANNOUNCEMENTS_URL='https://space.bilibili.com/7442091/upload/opus';
 const QR_IMAGE=new URL('./assets/support-ce-quark-qr.png',import.meta.url).href;
 
@@ -31,9 +32,13 @@ export function SupportCEInstallDialog({busy,disabled=false,common=false,onInsta
    <section className="support-ce-download" aria-label="获取礼装扩展包">
     <div className="support-ce-download-info">
      <h3><CloudDownload size={22} aria-hidden="true"/>获取礼装扩展包</h3>
-     <p>在网盘中下载<strong>礼装扩展包（ZIP）</strong>，例如 <code>MaaFGO-助战礼装扩展.zip</code>。</p>
-     <a className="button primary support-ce-quark-link" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer"><ExternalLink size={16} aria-hidden="true"/>夸克网盘：网盘下载</a>
-     <p className="support-ce-extraction-code">提取码：<strong>P38F</strong></p>
+     <p>通过网盘或 GitHub 下载<strong>礼装扩展包（ZIP）</strong>，任选一种方式即可。</p>
+     <div className="support-ce-download-links">
+      <a className="button primary support-ce-download-link" href={DOWNLOAD_URL} target="_blank" rel="noopener noreferrer"><ExternalLink size={16} aria-hidden="true"/>夸克网盘：网盘下载</a>
+      <a className="button support-ce-download-link" href={GITHUB_RELEASES_URL} target="_blank" rel="noopener noreferrer"><Github size={16} aria-hidden="true"/>GitHub：Releases 下载</a>
+     </div>
+     <p className="support-ce-extraction-code">夸克提取码：<strong>P38F</strong></p>
+     <p className="support-ce-github-help">GitHub 发布页展开 <strong>Assets（资源）</strong>，下载 <code>MaaFGO-SupportCE-DLC-版本号.zip</code>。</p>
     </div>
     <figure className="support-ce-download-qr">
      <img src={QR_IMAGE} width={196} height={192} alt="夸克网盘礼装扩展包下载二维码"/>

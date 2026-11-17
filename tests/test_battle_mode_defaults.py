@@ -19,7 +19,8 @@ class BattleModeDefaultTests(unittest.TestCase):
                 if not {"bbc", "native"} <= cases.keys():
                     continue
                 found.add(key)
-                self.assertEqual(option.get("default_case", option.get("default")), "native", key)
+                self.assertEqual(option.get("default_case"), "native", key)
+                self.assertEqual(option.get("default", "native"), "native", key)
                 self.assertEqual(cases["native"]["label"], "原生自动战斗（推荐）", key)
         self.assertTrue({"battle_mode", "主线-战斗方式", "Free-战斗方式"} <= found)
 
