@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import cv2
 import numpy as np
@@ -105,6 +105,38 @@ class StrengtheningFrameworkTests(FrameworkResources, unittest.TestCase):
             with self.assertRaisesRegex(StoryStopped, "强化任务"):
                 StrengtheningRunner(ctx).run()
         self.probe(np.zeros((720, 1280, 3), np.uint8), check)
+
+    def test_real_jp_support_and_formation_start_resume_current_quest(self):
+        for name in ("jp_support_start.png", "jp_formation_start.png"):
+            with self.subTest(page=name):
+                image = self.fixture(name)
+                def check(ctx):
+                    runner = StrengtheningRunner(ctx)
+                    runner.limit = 1
+                    runner.fight = Mock()
+                    runner.settle = Mock()
+                    runner.locate = Mock()
+                    runner.enter = Mock()
+                    with patch("strengthening_action.bond_stops.battle_started"):
+                        self.assertIn("完成 1", runner.run())
+                    runner.fight.assert_called_once()
+                    runner.settle.assert_called_once()
+                    runner.locate.assert_not_called()
+                    runner.enter.assert_not_called()
+                    self.assertEqual(runner.completed, 1)
+                self.probe(image, check, "jp")
+
+    def test_battle_and_download_dialog_are_not_mistaken_for_supported_start_pages(self):
+        frames = (self.fixture("cn_download_error.png"),
+                  cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/battle_preset_fallback_cn/main_after_cancel.png", np.uint8), 1))
+        for image in frames:
+            def check(ctx):
+                runner = StrengtheningRunner(ctx)
+                runner.fight = Mock()
+                with self.assertRaisesRegex(StoryStopped, "助战选择或编队确认"):
+                    runner.run()
+                runner.fight.assert_not_called()
+            self.probe(image, check)
 
     def test_quest_limit_is_isolated_and_validated(self):
         def check(ctx):

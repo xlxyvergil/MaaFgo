@@ -110,6 +110,10 @@ class StrengtheningDispatchTests(unittest.TestCase):
         runner = StrengtheningRunner.__new__(StrengtheningRunner)
         runner.completed = runner.battles = 0
         runner.limit = limit
+        runner._first_scan = True
+        runner.list_path = "迦勒底之门 → 强化任务"
+        runner.panel = Mock(return_value=True)
+        runner.reco = Mock(return_value=None)
         runner._dialogue_choices = {}
         runner.ctx = NS(get_task_job=lambda: NS(job_id=123456))
         for method in ("reset_restriction_state", "_ensure_list", "frame", "enter", "fight", "settle"):
@@ -173,3 +177,56 @@ class StrengtheningDispatchTests(unittest.TestCase):
             runner.run()
         self.assertEqual(runner.completed, 0)
         self.assertEqual(runner.locate.call_count, 1)
+
+    def test_support_and_formation_start_finish_current_quest_before_scanning(self):
+        for node in ("主线-助战界面", "进本-队伍确认"):
+            with self.subTest(entry=node):
+                target = object()
+                runner = self.runner([target])
+                runner.panel.return_value = False
+                runner.reco.side_effect = lambda name, _image: object() if name == node else None
+                steps = []
+                runner.fight.side_effect = lambda: steps.append("fight")
+                runner.settle.side_effect = lambda: steps.append("settle")
+                def locate():
+                    self.assertEqual(runner.completed, 1)
+                    self.assertTrue(runner._first_scan)
+                    steps.append("scan")
+                    return target
+                runner.locate.side_effect = locate
+                runner.enter.side_effect = lambda _target: steps.append("enter")
+                with patch("strengthening_action.bond_stops.battle_started"):
+                    runner.run()
+                self.assertEqual(steps, ["fight", "settle", "scan", "enter", "fight", "settle"])
+                self.assertEqual(runner.completed, 2)
+                runner.enter.assert_called_once_with(target)
+
+    def test_selected_quest_counts_towards_limit_without_selecting_another(self):
+        runner = self.runner([], limit=1)
+        runner.panel.return_value = False
+        runner.reco.side_effect = lambda name, _image: object() if name == "进本-队伍确认" else None
+        with patch("strengthening_action.bond_stops.battle_started") as budget:
+            self.assertIn("完成 1", runner.run())
+        runner.locate.assert_not_called()
+        runner.enter.assert_not_called()
+        runner.fight.assert_called_once()
+        runner.settle.assert_called_once()
+        self.assertEqual(budget.call_args.kwargs["another_battle_planned"], False)
+
+    def test_selected_quest_settlement_failure_never_starts_list_scan(self):
+        runner = self.runner([])
+        runner.panel.return_value = False
+        runner.reco.side_effect = lambda name, _image: object() if name == "主线-助战界面" else None
+        runner.settle.side_effect = StoryStopped("未确认返回强化列表")
+        with patch("strengthening_action.bond_stops.battle_started"), self.assertRaises(StoryStopped):
+            runner.run()
+        runner.locate.assert_not_called()
+        self.assertEqual(runner.completed, 0)
+
+    def test_unknown_start_page_stops_before_any_battle_or_scan(self):
+        runner = self.runner([])
+        runner.panel.return_value = False
+        with self.assertRaisesRegex(StoryStopped, "助战选择或编队确认"):
+            runner.run()
+        runner.fight.assert_not_called()
+        runner.locate.assert_not_called()

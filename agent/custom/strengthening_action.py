@@ -137,16 +137,31 @@ class StrengtheningRunner(StoryRunner):
                 raise StoryStopped(f"战后结算超时，未确认返回“{self.list_label}”列表，无法继续选关。请检查当前奖励或提示窗口，手动处理并回到该列表后重试。") from exc
             raise
 
+    def starting_at_selected_quest(self, image):
+        if self.panel(image):
+            return False
+        if any(self.reco(name, image) for name in ("主线-助战界面", "进本-队伍确认")):
+            return True
+        raise StoryStopped(
+            f"未识别到强化列表、助战选择或编队确认界面，无法开始任务。请打开“{self.list_path}”列表，"
+            "或手动选择一个强化关卡，停在助战选择或编队确认页后启动“挑战强化本”。"
+        )
+
     def run(self):
-        self._ensure_list(self.frame())
+        selected_quest = self.starting_at_selected_quest(self.frame())
         while self.completed < self.limit:
             self.reset_restriction_state()
             self._network_retries = 0
             self._dialogue_choices.clear()
-            result = self.locate()
-            if result is None:
-                return f"已扫描强化任务列表，没有可挑战的已开启强化关卡；完成 {self.completed} 个小关。"
-            self.enter(result)
+            if selected_quest:
+                # 仅接管启动时已选的小关；其后必须回到强化列表按正常扫描流程选关。
+                selected_quest = False
+                mfaalog.info("[挑战强化本] 从助战或编队确认页继续当前小关，结算返回强化列表后自动选关")
+            else:
+                result = self.locate()
+                if result is None:
+                    return f"已扫描强化任务列表，没有可挑战的已开启强化关卡；完成 {self.completed} 个小关。"
+                self.enter(result)
             bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
                 another_battle_planned=False if self.completed + 1 == self.limit else None)
             self.fight()
