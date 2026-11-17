@@ -31,3 +31,7 @@
 !fixtures/battle_preset_fallback_cn/
 !fixtures/battle_preset_fallback_cn/partial_cards.png
 !fixtures/battle_preset_fallback_cn/main_after_cancel.png
+# Anonymous CN strengthening-list and resource-download-error regressions.
+!fixtures/strengthening/
+!fixtures/strengthening/cn_list.png
+!fixtures/strengthening/cn_download_error.png

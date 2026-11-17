@@ -1,0 +1,155 @@
+{
+  "挑战强化本调度": {
+    "doc": "独立强化列表任务，复用主线单场助战/编队/战斗；结算由Python状态机只执行识别后的动作，不运行通用结算返回链，避免强化列表左上关闭被当作奖励返回。失败保留现场。 2026-11-18国服MaaMCP实测织田信长末关获胜，处理强化奖励后直接回到强化任务列表并选择伊丽莎白〔万圣节〕，未退回迦门。加载断线复用进本-断网重连，按每小关最多三次处理；次数在Python保留，不使用通用回主界面恢复。",
+    "action": {
+      "type": "Custom",
+      "param": {
+        "custom_action": "challenge_strengthening"
+      }
+    },
+    "on_error": []
+  },
+  "强化-配置": {
+    "attach": {
+      "quest_limit": 999,
+      "transition_timeout": 120,
+      "auto_handle_restrictions": true
+    }
+  },
+  "强化-结果提示": {},
+  "强化-列表界面": {
+    "doc": "右上强化任务标题与左上关闭文字同帧确认；标题使用前景白字过滤，拒绝奖励遮罩透出的背景。不点击左上关闭。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "base/挑战强化本/强化-列表界面/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  990,
+                  0,
+                  290,
+                  90
+                ],
+                "expected": [
+                  "^强化任务$"
+                ],
+                "threshold": 0.8,
+                "color_filter": "剧情奖励-前景白字过滤"
+              }
+            }
+          },
+          {
+            "sub_name": "base/挑战强化本/强化-列表界面/OCR2",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [
+                  0,
+                  0,
+                  175,
+                  90
+                ],
+                "expected": [
+                  "^关闭$"
+                ],
+                "threshold": 0.8
+              }
+            }
+          }
+        ]
+      }
+    },
+    "on_error": []
+  },
+  "强化-条目文字": {
+    "doc": "每张完整卡片单独覆盖ROI读取标题、AP及任务进行度，防止下一行开启条件串入本行。",
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [
+          765,
+          95,
+          335,
+          615
+        ],
+        "threshold": 0.6,
+        "order_by": "Vertical"
+      }
+    },
+    "on_error": []
+  },
+  "强化-可挑战条目": {
+    "doc": "共享幕间逐行色带定位；只接受本行强化关卡/Strengthen Quest、AP和任务进行度均成立且明亮未锁定的完整卡片，x950避开奖励图标。",
+    "recognition": {
+      "type": "Custom",
+      "param": {
+        "custom_recognition": "strengthening_entry"
+      }
+    },
+    "action": {
+      "type": "Click"
+    },
+    "post_delay": 900,
+    "on_error": []
+  },
+  "强化-条目扫描": {
+    "doc": "未知行与未开放条目分别报告；没有候选不等于全部完成。外层触底复核且全程没有未知行才提前结束。",
+    "recognition": {
+      "type": "Custom",
+      "param": {
+        "custom_recognition": "strengthening_scan"
+      }
+    },
+    "on_error": []
+  },
+  "强化-列表复位": {
+    "action": {
+      "type": "Swipe",
+      "param": {
+        "begin": [
+          980,
+          190,
+          1,
+          1
+        ],
+        "end": [
+          980,
+          550,
+          1,
+          1
+        ],
+        "duration": 500
+      }
+    },
+    "post_delay": 3400,
+    "on_error": [],
+    "doc": "参考幕间-列表复位的单步手势和等待。仅在强化列表确认后调用，有界扫描由调度器控制；列表触底比较只用于非战斗列表。"
+  },
+  "强化-列表向下滑动": {
+    "action": {
+      "type": "Swipe",
+      "param": {
+        "begin": [
+          980,
+          550,
+          1,
+          1
+        ],
+        "end": [
+          980,
+          190,
+          1,
+          1
+        ],
+        "duration": 500
+      }
+    },
+    "post_delay": 2400,
+    "on_error": [],
+    "doc": "参考幕间-列表向下滑动的单步手势和等待。仅在强化列表确认后调用，有界扫描由调度器控制；列表触底比较只用于非战斗列表。"
+  }
+}

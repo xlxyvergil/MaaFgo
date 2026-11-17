@@ -1,0 +1,103 @@
+"""国服强化列表真实OCR回放；无设备、无触控。"""
+import json
+from pathlib import Path
+import sys
+import unittest
+from unittest.mock import Mock
+
+import cv2
+import numpy as np
+from maa.custom_action import CustomAction
+from maa.tasker import Tasker
+
+ROOT = Path(__file__).resolve().parents[2]
+sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
+from strengthening_recognition import StrengtheningEntry, StrengtheningScan
+from strengthening_action import StrengtheningRunner
+from main_story_action import StoryStopped
+from test_main_story_framework import FrameworkResources, ScreenController
+
+
+class StrengtheningFrameworkTests(FrameworkResources, unittest.TestCase):
+    def probe(self, image, callback):
+        resource = self.resource("cn")
+        resource.register_custom_recognition("strengthening_entry", StrengtheningEntry())
+        resource.register_custom_recognition("strengthening_scan", StrengtheningScan())
+        outcomes, errors = [], []
+
+        class Probe(CustomAction):
+            def run(self, context, argv):
+                try:
+                    outcomes.append(callback(context))
+                    return True
+                except Exception as exc:
+                    errors.append(repr(exc))
+                    return False
+
+        resource.register_custom_action("strengthening_probe", Probe())
+        controller = ScreenController(image)
+        self.assertTrue(controller.post_connection().wait().succeeded)
+        tasker = Tasker()
+        self.assertTrue(tasker.bind(resource, controller))
+        try:
+            status = tasker.post_task("strengthening_probe", {
+                "strengthening_probe": {"action": {"type": "Custom", "param": {
+                    "custom_action": "strengthening_probe"}}, "on_error": []}
+            }).wait()
+            self.assertTrue(status.succeeded, errors)
+            self.assertEqual(controller.clicks, [])
+            self.assertEqual(controller.swipes, [])
+            return outcomes[0]
+        finally:
+            tasker.post_stop().wait()
+
+    def fixture(self):
+        return cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/strengthening/cn_list.png", np.uint8), 1)
+
+    def test_real_list_selects_first_unfinished_small_quest(self):
+        def check(ctx):
+            runner = StrengtheningRunner(ctx)
+            self.assertTrue(runner.panel(self.fixture()))
+            self.assertFalse(runner.on_map(self.fixture()))
+            result = ctx.run_recognition("强化-条目扫描", self.fixture())
+            raw = result.best_result.detail
+            detail = json.loads(raw) if isinstance(raw, str) else raw
+            self.assertEqual(len(detail["entries"]), 3, detail)
+            self.assertEqual(detail["uncertain_count"], 0, detail)
+            self.assertIn("织田信长", detail["entries"][0]["title"])
+            self.assertEqual(detail["entries"][0]["box"][0], 950)
+        self.probe(self.fixture(), check)
+
+    def test_wrong_page_preserves_screen_and_stops(self):
+        def check(ctx):
+            with self.assertRaisesRegex(StoryStopped, "强化任务"):
+                StrengtheningRunner(ctx).run()
+        self.probe(np.zeros((720, 1280, 3), np.uint8), check)
+
+    def test_quest_limit_is_isolated_and_validated(self):
+        def check(ctx):
+            ctx.override_pipeline({"强化-配置": {"attach": {"quest_limit": 2}},
+                                   "主线-配置": {"attach": {"use_spirit_stone": True}}})
+            runner = StrengtheningRunner(ctx)
+            self.assertEqual(runner.limit, 2)
+            self.assertFalse(runner.use_spirit_stone)
+            self.assertTrue(ctx.get_node_data("主线-配置")["attach"]["use_spirit_stone"])
+            ctx.override_pipeline({"强化-配置": {"attach": {"quest_limit": 0}}})
+            with self.assertRaisesRegex(ValueError, "挑战次数上限"):
+                StrengtheningRunner(ctx)
+        self.probe(self.fixture(), check)
+
+    def test_download_error_uses_existing_retry_button_with_limit(self):
+        image = cv2.imdecode(np.fromfile(ROOT / "tests/fixtures/strengthening/cn_download_error.png", np.uint8), 1)
+        def check(ctx):
+            runner = StrengtheningRunner(ctx)
+            runner.action = Mock()
+            for _ in range(3):
+                self.assertTrue(runner.interrupt(image, entering=True))
+            self.assertEqual(runner.action.call_count, 3)
+            self.assertEqual(runner.action.call_args.args[0], "进本-断网重连")
+            with self.assertRaisesRegex(StoryStopped, "重试连接3次"):
+                runner.interrupt(image, entering=True)
+            self.assertEqual(runner.action.call_count, 3)
+            self.assertFalse(runner.panel(image))
+        self.probe(image, check)

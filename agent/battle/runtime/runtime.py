@@ -1161,6 +1161,7 @@ class AutoBattleRuntime:
         # 明确的剧情仍由剧情分支处理，战后页面在羁绊检查完成后交回结算流水线。
         result = self._wait_until(_TERMINAL_OR_MAIN, _ANIMATION_TIMEOUT_S,
                                   tap_close=not preserve_bond_page, handle_story=True,
+                                  retry_download=True,
                                   command_selection_timeout_s=3.0)
         mfaalog.diagnostic(f"[AutoBattle] _wait_turn_settled() result={result}")
         return result
@@ -1191,6 +1192,7 @@ class AutoBattleRuntime:
 
     def _wait_until(self, scenes, timeout_s: float, tap_close: bool = False,
                     handle_story: bool = False,
+                    retry_download: bool = False,
                     command_selection_timeout_s: float | None = None) -> bool:
         mfaalog.diagnostic(f"[AutoBattle] _wait_until() scenes={[s.name for s in scenes]} timeout={timeout_s}s")
         deadline = time.monotonic() + timeout_s
@@ -1212,6 +1214,26 @@ class AutoBattleRuntime:
             if scene in scenes:
                 mfaalog.diagnostic(f"[AutoBattle] _wait_until() matched scene={scene.name}")
                 return True
+            # 下一回合、胜利或失败优先；均未命中才检查下载重试按钮。
+            if retry_download:
+                retry = self.ctx.run_recognition("战斗-出卡后下载重试", img)
+                if retry and retry.hit:
+                    if self.ctx.tasker.stopping:
+                        return False
+                    mfaalog.info("[AutoBattle] 出卡后检测到资源下载重试按钮，点击重试并继续等待下一回合")
+                    detail = self.ctx.run_task("战斗-出卡后下载重试")
+                    if not detail or not detail.status.succeeded or self.ctx.tasker.stopping:
+                        self._post_attack_failure_reason = "download_retry_failed"
+                        mfaalog.error(
+                            "[AutoBattle] 检测到资源下载重试按钮，但未能完成重试操作。"
+                            "请在游戏中点击“重试”，恢复战斗后重新启动任务。"
+                        )
+                        return False
+                    # 重试只是恢复下载，不代表回合结束；重新截图确认目标场景。
+                    # 保留原等待截止时间，持续断线仍按本次动画等待上限停止。
+                    map_since = command_selection_since = None
+                    command_selection_observations = 0
+                    continue
             if command_selection_timeout_s is not None and scene is Scene.COMMAND_SELECTION:
                 now = time.monotonic()
                 if command_selection_since is None:

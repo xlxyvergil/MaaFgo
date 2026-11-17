@@ -46,6 +46,8 @@ import main_story_recognition
 import main_story_action
 import interlude_recognition
 import interlude_action
+import strengthening_recognition
+import strengthening_action
 import free_quest_recognition
 import free_quest_action
 
