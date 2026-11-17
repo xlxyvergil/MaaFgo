@@ -62,7 +62,10 @@ class InterludeRunner(StoryRunner):
         return bool(self.reco("幕间-列表界面", image))
 
     def on_map(self, image):
-        return bool(self.reco("幕间-返回列表", image))
+        if self.reco("幕间-返回列表", image):
+            return True
+        # 同地图切换其他幕间后，专属返回入口可能消失。关闭仅作识别，不点击。
+        return bool(self.reco("幕间-关闭按钮地图", image)) and not self.total_list(image)
 
     def panel(self, image):
         return self.total_list(image) or self.on_map(image)
@@ -153,7 +156,7 @@ class InterludeRunner(StoryRunner):
     def return_to_list(self):
         result = self.reco("幕间-返回列表", self.frame())
         if not result:
-            raise StoryStopped("未找到“前往幕间物语”，无法返回幕间列表。请手动返回列表后重试。")
+            raise StoryStopped("当前地图没有可用的“前往幕间物语”按钮，无法自动返回幕间列表。请手动打开“幕间物语”列表后重新启动“自动幕间副本”。")
         self.action("幕间-返回列表", result)
         deadline = self.clock() + self.timeout
         while self.clock() < deadline:

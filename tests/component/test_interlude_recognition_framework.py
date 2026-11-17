@@ -11,7 +11,8 @@ from maa.tasker import Tasker
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
-from interlude_recognition import InterludeEntry, InterludeQuest, InterludeScan
+from interlude_action import InterludeRunner
+from interlude_recognition import InterludeEntry, InterludeMap, InterludeQuest, InterludeScan
 from test_main_story_framework import FrameworkResources, ScreenController
 
 
@@ -31,6 +32,7 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
         resource.register_custom_recognition("interlude_scan", InterludeScan())
         resource.register_custom_recognition("interlude_entry", InterludeEntry())
         resource.register_custom_recognition("interlude_quest", InterludeQuest())
+        resource.register_custom_recognition("interlude_map", InterludeMap())
         outcomes, errors = [], []
 
         class Probe(CustomAction):
@@ -130,6 +132,82 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             dimmed = context.run_recognition("幕间-返回列表", (image * .55).astype(np.uint8))
             return bool(visible and visible.hit), bool(dimmed and dimmed.hit)
         self.assertEqual(self.probe(image, callback), (True, False))
+
+    def test_close_map_from_log_is_recognized_without_return_button(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            self.assertIsNone(runtime.reco("幕间-返回列表", image))
+            self.assertTrue(runtime.on_map(image))
+            # 仅改变关闭按钮亮度；图片仍能匹配时不加独立白色像素门槛。
+            dim_close = image.copy()
+            dim_close[:100, :230] = (dim_close[:100, :230] * .55).astype(np.uint8)
+            self.assertTrue(runtime.on_map(dim_close))
+            result = runtime.reco("幕间-地图关卡", image)
+            self.assertIsNotNone(result)
+            self.assertEqual(detail(result)["title"], "龙之圣女，海边圣女")
+            self.assertLess(result.box[1], 280)
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_close_map_rejects_missing_button_and_non_map_pages(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+        no_close = image.copy()
+        no_close[:100, :230] = 0
+        close_only = np.zeros_like(image)
+        close_only[:100, :230] = image[:100, :230]
+        no_interlude = image.copy()
+        # 保留AP和亮棕卡，但去掉Interlude；同时去掉绿色Free，不能凭AP确认地图。
+        no_interlude[158:183, 765:1100] = 0
+        no_interlude[295:] = 0
+        list_image = self.fixture("cn_list_direct.png")
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            return [runtime.on_map(screenshot) for screenshot in (
+                no_close, close_only,
+                no_interlude, list_image,
+            )]
+
+        self.assertEqual(self.probe(image, callback), [False] * 4)
+
+    def test_close_map_supports_completed_interlude_and_free_only_after_clear(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+        marker = cv2.imdecode(np.fromfile(
+            ROOT / "assets/resource/cn/image/event/已完成的副本标签.png", np.uint8), 1)
+        completed = image.copy()
+        h, w = marker.shape[:2]
+        completed[235:235 + h, 635:635 + w] = marker
+        free_only = image.copy()
+        free_only[100:295] = 0
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            for screenshot in (completed, free_only):
+                self.assertTrue(runtime.on_map(screenshot))
+                self.assertIsNone(runtime.reco("幕间-地图关卡", screenshot))
+            return True
+
+        self.assertTrue(self.probe(image, callback))
+
+    def test_jp_existing_close_template_confirms_locked_interlude_map(self):
+        image = self.fixture("jp_map_locked_free.png")
+        no_return = image.copy()
+        no_return[90:180, :200] = 0
+
+        def callback(context):
+            runtime = InterludeRunner(context)
+            self.assertIsNone(runtime.reco("幕间-返回列表", no_return))
+            self.assertTrue(runtime.on_map(no_return))
+            dim_close = no_return.copy()
+            dim_close[:100, :230] = (dim_close[:100, :230] * .55).astype(np.uint8)
+            self.assertTrue(runtime.on_map(dim_close))
+            self.assertFalse(runtime.on_map(self.fixture("jp_list_direct_locked.png")))
+            return True
+
+        self.assertTrue(self.probe(image, callback, "jp"))
 
     def test_real_jp_direct_entries_and_locked_stage_are_separate(self):
         image = self.fixture("jp_list_direct_locked.png")

@@ -204,6 +204,30 @@ class ProgressTests(unittest.TestCase):
 
 
 class NavigationSafetyTests(unittest.TestCase):
+    def test_close_map_is_valid_but_total_list_is_never_treated_as_map(self):
+        runtime, context = runner()
+        close_map = {"幕间-关闭按钮地图"}
+        self.assertTrue(runtime.on_map(close_map))
+        self.assertTrue(runtime.panel(close_map))
+        self.assertFalse(runtime.on_map(close_map | LIST))
+        self.assertEqual(context.actions, [])
+
+    def test_settlement_and_next_quest_continue_after_return_button_disappears(self):
+        close_map = {"幕间-关闭按钮地图", "幕间-地图关卡"}
+        runtime, context = runner([close_map], {"quest_limit": 2})
+        with patch("interlude_action.same_list", return_value=True), \
+             patch.object(runtime, "enter", return_value="battle"), \
+             patch.object(runtime, "fight"):
+            runtime.run()
+        self.assertEqual((runtime.completed, runtime.battles), (2, 2))
+        self.assertEqual([name for name, _ in context.actions], ["幕间-地图列表复位"])
+
+    def test_missing_return_button_preserves_map_and_explains_manual_return(self):
+        runtime, context = runner([{"幕间-关闭按钮地图"}])
+        with self.assertRaisesRegex(StoryStopped, "没有可用的“前往幕间物语”按钮.*手动打开“幕间物语”"):
+            runtime.return_to_list()
+        self.assertEqual(context.actions, [])
+
     def test_only_total_list_or_interlude_stage_is_a_valid_entry(self):
         runtime, _ = runner()
         self.assertTrue(runtime.panel(LIST))

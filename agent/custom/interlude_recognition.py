@@ -140,6 +140,8 @@ def scan_entries(context, image, *, map_mode=False, params=None):
             marker_text = re.sub(r"\s+", "", " ".join(item["text"] for item in marker_items)).lower()
             candidate["marker_ocr"] = marker_items
             interlude = re.search(r"[il1]nterlu(?:d)?e?", marker_text) is not None
+        # 地图身份确认也接受已完成/锁定的幕间，不依赖它当前是否可挑战。
+        candidate["interlude"] = bool(interlude and ap)
         # 日服条件行会以“絆Lv.4で開放”等结尾；“開放条件緩和中”和
         # “編成条件あり”分别表示临时放宽和编队限制，不能据此跳过已开放任务。
         locked_text = any(re.search(
@@ -248,3 +250,13 @@ class InterludeScan(CustomRecognition):
         params = json.loads(argv.custom_recognition_param or "{}")
         report = scan_entries(context, argv.image, map_mode=params.get("map", False), params=params)
         return CustomRecognition.AnalyzeResult(box=[0, 0, 1, 1], detail=report)
+
+
+@AgentServer.custom_recognition("interlude_map")
+class InterludeMap(CustomRecognition):
+    def analyze(self, context, argv):
+        # 外层还须匹配关闭按钮图片并排除总列表；本识别只确认右侧地图任务卡。
+        report = _scan(context, argv, map_mode=True)
+        if any(row.get("interlude") for row in report["rows"]) or report["free_count"]:
+            return CustomRecognition.AnalyzeResult(box=[0, 0, 1, 1], detail=report)
+        return None
