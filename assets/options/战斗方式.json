@@ -5,6 +5,7 @@
             "label": "战斗方式",
             "description": "选择原生自动战斗或 BBC；使用 BBC 前需启动 BBC。",
             "default": "native",
+            "default_case": "native",
             "cases": [
                 {
                     "name": "bbc",
