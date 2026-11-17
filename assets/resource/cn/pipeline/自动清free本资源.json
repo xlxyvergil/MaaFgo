@@ -1,17 +1,23 @@
 {
   "Free-列表标记": {
-    "doc": "2026-11-01 国服卡美洛圣都市街实测：左侧标记为“自由关卡”，英文模板最高分仅 0.3531。使用国服字样，标题区域相对左侧模板向上15px；CLEAR 识别仍沿用逐行限制，参见 base 自动清free本.json。 国服三场连续首通验证通过，补图后匹配分 0.9921；上次执行标签出现后仍能认回同一关。",
+    "doc": "同时识别普通章节的中文“自由关卡”和奏章地图的英文 Free Quest，沿用 base 的 0.88 阈值与逐行 CLEAR 检查。2026-11-17 奏章截图：中文模板仅 0.3423，英文模板 0.9696；英文模板以独立文件名保存，避免被国服同名中文图片覆盖。中文模板 98×84，标题向上15px；英文模板 98×70，通过 title_roi_offset_by_size 改为向上35px，供战后同关复核使用。2026-11-01 国服卡美洛中文模板匹配分 0.9921，三场连续首通验证通过。",
     "attach": {
       "title_roi_offset": [
         125,
         -15,
         290,
         40
-      ]
+      ],
+      "title_roi_offset_by_size": {
+        "98x70": [125, -35, 290, 40]
+      }
     },
     "recognition": {
       "param": {
-        "template": "free_quest/free_label.png"
+        "template": [
+          "free_quest/free_label.png",
+          "free_quest/free_label_en.png"
+        ]
       }
     }
   },

@@ -121,8 +121,10 @@ class FreeQuestRunner:
 
     def title_patch(self, image, result):
         box = result.box
-        dx, dy, width, height = (self.ctx.get_node_data("Free-列表标记") or {}).get(
-            "attach", {}).get("title_roi_offset", [125, -35, 290, 40])
+        attach = (self.ctx.get_node_data("Free-列表标记") or {}).get("attach", {})
+        # TemplateMatch 返回的框尺寸就是模板尺寸，用它区分中英文标记的标题位置。
+        dx, dy, width, height = attach.get("title_roi_offset_by_size", {}).get(
+            f"{box.w}x{box.h}", attach.get("title_roi_offset", [125, -35, 290, 40]))
         x, y = box.x + dx, box.y + dy
         return image[y:y+height, x:x+width].copy()
 
