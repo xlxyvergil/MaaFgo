@@ -304,16 +304,31 @@ class InterludeRunner(StoryRunner):
                 return_since = None
         raise StoryStopped("进入幕间后未确认战斗或剧情完成，无法继续。请检查当前画面；若关闭了“跳过剧情”，请手动完成剧情后重试。")
 
+    def starting_at_selected_quest(self, image):
+        if self.panel(image):
+            return False
+        if any(self.reco(name, image) for name in ("主线-助战界面", "进本-队伍确认")):
+            return True
+        raise StoryStopped(
+            "未识别到幕间列表、故事舞台、助战选择或编队确认界面，无法开始任务。"
+            "请打开“幕间物语”列表，或手动选择一个幕间小关，停在助战选择或编队确认页后启动“自动幕间副本”。"
+        )
+
     def run(self):
-        if not self.panel(self.frame()):
-            raise StoryStopped("当前不在幕间列表或故事舞台。请打开“幕间物语”列表后启动“自动幕间副本”。")
+        selected_quest = self.starting_at_selected_quest(self.frame())
         while self.completed < self.limit:
             self.reset_restriction_state()
             self._dialogue_choices.clear()
-            target = self.locate()
-            if target is None:
-                return f"已扫描幕间列表，没有可挑战的已开启幕间；完成 {self.completed} 个小关，其中战斗 {self.battles} 场。"
-            kind = self.enter(target)
+            if selected_quest:
+                # 只接管启动时已选的小关；结算后仍须经幕间列表或故事舞台选关。
+                selected_quest = False
+                kind = "battle"
+                mfaalog.info("[自动幕间副本] 从助战或编队确认页继续当前小关，结算返回幕间列表或故事舞台后自动选关")
+            else:
+                target = self.locate()
+                if target is None:
+                    return f"已扫描幕间列表，没有可挑战的已开启幕间；完成 {self.completed} 个小关，其中战斗 {self.battles} 场。"
+                kind = self.enter(target)
             if kind == "map":
                 continue
             if kind == "battle":
