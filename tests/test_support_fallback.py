@@ -149,7 +149,7 @@ class SupportFallbackTests(unittest.TestCase):
         action._swipe.assert_not_called()
         self.assertEqual(ctx.entries, [])
 
-    def test_chaldea_normal_and_grand_ten_refreshes_then_fallback(self):
+    def test_chaldea_normal_and_grand_five_refreshes_then_fallback(self):
         for grand in (False, True):
             with self.subTest(grand=grand):
                 ctx = self.chaldea_context()
@@ -159,8 +159,8 @@ class SupportFallbackTests(unittest.TestCase):
                     result, action = self.search(ctx, chaldea=True)
                 fetch.assert_called_once_with("test-share")
                 self.assertTrue(result.success)
-                self.assertEqual(ctx.refreshes, 10)
-                self.assertEqual(action._match_servant.call_count, 33)
+                self.assertEqual(ctx.refreshes, 5)
+                self.assertEqual(action._match_servant.call_count, 18)
                 self.assertEqual(ctx.entries[-1], "助战兜底-选择首个助战")
                 self.assertTrue(sessions.support_fallback(ctx.root, ctx.token))
 
@@ -168,9 +168,9 @@ class SupportFallbackTests(unittest.TestCase):
         ctx = self.chaldea_context()
         sessions.set_support_fallback(ctx.root, ctx.token, True)
         with patch("support_action.fetch_share_data", return_value=(self.chaldea_share(), None, None)):
-            result, _ = self.search(ctx, lambda *args: ctx.refreshes == 10, chaldea=True)
+            result, _ = self.search(ctx, lambda *args: ctx.refreshes == 5, chaldea=True)
         self.assertTrue(result.success)
-        self.assertEqual(ctx.refreshes, 10)
+        self.assertEqual(ctx.refreshes, 5)
         self.assertNotIn("助战兜底-选择首个助战", ctx.entries)
         self.assertFalse(sessions.support_fallback(ctx.root, ctx.token))
 
@@ -257,7 +257,7 @@ class SupportFallbackTests(unittest.TestCase):
                 self.assertFalse(sessions.support_fallback(ctx.root, ctx.token))
                 action._get_detector.assert_not_called()
 
-    def test_ten_refreshes_then_fallback_and_clear_stale_formation(self):
+    def test_five_refreshes_then_fallback_and_clear_stale_formation(self):
         ctx = Context()
         slots = tuple(FormationSlot(i, "unknown", is_support=False) for i in range(1, 7))
         revision = sessions.begin_capture(ctx.root, ctx.token)
@@ -266,19 +266,19 @@ class SupportFallbackTests(unittest.TestCase):
         sessions.publish(ctx.root, ctx.token, revision, slots, "test")
         result, action = self.search(ctx)
         self.assertTrue(result.success)
-        self.assertEqual(ctx.refreshes, 10)
+        self.assertEqual(ctx.refreshes, 5)
         self.assertEqual(ctx.entries[-1], "助战兜底-选择首个助战")
-        # 初始列表和10次刷新后的列表都检查顶部及两次滑动。
-        self.assertEqual(action._match_servant.call_count, 33)
+        # 初始列表和5次刷新后的列表都检查顶部及两次滑动。
+        self.assertEqual(action._match_servant.call_count, 18)
         self.assertTrue(sessions.support_fallback(ctx.root, ctx.token))
         self.assertIsNone(sessions.read(ctx.root, ctx.token)[0])
 
-    def test_target_on_tenth_refreshed_top_row_wins_and_clears_fallback(self):
+    def test_target_on_fifth_refreshed_top_row_wins_and_clears_fallback(self):
         ctx = Context()
         sessions.set_support_fallback(ctx.root, ctx.token, True)
-        result, _ = self.search(ctx, lambda *args: ctx.refreshes == 10)
+        result, _ = self.search(ctx, lambda *args: ctx.refreshes == 5)
         self.assertTrue(result.success)
-        self.assertEqual(ctx.refreshes, 10)
+        self.assertEqual(ctx.refreshes, 5)
         self.assertNotIn("助战兜底-选择首个助战", ctx.entries)
         self.assertFalse(sessions.support_fallback(ctx.root, ctx.token))
 

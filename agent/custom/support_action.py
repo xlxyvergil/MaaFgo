@@ -167,7 +167,7 @@ SWIPE_SETTLE = 1              # 滑动结束后等待列表稳定再识别(秒),
 MAX_SWIPE_BEFORE_REFRESH = 12    # 未设置查找范围时，连续滑动12次未匹配后刷新
 MAX_SWIPE_BUDGET = 80           # 单轮列表查找范围上限，避免错误配置导致长时间无法刷新
 REFRESH_TASK = "助战刷新"        # 刷新流水线(由外部提供, 直接 run_task 调用)
-FALLBACK_REFRESH_LIMIT = 10
+FALLBACK_REFRESH_LIMIT = 5
 CONNECT_ROI = (1158, 623, 101, 86)  # 连接中检测区域: x1158-1259 y623-709
 TH_WHITE = 245                  # 纯白判定阈值(灰度 >= 该值视为白)
 # 实测: 正常助战列表该区域白占比 0-0.3%, 连接中约 33%; 阈值取 10% 区分度充足
@@ -935,7 +935,7 @@ class SupportAction(CustomAction):
         """撤销职介筛选并复用首个助战入口，不在本子任务中执行编队。"""
         if context.tasker.stopping:
             return CustomAction.RunResult(success=False)
-        mfaalog.warning("[SupportAction] 刷新10次仍未找到目标，改用首个助战并跳过 Chaldea 配置")
+        mfaalog.warning(f"[SupportAction] 刷新{FALLBACK_REFRESH_LIMIT}次仍未找到目标，改用首个助战并跳过 Chaldea 配置")
         detail = context.run_task(
             "助战兜底-选择首个助战",
             pipeline_override={"进本-选择助战": {"next": [], "on_error": []}},
@@ -1214,7 +1214,7 @@ class SupportAction(CustomAction):
             if try_match():
                 return CustomAction.RunResult(success=True)
 
-            # 每轮先查顶部再滑动查完整列表；刷新10次后的列表也完整查找后才兜底。
+            # 每轮先查顶部再滑动查完整列表；达到兜底刷新上限后的列表也完整查找后才兜底。
             mfaalog.info("[SupportAction] 首次识别无匹配, 进入滑动/刷新循环")
             swipe_count = 0
             refresh_count = 0
