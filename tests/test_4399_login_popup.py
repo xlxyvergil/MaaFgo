@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 LOGIN = json.loads((ROOT / "assets/resource/cn/pipeline/login.json").read_text("utf-8"))
 POPUP = json.loads((ROOT / "assets/resource/cn/pipeline/4399登录弹窗.json").read_text("utf-8"))
 OPTIONS = json.loads((ROOT / "assets/options/包名填写.json").read_text("utf-8"))
+JP_PLACEHOLDER_PATH = ROOT / "assets/resource/jp/pipeline/4399登录弹窗占位.json"
 
 SHARED = {
     "4399-关闭弹窗-前往游戏盒领取-小": {
@@ -120,6 +121,17 @@ class LoginPopupWiringTests(unittest.TestCase):
                 continue
             for name in [*ALL, RECHECK]:
                 self.assertNotIn(name, other["pipeline_override"])
+
+    def test_jp_placeholder_keeps_option_override_names_valid(self):
+        # 包名填写 是共享选项，日服资源组也要能解析这九个覆盖键，否则 maa-checker 报覆盖未知任务。
+        placeholder = json.loads(JP_PLACEHOLDER_PATH.read_text("utf-8"))
+        self.assertEqual(set(placeholder), set(ALL) | {RECHECK})
+        for name, node in placeholder.items():
+            with self.subTest(node=name):
+                self.assertIs(node["enabled"], False)
+                self.assertNotIn("next", node)
+                self.assertNotIn("recognition", node)
+                self.assertNotIn("action", node)
 
     def test_no_jumpback_dispatcher_remains(self):
         for entry in LOGIN.values():
