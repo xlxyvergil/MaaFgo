@@ -50,6 +50,86 @@ def publish(store, root, token):
 
 
 class SessionTests(unittest.TestCase):
+    def test_teapot_cache_requires_confirmation_and_repeat_scope(self):
+        store = FormationSessions()
+        single = store.begin(1)
+        self.assertFalse(store.confirm_teapot(1, single, False))
+        self.assertFalse(store.teapot_confirmed(1, single, False))
+        for desired in (False, True):
+            with self.subTest(desired=desired):
+                token = store.begin(2, repeat=True)
+                self.assertFalse(store.teapot_confirmed(2, token, desired))
+                self.assertTrue(store.confirm_teapot(2, token, desired))
+                self.assertTrue(store.teapot_confirmed(2, token, desired))
+                for invalid in (None, 0, 1, "false"):
+                    self.assertFalse(store.confirm_teapot(2, token, invalid))
+                    self.assertFalse(store.teapot_confirmed(2, token, invalid))
+                self.assertTrue(store.teapot_confirmed(2, token, desired))
+
+    def test_teapot_cache_is_independent_of_battle_and_formation_lifecycle(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, False))
+        publish(store, 1, token)
+        store.prepare_continuation(1, token)
+        store.battle_started(1, token, 2)
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+        revision = store.begin_update(1, token)
+        store.abandon_update(1, token, revision)
+        store.begin_capture(1, token)
+        store.skip_capture(1, token)
+        store.set_support_fallback(1, token, True)
+        store.set_support_fallback(1, token, False)
+        store.invalidate(1, token, "formation_check_failed")
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+
+    def test_teapot_configuration_change_clears_old_confirmation(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, token, False))
+        # 新目标检查失败、用户改回原目标时，也必须重新确认。
+        self.assertFalse(store.teapot_confirmed(1, token, True))
+        self.assertTrue(store.confirm_teapot(1, token, False))
+        self.assertTrue(store.teapot_confirmed(1, token, False))
+
+    def test_teapot_cache_rejects_foreign_expired_and_restarted_tokens(self):
+        store = FormationSessions()
+        token = store.begin(1, repeat=True)
+        other = store.begin(2, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.confirm_teapot(2, token, True))
+        self.assertFalse(store.teapot_confirmed(2, token, True))
+        self.assertFalse(store.teapot_confirmed(2, other, True))
+        newer = store.begin(1, repeat=True)
+        self.assertFalse(store.confirm_teapot(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, token, True))
+        self.assertFalse(store.teapot_confirmed(1, newer, True))
+        self.assertTrue(store.confirm_teapot(1, newer, False))
+        store.finish(1, token)
+        self.assertTrue(store.teapot_confirmed(1, newer, False))
+        store.finish(1, newer)
+        self.assertFalse(store.teapot_confirmed(1, newer, False))
+        self.assertFalse(store.confirm_teapot(1, newer, False))
+
+    def test_task_start_and_owner_stop_clear_only_their_teapot_confirmations(self):
+        store = FormationSessions()
+        for root in (1, 2):
+            store.task_started(root, f"device-{root}")
+        first, second = store.begin(1, repeat=True), store.begin(2, repeat=True)
+        self.assertTrue(store.confirm_teapot(1, first, False))
+        self.assertTrue(store.confirm_teapot(2, second, True))
+        store.stop_owner("device-1")
+        self.assertFalse(store.teapot_confirmed(1, first, False))
+        self.assertTrue(store.teapot_confirmed(2, second, True))
+        store.task_started(2, "device-2")
+        self.assertFalse(store.teapot_confirmed(2, second, True))
+        newer = store.begin(2, repeat=True)
+        self.assertFalse(store.teapot_confirmed(2, newer, True))
+        self.assertTrue(store.confirm_teapot(2, newer, False))
+        store.stop_owner("")
+        self.assertFalse(store.teapot_confirmed(2, newer, False))
+
     def test_repeat_reuses_initial_snapshot_without_mutating_positions(self):
         store = FormationSessions()
         token = store.begin(1, repeat=True)
@@ -203,6 +283,54 @@ class EntryTests(unittest.TestCase):
         self.assertTrue(r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param='{"battle_count":3}')).success)
         self.assertEqual([x[1] for x in snapshots], [1, 2, 3])
         self.assertTrue(all(x[0] is snapshots[0][0] for x in snapshots))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         [r._NODE_FIRST_BATTLE, r._NODE_NEXT_BATTLE, r._NODE_LAST_BATTLE])
+        self.assertEqual(
+            [call.kwargs["pipeline_override"][call.args[0]]["focus"]["Node.Action.Starting"]
+             for call in ctx.run_task.call_args_list],
+            [f"当前第{current}场战斗。" for current in range(1, 4)],
+        )
+
+    def test_trial_repeat_uses_full_entry_and_own_count_attach(self):
+        ctx = FakeContext()
+        ctx.nodes["地狱的试炼-入口"] = {"attach": {"battle_count": "3"}}
+        ctx.nodes["原生自动战斗_多次入口"] = {"attach": {"battle_count": "9"}}
+        ctx.run_task.return_value = NS(status=NS(succeeded=True, failed=False))
+        result = r.AutoBattleRepeatAction().run(ctx, NS(node_name="地狱的试炼-入口", custom_action_param={
+            "battle_entry_node": "地狱的试炼-单场入口", "reset_hit_nodes": ["试炼有界节点"],
+        }))
+        self.assertTrue(result.success)
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["地狱的试炼-单场入口"] * 3)
+        self.assertEqual(
+            [call.kwargs["pipeline_override"] for call in ctx.run_task.call_args_list],
+            [{"地狱的试炼-单场入口": {
+                "focus": {"Node.Action.Starting": f"当前第{current}场战斗。"},
+            }} for current in range(1, 4)],
+        )
+        self.assertEqual(ctx.clear_hit_count.call_count, 3)
+
+    def test_trial_repeat_stops_on_failed_round_without_starting_next(self):
+        ctx = FakeContext()
+        ctx.run_task.side_effect = [
+            NS(status=NS(succeeded=True, failed=False)),
+            NS(status=NS(succeeded=False, failed=True), entry="地狱的试炼-单场入口"),
+        ]
+        result = r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param={
+            "battle_count": 3, "battle_entry_node": "地狱的试炼-单场入口",
+        }))
+        self.assertFalse(result.success)
+        self.assertEqual(ctx.run_task.call_count, 2)
+        self.assertNotIn("连续出击", str(ctx.run_task.call_args_list))
+
+    def test_trial_repeat_one_still_calls_full_navigation_entry(self):
+        ctx = FakeContext()
+        ctx.run_task.return_value = NS(status=NS(succeeded=True, failed=False))
+        result = r.AutoBattleRepeatAction().run(ctx, NS(custom_action_param={
+            "battle_count": 1, "battle_entry_node": "地狱的试炼-单场入口",
+        }))
+        self.assertTrue(result.success)
+        self.assertEqual(ctx.run_task.call_args.args[0], "地狱的试炼-单场入口")
 
     def test_task_end_and_stop_callback_invalidate_session(self):
         ctx = FakeContext()

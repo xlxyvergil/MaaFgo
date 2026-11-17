@@ -14,12 +14,16 @@ import threading
 import time
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import unquote, urlsplit
+from urllib.parse import parse_qs, unquote, urlsplit
 
 from . import DEFAULT_PORT, PROTOCOL_VERSION, SERVICE_NAME
 from .storage import BattleStorage, EditorError, MAX_JSON_BYTES, battle_name, decode_json, project_identity, utc_now, within
 from .validation import DEFAULTS, validate_battle
 from .screenshot_import import IMAGE_TYPES, MAX_IMAGE_BYTES, ScreenshotWorker
+try:  # Both the packaged `battle_editor` and repository `agent.battle_editor` imports.
+    from support_ce import MAX_PACK_BYTES, SupportCEError, install_extension
+except ModuleNotFoundError:
+    from ..support_ce import MAX_PACK_BYTES, SupportCEError, install_extension
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +56,7 @@ class EditorHTTPServer(ThreadingHTTPServer):
         self.started_at = utc_now()
         self.token = secrets.token_urlsafe(32)
         self._catalog = None
+        self._catalog_support_ce_signature = self._support_ce_signature()
         self._catalog_lock = threading.Lock()
         self._bond_planning = threading.BoundedSemaphore(1)
         self._card_renderer = None
@@ -85,12 +90,38 @@ class EditorHTTPServer(ThreadingHTTPServer):
         finally:
             self._screenshot_worker.close()
 
+    def _support_ce_signature(self):
+        """Detect optional packs installed outside this HTTP process as well."""
+        directory = self.root / "config/SupportCE"
+        signature = []
+        # A manual extraction can write its manifest before its PNG files.
+        # Directory metadata catches referenced images added or removed later,
+        # without scanning the image collection on every catalog request.
+        for relative in ("manifest.json", "满破", "非满破"):
+            try:
+                info = (directory / relative).stat()
+                signature.append((info.st_mtime_ns, info.st_ctime_ns, info.st_size, info.st_ino))
+            except OSError:
+                signature.append(None)
+        return tuple(signature)
+
     def catalog(self) -> dict:
         with self._catalog_lock:
-            if self._catalog is None:
+            signature = self._support_ce_signature()
+            if self._catalog is None or signature != self._catalog_support_ce_signature:
                 from .catalog import build_catalog
                 self._catalog = build_catalog(self.root)
+                self._catalog_support_ce_signature = signature
             return self._catalog
+
+    def install_support_ce(self, payload):
+        try:
+            result = install_extension(self.root, payload)
+        except SupportCEError as exc:
+            raise EditorError(exc.code, exc.message, exc.status) from exc
+        with self._catalog_lock:
+            self._catalog = None
+        return result
 
     def validate(self, data) -> dict:
         try:
@@ -103,6 +134,25 @@ class EditorHTTPServer(ThreadingHTTPServer):
     def bond_settings(self):
         from .bond_optimizer import BondPlanner
         return BondPlanner(self.root, self.catalog()).settings()
+
+    def common_team_catalog(self):
+        from .common_teams import common_team_catalog
+        return common_team_catalog()
+
+    def common_teams(self, query: str):
+        from .common_teams import search_common_teams
+        try:
+            values = parse_qs(query, keep_blank_values=True, max_num_fields=8)
+        except ValueError as exc:
+            raise EditorError("common_teams_query", "队伍筛选条件过多，无法查询对应副本。请重新选择副本后重试。") from exc
+        if set(values) - {"quest", "sort", "offset"} or any(len(items) != 1 for items in values.values()):
+            raise EditorError("common_teams_query", "队伍筛选条件无法读取，无法查询对应副本。请重新选择副本和排序后重试。")
+        quest = values.get("quest", [""])[0]
+        sort = values.get("sort", ["upvotes"])[0]
+        offset = values.get("offset", ["0"])[0]
+        if not re.fullmatch(r"[0-9]{1,6}", offset):
+            raise EditorError("common_teams_offset", "加载更多的位置无法读取，无法继续查询。请重新选择副本后重试。")
+        return search_common_teams(quest, sort=sort, offset=int(offset))
 
     def optimize_bond(self, data, options):
         # An isolated, bounded worker keeps CPU-heavy all-catalog planning from
@@ -277,7 +327,7 @@ class EditorHandler(BaseHTTPRequestHandler):
         if self.headers.get("Sec-Fetch-Site", "none") not in {"same-origin", "none"}:
             raise EditorError("invalid_origin", "拒绝跨站访问本地编辑服务", 403)
         if token and not hmac.compare_digest(self.headers.get("X-Editor-Token", ""), self.server.token):
-            raise EditorError("invalid_token", "编辑器会话已失效，请刷新页面重新连接", 403)
+            raise EditorError("invalid_token", "编辑器会话已失效。请关闭当前弹窗，点击“重新连接”后重试；当前编队和编辑内容会保留。", 403)
 
     def _headers(self, status, content_type, length, *, cache=False, extra_headers=None):
         self.send_response(status)
@@ -326,8 +376,21 @@ class EditorHandler(BaseHTTPRequestHandler):
             length = self._content_length()
         except EditorError:
             return
+        # Authentication and project binding can reject an upload before its
+        # reader runs. Use that endpoint's byte limit rather than JSON's 4 MiB
+        # limit, without parsing or storing any rejected payload.
+        limit = MAX_JSON_BYTES
+        if self.command == "POST":
+            try:
+                path = unquote(urlsplit(self.path).path, encoding="utf-8", errors="strict")
+            except (UnicodeError, ValueError):
+                return
+            if path == "/api/support-ce/install":
+                limit = MAX_PACK_BYTES
+            elif path == "/api/import-image":
+                limit = MAX_IMAGE_BYTES
         remaining = length - self._body_read
-        if length > MAX_JSON_BYTES or remaining <= 0:
+        if length > limit or remaining <= 0:
             return
         deadline = time.monotonic() + 0.2
         original_timeout = self.connection.gettimeout()
@@ -386,6 +449,23 @@ class EditorHandler(BaseHTTPRequestHandler):
             self._body_read += len(chunk);chunks.append(chunk)
         return b''.join(chunks)
 
+    def _support_ce_body(self):
+        if self.headers.get_all("Transfer-Encoding", []):
+            raise EditorError("support_ce_body", "礼装扩展包传输方式无法读取，安装未开始。请刷新编队编辑器，再在“安装礼装扩展”窗口点击“选择扩展包 ZIP”重试。")
+        if self.headers.get("Content-Type", "").split(";")[0].strip().lower() != "application/zip":
+            raise EditorError("support_ce_format", "所选文件不是礼装扩展 ZIP，无法安装。请在“安装礼装扩展”窗口点击“选择扩展包 ZIP”，选择下载的礼装扩展 .zip 压缩包。", 415)
+        length = self._content_length()
+        if not 0 < length <= MAX_PACK_BYTES:
+            raise EditorError("support_ce_size", "礼装扩展包为空或超过 64 MiB，无法安装。请重新下载不超过 64 MiB 的礼装扩展 ZIP 后重试。", 413)
+        chunks = []
+        while self._body_read < length:
+            chunk = self.rfile.read1(min(length - self._body_read, 65536))
+            if not chunk:
+                raise EditorError("support_ce_body", "礼装扩展包没有完整接收，安装未开始。请在“安装礼装扩展”窗口点击“选择扩展包 ZIP”，重新选择文件后重试。")
+            self._body_read += len(chunk)
+            chunks.append(chunk)
+        return b"".join(chunks)
+
     def _file(self, path: Path):
         if not path.is_file():
             raise EditorError("not_found", "资源不存在，请确认静态页面已经构建并随包安装", 404)
@@ -432,7 +512,9 @@ class EditorHandler(BaseHTTPRequestHandler):
             if self.server._stopping.is_set():
                 raise EditorError("service_stopping", "编辑服务正在停止，请重新运行启动入口", 503)
             image_request = method == 'POST' and path == '/api/import-image'
-            body = self._image_body() if image_request else self._body() if method in ("POST", "PUT") else None
+            support_ce_request = method == 'POST' and path == '/api/support-ce/install'
+            body = (self._support_ce_body() if support_ce_request else self._image_body()
+                    if image_request else self._body() if method in ("POST", "PUT") else None)
             storage = self.server.storage
             if method == "GET" and path in ("/api/np-card", "/api/command-card"):
                 preview = self.server.card_preview(urlsplit(self.path).query, card_type="np" if path == "/api/np-card" else "face")
@@ -444,12 +526,20 @@ class EditorHandler(BaseHTTPRequestHandler):
                 self._json(200, self.server.capabilities())
             elif method == "GET" and path == "/api/catalog":
                 self._json(200, self.server.catalog())
+            elif support_ce_request:
+                self._json(200, self.server.install_support_ce(body))
+            elif method == "GET" and path == "/api/common-teams/catalog":
+                self._json(200, self.server.common_team_catalog())
+            elif method == "GET" and path == "/api/common-teams":
+                self._json(200, self.server.common_teams(urlsplit(self.path).query))
             elif method == 'GET' and path == '/api/bond/settings':
                 self._json(200, self.server.bond_settings())
             elif method == 'POST' and path == '/api/bond/optimize':
                 self._json(200, self.server.optimize_bond(body.get('data'), body.get('options')))
             elif method == "GET" and path == "/api/battles":
                 self._json(200, storage.list_battles())
+            elif method == "PUT" and path == "/api/library/favorite":
+                self._json(200, storage.set_favorite(body.get("name"), body.get("favorite")))
             elif method == "GET" and path.startswith("/api/battles/"):
                 self._json(200, storage.read_battle(path[len("/api/battles/"):]))
             elif method == "POST" and path == "/api/validate":

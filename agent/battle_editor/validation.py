@@ -349,7 +349,12 @@ def validate_battle(data: Any, catalog: dict | None = None) -> dict:
                 if delegate.get(key) is not None and not isinstance(delegate[key], list):
                     error("delegate." + key, "invalid_array", "特殊选项必须是数组或 null")
                 elif delegate.get(key):
-                    error("delegate." + key, "unsupported_delegate", "当前执行器不消费此类特殊选择；原值保留，可保存草稿或下载保真副本")
+                    # Chaldea uses -1 to skip random ActSet effects in simulation;
+                    # this is not a game dialog choice or an execution instruction.
+                    if key == "actWeightSelections" and all(type(value) is int and value == -1 for value in delegate[key]):
+                        warning("delegate." + key, "simulation_random_skip", "Chaldea 中跳过了随机效果的模拟；游戏内仍按实际随机结果生效，请核对方案是否依赖这些效果")
+                    else:
+                        error("delegate." + key, "unsupported_delegate", "方案指定了当前不支持的模拟选择，无法直接执行。请在 Chaldea 中取消对应的模拟选择，重新导出并导入；当前内容仍可保存草稿或下载保真副本")
             raw_swaps = delegate.get("replaceMemberIndexes")
             if raw_swaps is not None and not isinstance(raw_swaps, list):
                 error("delegate.replaceMemberIndexes", "invalid_array", "换人配置必须是数组")

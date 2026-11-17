@@ -1,0 +1,9 @@
+name: Install MaaFramework system dependencies
+description: Install Linux dependencies with independent Ubuntu mirrors and bounded failover.
+runs:
+  using: composite
+  steps:
+    - name: Install native dependencies
+      shell: bash
+      run: |
+        bash "$GITHUB_ACTION_PATH/install.sh"

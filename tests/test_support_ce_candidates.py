@@ -98,7 +98,7 @@ class CandidateMatchingTests(unittest.TestCase):
         self.select_candidates("普通助战-礼装", "满破", ["A.png", "B.png"])
         self.assertFalse(self.run_search().success)
         self.assertEqual(self.action._match_ce.call_count, 2)
-        self.assertEqual(self.action._tap.call_count, 3)  # 仅 ALL 页签点击。
+        self.action._tap.assert_not_called()
 
     def test_grand_each_slot_needs_a_match_and_keeps_its_own_status(self):
         self.select_candidates("冠位助战-1号礼装", "满破", ["A.png", "B.png"])
@@ -118,7 +118,7 @@ class CandidateMatchingTests(unittest.TestCase):
         self.action._match_ce.side_effect = [True, False, False]
         self.assertFalse(self.run_search(grand=True).success)
         self.action._match_bond.assert_not_called()
-        self.assertEqual(self.action._tap.call_count, 3)
+        self.action._tap.assert_not_called()
 
     def test_unchecked_multiselect_is_unrestricted_without_using_stale_single(self):
         self.select_candidates("普通助战-礼装", "满破", [])

@@ -3,12 +3,12 @@
     "地狱的试炼-队伍方案": {
       "type": "input",
       "label": "编队与逐回合方案",
-      "description": "默认名称可直接加载本期内置示例，另有「地狱的试炼_202610_补贯通.json」。示例可修改后另存到 config/Battle；本地同名方案优先，不会被内置示例覆盖。也可选择编辑器保存的其他 JSON，或填写 Chaldea 分享链接。方案中明确的技能、宝具和面卡顺序优先执行；isAuto 空位与未抽到的面卡交给补牌策略。",
+      "description": "默认名称可直接加载本期天魔轰临的枪AE双核视频示例；历史示例仍可通过文件名加载。示例可修改后另存到 config/Battle；本地同名方案优先，不会被内置示例覆盖。也可选择编辑器保存的其他 JSON，或填写 Chaldea 分享链接。方案中明确的技能、宝具和面卡顺序优先执行；isAuto 空位与未抽到的面卡交给补牌策略。",
       "inputs": [
         {
           "name": "chaldea_import_source",
           "label": "本地方案 / Chaldea 分享",
-          "default": "地狱的试炼_202610_阿兹赖尔.json",
+          "default": "地狱的试炼_202611_天魔轰临_枪AE双核.json",
           "verify": ".*",
           "input_type": "file",
           "file_dialog_dir": "config/Battle",
@@ -52,6 +52,27 @@
         "Chaldea助战action": {
           "attach": {
             "chaldea_import_source": "{chaldea_import_source}"
+          }
+        }
+      }
+    },
+    "地狱的试炼-挑战次数": {
+      "type": "input",
+      "label": "重复挑战次数",
+      "description": "默认1次，范围1～999。每次通关并返回活动页后重新进入本期关卡，可分次补齐任务。这里只统计完成挑战的次数，不代表15项任务已全部达成；战败、识别失败或手动停止时终止，不自动退出重试。",
+      "inputs": [
+        {
+          "name": "battle_count",
+          "label": "次数",
+          "default": "1",
+          "pipeline_type": "int",
+          "verify": "^([1-9][0-9]{0,2})$"
+        }
+      ],
+      "pipeline_override": {
+        "地狱的试炼-入口": {
+          "attach": {
+            "battle_count": "{battle_count}"
           }
         }
       }

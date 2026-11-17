@@ -11,6 +11,7 @@ import copy
 import json
 import os
 import sys
+from dataclasses import replace
 
 # 让 agent/battle 可作为顶层包导入（main.py 只把 custom 目录加进了 path）
 _AGENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -31,30 +32,37 @@ from battle.core.advanced_strategy import (ADVANCED_STRATEGY_FIELD,
                                           validate_advanced_strategy)
 from battle.core.models import BattlePlan
 from battle.core.special_skills import SpecialSkillChoiceError
+from battle.core.models import CONTINUOUS_FORMATION_SOURCE
 from battle.core.plan_parser import (_load_action_param, _parse_battle_policy,
                                     _parse_native_card_strategy, _parse_plan,
                                     _parse_strategy_profile)
 from battle.core.policy import StrategyProfile
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 from battle.data.servant_identity import canonical_servant_id
-from battle.runtime.runtime import AutoBattleRuntime
+from battle.runtime.runtime import AutoBattleRuntime, BattleResult
+from battle.runtime.preset_fallback import recover_for_default_battle
+from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRuntime,
+                                         trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
-from battle.runtime.bond_stop_state import bond_stops
+from battle.runtime.skill_confirmation_reminder import skill_confirmation_reminders
 from bond_stop_action import inspect_victory_settlement
 from chaldea import fetch_share_data
 
 
 @AgentServer.tasker_sink()
 class FormationTaskLifecycle(TaskerEventSink):
-    """与 BBC 停止监听并列，只清理编队内存，不控制任何游戏/进程。"""
+    """与 BBC 停止监听并列，维护编队和任务提醒内存，不控制游戏/进程。"""
 
     def on_tasker_task(self, tasker, noti_type, detail):
         if detail.entry == "MaaTaskerPostStop":
             sessions.stop_owner(detail.uuid)
+            skill_confirmation_reminders.stop_owner(detail.uuid)
         elif noti_type == NotificationType.Starting:
             sessions.task_started(detail.task_id, detail.uuid)
+            skill_confirmation_reminders.task_started(detail.task_id, detail.uuid)
         elif noti_type in (NotificationType.Succeeded, NotificationType.Failed):
             sessions.finish(detail.task_id)
+            skill_confirmation_reminders.finish(detail.task_id)
 
 
 @AgentServer.custom_action("begin_native_formation_session")
@@ -65,13 +73,25 @@ class BeginNativeFormationSession(CustomAction):
         if not sessions.valid(root, token, repeat=True):
             token = sessions.begin(root)
         try:
-            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+            if context.tasker.stopping or not context.override_pipeline(session_override(token, context)):
                 raise ValueError("cannot install native formation session")
             return CustomAction.RunResult(success=True)
         except Exception as exc:
             sessions.finish(root, token)
             mfaalog.error(f"[初始编队] 会话初始化失败: {exc}")
             return CustomAction.RunResult(success=False)
+
+
+@AgentServer.custom_action("remember_continuous_formation")
+class RememberContinuousFormation(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg):
+        root, token = context_session(context)
+        if context.tasker.stopping:
+            return CustomAction.RunResult(success=False)
+        if sessions.valid(root, token, repeat=True):
+            retained = sessions.prepare_continuation(root, token)
+            mfaalog.info(f"[初始编队] 连续出击初始编队已保留={retained}；等待本次助战选择")
+        return CustomAction.RunResult(success=True)
 
 
 @AgentServer.custom_action("auto_battle")
@@ -91,19 +111,27 @@ class AutoBattleAction(CustomAction):
         node_name = getattr(argv, "node_name", "")
         support_fallback = bool(token and sessions.support_fallback(root, token))
         formation_reset = param.get("native_battle_formation_reset") is True
+        continued_formation_reset = (formation_reset and initial_formation is not None
+                                     and getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE)
         if support_fallback or formation_reset:
             # 锁助战可能连带改变整队配置，不能读取旧攻略或旧编队身份。
             param = {}
-            if support_fallback:
+            if support_fallback or continued_formation_reset:
                 initial_formation = None
-            mfaalog.info("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
+                if continued_formation_reset and token:
+                    sessions.skip_capture(root, token)
+            mfaalog.warning("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
         plan = _parse_plan(param)
         chaldea_roster = None
         try:
             strategy_attach = _attached_strategy_settings(context, node_name)
             source_mode = strategy_attach.get("native_battle_strategy_source")
-            share = (_share_data_from_param(param) if plan is None or source_mode == "editor"
+            trial_node = (context.get_node_data(node_name) or {}) if node_name else {}
+            trial_requested = ((trial_node.get("attach") or {}).get("native_battle_trial_profile")
+                               == "hellish_202611" and not (support_fallback or formation_reset))
+            share = (_share_data_from_param(param) if plan is None or source_mode == "editor" or trial_requested
                      else None)
+            trial_config = trial_config_from_source(trial_node, share) if trial_requested else None
             if share is not None:
                 if plan is None:
                     plan = _build_plan_from_share(share)
@@ -121,7 +149,7 @@ class AutoBattleAction(CustomAction):
             battle_policy = _parse_battle_policy(param)
             if (battle_policy.card.native_strategy.opening_hand.enabled
                     and (plan is None or plan.active_turn(0) is None)):
-                mfaalog.info("[高级策略] 未设置有效首回合方案，跳过开局等待")
+                mfaalog.warning("[高级策略] 未设置有效首回合方案，跳过开局等待")
                 param = copy.deepcopy(param)
                 param["card_policy"]["native_strategy"]["opening_hand"]["enabled"] = False
                 battle_policy = _parse_battle_policy(param)
@@ -133,11 +161,22 @@ class AutoBattleAction(CustomAction):
             return CustomAction.RunResult(success=False)
         roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
         decider = RuleDecider(battle_policy, plan=plan)
+        runtime_class = AutoBattleRuntime
+        if trial_config is not None:
+            decider = HellishTrialDecider(decider, trial_config)
+            runtime_class = HellishTrialRuntime
+            mfaalog.info("[试炼策略] 已由本任务标记与导入方案共同启用202611专用策略")
 
-        # Agent 模式下，每次调用 context.tasker.controller 都会通过反向 IPC
-        # 获取一个新的 handle，只有第一次有效。因此在这里获取一次并传递下去。
+        if not context.tasker.stopping and skill_confirmation_reminders.claim(root):
+            mfaalog.warning(
+                "[原生战斗提醒] 请在游戏内关闭“技能使用确认”（技能二次确认）；"
+                "开启时可能取消或跳过技能。若已开启，请停止任务，关闭后重新运行。"
+                "如已关闭弹窗可以无视。"
+            )
+
+        # Agent 控制器代理仅在当前回调内复用；重复获取会使旧代理失效，
+        # 回调结束后也不能交给后续结算回调，因此只获取一次并显式传递。
         controller = context.tasker.controller
-        bond_stops.set_controller(root, controller)
 
         plan_status = "loaded" if plan is not None else "none"
         plan_turns = len(plan.turns) if plan is not None else 0
@@ -146,11 +185,20 @@ class AutoBattleAction(CustomAction):
             f"max_turns={profile.max_turns} plan={plan_status} plan_turns={plan_turns}"
         )
         try:
-            result = AutoBattleRuntime(
+            runtime = runtime_class(
                 context, controller, decider, profile, battle_policy,
                 initial_formation=initial_formation, formation_battle=formation_battle,
                 roster_servant_ids=roster_servant_ids,
-            ).run()
+            )
+            result = runtime.run()
+            preset_active = (trial_config is not None or (
+                isinstance(plan, BattlePlan) and bool(plan.turns) and runtime._has_active_plan()))
+            result = _continue_without_preset(
+                context, controller, runtime, result, profile,
+                enabled=(trial_node.get("attach") or {}).get("native_battle_preset_fallback") is True,
+                preset_active=preset_active,
+                trial_mode=trial_config is not None,
+            )
         except Exception:
             if token and sessions.valid(root, token):
                 sessions.invalidate(root, token, "battle_runtime_exception")
@@ -158,6 +206,14 @@ class AutoBattleAction(CustomAction):
         if not result.ok and token and sessions.valid(root, token):
             sessions.invalidate(root, token, "battle_runtime_failed")
         mfaalog.info(f"[auto_battle] end ok={result.ok} reason={result.reason} turns={result.turns}")
+        if not result.ok and not context.tasker.stopping:
+            mfaalog.error(
+                f"自动战斗未能完成，已停止本场自动战斗（已完成{result.turns}回合）。"
+                "请保留当前游戏画面截图，并使用客户端“导出日志”反馈。"
+                f"停止原因：{result.reason}"
+            )
+        elif result.reason == "defeat":
+            mfaalog.warning("本场战斗失败，将按现有流程处理撤退和结算。")
 
         # 已确认胜利后立即交接结算，避免Pipeline默认延迟错过短暂羁绊页。
         if result.ok and result.reason == "victory":
@@ -165,6 +221,78 @@ class AutoBattleAction(CustomAction):
 
         # TODO(save_evidence)：失败时保存截图/状态证据
         return CustomAction.RunResult(success=result.ok)
+
+
+_PRESET_RECOVERABLE_ERRORS = frozenset({
+    "skill_execution_failed", "card_actor_identity_mismatch",
+    "unexpected_dialog", "unexpected_order_change_scene",
+    "open_cards_failed", "open_cards_confirm_failed",
+    "selection_confirm_failed", "card_selection_not_submitted",
+    "stuck_unknown_scene",
+})
+
+
+def _continue_without_preset(context, controller, runtime, result, profile, *,
+                             enabled: bool, preset_active: bool, trial_mode: bool = False):
+    """Only explicitly opted-in story/trial battles may discard a broken plan.
+
+    No recursive fallback: a failure of the fresh default runtime is final.
+    Configuration, controller exceptions, stop requests and terminal results keep
+    their existing paths. An uncertain card submission reserves one turn of the
+    existing budget without claiming that it was a confirmed completed turn.
+    """
+    if (enabled is not True or not preset_active or result.ok or context.tasker.stopping
+            or not isinstance(result.reason, str)):
+        return result
+    reason = result.reason
+    if (reason not in _PRESET_RECOVERABLE_ERRORS and not reason.startswith((
+            "trial_", "opening_hand_", "invalid_main_action:", "invalid_card_action:"))):
+        return result
+
+    default_param = advanced_strategy_to_param()
+    default_profile = _parse_strategy_profile(default_param)
+    reserved = int(getattr(runtime, "_selection_in_flight", False) is True)
+    remaining = min(profile.max_turns - result.turns - reserved, default_profile.max_turns)
+    if remaining <= 0:
+        mfaalog.error("[战斗回退] 本场已用完战斗回合预算，无法再启动默认战斗。请检查战斗方案，或调整“最大战斗回合”后重新挑战。")
+        return BattleResult.fail("max_turns_exceeded", result.turns)
+
+    mfaalog.warning(
+        "[战斗回退] 预设技能或出卡流程无法继续，正在关闭误开的战斗弹窗。"
+        "确认返回战斗后，本场将清除预设方案，改为自动释放可用从者技能、优先使用可用宝具；下一场恢复原方案。"
+    )
+    if trial_mode:
+        mfaalog.warning("[试炼战斗回退] 本场优先继续战斗，不再按原方案保证颜色、击破职阶或无焦热等附加任务条件；请在战后核对任务进度。")
+    mfaalog.info(f"[战斗回退] reason={reason} confirmed_turns={result.turns} "
+                 f"reserved_unconfirmed_turns={reserved} remaining_budget={remaining}")
+    if not recover_for_default_battle(runtime):
+        mfaalog.error(
+            "[战斗回退] 未能确认返回可操作的战斗界面，无法切换默认战斗，已保留现场停止。"
+            "请手动关闭游戏内弹窗并检查当前画面后重试。"
+        )
+        return BattleResult.fail("preset_fallback_recovery_failed", result.turns)
+    if context.tasker.stopping:
+        return result
+
+    policy = _parse_battle_policy(default_param)
+    fallback = AutoBattleRuntime(
+        context, controller, RuleDecider(policy),
+        replace(default_profile, max_turns=remaining), policy,
+        initial_formation=None, roster_servant_ids=(None,) * 6,
+    )
+    # Old IDs are unordered visual candidates only. No original frontline slots,
+    # retired instances, actor bindings or special-choice queues survive.
+    candidates = set()
+    for name in ("candidate_servant_ids", "roster_servant_ids", "_initial_servant_ids"):
+        values = getattr(runtime, name, ())
+        if isinstance(values, (tuple, list)):
+            for value in values:
+                sid = canonical_servant_id(value)
+                if sid:
+                    candidates.add(sid)
+    fallback.candidate_servant_ids = tuple(sorted(candidates))
+    resumed = fallback.run()
+    return BattleResult(resumed.ok, resumed.reason, result.turns + resumed.turns)
 
 
 def _canonical_native_strategy_param(param: dict) -> dict:
@@ -483,6 +611,11 @@ def _merge_rosters(
 
     merged: list[str | None] = []
     for index, (seen, planned) in enumerate(zip(visual, chaldea_roster), start=1):
+        if (getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE
+                and initial_formation.slots[index - 1].is_support and seen is None):
+            # 本场未识别的助战不能从旧攻略回填；其余自有成员照常合并。
+            merged.append(None)
+            continue
         if seen is not None and planned is not None and seen != planned:
             mfaalog.warning(
                 f"[auto_battle] roster conflict at slot {index}: "

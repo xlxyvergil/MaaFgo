@@ -1,0 +1,64 @@
+{
+  "coordinate_system": "1280x720",
+  "original_face_polygon": [
+    [
+      27,
+      57
+    ],
+    [
+      27,
+      108
+    ],
+    [
+      140,
+      108
+    ],
+    [
+      140,
+      84
+    ],
+    [
+      166,
+      84
+    ],
+    [
+      166,
+      39
+    ],
+    [
+      51,
+      39
+    ]
+  ],
+  "fixtures": [
+    {
+      "file": "jp_gilgamesh.png",
+      "source": ".workbuddy/runtime/bond-stop-live-20261101/support_xa_before.png",
+      "source_roi": [
+        63,
+        423,
+        140,
+        70
+      ],
+      "servant_id": "200200",
+      "template": "f_2002001.png",
+      "sha256": "fe7c1812535dde4fde6a8111605a50209a636d775dd86e46e2d6cdc4daba55cb"
+    },
+    {
+      "file": "jp_castoria_level120.png",
+      "source": ".diagnostics/support-face-20261114/live-local/probe_frame.png",
+      "source_roi": [
+        63,
+        223,
+        140,
+        70
+      ],
+      "servant_id": "704700",
+      "template": "f_7047003.png",
+      "old_score": 0.7179524898529053,
+      "masked_old_polygon_score": 0.7367251515388489,
+      "corrected_score": 0.9048833847045898,
+      "sha256": "32cb5e9cce7651e18f3a91df66de02c7b1893cb7349000bf9deec7edb11b2dcb"
+    }
+  ]
+}

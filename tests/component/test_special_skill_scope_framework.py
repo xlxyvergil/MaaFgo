@@ -38,12 +38,12 @@ class SpecialSkillScopeFrameworkTests(unittest.TestCase):
                              replace(complete.slots[3], status="unknown"), *complete.slots[4:]))
         cases = [
             (complete, None, 1, LILITH),
-            (None, ("405900", "100500", "200100", None, None, None), 1, ASH),
+            (None, ("405900", "100500", "200200", None, None, None), 1, ASH),
             (incomplete, None, 1, ASH),
             (complete, None, 2, ASH),
-            (complete, (None, "100500", "200100", None, None, None), 1, ASH),
-            (snapshot(("100100", "200100", "300100", None, None, None)), None, 1, COMMON[-1]),
-            (snapshot(("203300", "200100", "300100", None, None, None)), None, 1, ASH),
+            (complete, (None, "100500", "200200", None, None, None), 1, ASH),
+            (snapshot(("100100", "200200", "300100", None, None, None)), None, 1, COMMON[-1]),
+            (snapshot(("203300", "200200", "300100", None, None, None)), None, 1, ASH),
         ]
 
         class Probe(CustomRecognition):

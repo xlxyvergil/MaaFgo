@@ -46,6 +46,9 @@ class BondResultImageTests(unittest.TestCase):
         enabled = next(case for case in options["option"]["原生自动战斗羁绊满停止"]["cases"]
                        if case["name"] == "Yes")
         pipeline["战斗_胜利"] = enabled["pipeline_override"]["战斗_胜利"]
+        perception = json.loads((ROOT / "assets/resource/base/pipeline/自动战斗_感知.json").read_text(encoding="utf-8"))
+        pipeline.update({name: perception[name] for name in (
+            "战斗_战后RESULT", "战斗_战利品弹窗", "战斗_战利品标题", "战斗_战利品下一步")})
         pipeline["probe"] = {"action": {"type": "Custom", "param": {"custom_action": "probe"}}}
         observed = {}
         test = self
@@ -67,7 +70,9 @@ class BondResultImageTests(unittest.TestCase):
                     read_any_bond_max(context, overlay)
                 with test.assertRaisesRegex(ValueError, "page_not_visible"):
                     read_bond_max(context, overlay)
-                for image, expected in ((positive, True), (overlay, False)):
+                fading_header = positive.copy()
+                fading_header[0:120, 450:850] = 0
+                for image, expected in ((positive, True), (overlay, True), (fading_header, True)):
                     detail = context.run_recognition("战斗_胜利", image)
                     test.assertIsNotNone(detail)
                     test.assertEqual(detail.hit, expected)
@@ -85,6 +90,7 @@ class BondResultImageTests(unittest.TestCase):
                 shutil.copyfile(ROOT / "assets/resource/base/image" / template, target)
             resource = Resource()
             resource.use_cpu()
+            self.assertTrue(resource.post_bundle(ROOT / "assets/resource/base").wait().succeeded)
             self.assertTrue(resource.post_bundle(temp).wait().succeeded)
             resource.register_custom_action("probe", Probe())
             controller = MemoryController(positive)

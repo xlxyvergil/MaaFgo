@@ -12,11 +12,14 @@ import json
 from pathlib import Path
 import re
 import struct
-import unicodedata
 from urllib.parse import quote
 
 from .special_choices import special_skill_catalog
 from .equip_filters import catalog_filter_metadata, equip_filter_facts, read_equip_filters
+try:
+    from support_ce import extension_snapshot, resolve_external_templates
+except ModuleNotFoundError:
+    from ..support_ce import extension_snapshot, resolve_external_templates
 
 
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -102,9 +105,16 @@ def resolve_media(project_root: Path | str, kind: str, filename: str) -> Path | 
         "mystic": (),
         "ui": (),
         "status": (),
+        "supportce": (),
     }
     if kind not in subdirs:
         return None
+    if kind == "supportce":
+        match = re.fullmatch(r"support_([1-9][0-9]{0,9})_(normal|max)\.png", filename)
+        if match is None:
+            return None
+        eid, state = match.groups()
+        return next(iter(resolve_external_templates(root, "", "满破" if state == "max" else "非满破", int(eid))), None)
     directories = [base / sub for base in _resource_roots(root) for sub in subdirs[kind]]
     status_id = None
     if kind == "status":
@@ -217,50 +227,32 @@ def _dimensions(root: Path, url: str | None) -> tuple[int | None, int | None]:
     return None, None
 
 
-def _common_equips(root: Path, equips: list[dict], raw_records: list[dict]) -> tuple[dict[int, list[str]], dict]:
-    """Map actual support CE templates by exact, width-normalized official name.
+def _common_equips(equips: list[dict], runtime_records: list[dict]) -> tuple[dict[int, list[str]], dict]:
+    """Use explicit important flags for the editor's common CE display category.
 
-    Fullwidth punctuation (for example 限制／零毁) is Unicode NFKC-equivalent
-    to its database spelling. No substring, fuzzy or first-candidate matching is
-    allowed: ambiguous and absent names remain reported and unselected.
+    The flag belongs to the runtime CE list and is matched by ID. Support
+    recognition still requires actual templates and is checked independently.
     """
-    index: dict[str, set[int]] = {}
     known_ids = {item["id"] for item in equips}
-    for item in equips + raw_records:
-        eid = _int(item.get("id"))
-        if eid not in known_ids:
-            continue
-        for field in ("name", "nameJp", "name_jp"):
-            value = item.get(field)
-            if isinstance(value, str) and value.strip():
-                index.setdefault(unicodedata.normalize("NFKC", value.strip()), set()).add(eid)
-    mapped: dict[int, list[str]] = {}
-    unmatched, ambiguous = [], []
-    for base in _resource_roots(root):
-        directory = base / "lizhuang"
-        if not directory.is_dir() or not directory.resolve().is_relative_to(root):
-            continue
-        for path in sorted(directory.rglob("*.png")):
-            if not path.resolve().is_relative_to(directory.resolve()) or path.stem == "0_空":
-                continue
-            relative = path.relative_to(root).as_posix()
-            ids = index.get(unicodedata.normalize("NFKC", path.stem.strip()), set())
-            if len(ids) == 1:
-                mapped.setdefault(next(iter(ids)), []).append(relative)
-            elif ids:
-                ambiguous.append({"source": relative, "ids": sorted(ids)})
-            else:
-                unmatched.append(relative)
-    return mapped, {"count": len(mapped), "unmatched": unmatched, "ambiguous": ambiguous}
+    mapped = {_int(item.get("id")): ["important"] for item in runtime_records
+              if _int(item.get("id")) in known_ids and _int(item.get("important")) == 1}
+    # Keep the response shape consumed by existing clients; ID flags have no
+    # template-name matches to report as unmatched or ambiguous.
+    return mapped, {"count": len(mapped), "unmatched": [], "ambiguous": []}
 
 
-def _support_equip_recognition(root: Path, name) -> dict[str, bool]:
+def _support_equip_recognition(root: Path, name, equip_id=None, extension_templates=None) -> dict[str, bool]:
     """Mirror Chaldea's filename normalization, without importing its online clients.
 
     Team portraits and common/NFKC-name matches cannot prove support recognition.
     Directory priority mirrors SupportAction._image_dir('base', 'lizhuang').
     """
     result = {"limitBreak": False, "nonLimitBreak": False}
+    for key, state in (("limitBreak", "满破"), ("nonLimitBreak", "非满破")):
+        if extension_templates is not None:
+            result[key] = state in extension_templates.get(equip_id, {})
+        else:
+            result[key] = bool(resolve_external_templates(root, "", state, equip_id)) if equip_id else False
     if not isinstance(name, str) or not name.strip():
         return result
     fullwidth_alnum = {code: code - 0xFEE0 for start, end in
@@ -332,6 +324,43 @@ def _np_filter(item: dict) -> dict:
                     if value and value not in values:
                         values.append(value)
     return {"types": types, "cards": cards, "variants": variants}
+
+
+def _servant_forms(root: Path, source: dict, skill_variants: dict, np_variants: dict,
+                   class_variants: dict, default_class, cache: dict,
+                   form_portraits: dict | None = None) -> list[dict]:
+    """Expose coherent form presets without creating additional servant IDs."""
+    raw = source.get("forms")
+    if not isinstance(raw, list):
+        return []
+    forms, keys = [], set()
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        key, label, limit, rarity, cost = (item.get(field) for field in
+                                           ("key", "label", "limitCount", "rarity", "cost"))
+        ids, aliases, td_id = item.get("skillIds"), item.get("limitCounts"), item.get("tdId")
+        if (not isinstance(key, str) or not key or key in keys or not isinstance(label, str) or not label
+                or type(limit) is not int or limit < 0 or type(rarity) is not int or rarity not in range(6)
+                or type(cost) is not int or not 0 <= cost <= 100
+                or not isinstance(aliases, list) or not aliases or limit not in aliases
+                or any(type(value) is not int or value < 0 for value in aliases)
+                or not isinstance(ids, list) or len(ids) != 3
+                or any(type(sid) is not int or skill_variants.get(sid, {}).get("num") != index + 1
+                       for index, sid in enumerate(ids))
+                or type(td_id) is not int or td_id not in np_variants):
+            continue
+        keys.add(key)
+        portrait = _image(root, "ui", [(form_portraits or {}).get(key)], cache)
+        portrait_width, portrait_height = _dimensions(root, portrait)
+        forms.append({"key": key, "label": label, "limitCount": limit, "limitCounts": list(aliases),
+                      "rarity": rarity, "cost": cost, "skillIds": list(ids), "tdId": td_id,
+                      "defaultForLimit": item.get("defaultForLimit") is True,
+                      "image": _image(root, "servant", [item.get("image")], cache),
+                      # Only the exact per-form UI mapping may supply full artwork.
+                      "portrait": portrait, "portraitWidth": portrait_width, "portraitHeight": portrait_height,
+                      "classIcon": _image(root, "ui", [class_variants.get(str(rarity)), default_class], cache)})
+    return forms
 
 
 def build_catalog(project_root: Path | str) -> dict:
@@ -428,6 +457,13 @@ def build_catalog(project_root: Path | str) -> dict:
             "bond": copy.deepcopy(item.get("bond")),
             "npFilter": _np_filter(item),
         })
+        if "forms" in extra:
+            forms = _servant_forms(root, extra, skill_variants, np_variants, class_variants,
+                                   ui_classes.get(item.get("class")), media_cache,
+                                   appearance.get("formPortraits") if isinstance(appearance.get("formPortraits"), dict) else None)
+            default_key = extra.get("defaultFormKey")
+            servants[-1].update({"forms": forms,
+                                 "defaultFormKey": default_key if any(form["key"] == default_key for form in forms) else None})
     servants.sort(key=lambda item: (item["collectionNo"] or 0, item["id"]))
 
     recognized = {str(item["id"]): item for item in _read(custom / "equip_list.json", {}).get("equips", [])}
@@ -435,8 +471,10 @@ def build_catalog(project_root: Path | str) -> dict:
     equip_filter_index = read_equip_filters(root)
     cn_names = _read(names_dir / "equip_names_CN.json", {})
     jp_names = _read(names_dir / "equip_names_JP.json", {})
+    installed, extension_templates = extension_snapshot(root)
+    extension_by_id = {str(entry["id"]): entry for entry in installed}
     equips = []
-    for key in sorted(set(recognized) | set(equip_meta) | set(cn_names) | set(jp_names), key=str):
+    for key in sorted(set(recognized) | set(equip_meta) | set(cn_names) | set(jp_names) | set(extension_by_id), key=str):
         eid = _int(key)
         if eid is None:
             continue
@@ -445,24 +483,28 @@ def build_catalog(project_root: Path | str) -> dict:
         # and complete metadata must not expand the executable selection set.
         image = _image(root, "equip", item.get("images", []), media_cache) if key in recognized else None
         image_width, image_height = _dimensions(root, image)
+        available_templates = extension_templates.get(eid, {})
+        support_image = next((f"/media/supportce/support_{eid}_{label}.png"
+                              for label, state in (("normal", "非满破"), ("max", "满破"))
+                              if state in available_templates), None)
         equips.append({
-            "id": eid, "name": item.get("name") or cn_names.get(key) or extra.get("name") or extra.get("nameJp") or jp_names.get(key) or f"礼装 {eid}",
+            "id": eid, "name": item.get("name") or cn_names.get(key) or extra.get("name") or extra.get("nameJp") or jp_names.get(key) or extension_by_id.get(key, {}).get("name") or f"礼装 {eid}",
             "nameJp": item.get("name_jp") or extra.get("nameJp") or jp_names.get(key, ""),
             "collectionNo": item.get("collection_no", extra.get("collectionNo")),
             "rarity": item.get("rarity", extra.get("rarity")), "cost": equip_costs.get(key),
             "recognizable": key in recognized and image is not None,
-            "supportRecognition": _support_equip_recognition(root, cn_names.get(key)),
+            "supportRecognition": _support_equip_recognition(root, cn_names.get(key), eid, extension_templates),
             "image": image, "imageWidth": image_width, "imageHeight": image_height,
+            "supportImage": support_image,
             "filters": equip_filter_facts(equip_filter_index, key) if key in recognized else None,
         })
     equips.sort(key=lambda item: (item["collectionNo"] or 0, item["id"]))
-    raw_names = ([{"id": key, "name": value} for key, value in cn_names.items()]
-                 + [{"id": key, "nameJp": value} for key, value in jp_names.items()]
-                 + list(recognized.values()) + list(equip_meta.values()))
-    common_equips, common_status = _common_equips(root, equips, raw_names)
+    common_equips, common_status = _common_equips(equips, list(recognized.values()))
+    extension_ids = {entry["id"] for entry in installed}
     for equip in equips:
         equip["common"] = equip["id"] in common_equips
         equip["commonSources"] = common_equips.get(equip["id"], [])
+        equip["supportExtension"] = equip["id"] in extension_ids
     mystics = []
     for item in source.get("mysticCodes", []):
         code = copy.deepcopy(item)
@@ -478,6 +520,7 @@ def build_catalog(project_root: Path | str) -> dict:
         "inventory": {"servants": owned_servants, "equips": owned_equips,
                       "servantsStatus": servant_status, "equipsStatus": equip_status},
         "commonEquips": common_status,
+        "supportExtension": {"installed": len(installed)},
         "uiAssets": {
             "classes": {key: url for key, filename in ui_classes.items()
                         if (url := _image(root, "ui", [filename], media_cache))},

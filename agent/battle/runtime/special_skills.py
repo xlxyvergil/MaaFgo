@@ -11,6 +11,8 @@ from ..core.special_skills import SPECIAL_SKILL_GROUPS, TD, SpecialSkillChoiceEr
 ENTRY = "战斗_特殊技能处理"
 NO_OVERLAY = "战斗_特殊技能_无覆盖层"
 UNKNOWN_MENU = "战斗_特殊技能_未支持选项"
+NP_IDENTITY_GUARD = "战斗_宝具类型选择_身份未确认"
+DEFAULT_NP_MENU_ROOTS = frozenset(("战斗_BB迪拜3技能_宝具类型选择", "战斗_卫宫3技能_宝具类型选择"))
 SKIP = ("战斗_技能使用弹窗", "战斗_技能无法使用弹窗")
 
 
@@ -54,7 +56,7 @@ class SpecialSkillDispatcher:
                     f"从者{step.servant_slot}技能{step.skill_index}被跳过，特殊选项队列将错位；停止重放"
                 )
 
-    def run(self, context, override, *, servant_id=None, skill_index=None):
+    def run(self, context, override, *, servant_id=None, skill_index=None, default_only=False):
         """Only commit a queue item after its selected node actually completes.
 
         Recognition gates cannot click; their sole successor is the requested
@@ -90,7 +92,10 @@ class SpecialSkillDispatcher:
             # References only read recognition from the original nodes. They do
             # not execute those nodes' default actions or change global state.
             probes = []
-            for name in dict.fromkeys((group.root, *group.options)):
+            # NP color/type buttons are shared by several servants. Require the
+            # complete actor-scoped title+options gate, not an isolated Arts label.
+            probe_names = (group.root,) if group.field == TD else (group.root, *group.options)
+            for name in dict.fromkeys(probe_names):
                 recognition = (context.get_node_data(name) or {}).get("recognition", {})
                 if recognition and recognition.get("type", "DirectHit") != "DirectHit":
                     probes.append(name)
@@ -141,9 +146,18 @@ class SpecialSkillDispatcher:
         names = [node.name for node in nodes]
         if UNKNOWN_MENU in names:
             raise SpecialSkillChoiceError("检测到未支持或未识别的技能选项菜单，停止以免点错")
+        if NP_IDENTITY_GUARD in names:
+            raise SpecialSkillChoiceError(
+                "检测到宝具切换弹窗，但未能确认当前从者和可用选项，无法安全点击。"
+                "请确认编队中的从者与技能形态后重试；若仍失败，请反馈这张弹窗截图。"
+            )
         if any(name in SKIP for name in names):
-            if expected:
+            if expected and not default_only:
                 raise SpecialSkillChoiceError("配置了特殊选项的技能不可用，无法准确重放攻略")
+            return detail
+        # A pre-upgrade Emiya S3 casts directly. With no replay queue, absence
+        # of a menu must preserve that behavior without consuming a fake item.
+        if default_only and NO_OVERLAY in names:
             return detail
         matched = [gate for gate in pending if gate in names]
         if expected and not matched:

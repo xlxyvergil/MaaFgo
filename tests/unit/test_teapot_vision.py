@@ -67,6 +67,18 @@ class TeapotVisionTests(unittest.TestCase):
     def score(self, image, name, roi):
         return template_score(image, f"battle/teapot/{name}.png", roi, name == "entry_icons")
 
+    def test_full_empty_strip_rejects_real_item_and_transition_crops(self):
+        combined = self.pipeline["茶壶-识别无自动道具栏"]["recognition"]["param"]["all_of"]
+        self.assertEqual(combined[:2], ["茶壶-识别编队页", "茶壶-识别交替过渡"])
+        recognition = combined[2]["recognition"]
+        self.assertEqual(recognition["param"]["threshold"], .95)
+        # The fixture is a second live frame, independent of the production
+        # template's original frame. Only this crop is not a full-page proof.
+        self.assertTrue(static_recognition_matches(self.assemble("trial_empty_auto_items"), recognition))
+        for part in ("bar_tea_on", "bar_tea_off", "bar_storm_on", "bar_transition"):
+            with self.subTest(part=part):
+                self.assertFalse(static_recognition_matches(self.assemble(part), recognition))
+
     def test_entry_icons_ignore_background_colors_and_require_both_icons(self):
         recognition = self.pipeline["茶壶-识别交替过渡"]["recognition"]
         self.assertTrue(recognition["param"]["green_mask"])

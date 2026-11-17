@@ -69,8 +69,21 @@ class CeOnlySupportTests(unittest.TestCase):
                          ("目标礼装.png", support.CE_ANCHOR_NORMAL, "满破"))
         controller = self.context.tasker.controller
         self.assertEqual(self.action._tap.call_args_list,
-                         [call(controller, *support.CLASS_TABS["ALL"])] * 3 + [call(controller, 50, 250)])
+                         [call(controller, 50, 250)])
         self.action._swipe.assert_not_called()
+
+    def test_any_servant_preserves_current_tab_for_both_filters_and_support_types(self):
+        self.context.attach.update({
+            "冠位助战-1号礼装-满破": "礼装1.png",
+            "冠位助战-2号礼装-满破": "礼装2.png", "ce_bond": "any",
+        })
+        for support_type in ("normal", "grand"):
+            for class_all in ("def", "all"):
+                with self.subTest(support_type=support_type, class_all=class_all):
+                    self.context.attach["class_all"] = class_all
+                    self.action._tap.reset_mock()
+                    self.assertTrue(self.run_search(support_type).success)
+                    self.action._tap.assert_called_once_with(self.context.tasker.controller, 50, 50)
 
     def test_no_servant_or_level_fields_are_required(self):
         for key in list(self.context.attach):
@@ -127,6 +140,16 @@ class CeOnlySupportTests(unittest.TestCase):
         self.context.attach.update(class_name="剑士", servant="")
         self.assertFalse(self.run_search().success)
         self.action._get_detector.assert_not_called()
+
+    def test_specific_servant_still_switches_to_all_when_requested(self):
+        self.context.attach.update(class_name="剑士", servant="test", class_all="all")
+        self.context.attach.update({f"skill_passive_{i}": 0 for i in range(1, 6)})
+        self.action._match_servant.return_value = True
+        self.action._check_active_view.return_value = True
+        self.assertTrue(self.run_search().success)
+        controller = self.context.tasker.controller
+        self.assertEqual(self.action._tap.call_args_list,
+                         [call(controller, *support.CLASS_TABS["ALL"])] * 3 + [call(controller, 50, 50)])
 
 
 if __name__ == "__main__":

@@ -100,7 +100,7 @@ class NativeTeapotRoutingTests(unittest.TestCase):
 
     def test_manual_and_automatic_formation_check_before_capture_and_start(self):
         for mode in ("manual", "auto"):
-            for desired in (False, True):
+            for desired in (False, True, "skip"):
                 with self.subTest(mode=mode, desired=desired):
                     ok, seen = self.execute(mode=mode, use_teapot=desired)
                     self.assertTrue(ok)
@@ -115,7 +115,7 @@ class NativeTeapotRoutingTests(unittest.TestCase):
         self.assertEqual(seen, [(CHECK, False), "编队身份-采集", "进本-实际点击队伍确认"])
 
     def test_support_fallback_checks_without_capturing_identities(self):
-        for desired in (False, True):
+        for desired in (False, True, "skip"):
             with self.subTest(desired=desired):
                 ok, seen = self.execute(mode="fallback", use_teapot=desired)
                 self.assertTrue(ok)

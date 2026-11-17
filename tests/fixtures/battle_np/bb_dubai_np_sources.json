@@ -1,0 +1,80 @@
+[
+  {
+    "file": "jp_bb_dubai_ccc_20261114.png",
+    "source": "np-before-switch.png",
+    "source_sha256": "5b4e3bbfe9778b8bc5263a051cc55afb21ef093bdb7f99fa6f700d9e89129b61",
+    "source_size": [
+      1280,
+      720
+    ],
+    "source_roi": [
+      264,
+      70,
+      292,
+      300
+    ],
+    "work_roi": [
+      132,
+      35,
+      146,
+      150
+    ],
+    "work_scale": 0.5,
+    "description": "Initial C.C.C. Arts NP, before type-change skill",
+    "preparation": "Exact native recognizer half-scale BGR NP1 ROI, lossless PNG; replay by nearest-neighbor 2x expansion before the unchanged recognizer AREA normalization.",
+    "sha256": "4c1e318ef3ac40112d76e10a3171204848dfe9218bdc9b00702cbabbb684dd4b",
+    "bytes": 44494
+  },
+  {
+    "file": "jp_bb_dubai_ggg_badge_flash_20261114.png",
+    "source": "np-bb-defense-steady-1.png",
+    "source_sha256": "c64e5d2953f52dc22cbfe21642cc0583ef05d44a394e2251715507057160b456",
+    "source_size": [
+      1280,
+      720
+    ],
+    "source_roi": [
+      264,
+      70,
+      292,
+      300
+    ],
+    "work_roi": [
+      132,
+      35,
+      146,
+      150
+    ],
+    "work_scale": 0.5,
+    "description": "G.G.G. Arts NP with persistent three-turn type-change badge, brighter flash phase",
+    "preparation": "Exact native recognizer half-scale BGR NP1 ROI, lossless PNG; replay by nearest-neighbor 2x expansion before the unchanged recognizer AREA normalization.",
+    "sha256": "3078f1b10ee7d2a54965988958308a5c4ac0a3f5d197ef1d68c471618be09bc1",
+    "bytes": 45161
+  },
+  {
+    "file": "jp_bb_dubai_ggg_badge_20261114.png",
+    "source": "np-bb-defense-steady-3.png",
+    "source_sha256": "64705e38f97b07c285c35abd9d3b037f21da82ec1534227b9534c8fd1ee1abc8",
+    "source_size": [
+      1280,
+      720
+    ],
+    "source_roi": [
+      264,
+      70,
+      292,
+      300
+    ],
+    "work_roi": [
+      132,
+      35,
+      146,
+      150
+    ],
+    "work_scale": 0.5,
+    "description": "G.G.G. Arts NP with the same persistent badge, clearer phase",
+    "preparation": "Exact native recognizer half-scale BGR NP1 ROI, lossless PNG; replay by nearest-neighbor 2x expansion before the unchanged recognizer AREA normalization.",
+    "sha256": "2722698cff3bd412d7bfc86dd64bf5fce18a2192fcfadee678fbf53971262fb8",
+    "bytes": 44688
+  }
+]

@@ -1,4 +1,4 @@
-"""CE-only friend support round-trips and reaches the existing ALL/CE search path."""
+"""CE-only friend support round-trips and searches CEs on the current class tab."""
 import copy
 import http.client
 import json
@@ -76,7 +76,7 @@ class CeOnlySupportCriteriaTests(unittest.TestCase):
         support['equip1'] = {'id': 0}
         self.assertEqual(self.criteria(support)['ce_specs'], [])
 
-    def test_real_chaldea_action_uses_all_and_ce_without_any_identity_checks(self):
+    def test_real_chaldea_action_keeps_current_tab_and_checks_ce_without_identity_checks(self):
         context = Context(enabled=False)
         self.addCleanup(support_action.sessions.stop_owner, '')
         context.attach.update(chaldea_enabled=True, chaldea_import_source='fixture')
@@ -98,8 +98,7 @@ class CeOnlySupportCriteriaTests(unittest.TestCase):
         action._match_passive.assert_not_called()
         action._match_ce.assert_called_once()
         self.assertEqual(action._tap.call_args_list,
-                         [call(context.tasker.controller, *support_action.CLASS_TABS['ALL'])] * 3
-                         + [call(context.tasker.controller, 50, 50)])
+                         [call(context.tasker.controller, 50, 50)])
 
 
 class CeOnlySupportValidationTests(unittest.TestCase):

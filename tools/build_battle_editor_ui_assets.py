@@ -91,7 +91,8 @@ def atlas_narrow_source(url: str, source: Path) -> tuple[Path, tuple[int, int, i
     return path, (left, 0, left + NARROW_RECT[0], NARROW_RECT[1])
 
 
-def atlas_formation_source(url: str, source: Path, servant_id: int) -> tuple[Path, tuple[int, int, int, int]] | None:
+def atlas_formation_source(url: str, source: Path, servant_id: int, *,
+                           source_kind: str = "fgo-dump", allow_unframed: bool = False) -> tuple[Path, tuple[int, int, int, int]] | None:
     """Resolve an exact servant's declared CharaGraph half, excluding name rows.
 
     The a/b textures are 1024px-wide two-card atlases. Atlas @1/@2 identify
@@ -101,19 +102,28 @@ def atlas_formation_source(url: str, source: Path, servant_id: int) -> tuple[Pat
     if not isinstance(url, str) or type(servant_id) is not int or servant_id <= 0:
         return None
     parsed = urlsplit(url)
-    match = re.fullmatch(r"/(JP|CN)/CharaGraph/([1-9][0-9]*)/([1-9][0-9]*)([ab])@([12])\.png", parsed.path)
+    match = re.fullmatch(r"/(JP|CN)/CharaGraph/([1-9][0-9]*)/([1-9][0-9]*)([ab])(?:@([12]))?\.png", parsed.path)
     if (parsed.scheme != "https" or parsed.netloc != "static.atlasacademy.io"
             or parsed.query or parsed.fragment or not match
-            or match[2] != str(servant_id) or match[3] != str(servant_id)):
+            or match[2] != str(servant_id) or match[3] != str(servant_id)
+            or source_kind not in ("fgo-dump", "atlas-cache")
+            or (match[5] is None and not allow_unframed)):
         return None
     _, folder, stem, suffix, frame = match.groups()
-    path = source / "从者立绘/CharaGraph" / folder / (stem + suffix + ".png")
-    left = (int(frame) - 1) * FORMATION_RECT[0]
+    # Atlas URLs with @1/@2 already return one 512x724 card. Keep their
+    # exact basenames in an external cache instead of pretending they are the
+    # dump's unframed two-card textures.
+    filename = stem + suffix + (("@" + frame) if source_kind == "atlas-cache" and frame else "") + ".png"
+    path = source / "从者立绘/CharaGraph" / folder / filename
+    left = (int(frame or "1") - 1) * FORMATION_RECT[0] if source_kind == "fgo-dump" else 0
     return path, (left, 0, left + FORMATION_RECT[0], FORMATION_RECT[1])
 
 
 class AssetBuilder:
-    def __init__(self, project: Path, source: Path, cache: Path, output: Path):
+    def __init__(self, project: Path, source: Path, cache: Path, output: Path, *, source_kind: str = "fgo-dump"):
+        if source_kind not in ("fgo-dump", "atlas-cache"):
+            raise ValueError("Expected fgo-dump or atlas-cache image sources")
+        self.source_kind = source_kind
         self.project, self.source, self.cache, self.output = project, source, cache, output
         self.media = output / "media"
         self.media.mkdir(parents=True, exist_ok=True)
@@ -164,7 +174,7 @@ class AssetBuilder:
     def _relative_source(self, path: Path) -> tuple[str, str]:
         path = path.resolve()
         if path.is_relative_to(self.source):
-            return "fgo-dump", path.relative_to(self.source).as_posix()
+            return self.source_kind, path.relative_to(self.source).as_posix()
         if path.is_relative_to(self.project):
             return "project", path.relative_to(self.project).as_posix()
         raise ValueError(f"Source must stay in the selected dump/project: {path}")
@@ -187,9 +197,11 @@ class AssetBuilder:
         source_kind, source_path = self._relative_source(path)
         if formation:
             sid = formation[1]
-            if (source_kind != "fgo-dump" or not re.fullmatch(
-                    rf"从者立绘/CharaGraph/{sid}/{sid}[ab]\.png", source_path)
-                    or crop not in ((0, 0, 512, 724), (512, 0, 1024, 724))
+            source_pattern = (rf"从者立绘/CharaGraph/{sid}/{sid}[ab](?:@[12])?\.png"
+                              if source_kind == "atlas-cache" else rf"从者立绘/CharaGraph/{sid}/{sid}[ab]\.png")
+            allowed_crops = ((0, 0, 512, 724),) if source_kind == "atlas-cache" else ((0, 0, 512, 724), (512, 0, 1024, 724))
+            if (source_kind not in ("fgo-dump", "atlas-cache") or not re.fullmatch(source_pattern, source_path)
+                    or crop not in allowed_crops
                     or not resize or resize.get("mode") != "RGB" or transparent_edge_black):
                 raise ValueError("Formation WebP inputs must be original same-servant CharaGraph crops resized from opaque RGB")
         previous = self._previous_files.get(filename)
@@ -212,6 +224,8 @@ class AssetBuilder:
         with Image.open(path) as original:
             original.load()
             original_size = original.size
+            if formation and source_kind == "atlas-cache" and original_size != FORMATION_RECT:
+                raise ValueError("Atlas formation cache must contain the declared extracted 512x724 card")
             if crop and not (0 <= crop[0] < crop[2] <= original.width and 0 <= crop[1] < crop[3] <= original.height):
                 raise ValueError(f"Crop outside {path}: {crop}")
             image = original.crop(crop) if crop else original.copy()
@@ -309,7 +323,7 @@ class AssetBuilder:
         preferred = str(record.get("portraitAscension", 3))
         for ascension in dict.fromkeys((preferred, "3", "1", "2", "4")):
             url = ascensions.get(ascension, "")
-            mapped = atlas_formation_source(url, self.source, sid)
+            mapped = atlas_formation_source(url, self.source, sid, source_kind=self.source_kind)
             if mapped is None:
                 continue
             path, rect = mapped

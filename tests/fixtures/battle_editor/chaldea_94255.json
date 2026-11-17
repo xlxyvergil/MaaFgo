@@ -1,0 +1,457 @@
+{
+  "minBuild": 933,
+  "appBuild": 989,
+  "quest": {
+    "id": 94151247,
+    "phase": 1,
+    "enemyHash": "1_0215_4f20d51"
+  },
+  "options": {
+    "mightyChain": true,
+    "disableEvent": false,
+    "pointBuffs": null,
+    "simulateAi": true,
+    "enemyRateUp": null
+  },
+  "team": {
+    "name": null,
+    "mysticCode": {
+      "mysticCodeId": 110,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 505300,
+        "limitCount": 4,
+        "skillIds": [
+          2238550,
+          2239550,
+          2240550
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "tdId": 505301,
+        "tdLv": 1,
+        "lv": 100,
+        "atkFou": 2000,
+        "hpFou": 1000,
+        "ceId": 9408060,
+        "ceLimitBreak": true,
+        "ceLv": 100,
+        "equip1": {
+          "id": 9408060,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9307920,
+          "limitBreak": false,
+          "lv": 1
+        },
+        "equip3": {
+          "id": 9403520,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "supportType": "none",
+        "grandSvt": true,
+        "classBoardData": {
+          "grandBondEquipSkillChange": true,
+          "classBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "grandClassBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "classStatistics": [
+            {
+              "classId": 5,
+              "type": 1,
+              "typeVal": 62
+            },
+            {
+              "classId": 5,
+              "type": 2,
+              "typeVal": 200
+            }
+          ]
+        }
+      },
+      {
+        "svtId": 505300,
+        "limitCount": 4,
+        "skillIds": [
+          2238550,
+          2239550,
+          2240550
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "tdId": 505301,
+        "tdLv": 5,
+        "lv": 120,
+        "atkFou": 2000,
+        "hpFou": 1000,
+        "ceId": 9408060,
+        "ceLimitBreak": true,
+        "ceLv": 100,
+        "equip1": {
+          "id": 9408060,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "equip2": {
+          "id": 9307920,
+          "limitBreak": false,
+          "lv": 1
+        },
+        "equip3": {
+          "id": 9403520,
+          "limitBreak": true,
+          "lv": 100
+        },
+        "supportType": "friend",
+        "grandSvt": true,
+        "classBoardData": {
+          "grandBondEquipSkillChange": true,
+          "classBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30,
+            31,
+            32,
+            33,
+            34,
+            35,
+            36,
+            37,
+            38,
+            39,
+            40,
+            41,
+            42,
+            43,
+            44,
+            45,
+            46,
+            47,
+            48,
+            49,
+            50,
+            51,
+            52,
+            53,
+            54,
+            55,
+            56,
+            57,
+            58,
+            59,
+            60,
+            61,
+            62
+          ],
+          "grandClassBoardSquares": [
+            1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16
+          ],
+          "classStatistics": [
+            {
+              "classId": 5,
+              "type": 1,
+              "typeVal": 62
+            },
+            {
+              "classId": 5,
+              "type": 2,
+              "typeVal": 200
+            }
+          ]
+        }
+      },
+      {
+        "svtId": 503300,
+        "limitCount": 4,
+        "skillIds": [
+          89450,
+          441550,
+          2556551
+        ],
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "tdId": 503302,
+        "tdLv": 1,
+        "lv": 80,
+        "atkFou": 1000,
+        "hpFou": 1000,
+        "ceLimitBreak": false,
+        "ceLv": 0,
+        "equip1": {
+          "id": null,
+          "limitBreak": false,
+          "lv": 0
+        },
+        "supportType": "none"
+      }
+    ],
+    "backupSvts": [
+      null,
+      null,
+      null
+    ]
+  },
+  "delegate": {
+    "actWeightSelections": [
+      -1,
+      -1
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "skill",
+      "skill": 1,
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "card": 4,
+          "isTD": false,
+          "critical": false,
+          "cardType": 2
+        },
+        {
+          "svt": 0,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 2
+        },
+        {
+          "svt": 1,
+          "card": -1,
+          "isTD": true,
+          "critical": false,
+          "cardType": 2
+        }
+      ],
+      "options": {
+        "playerTarget": 1,
+        "enemyTarget": 2,
+        "random": 900,
+        "threshold": 1000
+      }
+    }
+  ],
+  "isCritTeam": false
+}

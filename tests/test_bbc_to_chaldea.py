@@ -185,12 +185,13 @@ class BbcToChaldeaTest(unittest.TestCase):
         self.assertEqual(filtered.skill_sequence, (master, swap, skill))
         self.assertTrue(validate_main_action(filtered, state, StrategyProfile()).ok)
 
-    def test_unsupported_special_action_fails(self):
-        with self.assertRaisesRegex(BbcImportError, "特殊技能"):
-            convert_bbc_config(
-                self._config("迪拜BB_棉被王_Caber_花嫁.json"),
-                self.catalog, self.equips,
-            )
+    def test_bbdubai_fixture_imports_with_the_attack_np_variant_preserved(self):
+        original = self._config("迪拜BB_棉被王_Caber_花嫁.json")
+        share, _ = convert_bbc_config(original, self.catalog, self.equips)
+        self.assertEqual(share["delegate"]["tdTypeChanges"], [1])
+        plan = convert_chaldea_actions_to_battle_plan(share["actions"], share["delegate"])
+        self.assertEqual(plan.special_choices.td_type_changes, (1,))
+        self.assertIn(ServantSkillAction(1, 3), plan.turns[2].servant_skills)
 
     def test_card_strategy_is_not_silently_skipped_when_malformed(self):
         config = self._config("爱尔奎特_光狐_光狐.json")

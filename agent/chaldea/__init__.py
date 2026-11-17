@@ -30,6 +30,9 @@ CACHE_DIR = os.path.join("config", "Battle")
 _BUNDLED_BATTLE_PRESETS = frozenset({
     "地狱的试炼_202610_阿兹赖尔.json",
     "地狱的试炼_202610_补贯通.json",
+    "地狱的试炼_202611_天魔轰临_枪AE双核.json",
+    "地狱的试炼_202611_天魔轰临_冠妖兰莉莉丝.json",
+    "地狱的试炼_202611_天魔轰临_阶段续航.json",
 })
 
 

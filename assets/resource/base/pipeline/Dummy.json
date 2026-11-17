@@ -22,10 +22,10 @@
             }
         },
         "focus": {
-            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">风暴罐不足，任务无法继续进行！！</span>"
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">风暴罐不足，关闭提示后结束当前任务。请获取风暴罐后再重试。</span>"
         },
         "next": [
-            "回主界面"
+            "风暴罐不足-结束任务"
         ]
     },
     "Global_Null": {
@@ -60,11 +60,17 @@
             }
         },
         "focus": {
-            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">风暴罐不足，任务无法继续进行！！</span>"
+            "Node.Recognition.Succeeded": "<span style=\"color: #FF0000;\">风暴罐不足，关闭提示后结束当前任务。请获取风暴罐后再重试。</span>"
         },
         "next": [
-            "回主界面"
+            "风暴罐不足-结束任务"
         ]
+    },
+    "风暴罐不足-结束任务": {
+        "doc": "参考全局-体力不足：风暴罐不足及风暴罐不足2关闭提示后共用此StopTask出口，终止当前任务及其JumpBack回程，避免全局恢复返回后继续战斗；任务队列中的后续任务仍可执行。",
+        "action": {
+            "type": "StopTask"
+        }
     },
     "其他异常": {
         "focus": {

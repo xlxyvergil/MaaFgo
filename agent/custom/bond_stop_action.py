@@ -5,7 +5,6 @@ import hashlib
 import html
 import os
 from datetime import datetime, timezone
-from dataclasses import replace
 from pathlib import Path
 import sys
 import time
@@ -107,34 +106,37 @@ def _slot_mapping(context, target):
 
 
 def _inspect_upgrade(context, token, image, mode, target, *, evidence_image=None):
-    """Only an explicitly recognized bond upgrade can defer a selected slot.
-
-    The popup does not prove MAX. Keep any-mode conservative and never turn a
-    missing mapping or an ordinary recognition failure into permission to play.
-    """
+    """明确升级可下场复核或末场正常结算；不能把升级或识别失败当作未满。"""
     if not read_bond_upgrade(context, image):
         return False, None
     root = _root(context)
     evidence = image if evidence_image is None else evidence_image
     if mode in {"slot", "slots"}:
         _slot_mapping(context, target)
-        if bond_stops.can_defer(root):
-            deferred = bond_stops.defer(root, token,
-                message=(f"第{bond_stops.battle_number(root)}场羁绊升级展示遮挡，"
-                         "所选号位是否MAX尚未确认；按原剩余次数在下一场结算复核"),
-                image=evidence, latest_image=image if evidence_image is not None else None)
-            if deferred:
-                _save_evidence(context, deferred)
-            return True, None
-        message = "羁绊升级展示遮挡目标号位，当前没有已声明的剩余战斗次数，未额外开战"
-    else:
-        message = "羁绊升级展示遮挡，尚未捕获明确MAX；升级等级不能证明达到当前上限"
+    if bond_stops.can_defer(root):
+        existing = bond_stops.deferred(root)
+        deferred = bond_stops.defer(root, token,
+            message=(f"第{bond_stops.battle_number(root)}场羁绊升级展示遮挡，"
+                     "待检查从者是否MAX尚未确认；按原剩余次数在下一场结算复核"),
+            image=evidence, latest_image=image if evidence_image is not None else None)
+        if deferred and existing is None:
+            _save_evidence(context, deferred)
+        return True, None
+    if bond_stops.is_last_battle(root):
+        existing = bond_stops.upgrade_continuation(root)
+        final = bond_stops.continue_last_upgrade(root, token,
+            message=f"第{bond_stops.battle_number(root)}场已确认羁绊升级，本场为最后一场；正常完成结算，后续任务可继续",
+            image=evidence, latest_image=image if evidence_image is not None else None)
+        if final is not None and existing is None:
+            mfaalog.info(f"[羁绊结算] {final.message}")
+        return True, None
+    message = "羁绊升级展示遮挡，当前无法确认本场是否为最后一场，也无法安排下场复核，已保留现场并停止。请保留当前截图和日志反馈。"
     return True, _latch_error(context, token, evidence, message,
                              latest_image=image if evidence_image is not None else None)
 
 
 def _poll_config(attach, prefix):
-    node = attach.get("positive_wait_node" if prefix == "positive" else f"{prefix}_node")
+    node = attach.get(f"{prefix}_node")
     attempts = attach.get(f"{prefix}_attempts")
     timeout = attach.get(f"{prefix}_timeout_ms")
     if (not isinstance(node, str) or not node or type(attempts) is not int
@@ -156,12 +158,14 @@ def _poll_wait(context, token, node):
 
 
 def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
-    """同帧MAX先锁存；指定号位的升级遮挡可按原剩余次数延后。"""
+    """首次羁绊页起共用观察窗口，阳性立即处理，到点以新帧确认阴性。"""
     root = _root(context)
     existing = bond_stops.get(root)
     if existing:
         return existing
     if context.tasker.stopping:
+        return None
+    if bond_stops.upgrade_continuation(root) is not None or bond_stops.observation_complete(root):
         return None
     token = bond_stops.ensure(root)
     evidence_image, current_image = image, None
@@ -172,100 +176,67 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         if not read_bond_page(context, image):
             _, stopped = _inspect_upgrade(context, token, image, mode, target)
             return stopped
+        started_at = bond_stops.start_observation(root, token, time.monotonic())
+        if started_at is None:
+            return None
         # 羁绊页可能自动被升级展示覆盖，先保留这一帧，不能等动画后再找证据。
         evidence_image = image.copy()
         original_digest = _digest(image)
-        if bond_stops.checked(root, original_digest):
-            return None
         order, target_column = _slot_mapping(context, target) if mode in {"slot", "slots"} else ((), None)
         maxima = _read_maxima(context, evidence_image, mode)
         stopped = _positive(context, token, evidence_image, mode, maxima, order, target_column)
         if stopped:
             return stopped
+        recognized, stopped = _inspect_upgrade(context, token, image, mode, target,
+                                               evidence_image=evidence_image)
+        if recognized:
+            return stopped
         guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
-        if controller is not None:
-            bond_stops.set_controller(root, controller)
-        controller = bond_stops.controller(root)
+        wait_node, attempts, timeout = _poll_config(guard, "observation")
+        deadline = started_at + timeout / 1000
+        # 胜利立即交接时复用调用方的同回调代理；Pipeline 后续回调须自行
+        # 获取一次，不能从根任务状态复用已失效的 Agent 控制器句柄。
         if controller is None:
             controller = context.tasker.controller
-            bond_stops.set_controller(root, controller)
-        # 升级展示可能很快覆盖羁绊栏；先逐帧捕获明确MAX，负结果才等待冻结。
-        fast_node, fast_attempts, fast_timeout = _poll_config(guard, "positive")
-        fast_deadline = time.monotonic() + fast_timeout / 1000
-        for _ in range(fast_attempts):
-            if time.monotonic() >= fast_deadline:
-                break
-            if not _poll_wait(context, token, fast_node):
-                return None
-            current_image = controller.post_screencap().wait().get()
-            if current_image is None:
-                raise ValueError("羁绊快速复核截图失败")
-            maxima = _read_maxima(context, current_image, mode)
-            stopped = _positive(context, token, current_image, mode, maxima, order, target_column)
-            if stopped:
-                return stopped
-        attempts = guard.get("check_attempts", 3)
-        wait_node = guard.get("check_wait_node", "结算-羁绊停止等待动画")
-        if type(attempts) is not int or not 2 <= attempts <= 6 or not isinstance(wait_node, str) or not wait_node:
-            raise ValueError("羁绊检查轮询配置无效")
-        freeze = context.get_node_object(wait_node).post_wait_freezes
-        if freeze is None or freeze.time <= 0 or freeze.timeout <= 0:
-            raise ValueError("羁绊检查缺少有界画面稳定配置")
-        deadline = time.monotonic() + freeze.timeout / 1000
-        previous = None
+        # 不再串联快速轮询、冻结及升级等待；动画中途消失的文字同样共用此截止时间。
         for _ in range(attempts):
             if context.tasker.stopping or not bond_stops.valid(root, token):
                 return None
-            # 节点冻结超时可能仍报告succeeded；只复用其延迟，冻结另取明确bool。
-            detail = context.run_task(wait_node, pipeline_override={
-                wait_node: {"post_wait_freezes": {"time": 0}}})
+            if bond_stops.observation_complete(root):
+                return None
+            if time.monotonic() < deadline and not _poll_wait(context, token, wait_node):
+                return None
             if context.tasker.stopping or not bond_stops.valid(root, token):
                 return None
-            if detail is None or not detail.status.succeeded:
-                raise ValueError("羁绊动画稳定等待失败")
-            remaining_ms = int((deadline - time.monotonic()) * 1000)
-            frozen = remaining_ms >= freeze.time and context.wait_freezes(
-                wait_freezes_param=replace(freeze, timeout=min(freeze.timeout, remaining_ms)))
-            if not frozen:
-                if context.tasker.stopping or not bond_stops.valid(root, token):
-                    return None
-                # A level-up animation may prevent freezing; defer only when
-                # its dedicated recognition confirms this exact obstruction.
-                current_image = controller.post_screencap().wait().get()
-                if current_image is not None:
-                    recognized, stopped = _inspect_upgrade(context, token, current_image, mode, target,
-                                                           evidence_image=evidence_image)
-                    if recognized:
-                        return stopped
-                raise ValueError("羁绊结算画面未稳定")
-            if context.tasker.stopping or not bond_stops.valid(root, token):
-                return None
-            if time.monotonic() > deadline:
-                raise ValueError("羁绊结算稳定检查超时")
-            current_image = controller.post_screencap().wait().get()
-            if current_image is None:
-                raise ValueError("羁绊复核截图失败")
-            # 复核帧也必须仍是羁绊页；read_*会拒绝升级遮挡等非该页面。
-            maxima = _read_maxima(context, current_image, mode)
-            stopped = _positive(context, token, current_image, mode, maxima, order, target_column)
-            if stopped:
+            # 以取图开始时间判定末帧，不能拿4秒前的旧截图在到点后宣告阴性。
+            captured_at = time.monotonic()
+            captured = controller.post_screencap().wait().get()
+            if captured is None:
+                raise ValueError("羁绊观察截图失败，无法确认当前结算画面。请保留日志反馈后重试。")
+            current_image = captured
+            page_visible = read_bond_page(context, current_image)
+            if page_visible:
+                maxima = _read_maxima(context, current_image, mode)
+                stopped = _positive(context, token, current_image, mode, maxima, order, target_column)
+                if stopped:
+                    return stopped
+            recognized, stopped = _inspect_upgrade(context, token, current_image, mode, target,
+                                                   evidence_image=evidence_image)
+            if recognized:
                 return stopped
-            if maxima == previous:
+            if not page_visible:
+                _reject_missed_bond_page(context, current_image)
+            if context.tasker.stopping or not bond_stops.valid(root, token):
+                return None
+            if captured_at >= deadline:
+                bond_stops.complete_observation(root, token)
                 bond_stops.mark_checked(root, token, _digest(current_image))
-                # 触发检查的初始帧也已在本轮稳定复核中处理。
                 bond_stops.mark_checked(root, token, original_digest)
                 return None
-            previous = maxima
-        return _latch_error(context, token, evidence_image, "羁绊结果动画未稳定", latest_image=current_image)
+        raise ValueError("羁绊观察未覆盖完整时限，无法完成本场检查。请更新资源包后重试；若仍出现此提示，请保留截图和日志反馈。")
     except Exception as exc:
-        if str(exc) == "bond_result_page_not_visible" and current_image is not None:
-            try:
-                recognized, stopped = _inspect_upgrade(context, token, current_image, mode, target,
-                                                       evidence_image=evidence_image)
-                if recognized:
-                    return stopped
-            except Exception as upgrade_error:
-                exc = upgrade_error
+        if context.tasker.stopping or not bond_stops.valid(root, token):
+            return None
         return _latch_error(context, token, evidence_image, exc, latest_image=current_image)
 
 
@@ -298,7 +269,7 @@ def _save_evidence(context, result: BondStop | None) -> BondStop | None:
     except Exception as exc:
         result.screenshot_error = str(exc)
     label = "羁绊待复核" if result.reason == "bond_upgrade_deferred" else "羁绊停止"
-    mfaalog.info(f"[{label}] {result.display()}")
+    mfaalog.warning(f"[{label}] {result.display()}")
     return result
 
 
@@ -311,6 +282,16 @@ def check_settlement_bond_stop(context, image, *, controller=None) -> None:
     if result:
         save_bond_stop(context)
         raise BondStopReached(result)
+
+
+def _reject_missed_bond_page(context, image) -> None:
+    # 正常顺序是羁绊 → 经验 → 战利品。到达后两页不能再靠点击补查羁绊。
+    for name, label in (("战斗_经验结算页", "经验结算页"), ("战斗_战利品弹窗", "战利品页")):
+        recognized = context.run_recognition(name, image)
+        if context.tasker.stopping:
+            return
+        if recognized and recognized.hit:
+            raise ValueError(f"已进入{label}，之前的羁绊页未完成检查，无法确认是否满羁绊，本场无法补查。请保留当前截图和日志反馈；已停止，不会继续点击或开始下一场。")
 
 
 def inspect_victory_settlement(context, battle_result, controller) -> BondStop | None:
@@ -326,6 +307,8 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         return None
     root = _root(context)
     token = bond_stops.ensure(root)
+    if bond_stops.upgrade_continuation(root) is not None or bond_stops.observation_complete(root):
+        return None
     evidence_image, image = None, None
     try:
         if settings_error is not None:
@@ -339,6 +322,9 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         else:
             guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
             wait_node, attempts, timeout = _poll_config(guard, "page_wait")
+            _reject_missed_bond_page(context, image)
+            if context.tasker.stopping:
+                return None
             deadline = time.monotonic() + timeout / 1000
             result = None
             found_page = False
@@ -354,8 +340,9 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
                     found_page = True
                     result = inspect_bond_stop(context, image, controller=controller)
                     break
+                _reject_missed_bond_page(context, image)
             if not found_page:
-                raise ValueError("已确认战后RESULT，但未在配置时限内捕获羁绊结算页或羁绊升级展示")
+                raise ValueError("已识别战斗结束，但未在配置时限内捕获羁绊结算页或羁绊升级展示。无法确认是否满羁绊，已停止；请保留当前截图反馈。")
     except Exception as exc:
         result = _latch_error(context, token, evidence_image, exc, latest_image=image)
     if result:
@@ -369,6 +356,21 @@ class NativeBondMax(CustomRecognition):
         result = inspect_bond_stop(context, argv.image)
         if result:
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"reason": result.reason})
+        return None
+
+
+@AgentServer.custom_recognition("native_bond_upgrade_continue")
+class NativeBondUpgradeContinue(CustomRecognition):
+    def analyze(self, context, argv):
+        if context.tasker.stopping:
+            return None
+        mode, _ = _settings(context)
+        root = _root(context)
+        if bond_stops.get(root) is not None:
+            return None
+        if (mode == "off" or bond_stops.upgrade_continuation(root) is not None
+                or bond_stops.observation_complete(root)):
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"bond_upgrade_continue": True})
         return None
 
 

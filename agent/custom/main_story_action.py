@@ -30,6 +30,10 @@ class StoryStopped(RuntimeError):
     pass
 
 
+class StoryQuestRetry(StoryStopped):
+    """已确认撤退回地图；重新定位同一未完成关卡，不增加推进计数。"""
+
+
 def next_names(node):
     """Maa get_node_data 返回规范化 edge 对象，源 JSON 也允许字符串。"""
     return [edge if isinstance(edge, str) else edge["name"] for edge in node.get("next", [])]
@@ -71,6 +75,13 @@ class StoryRunner:
         self.skip_confirm_until = self.skip_settle_until = 0
         self.auto_handle_restrictions = self.config.get("auto_handle_restrictions", True) is True
         self.use_spirit_stone = self.config.get("use_spirit_stone", False) is True
+        self.retry_without_spirit_stone = self.config.get("retry_without_spirit_stone", False) is True
+        self.defeat_retry_limit = self.config.get("defeat_retry_limit", 3)
+        if self.retry_without_spirit_stone and (type(self.defeat_retry_limit) is not int
+                                               or not 1 <= self.defeat_retry_limit <= 9):
+            raise ValueError("战败重进次数无法读取。请将“战败重进次数上限”设为1至9后重试。")
+        self._defeat_retries = 0
+        self._dialogue_choices = {}
         self._spirit_stones_used = 0
         self.reset_restriction_state()
 
@@ -88,7 +99,7 @@ class StoryRunner:
         if not self.auto_handle_restrictions:
             raise StoryStopped("关卡存在编成限制，需要手动调整；或开启“自动处理编队限制情况”后重试")
         if not self.current_restricted:
-            mfaalog.info(
+            mfaalog.warning(
                 f"[自动推主线] 检测到限制编队（{reason}）；本关以游戏编队为准，"
                 "跳过 Chaldea 阵容检查、自动编队及羁绊补齐，使用默认战斗逻辑"
             )
@@ -236,15 +247,19 @@ class StoryRunner:
 
     def continue_with_spirit_stone(self, image):
         """仅处理明确的灵脉石按钮；每次续关最多一次选道具、一次确认。"""
+        confirm = self.reco("主线-灵脉石确认", image)
+        offer = None if confirm else self.reco("主线-使用灵脉石", image)
+        if (not confirm and not offer and self.mode == "native"
+                and self.retry_without_spirit_stone
+                and self.reco("主线-灵脉石不足", image)):
+            self.retreat_and_retry(image)
         if not self.use_spirit_stone or self.mode != "native":
-            raise StoryStopped("战斗失败，未开启自动使用灵脉石")
+            raise StoryStopped("战斗失败，未开启“是否自动使用灵脉石”。请开启该选项或手动处理；未使用令咒或圣晶石。")
         if self._spirit_stones_used >= 3:
             raise StoryStopped("本关已使用3次灵脉石，仍未通关，停止任务")
-        confirm = self.reco("主线-灵脉石确认", image)
         if not confirm:
-            offer = self.reco("主线-使用灵脉石", image)
             if not offer:
-                raise StoryStopped("战斗失败：没有可确认的灵脉石按钮或正数库存，停止续关；未使用令咒或圣晶石")
+                raise StoryStopped("战斗失败：没有可确认的灵脉石按钮或正数库存，已保留续关画面。请检查道具库存；确认灵脉石不足时，可开启“灵脉石不足时退出重进”后重试。未使用令咒或圣晶石。")
             self.action("主线-使用灵脉石", offer)
             deadline = self.clock() + min(self.timeout, 15)
             while self.clock() < deadline:
@@ -258,15 +273,51 @@ class StoryRunner:
         self.check_stop()
         self.action("主线-灵脉石确认", confirm)
         self._spirit_stones_used += 1
-        mfaalog.info(f"[自动推主线] 已确认使用灵脉石，本关第{self._spirit_stones_used}/3次；等待续战，不计入通关数")
+        mfaalog.warning(f"[自动推主线] 已确认使用灵脉石，本关第{self._spirit_stones_used}/3次；等待续战，不计入通关数")
         deadline = self.clock() + self.timeout
         while self.clock() < deadline:
             image = self.frame()
             if self.reco("进本-战斗主界面已出现", image):
-                mfaalog.info("[自动推主线] 灵脉石续战成功，本关改用默认战斗逻辑")
+                mfaalog.warning("[自动推主线] 灵脉石续战成功，本关改用默认战斗逻辑")
                 return
             self.pause()
         raise StoryStopped("灵脉石确认后未返回战斗，停止任务；未重复消费")
+
+    def retreat_and_retry(self, image):
+        """仅明确缺石的续关页允许撤退；两个正向按钮各点一次，再确认地图。"""
+        if (self.mode != "native" or not self.retry_without_spirit_stone
+                or not self.reco("主线-灵脉石不足", image)):
+            raise StoryStopped("尚未确认战败且灵脉石不足，无法自动退出重进。请检查续关画面后重试。")
+        if self._defeat_retries >= self.defeat_retry_limit:
+            raise StoryStopped(f"本关已战败重进{self._defeat_retries}次，仍未通关，已保留现场停止。请调整队伍或战斗方案后重试；可在“战败重进次数上限”修改限制。")
+        retreat = self.reco("战斗失败_不回主界面", image)
+        if not retreat:
+            raise StoryStopped("已确认灵脉石不足，但未找到“撤退”按钮，已保留现场。请手动退出战斗后重试。")
+        self.action("战斗失败_不回主界面", retreat)
+        deadline = self.clock() + min(self.timeout, 15)
+        while self.clock() < deadline:
+            self.pause()
+            image = self.frame()
+            confirm = self.reco("主线-撤退确认", image)
+            if confirm:
+                self.action("主线-撤退确认", confirm)
+                break
+        else:
+            raise StoryStopped("点击“撤退”后未确认退出提示，已保留现场停止。请核对弹窗并手动处理后重试；未重复点击。")
+        deadline, stable = self.clock() + self.timeout, 0
+        while self.clock() < deadline:
+            image = self.frame()
+            if self.interrupt(image):
+                stable = 0
+            elif self.panel(image) or self.on_map(image):
+                stable += 1
+                if stable >= 2:
+                    self._defeat_retries += 1
+                    raise StoryQuestRetry(f"灵脉石不足，已退出战斗；本关第{self._defeat_retries}/{self.defeat_retry_limit}次重新进本，不计为通关")
+            else:
+                stable = 0
+            self.pause()
+        raise StoryStopped("确认撤退后未返回主线地图或副本列表，已停止。请回到当前章节后重试；未再次开战。")
 
     def interrupt(self, image, *, entering=False, forming=False):
         """已识别事件才操作；剧情跳过分帧确认，避免切换中重复点击。"""
@@ -274,6 +325,24 @@ class StoryRunner:
             self.check_formation_restriction(image)
             if self._handle_restricted_formation(image):
                 return True
+        # 强制剧情选项会使 SKIP 灰显，必须在跳过确认的等待窗口之前处理。
+        for choice_node, label in (
+            ("主线-剧情选择-不赞同魁札尔", "不赞同魁札尔·科亚特尔"),
+            ("主线-剧情选择-埃列什基伽勒", "埃列什基伽勒"),
+            ("主线-剧情选择-埃列什基伽勒没有错", "埃列什基伽勒没有错"),
+        ):
+            choice = self.reco(choice_node, image)
+            if not choice:
+                continue
+            count = self._dialogue_choices.get(choice_node, 0)
+            if count >= 3:
+                raise StoryStopped("剧情选项点击3次后仍未离开，已保留现场。请手动选择当前对话选项后重试。")
+            self.action(choice_node, choice)
+            self._dialogue_choices[choice_node] = count + 1
+            self.skip_confirm_until = 0
+            self.skip_settle_until = self.clock() + 1
+            mfaalog.info(f"[自动推主线] 已选择剧情选项：{label}")
+            return True
         if entering and self.reco("全局-战前吃体力", image):
             entry = self.ctx.get_node_data("全局-战前吃体力") or {}
             if next_names(entry) == ["全局-体力不足"]:
@@ -339,9 +408,13 @@ class StoryRunner:
                 self.pause(1)
                 continue
             if self.on_map(image):
-                result = self.reco("主线-地图NEXT", image)
+                map_node = "主线-地图NEXT"
+                result = self.reco(map_node, image)
+                if not result:
+                    map_node = "主线-地图提亚马特"
+                    result = self.reco(map_node, image)
                 if result:
-                    self.open_panel(result)
+                    self.open_panel(result, map_node)
                     continue
                 name = next(swipes, None)
                 if name is None:
@@ -368,23 +441,70 @@ class StoryRunner:
             if not self.panel(image):
                 raise StoryStopped("查找主线关卡时离开了副本列表")
 
-    def open_panel(self, result):
-        for _ in range(3):
-            self.action("主线-地图NEXT", result)
+    def open_panel(self, result, node="主线-地图NEXT"):
+        recovered = False
+        attempts = 0
+        while attempts < 3:
+            attempts += 1
+            self.action(node, result)
             until = self.clock() + 5
             while self.clock() < until:
                 self.pause()
                 image = self.frame()
+                # 资料页也有左上关闭和经验条 NEXT，必须先于列表判断。
+                profile = self.reco("主线-御主资料返回", image)
+                if profile:
+                    if recovered:
+                        raise StoryStopped("地图居中后仍误入御主资料，无法打开副本列表。请手动关闭资料页，将 NEXT 所在地图点拖离左下头像后重试。")
+                    result = self.recover_map_profile(profile, node)
+                    recovered = True
+                    attempts = 0
+                    break
                 if self.panel(image):
                     return
-            # 每次重试刷新位置，不重复点击过期坐标。
+            else:
+                # 每次重试刷新位置，不重复点击过期坐标。
+                image = self.frame()
+                if not self.on_map(image):
+                    break
+                result = self.reco(node, image)
+                if not result:
+                    break
+                continue
+            # 恢复已重新定位目标，下一次循环再点击。
+        raise StoryStopped("点击主线节点后未打开副本列表。请确认当前画面，回到主线地图后重试。")
+
+    def recover_map_profile(self, profile, node):
+        """只在资料页被确认后返回；拖动起点取标记，避开遮挡点击点的头像。"""
+        mfaalog.warning("[自动推主线] 点击地图点后误入御主资料，返回地图并将目标拖到中心后重试")
+        self.action("主线-御主资料返回", profile)
+        deadline = self.clock() + min(self.timeout, 15)
+        marker_node = "主线-地图NEXT标记" if node == "主线-地图NEXT" else node
+        saw_map = False
+        while self.clock() < deadline:
+            self.pause()
             image = self.frame()
-            if not self.on_map(image):
-                break
-            result = self.reco("主线-地图NEXT", image)
-            if not result:
-                break
-        raise StoryStopped("点击主线节点后未打开副本列表")
+            if not self.panel(image) and self.on_map(image):
+                saw_map = True
+                marker = self.reco(marker_node, image)
+                if marker:
+                    break
+        else:
+            if saw_map:
+                raise StoryStopped("已返回地图，但未找到刚才的主线目标，无法居中。请将 NEXT 所在地图点移到可见区域后重试。")
+            raise StoryStopped("关闭御主资料后未能确认主线地图，无法拖动目标。请手动回到主线地图后重试。")
+        # 复用轮巡的拖到中心动作，只执行动作，不进入其 OCR / next 链。
+        self.action("巡-找到目标-设为中心", marker)
+        self.pause(1)
+        deadline = self.clock() + 5
+        while self.clock() < deadline:
+            image = self.frame()
+            if not self.panel(image) and self.on_map(image):
+                result = self.reco(node, image)
+                if result:
+                    return result
+            self.pause()
+        raise StoryStopped("拖动地图后未重新找到主线目标，无法继续点击。请将 NEXT 所在地图点移到可见区域后重试。")
 
     def enter(self, result):
         self.action("主线-列表NEXT", result)
@@ -557,11 +677,15 @@ class StoryRunner:
             # 字符串整体替换，不能用空对象深合并后遗留原 plan/share/source。
             use_default = self.current_restricted or self._spirit_stones_used > 0
             while True:
-                battle_override = {"原生自动战斗入口": {"action": {"param": {
-                    "custom_action_param": '{"native_battle_formation_reset":true}'
-                }}}} if use_default else None
+                # 仅本关原生入口允许预设执行失败后改用默认战斗，不污染其他任务。
+                battle_node = {"attach": {"native_battle_preset_fallback": True}}
+                if use_default:
+                    battle_node["action"] = {"param": {
+                        "custom_action_param": '{"native_battle_formation_reset":true}'
+                    }}
+                battle_override = {"原生自动战斗入口": battle_node}
                 self.task("原生自动战斗入口", battle_override)
-                if not self.use_spirit_stone:
+                if not self.use_spirit_stone and not self.retry_without_spirit_stone:
                     return
                 image = self.frame()
                 if not self.is_defeat(image):
@@ -581,8 +705,9 @@ class StoryRunner:
             self.failure(image)
             # 弹窗先处理，避免误认弹窗后透出的地图。
             handled = False
-            for name in ("作战成功_结束战斗", "好友申请界面_不回主界面",
-                         "战斗结束关闭_不回主界面"):
+            upgrade = ("结算-羁绊升级继续",) if self.mode == "native" else ()
+            for name in upgrade + ("作战成功_结束战斗", "好友申请界面_不回主界面",
+                                  "战斗结束关闭_不回主界面"):
                 result = self.reco(name, image)
                 if result:
                     self.action(name, result)
@@ -620,11 +745,20 @@ class StoryRunner:
             target = self.locate()
             kind = "battle" if target is None else self.enter(target)
             if kind == "battle":
-                bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1)
-                self.fight()
+                # 推进关数可能包含剧情；只有当前战斗已是最后一个推进阶段时，
+                # 才能明确声明无下一场，其余阶段的战斗预算仍为未知。
+                bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
+                    another_battle_planned=False if self.completed + 1 == self.limit else None)
+                try:
+                    self.fight()
+                except StoryQuestRetry as exc:
+                    mfaalog.info(f"[自动推主线] {exc}")
+                    continue
                 self.settle()
                 self.battles += 1
             self.completed += 1
+            self._defeat_retries = 0
+            self._dialogue_choices.clear()
             mfaalog.info(f"[自动推主线] 已推进 {self.completed}/{self.limit} 关，战斗 {self.battles} 场")
         return f"达到推进上限：已推进 {self.completed} 关，完成战斗 {self.battles} 场"
 

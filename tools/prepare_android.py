@@ -13,7 +13,8 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "Android" / "assets"
 ANDROID_OPTION_TYPES = {"select", "switch", "checkbox", "input"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
-REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍", "打开编队与战斗编辑器"}
+# MXU 内置任务由桌面客户端执行，安卓端没有对应的 CustomAction。
+REMOVED_TASKS = {"启动bbc", "关闭bbc", "BBC 配置转 Chaldea 本地队伍", "打开编队与战斗编辑器", "__MXU_KILLPROC__"}
 BILIBILI_ANDROID_LAUNCHERS = {
     "com.bilibili.fatego",
     "com.bilibili.fatego/.EmptyClass",
@@ -379,7 +380,7 @@ def prepare(root: Path = ROOT, output: Path = OUTPUT) -> dict:
         pipeline.pop("关闭bbc", None)
         pipeline["关闭游戏"].pop("next", None)
         write_json(close, pipeline)
-    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json", "编队与战斗编辑器.json"):
+    for name in ("bbc战斗.json", "BBC配置转Chaldea本地队伍.json", "启动bbc.json", "更新bbc配置文件.json", "编队与战斗编辑器.json", "MXU内置任务.json"):
         (output / "resource/base/pipeline" / name).unlink(missing_ok=True)
 
     for path in (output / "resource").glob("*/pipeline/**/*.json"):

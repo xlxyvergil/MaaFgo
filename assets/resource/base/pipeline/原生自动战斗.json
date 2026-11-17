@@ -1,4 +1,14 @@
 {
+  "连续出击-记录初始编队": {
+    "max_hit": 1,
+    "doc": "仅原生会话通过session_override挂在连续出击_继续的成功点击之后。保存任务内初始编队，下一场用助战action实际匹配并点击的从者替换唯一助战位；不沿用战斗中的换人/退场位置。不明确助战标记、首个/随机/NPC助战或重新编队时丢弃沿用证据，由编队确认页重新采集。这里不操作游戏界面。2026-11-05国服阿尔西亚山MaaMCP两场实测：初始助战位1，实际再次选中704700后自有2至6位证据逐项相同，第二场source=continuous_support_selection，无initial_formation=none；两场7/6回合胜利并返回活动地图。",
+    "action": {
+      "type": "Custom",
+      "param": {"custom_action": "remember_continuous_formation"}
+    },
+    "next": [],
+    "on_error": []
+  },
   "原生自动战斗入口": {
     "action": {
       "type": "Custom",

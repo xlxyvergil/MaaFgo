@@ -28,14 +28,29 @@ def pipeline_nodes():
 
 
 class NativeTeapotOptionTests(unittest.TestCase):
+    def test_empty_item_bar_detection_is_shared_without_trial_switches(self):
+        nodes = pipeline_nodes()
+        self.assertEqual(nodes[CONFIG]["attach"], {"use_teapot": False})
+        self.assertIn("茶壶-识别无自动道具栏", nodes)
+        for path in (ROOT / "assets/tasks").glob("*.json"):
+            for task in json.loads(path.read_text(encoding="utf-8")).get("task", []):
+                attach = task.get("pipeline_override", {}).get(CONFIG, {}).get("attach", {})
+                with self.subTest(task=task["name"]):
+                    self.assertNotIn("trial_no_auto_items", attach)
+                    self.assertNotIn("native_battle_trial_profile", attach)
+        trial = read("assets/tasks/地狱的试炼.json")["task"][0]["pipeline_override"]
+        self.assertEqual(trial["原生自动战斗入口"]["attach"]["native_battle_trial_profile"], "hellish_202611")
+        self.assertIs(trial["执行自动编队"]["attach"]["trial_grand_slot_repair"], True)
+
     def test_default_off_changes_configuration_without_disabling_detection(self):
         option = read(f"assets/options/{OPTION}.json")["option"][OPTION]
-        self.assertEqual(option["type"], "switch")
+        self.assertEqual(option["type"], "select")
         self.assertEqual(option["label"], "是否使用茶壶")
         self.assertEqual(option["default_case"], "No")
         cases = {case["name"]: case for case in option["cases"]}
-        self.assertEqual(set(cases), {"No", "Yes"})
-        for name, expected in (("No", False), ("Yes", True)):
+        self.assertEqual([case["label"] for case in option["cases"]], ["使用", "不使用", "不检测"])
+        self.assertEqual(set(cases), {"No", "Yes", "Skip"})
+        for name, expected in (("No", False), ("Yes", True), ("Skip", "skip")):
             self.assertEqual(cases[name]["pipeline_override"], {
                 CONFIG: {"attach": {"use_teapot": expected}},
             })

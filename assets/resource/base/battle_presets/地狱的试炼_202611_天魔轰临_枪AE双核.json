@@ -1,0 +1,450 @@
+{
+  "team": {
+    "name": "地狱的试炼第四期_天魔轰临_布里托玛特_阿斯卡拉福斯（视频4T，需发牌）",
+    "mysticCode": {
+      "mysticCodeId": 440,
+      "level": 10
+    },
+    "onFieldSvts": [
+      {
+        "svtId": 305300,
+        "supportType": "none",
+        "lv": 120,
+        "tdLv": 3,
+        "tdId": 305302,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          2157351,
+          2158550,
+          2159350
+        ],
+        "appendLvs": [
+          9,
+          10,
+          0,
+          10,
+          0
+        ],
+        "grandSvt": true,
+        "classBoardData": {
+          "grandClassBoardSquares": [
+            12
+          ],
+          "grandBondEquipSkillChange": true
+        },
+        "equip1": {
+          "id": 9403990,
+          "limitBreak": true
+        }
+      },
+      {
+        "svtId": 1002200,
+        "supportType": "friend",
+        "lv": 120,
+        "tdLv": 5,
+        "tdId": 1002201,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          2644550,
+          2645550,
+          2642550
+        ],
+        "appendLvs": [
+          9,
+          10,
+          10,
+          10,
+          10
+        ],
+        "grandSvt": true,
+        "equip1": {
+          "id": 9406010,
+          "limitBreak": true
+        },
+        "classBoardData": {
+          "grandBondEquipSkillChange": true
+        }
+      },
+      {
+        "svtId": 4000100,
+        "supportType": "none",
+        "lv": 120,
+        "tdLv": 3,
+        "limitCount": 4,
+        "tdId": 4000101,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          2512650,
+          2513450,
+          2514650
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          10,
+          0
+        ],
+        "equip1": {
+          "id": 9400180,
+          "limitBreak": true,
+          "lv": 11
+        }
+      }
+    ],
+    "backupSvts": [
+      {
+        "svtId": 504500,
+        "supportType": "none",
+        "lv": 90,
+        "tdLv": 1,
+        "tdId": 504501,
+        "skillLvs": [
+          10,
+          10,
+          10
+        ],
+        "skillIds": [
+          761450,
+          762550,
+          763650
+        ],
+        "appendLvs": [
+          0,
+          10,
+          0,
+          9,
+          10
+        ],
+        "equip1": {
+          "id": 9400180,
+          "limitBreak": true,
+          "lv": 11
+        }
+      },
+      null,
+      null
+    ]
+  },
+  "actions": [
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 305300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 305300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 0,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 0,
+        "svtId": 305300
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 305300
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3,
+          "actor": {
+            "initialSlot": 2,
+            "svtId": 4000100
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": false,
+          "cardType": 2,
+          "card": 3,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 305300
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 2,
+        "svtId": 4000100
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 2
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      },
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1002200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 2,
+      "skill": 0,
+      "actor": {
+        "initialSlot": 3,
+        "svtId": 504500
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1002200
+          }
+        },
+        {
+          "svt": 2,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 3,
+            "svtId": 504500
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 1,
+          "card": 2,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1002200
+          }
+        }
+      ]
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1002200
+          }
+        },
+        {
+          "svt": 0,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 0,
+            "svtId": 305300
+          }
+        },
+        {
+          "svt": 1,
+          "isTD": false,
+          "cardType": 3,
+          "card": 0,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1002200
+          }
+        }
+      ]
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 1,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1002200
+      }
+    },
+    {
+      "type": "skill",
+      "svt": 1,
+      "skill": 2,
+      "actor": {
+        "initialSlot": 1,
+        "svtId": 1002200
+      },
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "skill",
+      "svt": null,
+      "skill": 1,
+      "options": {
+        "playerTarget": 1
+      }
+    },
+    {
+      "type": "attack",
+      "attacks": [
+        {
+          "svt": 1,
+          "isTD": true,
+          "card": -1,
+          "actor": {
+            "initialSlot": 1,
+            "svtId": 1002200
+          }
+        },
+        {
+          "isAuto": true
+        },
+        {
+          "isAuto": true
+        }
+      ]
+    }
+  ],
+  "delegate": {
+    "replaceMemberIndexes": [
+      [
+        2,
+        0
+      ]
+    ]
+  },
+  "maaAdvancedStrategy": {
+    "preset": "balanced",
+    "openingHand": {
+      "enabled": false,
+      "servantId": null,
+      "servantSlot": null,
+      "requiredColors": [
+        "B",
+        "Q"
+      ],
+      "maxWaitTurns": 2
+    },
+    "nativeStrategyOverrides": {
+      "preferred_servant_ids": [
+        "1002200"
+      ],
+      "np_colors_by_servant_id": {
+        "305300": "Q",
+        "1002200": "A",
+        "4000100": "B",
+        "504500": "A"
+      },
+      "avoid_np_color_before_np": true,
+      "np_color_preservation_weight": 40
+    },
+    "autoServantSkills": false,
+    "maxTurns": 40
+  },
+  "_guideNotes": {
+    "source": "https://www.bilibili.com/video/BV1Xxx468EqM/",
+    "part": 1,
+    "cid": 43237903977,
+    "quest": "2026年11月地狱的试炼第四期「天魔轟臨」；信长弓→杀→骑→术，HP308832→675570→810684→1222460。",
+    "status": "视频单队4T逐帧转录；已通过数据和原生动作转换校验，并完成当前账号有限技能/换人初测；未验证原样4T通关或15任务。",
+    "formation": "1号冠位布里托玛特Lv120宝具3，2号好友冠位阿斯卡拉福斯Lv120宝具5，3号所长Lv120宝具3（战斗形态必须为第三阶段），4号术呆Lv90宝具1；视频主动技能全10。御主服为440普通迦勒底制服，T2将3号所长与4号术呆换人。",
+    "equipment": "视频最终50秒编队：枪为满破名侦探芙尔摩斯9403990，AE为满破狼的故事9406010，所长和术呆为满破龙脉9400180（画面Lv11）。首两张礼装等级及冠位另两格礼装未完整展示，不臆填。主C可按视频建议换高ATK礼装，但须重新核对伤害、初始NP及Cost。",
+    "cost": "视频显示70：自有三名五星从者48，加自有礼装12+5+5=22；好友助战不计Cost。新增候补或换礼装后须重新确保不超过80。",
+    "grandLancer": "必须事先解锁并启用冠位枪盘10003第12格、技能5048000「一刺にて城を穿つ（槍）」：宝具发动前取得伤害前解除目标防御强化效果，完成首条破血前清除全部加防。classBoardData只记录已确认必要格，不代表其他格关闭，也不会代用户解锁或点亮盘子。",
+    "appearance": "所长第三形态的3技能提供全体弱化无效；第一、第二形态效果不同。JSON中的limitCount/skillIds是方案记录，开战前仍须在游戏里将战斗形象固定到第三阶段。",
+    "turn1": "00:51–01:14：枪1→2→3，所长1；枪Quick宝具→所长Buster→枪Buster。需要同时有所长红和枪红，且由枪实际击破第一条；冠枪宝具前置解除敌防。AE和所长2/3此回合保留。",
+    "turn2": "01:29–01:48：所长2→3，御主3换所长与术呆，术呆3给AE，AE1，术呆1；AE Arts宝具→术呆Arts宝具→AE Arts。术呆宝具在AE宝具之后解掉既存焦热；蓝攻击两次来自AE宝具和面卡，不包括术呆辅助宝具。术呆2未使用。",
+    "turn3": "01:56–02:08：无技能；AE Arts宝具→枪Quick宝具→AE Quick。两次绿攻击来自枪宝具和AE绿面卡；需要枪NP回收足够和AE绿发牌，AE实际击破第三条。",
+    "turn4": "02:09–02:21：AE2→AE3给自己，御主2给AE；AE Arts宝具击杀第四条。视频后两张未展示，配置设默认普通卡补位。击杀时AE不得持有焦热。",
+    "debuffTiming": "所长T2的弱化无效持续3T覆盖T2–T4，但不清除T1已有焦热；T2术呆宝具解弱化不可省略。拖回合后要重新检查焦热、无效到期和技能续航。",
+    "aeSkill3": "AE3保留T4给自己，带来充能与增伤，也附加3回合后无视毅力即死，不能提前到T1或将固定4T方案当作可无限续打。",
+    "cardConditions": "每个attack是计划回合，不根据实际Break跳转。指定面卡缺失或宝具未就绪时，执行器会原位补普通卡，不会等待或保证任务计数。前3T依赖随机发牌，开局等牌无法保障后续牌，故本方案关闭等待；可分次通关补缺任务。",
+    "advancedStrategy": "任务中选择「高级策略→使用编辑器/chaldea配置」读取本文件：平衡补牌、不等关键牌、关闭方案结束后自动补从者技能、上限40；指定技能、宝具与面卡优先，策略只补空位。",
+    "verification": "2026-11-01核对P1完整媒体、简介和关键逐帧；视频末展示本期任务领取。本文件数据校验不等于本机通关或15任务已完成，仍以战后任务列表为准。",
+    "atlasSources": [
+      "https://api.atlasacademy.io/nice/JP/servant/305300",
+      "https://api.atlasacademy.io/nice/JP/servant/1002200",
+      "https://api.atlasacademy.io/nice/JP/servant/4000100",
+      "https://api.atlasacademy.io/nice/JP/servant/504500",
+      "https://api.atlasacademy.io/nice/JP/equip/9403990",
+      "https://api.atlasacademy.io/nice/JP/equip/9406010",
+      "https://api.atlasacademy.io/nice/JP/equip/9400180",
+      "https://api.atlasacademy.io/export/JP/nice_class_board.json"
+    ],
+    "grandBondNP50": "根据用户核对视频后的要求，冠位枪和冠位AE的羁绊礼装效果均设为NP50（grandBondEquipSkillChange=true）。须在游戏中实际启用；自有冠位礼装不会由自动编队修改，助战按NP50效果筛选。羁绊礼装卡面与第三格未完整读取，不臆填。",
+    "liveProbe20261101": "按用户要求仅技能/换人初测、不通关。实际枪非冠位Lv90宝具2、AE好友Lv100宝具3、不同礼装Cost84；T1技能执行，T2所长NP92不足3技能要求，保存断点后仅诊断副本补御主2给所长，再成功执行所长3、3↔4换术呆、术呆3给AE、AE1、术呆1，下一次Attack前拦截停止。最终第2回合第一条血274592，未结算。正式actions仍为视频原顺序，没有加入诊断充能。"
+  }
+}

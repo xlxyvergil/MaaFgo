@@ -39,6 +39,7 @@ class EditorTakeoverTests(unittest.TestCase):
         if portable:
             shutil.copytree(ROOT / 'agent/battle_editor', root / 'agent/battle_editor',
                             ignore=shutil.ignore_patterns('__pycache__', 'data'))
+            shutil.copy2(ROOT / 'agent/support_ce.py', root / 'agent/support_ce.py')
             (root / 'agent/chaldea').mkdir()
             shutil.copy2(ROOT / 'agent/chaldea/servant_aliases.py', root / 'agent/chaldea')
             (root / 'agent/battle/core').mkdir(parents=True)
@@ -298,7 +299,9 @@ _Storage._atomic, _Server.stop = _delayed_atomic, _observed_stop
             time.sleep(.05)
         else:
             self.fail('disposable legacy editor did not become ready')
-        self.assertEqual(health['pid'], child.pid)
+        backend_pid = health['pid']
+        # A Windows venv keeps a redirector process above the actual listener.
+        self.assertTrue(launcher._started_by_launcher(child, backend_pid))
         _, session = self.request(port, 'GET', '/api/session')
         payload = {'revision': 0, 'data': {'team': {'name': '旧页面已同步草稿'}, 'actions': []}}
         self.assertEqual(self.request(port, 'PUT', '/api/drafts/legacy-page', payload, token=session['token'])[0], 200)
@@ -333,9 +336,9 @@ _Storage._atomic, _Server.stop = _delayed_atomic, _observed_stop
             finally:
                 (old / '.release-write').touch()
         self.assertFalse(result.reused)
-        self.assertEqual(result.replaced_pid, child.pid)
+        self.assertEqual(result.replaced_pid, backend_pid)
         self.assertEqual(result.replaced_project_root, str(old.resolve()))
-        self.assertNotEqual(result.pid, child.pid)
+        self.assertNotEqual(result.pid, backend_pid)
         reaper.join(timeout=3)
         self.assertIsNotNone(child.poll())
         self.assertEqual(result.url, f'http://127.0.0.1:{port}/?project={project_identity(new)}')

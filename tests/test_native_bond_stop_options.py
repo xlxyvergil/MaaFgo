@@ -34,10 +34,13 @@ class NativeBondOptionTests(unittest.TestCase):
             for i in range(1, 7):
                 self.assertIs(overrides[CONFIG]["attach"][f"native_bond_stop_slot_{i}"], False)
             victory = overrides["战斗_胜利"]["recognition"]
-            self.assertEqual(victory["type"], "TemplateMatch")
-            self.assertEqual(victory["param"]["template"],
-                             "battle/bond/战后结果标题.png" if enabled else "battle/下一步.png")
-            self.assertEqual(victory["param"]["roi"], [450, 0, 400, 120] if enabled else [0, 0, 0, 0])
+            if enabled:
+                self.assertEqual(victory["type"], "Or")
+                self.assertEqual(victory["param"]["any_of"], ["战斗_战后RESULT", "羁绊结算-页面", "羁绊结算-升级展示", "战斗_战利品弹窗"])
+            else:
+                self.assertEqual(victory["type"], "TemplateMatch")
+                self.assertEqual(victory["param"]["template"], "battle/下一步.png")
+                self.assertEqual(victory["param"]["roi"], [0, 0, 0, 0])
         for i, case in enumerate(selection["cases"], 1):
             self.assertEqual(case["pipeline_override"], {CONFIG: {"attach": {f"native_bond_stop_slot_{i}": True}}})
         native = read("assets/resource/base/pipeline/原生自动战斗.json")
@@ -69,6 +72,7 @@ class NativeBondOptionTests(unittest.TestCase):
                      "结算推进_点击右上角", "结算推进_点击右上角_继续"):
             with self.subTest(name=name):
                 self.assertEqual(nodes[name]["next"][0], GUARD)
+                self.assertEqual(nodes[name]["next"][1], "[JumpBack]结算-羁绊升级继续")
         trial = read("assets/resource/base/pipeline/地狱的试炼.json")
         self.assertEqual(trial["地狱的试炼-结算调度"]["next"][0], GUARD)
         guard = nodes[GUARD]
@@ -79,21 +83,23 @@ class NativeBondOptionTests(unittest.TestCase):
             self.assertEqual(nodes[exit_name]["action"]["type"], "StopTask")
             self.assertEqual(nodes[exit_name]["next"], [])
             self.assertEqual(nodes[exit_name]["on_error"], [])
-        self.assertGreaterEqual(guard["attach"]["check_attempts"], 2)
-        wait = nodes[guard["attach"]["check_wait_node"]]
-        self.assertGreater(wait["pre_delay"], 0)
-        self.assertEqual(wait["action"]["type"], "DoNothing")
-        freezes = wait["post_wait_freezes"]
-        self.assertGreaterEqual(freezes["time"], 1000)
-        self.assertGreaterEqual(freezes["timeout"], freezes["time"])
-        self.assertEqual(freezes["target"], [80, 450, 1120, 100])
-        for prefix, expected_delay in (("page_wait", 50), ("positive", 100)):
-            key = f"{prefix}_node" if prefix == "page_wait" else "positive_wait_node"
-            polling = nodes[guard["attach"][key]]
+        attach = guard["attach"]
+        self.assertEqual(attach["observation_timeout_ms"], 4000)
+        self.assertEqual(attach["page_wait_timeout_ms"], 5000)
+        self.assertNotIn("check_wait_node", attach)
+        self.assertNotIn("positive_wait_node", attach)
+        self.assertNotIn("结算-羁绊快速复核", nodes)
+        self.assertNotIn("结算-羁绊停止等待动画", nodes)
+        for prefix, expected_delay in (("page_wait", 50), ("observation", 100)):
+            polling = nodes[attach[f"{prefix}_node"]]
             self.assertEqual(polling["pre_delay"], expected_delay)
             self.assertEqual(polling["post_delay"], 0)
             self.assertEqual(polling["action"]["type"], "DoNothing")
             self.assertEqual(polling["next"], [])
+            self.assertEqual(polling["on_error"], [])
+            self.assertNotIn("post_wait_freezes", polling)
+        self.assertGreaterEqual(attach["observation_attempts"] * 100,
+                                attach["observation_timeout_ms"])
 
 
 if __name__ == "__main__":

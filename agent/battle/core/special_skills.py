@@ -49,7 +49,8 @@ class SpecialSkillGroup:
     field: str
     options: tuple[str, ...]
     default: int
-    # tdTypeChanges stores CardType values 1/2/3, not button positions Q/A/B.
+    # tdTypeChanges stores Chaldea selector values, not screen button positions.
+    # Usually 1/2/3 mean A/B/Q; BB Dubai reuses 1/2 for attack/defense (both A).
     first_value: int = 0
 
 
@@ -90,4 +91,8 @@ SPECIAL_SKILL_GROUPS = (
             ("战斗_静希草十郎3技能_绿卡选择", "战斗_静希草十郎3技能_蓝卡选择", "战斗_静希草十郎3技能_红卡选择"), 2),
     _select("战斗_巴格斯特3技能_全体宝具选择", ("204900",), (3,),
             ("战斗_巴格斯特3技能_全体宝具选择", "战斗_巴格斯特3技能_单体宝具选择")),
+    SpecialSkillGroup("战斗_BB迪拜3技能_宝具类型选择", ("2300600",), (3,), TD,
+                      ("战斗_BB迪拜3技能_攻击宝具选择", "战斗_BB迪拜3技能_防御宝具选择"), 1, 1),
+    SpecialSkillGroup("战斗_卫宫3技能_宝具类型选择", ("200100",), (3,), TD,
+                      ("战斗_卫宫3技能_Arts宝具选择", "战斗_卫宫3技能_Buster宝具选择"), 1, 1),
 )

@@ -1,5 +1,79 @@
 import sys
 import time
+import logging
+import os
+import threading
+from logging.handlers import RotatingFileHandler
+from pathlib import Path
+
+
+# 界面日志开关：False 只发送 warning/error 和 focus 指令；
+# 改成 True 可恢复 info/debug 界面输出。本地文件日志始终保留全部级别。
+# 修改后需停止并重新启动任务，让新 Agent 加载此值。
+SHOW_VERBOSE_LOGS_IN_GUI = False
+
+
+# 多个 Agent 分开写文件，避免跨进程轮转冲突；不经过 MXU 的输出通道。
+_DIAGNOSTIC_PATH = (Path(__file__).resolve().parents[2] / "debug"
+                    / f"recognition-{os.getpid()}.log")
+_DIAGNOSTIC_MAX_BYTES = 4 * 1024 * 1024
+_DIAGNOSTIC_BACKUP_COUNT = 2
+_diagnostic_handler = None
+_diagnostic_lock = threading.RLock()
+
+
+class _DiagnosticFileHandler(RotatingFileHandler):
+    def handleError(self, record):
+        # 交给 diagnostic 提示文件故障，避免 logging 静默丢失排查记录。
+        raise
+
+
+def _diagnostic_backup_name(name):
+    # 轮转文件也以 .log 结尾，兼容 MXU 的日志导出与清理。
+    base, index = name.rsplit(".", 1)
+    return f"{Path(base).with_suffix('')}.{index}.log"
+
+
+def diagnostic(msg, *, level=logging.INFO):
+    """保存本地日志；文件不可写时仅提示一次，不将低级别日志刷回客户端。"""
+    global _diagnostic_handler
+    failure = None
+    with _diagnostic_lock:
+        if _diagnostic_handler is not False:
+            try:
+                if _diagnostic_handler is None:
+                    _DIAGNOSTIC_PATH.parent.mkdir(parents=True, exist_ok=True)
+                    handler = _DiagnosticFileHandler(
+                        _DIAGNOSTIC_PATH, maxBytes=_DIAGNOSTIC_MAX_BYTES,
+                        backupCount=_DIAGNOSTIC_BACKUP_COUNT, encoding="utf-8",
+                    )
+                    handler.namer = _diagnostic_backup_name
+                    handler.setFormatter(logging.Formatter(
+                        "%(asctime)s.%(msecs)03d [%(levelname)s] %(message)s",
+                        datefmt="%Y-%m-%d %H:%M:%S",
+                    ))
+                    _diagnostic_handler = handler
+                record = logging.LogRecord(
+                    "maafgo.recognition", level, __file__, 0, str(msg), (), None,
+                )
+                _diagnostic_handler.handle(record)
+                return
+            except Exception as exc:
+                failure = exc
+                if _diagnostic_handler is not None:
+                    try:
+                        _diagnostic_handler.close()
+                    except OSError:
+                        pass
+                _diagnostic_handler = False
+    if failure is not None:
+        # 不能调用 warning()：它也会写本地日志，可能递归进入当前失败出口。
+        _print_to_gui("warn:",
+            f"⚠️ >>> 本地日志无法写入 {_DIAGNOSTIC_PATH}，后续普通日志和识别细节将无法保存；"
+            "警告、错误仍会显示在运行日志中。"
+            "请检查该目录是否可写、磁盘是否有剩余空间，处理后停止并重新启动任务。"
+            f"原因：{failure}"
+        )
 
 # 核心修改：MFA GUI 监听的是标准输出，且需要特定的前缀
 # 开发者原话："focus或者字符串前面拼接info："
@@ -24,24 +98,26 @@ def _print_to_gui(prefix, msg):
     print(final_msg, flush=True)
 
 def info(msg):
-    """普通日志"""
-    # 对应开发者说的 "拼接 info:"
-    _print_to_gui("info:", f"🟣 >>> {msg}")
+    """普通日志始终落文件，是否发送到客户端由顶部开关控制。"""
+    diagnostic(msg)
+    if SHOW_VERBOSE_LOGS_IN_GUI:
+        _print_to_gui("info:", f"🟣 >>> {msg}")
 
 def warning(msg):
-    """警告日志"""
-    # 尝试猜测 warning 的前缀，通常是 warn: 或 warning:，如果没有就用 info: [WARN]
+    """警告同时保存在本地并显示在客户端。"""
+    diagnostic(msg, level=logging.WARNING)
     _print_to_gui("warn:", f"⚠️ >>> {msg}")
 
 def error(msg):
-    """错误日志"""
-    # 尝试猜测 error 的前缀
+    """错误同时保存在本地并显示在客户端。"""
+    diagnostic(msg, level=logging.ERROR)
     _print_to_gui("error:", f"🔴 >>> {msg}")
 
 def debug(msg):
-    """调试日志"""
-    # debug 可能会被 GUI 过滤，如果显示不出来，可以改用 info: [DEBUG]
-    _print_to_gui("debug:", msg)
+    """调试日志始终落文件，是否发送到客户端由顶部开关控制。"""
+    diagnostic(msg, level=logging.DEBUG)
+    if SHOW_VERBOSE_LOGS_IN_GUI:
+        _print_to_gui("debug:", msg)
 
 def focus(task_id):
     """
@@ -62,8 +138,9 @@ if sys.version_info >= (3, 7):
 if __name__ == "__main__":
     print("正在测试 MFA 日志协议...", flush=True)
     
-    # 1. 开发者明确提到的格式
-    info("这条日志应该能显示了！(基于 info: 前缀)")
+    # 普通和调试日志只落本地文件。
+    info("这条普通日志只保存在本地文件中")
+    debug("这条调试日志只保存在本地文件中")
     
     # 2. 测试其他等级
     time.sleep(0.5)
@@ -73,4 +150,4 @@ if __name__ == "__main__":
     # 3. 测试 focus (假设任务ID是 task_1)
     time.sleep(0.5)
     focus("task_1")
-    info("应该已经尝试聚焦任务了")
+    info("已发送任务聚焦指令")

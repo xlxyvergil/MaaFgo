@@ -136,6 +136,27 @@ def _shared(data: dict, region: str, color: str) -> dict:
     return entry
 
 
+def _mash_costume_limit(sid: int, servant: dict, limit: int | None) -> int | None:
+    """Accept Mash's Chaldea costume numbers using exact sidecar bindings.
+
+    Chaldea may retain the costume number (12) instead of its battle character
+    ID (800140). Only Mash has this compatibility rule; a registered costume
+    portrait supplies the relation, so unknown numbers never become defaults.
+    The normalized value is local to preview resolution, not saved plan data.
+    """
+    if sid != 800100 or limit is None or limit <= 4:
+        return limit
+    portraits = servant.get("portraits", [])
+    if not isinstance(portraits, list):
+        return limit
+    matches = {int(portrait["key"]) for portrait in portraits
+               if isinstance(portrait, dict) and portrait.get("group") == "costume"
+               and type(portrait.get("variant")) is int and portrait["variant"] == limit
+               and isinstance(portrait.get("key"), str) and len(portrait["key"]) <= 10
+               and portrait["key"].isascii() and portrait["key"].isdecimal()}
+    return next(iter(matches)) if len(matches) == 1 else limit
+
+
 def _portrait(servant: dict, variant: int | None, limit: int | None) -> tuple[dict, str]:
     portraits = servant.get("portraits", [])
     portraits = [p for p in portraits if isinstance(p, dict) and type(p.get("variant")) is int and p["variant"] > 0] if isinstance(portraits, list) else []
@@ -219,6 +240,7 @@ def resolve_np_card(project_root: Path | str, *, svt_id: int, td_id: int, region
         raise NpMetadataError("invalid_np_card_parameter", "region 只支持 JP 或 CN", 400)
     data, metadata_digest = _metadata(Path(project_root).resolve())
     sid, servant, regional = _servant(data, sid, region, transform, require_region=True)
+    limit = _mash_costume_limit(sid, servant, limit)
     nps = regional.get("nps", {})
     np = nps.get(str(td)) if isinstance(nps, dict) else None
     if not isinstance(np, dict):
@@ -262,6 +284,7 @@ def resolve_face_card(project_root: Path | str, *, svt_id: int, region: str, col
         raise NpMetadataError("invalid_np_card_parameter", "指令卡地区或颜色不受支持", 400)
     data, metadata_digest = _metadata(Path(project_root).resolve())
     sid, servant, _ = _servant(data, sid, region, transform, require_region=False)
+    limit = _mash_costume_limit(sid, servant, limit)
     portrait, source = _portrait(servant, variant, limit)
     shared = _shared(data, region, color)
     pack = "base" if region == "JP" else "cn"

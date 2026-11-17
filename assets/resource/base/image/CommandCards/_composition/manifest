@@ -325,6 +325,42 @@
         "source_sha256": "98c6e0bcd65cb348bc0438a842985ada25d9c94bd41cb87efbab01cf61648bd8"
       }
     },
+    "2501700": {
+      "2501710.png": {
+        "alpha_mask_changed_pixels": 0,
+        "file": "np/2501700/2501710.png",
+        "fully_transparent_changed_pixels": 0,
+        "mode": "P",
+        "name_rows": [
+          0
+        ],
+        "quantization_profile": "libimagequant-256-alpha-classes-v1",
+        "sha256": "f1a10c7918b4a8dfb743e6c3847eb7ee3f8aaea2cbb6af6a715acd4ce2676a03",
+        "size": [
+          256,
+          256
+        ],
+        "source": "https://static.atlasacademy.io/JP/Servants/Commands/2501700/2501710.png",
+        "source_sha256": "b542a1d32a27336b7193da4d94785873771db0ff68ec5f7dc286d47c4075d535"
+      },
+      "2501720.png": {
+        "alpha_mask_changed_pixels": 0,
+        "file": "np/2501700/2501720.png",
+        "fully_transparent_changed_pixels": 0,
+        "mode": "P",
+        "name_rows": [
+          0
+        ],
+        "quantization_profile": "libimagequant-256-alpha-classes-v1",
+        "sha256": "1e29aa9cb569a7ac5e902a61070a9a2cc1c684f9e64d225494e9857b428bb290",
+        "size": [
+          256,
+          256
+        ],
+        "source": "https://static.atlasacademy.io/JP/Servants/Commands/2501700/2501720.png",
+        "source_sha256": "a3230906ccb74705ffaaba790cc779a220d08cab78a0668fa5aabd6655c38d8b"
+      }
+    },
     "2800100": {
       "2800110.png": {
         "alpha_mask_changed_pixels": 0,
@@ -361,6 +397,25 @@
         ],
         "source": "https://static.atlasacademy.io/JP/Servants/Commands/2800500/card_servant_np1.png",
         "source_sha256": "f118d9ca236406ca08940cf73be4b494ff3f1067d9199e4967e496136617c64d"
+      }
+    },
+    "2801400": {
+      "2801410.png": {
+        "alpha_mask_changed_pixels": 0,
+        "file": "np/2801400/2801410.png",
+        "fully_transparent_changed_pixels": 0,
+        "mode": "P",
+        "name_rows": [
+          0
+        ],
+        "quantization_profile": "libimagequant-256-alpha-classes-v1",
+        "sha256": "ac0359a24e20f325c947dd2f4c085e213461cf762cb6cc26e173d95d2494b1ae",
+        "size": [
+          256,
+          256
+        ],
+        "source": "https://static.atlasacademy.io/JP/Servants/Commands/2801400/2801410.png",
+        "source_sha256": "98eb6595cb440513e6e3e5bb3007e87d28329e3fbb3b18a4c88b9568f657f543"
       }
     },
     "304800": {
@@ -686,6 +741,25 @@
         "source_sha256": "b6996eb51de56ac4ecaa88f924266ccab31034dfaf2a78207f13b04c6731ad3f"
       }
     },
+    "705500": {
+      "705510.png": {
+        "alpha_mask_changed_pixels": 0,
+        "file": "np/705500/705510.png",
+        "fully_transparent_changed_pixels": 0,
+        "mode": "P",
+        "name_rows": [
+          0
+        ],
+        "quantization_profile": "libimagequant-256-alpha-classes-v1",
+        "sha256": "a13c47cac2cc65dc02f66a6bcced4f077cef79881cf8e52f963ea08485f12b7c",
+        "size": [
+          256,
+          256
+        ],
+        "source": "https://static.atlasacademy.io/JP/Servants/Commands/705500/705510.png",
+        "source_sha256": "81698cd7a43bec5fd8ec9a8fd38be93fa4e366cd4d5696f8436dc16a341a2478"
+      }
+    },
     "800100": {
       "card_servant_np1.png": {
         "alpha_mask_changed_pixels": 0,
@@ -774,6 +848,7 @@
       }
     }
   },
+  "np_missing": {},
   "np_names": {
     "1000100": {
       "alpha_mask_changed_pixels": 0,
@@ -3872,6 +3947,23 @@
       "source": "https://static.atlasacademy.io/JP/Servants/Commands/2501600/card_servant_np.png",
       "source_sha256": "943a44af11a9b1e2f64bc06554dfbd02594683e06e3135f2b02b20c1e0878a8f"
     },
+    "2501700": {
+      "alpha_mask_changed_pixels": 0,
+      "file": "np/2501700/card_servant_np.png",
+      "fully_transparent_changed_pixels": 0,
+      "mode": "P",
+      "name_rows": [
+        0
+      ],
+      "quantization_profile": "libimagequant-256-alpha-classes-v1",
+      "sha256": "8f0a66d4325178b7bb6822ccee31335a6a1c8c55ee816daba092622dd76ed517",
+      "size": [
+        256,
+        256
+      ],
+      "source": "https://static.atlasacademy.io/JP/Servants/Commands/2501700/card_servant_np.png",
+      "source_sha256": "3a60477a115ab72cd4c710054bd09e16da7839d6df2ce5fde4b8467ca118cef7"
+    },
     "2800100": {
       "alpha_mask_changed_pixels": 0,
       "file": "np/2800100/card_servant_np.png",
@@ -4093,6 +4185,23 @@
       ],
       "source": "https://static.atlasacademy.io/JP/Servants/Commands/2801300/card_servant_np.png",
       "source_sha256": "7839e297938795884b83d7b71377ad34a38b0b1d658658af5ceb23563d0df90a"
+    },
+    "2801400": {
+      "alpha_mask_changed_pixels": 0,
+      "file": "np/2801400/card_servant_np.png",
+      "fully_transparent_changed_pixels": 0,
+      "mode": "P",
+      "name_rows": [
+        0
+      ],
+      "quantization_profile": "libimagequant-256-alpha-classes-v1",
+      "sha256": "d5ebd1f773dd9fee7f35397c8979aca5315dddd19c6ad051a9e76866f0319f02",
+      "size": [
+        256,
+        256
+      ],
+      "source": "https://static.atlasacademy.io/JP/Servants/Commands/2801400/card_servant_np.png",
+      "source_sha256": "4be8fbb69c9309ce6237319ea6a6a29ab2de2897838f7980a513242bb3643a53"
     },
     "300100": {
       "alpha_mask_changed_pixels": 0,
@@ -5964,6 +6073,23 @@
       ],
       "source": "https://static.atlasacademy.io/JP/Servants/Commands/406000/card_servant_np.png",
       "source_sha256": "68aa87100f4025e732d28d10a232021f9e0e10b3b498172f99f1394914ce6f19"
+    },
+    "406100": {
+      "alpha_mask_changed_pixels": 0,
+      "file": "np/406100/card_servant_np.png",
+      "fully_transparent_changed_pixels": 0,
+      "mode": "P",
+      "name_rows": [
+        0
+      ],
+      "quantization_profile": "libimagequant-256-alpha-classes-v1",
+      "sha256": "56a83748a241d750f01010cd17e92e09365f17d114ef49b626fa17d836efb192",
+      "size": [
+        256,
+        256
+      ],
+      "source": "https://static.atlasacademy.io/JP/Servants/Commands/406100/card_servant_np.png",
+      "source_sha256": "0b3dbb6698328a0d5931ce5698afc02acf2c930d8ba46313eab725f60c463e98"
     },
     "500100": {
       "alpha_mask_changed_pixels": 0,
@@ -8532,6 +8658,23 @@
       ],
       "source": "https://static.atlasacademy.io/JP/Servants/Commands/705400/card_servant_np.png",
       "source_sha256": "104b541827627ded5e812b5aa10aed7e5a47ba6fcd2c765b261b2d7794783574"
+    },
+    "705500": {
+      "alpha_mask_changed_pixels": 0,
+      "file": "np/705500/card_servant_np.png",
+      "fully_transparent_changed_pixels": 0,
+      "mode": "P",
+      "name_rows": [
+        0
+      ],
+      "quantization_profile": "libimagequant-256-alpha-classes-v1",
+      "sha256": "497ff327b6a84e9749ff020b13f30fd89b9031d138125c52e510094a3161746b",
+      "size": [
+        256,
+        256
+      ],
+      "source": "https://static.atlasacademy.io/JP/Servants/Commands/705500/card_servant_np.png",
+      "source_sha256": "8d46675403671e6ae42747daa0e641c7613b779b4ce78bb42c8c58737a1eabdf"
     },
     "800100": {
       "alpha_mask_changed_pixels": 0,

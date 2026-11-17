@@ -1,6 +1,9 @@
+import {projectServantForm} from './servantForms';
 import {members,servantFor,skillAt,turnsOf,isSwap,hasServantIdentity,isUnspecifiedSupport} from './model';
-import type {Catalog,Json,Mystic,Servant} from './model';
+import type {Catalog,Entry,Json,Mystic,Servant} from './model';
 import {advanceActionRoster,isRetire,resolveActionActor} from './actionRoster';
+import {isAutoAttackCard} from './attackCards';
+import {specialSkillChoiceFor,specialSkillChoiceNP} from './specialSkillChoices';
 
 /** Display-only cooldown information. This module never edits BattleShareData. */
 export interface CooldownBounds {
@@ -22,6 +25,8 @@ export interface PreviewMember {
   slot:number;
   member:Json|null;
   servant:Servant|undefined;
+  np:Json|undefined;
+  npState?:{kind:'mash-sword-loaded';remainingTurns:number}|{kind:'skill-np-change';remainingTurns:number;np:Json};
   skills:PreviewSkill[];
   retired:boolean;
 }
@@ -64,11 +69,74 @@ const initialSkill=(skill:Json|undefined,index:number,level:unknown,hasActor:boo
 
 export function npAt(member:Json|undefined|null,servant:Servant|undefined):Json|undefined {
   if(!hasServantIdentity(member))return undefined;
-  const chosen=member?.tdId;
-  if(chosen!=null)return servant?.npVariants?.find(np=>np.id===chosen)
+  const chosen=member?.tdId;servant=projectServantForm(servant,member);
+  if(chosen!=null&&!(servant?.forms?.length&&chosen===0))return servant?.npVariants?.find(np=>np.id===chosen)
     ??(servant?.np?.id===chosen?servant?.np:undefined)
     ??{id:chosen,name:`宝具 #${chosen}`};
   return servant?.np??undefined;
+}
+
+/** Planned NP state immediately before this attack; never changes the saved tdId. */
+export function npAtAction(data:Json,catalog:Catalog,actionIndex:number,slot:number,card?:Json):Json|undefined {
+  if(!Number.isInteger(slot)||slot<0||slot>2||data.actions?.[actionIndex]?.type!=='attack')return undefined;
+  const turnIndex=turnsOf(data).findIndex(turn=>turn.entries.some(entry=>entry.index===actionIndex));
+  if(turnIndex<0)return undefined;
+  const preview=previewTurn(data,catalog,turnIndex);
+  if(card){
+    if(card.svt!==slot)return undefined;
+    const resolved=resolveActionActor(preview.roster,card);
+    if(resolved.issue){
+      // Invalid recorded actions still show their original owner, never the
+      // replacement at this slot. Validation separately blocks their execution.
+      const original=resolved.actor as PreviewMember|undefined;
+      return original&&original.member?.svtId===card.actor?.svtId?original.np:undefined;
+    }
+  }
+  return preview.front[slot]?.np;
+}
+
+function updateLoadedNP(actor:PreviewMember) {
+  const initial=npAt(actor.member,actor.servant);
+  actor.np=actor.npState?.remainingTurns
+    ?actor.npState.kind==='skill-np-change'?actor.npState.np
+      :actor.servant?.npVariants?.find(np=>np.id===800108)??{id:800108,name:'圣剑装填宝具（资料待补充）',cardType:2}
+    :initial;
+}
+
+/** Replay the selected NP for display; saved team.tdId and delegate stay intact. */
+function applySkillNPChange(actor:PreviewMember,entry:Entry,catalog:Catalog) {
+  const group=specialSkillChoiceFor(actor.member,actor.servant,entry.raw.skill,catalog);
+  const duration=group?.durationTurns;
+  const binding=entry.specialChoice;
+  if(group?.field!=='tdTypeChanges'||typeof duration!=='number'||!Number.isInteger(duration)||duration<=0||!binding||binding.groupId!==group.id||binding.missing)return;
+  const rawValue=binding.value;
+  const value=typeof rawValue==='string'?({arts:1,buster:2,quick:3} as Record<string,number>)[rawValue]:rawValue;
+  const option=group.options.find(item=>item.value===value);
+  if(!option)return;
+  const base=npAt(actor.member,actor.servant);
+  const np=specialSkillChoiceNP(option,base,actor.servant);
+  if(!np)return;
+  actor.npState={kind:'skill-np-change',remainingTurns:duration,np};
+  updateLoadedNP(actor);
+}
+
+/** Atlas buff 5825 lasts three on-field turns; only NP 800107 grants it. */
+function advanceNPState(roster:PreviewMember[],attack:Json) {
+  const used=new Set<string>();
+  for(const card of (Array.isArray(attack.attacks)?attack.attacks:[]).slice(0,3)){
+    if(isAutoAttackCard(card)||card?.isTD!==true)continue;
+    const resolved=resolveActionActor(roster,card),actor=resolved.actor as PreviewMember|undefined;
+    if(resolved.issue||!actor||actor.retired||used.has(actor.key))continue;
+    used.add(actor.key);
+    if(actor.member?.svtId===800100&&actor.np?.id===800107){
+      actor.npState={kind:'mash-sword-loaded',remainingTurns:3};
+    }
+  }
+  // Like Chaldea's active-player buff clock, backup members retain their state.
+  for(const actor of roster.slice(0,3)){
+    if(actor.npState&&--actor.npState.remainingTurns<=0)delete actor.npState;
+    updateLoadedNP(actor);
+  }
 }
 
 export function skillTargetMode(skill:Json|undefined):'ally'|'none'|'unknown' {
@@ -80,12 +148,10 @@ export function hasEnemyTarget(skill:Json|undefined):boolean {
   return Array.isArray(skill?.targets)&&skill.targets.includes('enemy');
 }
 
-/** Ally indices remain current-front 0..2; casterSlot=-1 represents the master. */
-export function allowedAllyTargets(skill:Json|undefined,casterSlot:number,roster:readonly PreviewMember[]):number[] {
-  const targets=Array.isArray(skill?.targets)?skill.targets:[];
-  const excludesSelf=targets.includes('ptOneOther')&&!targets.includes('ptOne');
+/** Effect recipients do not restrict selection: ptOneOther excludes the chosen ally, not the caster. */
+export function allowedAllyTargets(_skill:Json|undefined,_casterSlot:number,roster:readonly PreviewMember[]):number[] {
   return roster.slice(0,3).flatMap((entry,index)=>
-    (hasServantIdentity(entry.member)||isUnspecifiedSupport(entry.member))&&(!excludesSelf||index!==casterSlot)?[index]:[]);
+    hasServantIdentity(entry.member)||isUnspecifiedSupport(entry.member)?[index]:[]);
 }
 
 function decrease(skills:PreviewSkill[]) {
@@ -104,11 +170,11 @@ function decrease(skills:PreviewSkill[]) {
  * instance; only members on field at an attack boundary receive the basic tick.
  */
 export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePreview {
-  const turns=turnsOf(data);
+  const turns=turnsOf(data,catalog);
   const selected=Math.max(0,Math.min(Math.max(0,turns.length-1),Number.isInteger(turnIndex)?turnIndex:0));
   const roster:PreviewMember[]=members(data).map((member,initialSlot)=>{
-    const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId):undefined;
-    return {key:`initial:${initialSlot}`,initialSlot,slot:initialSlot,member,servant,retired:false,
+    const actorPresent=hasServantIdentity(member),servant=actorPresent?servantFor(catalog,member?.svtId,member):undefined;
+    return {key:`initial:${initialSlot}`,initialSlot,slot:initialSlot,member,servant,np:npAt(member,servant),retired:false,
       skills:[0,1,2].map(index=>initialSkill(actorPresent?skillAt(member??undefined,servant,index):undefined,index,member?.skillLvs?.[index],actorPresent))};
   });
   const mystic=catalog.mysticCodes.find(code=>code.id===data.team?.mysticCode?.mysticCodeId);
@@ -122,6 +188,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
       const action=entry.raw;
       if(action?.type==='attack'){
         if(ti===selected){beforeAttackIndex=entry.index;break;}
+        advanceNPState(roster,action);
         for(const actor of roster.slice(0,3))if(hasServantIdentity(actor.member))decrease(actor.skills);
         decrease(master.skills);
         for(const actor of roster)for(const state of actor.skills)state.usedThisTurn=false;
@@ -147,6 +214,7 @@ export function previewTurn(data:Json,catalog:Catalog,turnIndex:number):BattlePr
       // A click is one recorded use even for a rare zero-CD skill. Another use
       // in this turn still requires the explicit manual-ready interaction.
       state.ready=false;
+      if(actor)applySkillNPChange(actor,entry,catalog);
       if(state.remainingMax==null)warnings.push({code:'unknown-cooldown',actionIndex:entry.index,message:'缺少可靠技能或等级 CD 元数据；冷却保持未知，可手动右键就绪。'});
       if(isSwap(data,action)){
         const pair=entry.replacement,front=pair?.[0],back=pair?.[1]<3?pair[1]+3:pair?.[1];

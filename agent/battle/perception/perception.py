@@ -36,6 +36,7 @@ def build(
     servant_recognizer: FrontlineServantRecognizer | None = None,
     composed_recognizer: ComposedCardRecognizer | None = None,
     enemy_slots: Sequence[int] | None = None,
+    read_skill_cooldowns: bool = True,
 ) -> BattleState:
     scene, sconf = _detect_scene(context, img)
 
@@ -102,7 +103,7 @@ def build(
         for slot, detected in np_owners.items():
             if getattr(detected, "reason", "") == "np_glare_uncertain":
                 unknown.append(f"np[{slot}].presence:glare")
-                mfaalog.info(f"[NPGlare] slot={slot} score={detected.score:.4f} "
+                mfaalog.diagnostic(f"[NPGlare] slot={slot} score={detected.score:.4f} "
                              f"white_fraction={detected.glare_fraction:.4f} "
                              f"template={detected.matched_template}; 仅请求重拍，不确认为可用宝具")
         for c in cards:
@@ -114,6 +115,7 @@ def build(
         servants = _detect_servants(
             context, img, candidate_servant_ids or frontline_servant_ids or (),
             recognizer=servant_recognizer,
+            read_skill_cooldowns=read_skill_cooldowns,
         )
         for servant in servants:
             for index, skill in enumerate(servant.skills, start=1):
@@ -121,7 +123,8 @@ def build(
                     unknown.append(
                         f"servant[{servant.slot}].skill[{index}].available"
                     )
-        master_skills = _detect_master_skills(context, img)
+        master_skills = (_detect_master_skills(context, img) if read_skill_cooldowns
+                         else _planned_skills())
         for index, skill in enumerate(master_skills, start=1):
             if skill.available is None:
                 unknown.append(f"master_skill[{index}].available")
@@ -260,38 +263,72 @@ def _count(reco) -> int:
     return int(getattr(best, "count", 0) or 0)
 
 
-def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None) -> Tuple[ServantState, ...]:
-    """先识别各位置的战斗头像，再检测已确认从者的技能 CD。
+def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None,
+                     read_skill_cooldowns: bool = True) -> Tuple[ServantState, ...]:
+    """有编队候选时先确认头像；无候选时仅按前排位置检测技能 CD。
 
-    头像未匹配时按空位处理，不识别或使用该位置的技能。
-    存在从者时，技能按钮命中 CD 数字模板则不可用，否则可用。
-    搜索范围为已确认编队（含候补），身份与位置取自当前截图。
+    无候选路径暂不判断空位，身份保持未知，不作为攻略身份校验的证据。
+    有候选时仍仅搜索已确认编队（含候补），头像未匹配则跳过该位置。
+    技能按钮命中 CD 数字模板则不可用，否则可用。明确执行计划时可跳过 CD，
+    沿用计划技能可用状态；头像识别和空位过滤仍然执行。
     """
     out: List[ServantState] = []
     if not any(candidate_servant_ids):
-        return ()
+        return tuple(
+            ServantState(slot, (_detect_servant_skills(context, img, slot) if read_skill_cooldowns
+                                else _planned_skills()),
+                         Confidence(0.0, "identity:unknown"))
+            for slot in config.FRONTLINE_SLOTS
+        )
     recognizer = recognizer or FrontlineServantRecognizer.from_context(context)
     for identity in recognizer.detect(img, candidate_servant_ids):
         if identity.servant_id is None or getattr(identity, "visible_top", 35) != 35:
-            mfaalog.info(f"[HUDIdentity] slot={identity.slot} id={identity.servant_id or 'unknown'} "
+            mfaalog.diagnostic(f"[HUDIdentity] slot={identity.slot} id={identity.servant_id or 'unknown'} "
                          f"score={identity.confidence.value:.4f} margin={identity.margin:.4f} "
                          f"crop_top={getattr(identity, 'visible_top', 35)} template={identity.matched_template}")
         if identity.servant_id is None:
             continue
         slot = identity.slot
-        skills: List[SkillState] = []
-        for idx in range(1, 4):
-            cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
-            cd_result = _reco(context, cd_node, img)
-            if cd_result and cd_result.hit:
-                # 命中 CD 数字模板 → 技能在冷却，不可用。
-                score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
-                skills.append(SkillState(False, Confidence(float(score), "template:cd")))
-                continue
-            # 未命中任何 CD 数字 → 技能可用。
-            skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
-        out.append(ServantState(slot, tuple(skills), identity.confidence, identity.servant_id))
+        out.append(ServantState(slot, (_detect_servant_skills(context, img, slot) if read_skill_cooldowns
+                                     else _planned_skills()),
+                                identity.confidence, identity.servant_id))
     return tuple(out)
+
+
+def _planned_skills() -> Tuple[SkillState, SkillState, SkillState]:
+    """计划明确指定何时释放技能；此状态来自计划，不代表识别到了无冷却。"""
+    return (SkillState(True, Confidence(1.0, "plan:skip_cd")),) * 3
+
+
+def read_skill_cooldowns(context, img, state: BattleState) -> BattleState:
+    """阶段映射后按需补读同帧 CD，保留身份、空位和敌人识别结果。"""
+    if state.scene is not Scene.MAIN_BATTLE:
+        return state
+    servants = tuple(replace(servant, skills=_detect_servant_skills(context, img, servant.slot))
+                     for servant in state.servants)
+    master_skills = _detect_master_skills(context, img)
+    unknown = [name for name in state.unknown_fields
+               if not (name.startswith(("servant[", "master_skill[")) and name.endswith(".available"))]
+    for servant in servants:
+        unknown.extend(f"servant[{servant.slot}].skill[{index}].available"
+                       for index, skill in enumerate(servant.skills, 1) if skill.available is None)
+    unknown.extend(f"master_skill[{index}].available"
+                   for index, skill in enumerate(master_skills, 1) if skill.available is None)
+    return replace(state, servants=servants, master_skills=master_skills,
+                   unknown_fields=tuple(unknown))
+
+
+def _detect_servant_skills(context, img, slot: int) -> Tuple[SkillState, SkillState, SkillState]:
+    skills: List[SkillState] = []
+    for idx in range(1, 4):
+        cd_node = config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=idx)
+        cd_result = _reco(context, cd_node, img)
+        if cd_result and cd_result.hit:
+            score = getattr(getattr(cd_result, "best_result", None), "score", 1.0) or 1.0
+            skills.append(SkillState(False, Confidence(float(score), "template:cd")))
+        else:
+            skills.append(SkillState(True, Confidence(1.0, "template:no_cd")))
+    return tuple(skills)
 
 
 def _detect_master_skills(context, img) -> Tuple[SkillState, ...]:

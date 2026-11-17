@@ -132,7 +132,6 @@
         "主动技能-2": {
             "type": "select",
             "label": "主动技能2",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default_case": "10",
             "cases": [
                 {
@@ -261,7 +260,6 @@
         "主动技能-3": {
             "type": "select",
             "label": "主动技能3",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default_case": "10",
             "cases": [
                 {
@@ -390,7 +388,6 @@
         "被动技能-1": {
             "type": "select",
             "label": "被动技能1",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default": "0",
             "cases": [
                 {
@@ -519,7 +516,6 @@
         "被动技能-2": {
             "type": "select",
             "label": "被动技能2",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default": "0",
             "cases": [
                 {
@@ -648,7 +644,6 @@
         "被动技能-3": {
             "type": "select",
             "label": "被动技能3",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default": "0",
             "cases": [
                 {
@@ -777,7 +772,6 @@
         "被动技能-4": {
             "type": "select",
             "label": "被动技能4",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default": "0",
             "cases": [
                 {
@@ -906,7 +900,6 @@
         "被动技能-5": {
             "type": "select",
             "label": "被动技能5",
-            "description": "0=不要求该技能, 1-10=技能等级",
             "default": "0",
             "cases": [
                 {

@@ -35,16 +35,40 @@ _LABELS = {
     "战斗_岸波白野3技能_天之力选择": ("天之力特攻", "地之力特攻", "人之力特攻"),
     "战斗_静希草十郎3技能_红卡选择": ("Quick", "Arts", "Buster"),
     "战斗_巴格斯特3技能_全体宝具选择": ("全体宝具", "单体宝具"),
+    "战斗_BB迪拜3技能_宝具类型选择": ("攻击宝具（C.C.C.）", "防御宝具（G.G.G.）"),
+    "战斗_卫宫3技能_宝具类型选择": ("Arts 宝具", "Buster 宝具"),
 }
 
-# JP Atlas skill.script.SelectAddInfo, checked against the bundled catalog and
-# the 2026-10-29 source snapshots. Earlier variants have no selection menu.
+# Queue values name the game selector, not always the resulting card color.
+# BB Dubai's attack and defense NPs are both Arts despite using TD values 1/2.
+_NP_CARD_TYPES = {
+    "战斗_仇凛2技能_色卡选择": (1, 2, 3),
+    "战斗_BB迪拜3技能_宝具类型选择": (1, 1),
+    "战斗_卫宫3技能_宝具类型选择": (1, 2),
+}
+_NP_IDS = {"战斗_BB迪拜3技能_宝具类型选择": (2300601, 2300698),
+           "战斗_仇凛2技能_色卡选择": (1100901, 1100997, 1100998)}
+_NP_IDS_BY_BASE = {
+    # Exact Atlas NP script.tdTypeChangeIDs; weakened/strengthened Arts IDs
+    # are not ordered by number and must not be chosen by a color-only guess.
+    "战斗_卫宫3技能_宝具类型选择": (
+        {200101: 200198, 200102: 200197, 200197: 200197, 200198: 200198},
+        {200101: 200101, 200102: 200102, 200197: 200102, 200198: 200101},
+    ),
+}
+_DURATION_TURNS = {"战斗_BB迪拜3技能_宝具类型选择": 3,
+                   "战斗_卫宫3技能_宝具类型选择": 1,
+                   "战斗_仇凛2技能_色卡选择": 3}
+
+# JP Atlas menu/function metadata, checked against the bundled catalog and
+# source snapshots. Earlier variants have no selection menu.
 _MENU_SKILL_IDS = {
     "战斗_马嘶1技能_无敌选择": (604550,),
     "战斗_夏洛特3技能_Arts选择": (2379350,),
     "战斗_芙萝拉3技能_通常状态选择": (2589650, 2589675),
     "战斗_安哥拉曼纽3技能_50%毅力选择": (458900,),
     "战斗_岸波白野3技能_天之力选择": (2415451,),
+    "战斗_卫宫3技能_宝具类型选择": (754650,),
 }
 
 
@@ -57,6 +81,12 @@ def special_skill_catalog() -> dict:
         for index, node in enumerate(native.options):
             label = labels[index] if labels and index < len(labels) else node.removeprefix("战斗_").replace("_", " · ")
             option = {"value": native.first_value + index, "label": label}
+            if native.root in _NP_CARD_TYPES:
+                option["cardType"] = _NP_CARD_TYPES[native.root][index]
+            if native.root in _NP_IDS:
+                option["npId"] = _NP_IDS[native.root][index]
+            if native.root in _NP_IDS_BY_BASE:
+                option["npIdsByBase"] = dict(_NP_IDS_BY_BASE[native.root][index])
             # Kukulkan's shared menu covers S1/S3 (no ally target) and S2
             # (ally target), so preserve the selected skill's target metadata.
             if native.root != "战斗_库库尔坎_暴击星消耗":
@@ -67,6 +97,8 @@ def special_skill_catalog() -> dict:
                  "options": options, "defaultValue": native.default}
         if native.root in _MENU_SKILL_IDS:
             group["skillIds"] = list(_MENU_SKILL_IDS[native.root])
+        if native.root in _DURATION_TURNS:
+            group["durationTurns"] = _DURATION_TURNS[native.root]
         groups.append(group)
     return {"schemaVersion": 1, "groups": groups}
 

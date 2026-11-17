@@ -376,7 +376,7 @@ class ExecuteBoxTask(CustomAction):
                 self._context.run_task("整理礼物盒-一键领取循环")
             if self._match(TPL_GIFT_FULL) is not None:
                 self._giftbox_full = True
-                mfaalog.info("[整理礼物盒] 持有上限已满，停止继续整理并进入后续流程")
+                mfaalog.warning("[整理礼物盒] 持有上限已满，停止继续整理并进入后续流程")
                 self._dismiss_giftbox_full()
                 return not self._context.tasker.stopping, False
 
@@ -585,7 +585,7 @@ class ExecuteBoxTask(CustomAction):
                     continue
                 if self._match(TPL_GIFT_FULL) is not None:
                     self._giftbox_full = True
-                    mfaalog.info("[整理礼物盒] 持有上限已满，停止继续整理")
+                    mfaalog.warning("[整理礼物盒] 持有上限已满，停止继续整理")
                     self._dismiss_giftbox_full()
                     return False
                 for i in active:
@@ -732,7 +732,7 @@ class ExecuteBoxTask(CustomAction):
                 mfaalog.warning(f"[整理礼物盒] 贩点贩卖 pipeline 异常: {e}")
             # 5. aqf=false 时 pipeline 对 QP 满 DoNothing，这里检查并停止
             if not aqf and self._match(TPL_QP_FULL) is not None:
-                mfaalog.info("[整理礼物盒] QP 已满，按设置停止贩卖")
+                mfaalog.warning("[整理礼物盒] QP 已满，按设置停止贩卖")
                 return
         mfaalog.warning("[整理礼物盒] 贩卖达到最大轮数")
 

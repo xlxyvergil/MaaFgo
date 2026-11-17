@@ -1,45 +1,26 @@
 {
     "羁绊结算-页面": {
-        "doc": "日服模板已换为2026-11-01冬木XA实机羁绊页裁图，保留BBC 720p参考ROI；国服cn同名覆盖仍为BBC临时素材。页面与第5栏MAX已由MaaMCP确认（替换前0.9728/0.9732），可参考tests/fixtures/bond_stop/jp_bond_slot5_max.png与docs/verification/bond_stop_templates.json。固定左上ROI用于排除升级展示右侧同样出现的文字，不能扩大到全屏；升级弹窗负样本见jp_bond_level_up_overlay.png。",
+        "doc": "使用原包img_txt_servantbonds01完整文字，tools/generate_bond_text_templates.py按720p字号放大1.25倍并将背景制成纯绿遮罩；国服cn覆盖同名中文资源。日服普通页真实框架回放0.910。01文字也是升级说明02的前缀，必须限制左上，不能全屏搜索；MAX只在本节点命中后读取。参考羁绊结算-升级展示、test_bond_result_images.py及docs/verification/bond_stop_templates.json。",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "battle/bond/羁绊结算页.png",
-                "roi": [67, 150, 93, 83],
+                "template": "battle/bond/img_txt_servantbonds01.png",
+                "roi": [60, 150, 400, 90],
+                "method": 5,
+                "green_mask": true,
                 "threshold": 0.8
             }
         }
     },
     "羁绊结算-升级展示": {
-        "doc": "升级标题与右侧羁绊说明必须同时命中，只证明羁绊升级展示正在遮挡结算。不能证明当前上限已满，不能替代MAX判定；禁止采用BBC数字1或羁绊>=10逻辑。日服两张模板来自2026-11-01本项目12到13级升级实拍；国服同名覆盖采用BBC临时模板，待实机校准。",
-        "recognition": {
-            "type": "And",
-            "param": {
-                "all_of": [
-                    "羁绊结算-升级标题",
-                    "羁绊结算-升级说明"
-                ]
-            }
-        }
-    },
-    "羁绊结算-升级标题": {
-        "doc": "BBC jbup1顶部升级字区的720p参考ROI，日服改为本项目实拍裁图；仅与升级说明组合识别展示，不读羁绊等级。",
+        "doc": "只使用原包img_txt_servantbonds02右侧完整羁绊加深文字，按1.25倍字号及纯绿背景遮罩导出，国服cn覆盖同名中文资源。2026-11-07 MaaMCP实测日服龙娘5→6现有弹窗0.8863：以全选及重建第5/10场剩余预算登记下场复核，结算-羁绊升级继续单击后确认经验页。完整动画过渡仍由真实框架截图回放覆盖；旧详情0.888。早期大横幅尚无这段文字，应由羁绊守卫有界等待，不依赖动态顶部标题或卡片LEVEL UP。此节点只确认升级展示，不能判断MAX；延后复核及点击权限见结算-羁绊升级继续。",
         "recognition": {
             "type": "TemplateMatch",
             "param": {
-                "template": "battle/bond/升级标题.png",
-                "roi": [1100, 67, 157, 167],
-                "threshold": 0.8
-            }
-        }
-    },
-    "羁绊结算-升级说明": {
-        "doc": "BBC jbup右侧羁绊说明字区的720p参考ROI，日服改为本项目实拍裁图。该文字片段也见于正常结果页，必须限定右侧并同时确认顶部升级标题。",
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": "battle/bond/升级说明.png",
-                "roi": [653, 267, 87, 133],
+                "template": "battle/bond/img_txt_servantbonds02.png",
+                "roi": [630, 295, 620, 100],
+                "method": 5,
+                "green_mask": true,
                 "threshold": 0.8
             }
         }
@@ -77,6 +58,7 @@
         }
     },
     "羁绊结算-第3栏MAX": {
+        "doc": "2026-11-05日服枪冠位MaaMCP实测0.9981/0.8：初始编队4号位龙娘、2号位助战，故龙娘对应结算第3栏；战斗中3与4号位换人不改变该映射。1和4号位多选及2和4号位含助战多选均正确归属4号位，1和3号位未误触发。可参考原生自动战斗-羁绊停止配置及docs/原生自动战斗羁绊满停止方案.md；本次为已满启动，不代表刚满或升级遮挡时序已验收。",
         "recognition": {
             "type": "TemplateMatch",
             "param": {

@@ -8,3 +8,28 @@
 !free_quest_badge_1.png
 # Minimal tea/storm popup, bar and page-guard UI crops.
 !teapot/*.png
+# Anonymous servant level / attack-value crops for support filtering regressions.
+!support_level/*.png
+# Anonymous JP bond-effect icon crops (original / NP50) for masked matching.
+!support_bond/*.png
+# Anonymous support portrait crops for polygon masking and level-text occlusion.
+!support_face/*.png
+# Anonymous two-card JP servant-list last row, including the selected-card overlay.
+!servant_list/*.png
+# Retained JP loot header/button patches on a blank frame; no account values.
+!bond_stop/jp_loot_header_and_next.png
+!bond_stop/jp_experience_result.png
+!bond_stop/jp_bond_upgrade_banner.png
+# Anonymous CN confirmation UI and explicitly synthetic retreat-question sample.
+!main_story/cn_spirit_confirmation_retreat_negative.png
+!main_story/cn_retreat_confirmation_synthetic.png
+!main_story/cn_quetzal_choice.png
+!main_story/cn_eresh_choice.png
+!main_story/cn_eresh_choice_long.png
+!main_story/cn_eresh_right_choice.png
+!main_story/cn_tiamat_map_phase2.png
+!main_story/cn_tiamat_map_phase8.png
+!main_story/cn_tiamat_map_absent.png
+!main_story/cn_tiamat_map_moved.png
+# Anonymous CN interlude card lists and one explicitly synthetic Free-only map.
+!interlude/*.png

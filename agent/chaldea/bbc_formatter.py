@@ -249,7 +249,7 @@ def _reject_special_skill_choices(delegate) -> None:
         return
     fields = [key for key in ("tdTypeChanges", "skillActSelectSelections") if delegate.get(key)]
     if fields:
-        raise ValueError("BBC 无法无损执行 Chaldea 特殊技能选项（" + "、".join(fields)
+        raise ValueError("当前 BBC 导出无法保留 Chaldea 特殊技能选项（" + "、".join(fields)
                          + "）；请使用原生自动战斗，不能忽略选项后转换。")
 
 

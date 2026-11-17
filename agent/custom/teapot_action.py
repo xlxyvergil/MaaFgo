@@ -2,6 +2,8 @@
 """原生编队的茶壶状态守卫；识别、固定输入和等待均委托 Pipeline。"""
 from dataclasses import dataclass
 import html
+from pathlib import Path
+import sys
 
 import cv2
 import numpy as np
@@ -11,12 +13,18 @@ from maa.custom_action import CustomAction
 
 import mfaalog
 
+_AGENT_DIR = str(Path(__file__).resolve().parents[1])
+if _AGENT_DIR not in sys.path:
+    sys.path.insert(0, _AGENT_DIR)
+
+from battle.runtime.formation_session import context_session, sessions
+
 
 CONFIG_NODE = "原生战斗-茶壶配置"
 WAIT_NODE = "茶壶-等待观察"
 NOTICE_NODE = "茶壶-用户提示"
 OBSERVATION_ROUNDS = 8
-STABLE_FRAMES = 2
+ABSENT_STABLE_FRAMES = 3
 
 
 @dataclass(frozen=True)
@@ -36,8 +44,8 @@ class TeapotUnconfirmed(RuntimeError):
 def _settings(context):
     node = context.get_node_data(CONFIG_NODE) or {}
     value = (node.get("attach") or {}).get("use_teapot", False)
-    if type(value) is not bool:
-        raise ValueError("是否使用茶壶必须为布尔值")
+    if type(value) is not bool and value != "skip":
+        raise ValueError("无法读取茶壶选项，不能确定是否需要调整茶壶。请在“是否使用茶壶”中重新选择“使用”“不使用”或“不检测”后重试")
     return value
 
 
@@ -66,7 +74,8 @@ class TeapotRunner:
     def _capture(self):
         self._guard()
         # Agent 控制器的截图 job.status 偶尔挂起；等待由独立 Pipeline 节点
-        # 承载，随后读取缓存。切页旧帧由连续两帧复核和有限轮次过滤。
+        # 承载，随后读取缓存。开关状态须在同张截图中联合确认茶壶图标；
+        # 每次操作后重新截图复核，不能沿用操作前的状态作为成功依据。
         self.controller.post_screencap()
         self._act(WAIT_NODE)
         image = self.controller.cached_image
@@ -108,6 +117,12 @@ class TeapotRunner:
             return TeapotFrame("entry")
         if self._hit("茶壶-识别风暴罐", image):
             return TeapotFrame("storm")
+        # Rewardless quests may retain both info buttons without an automatic
+        # item bar. The shared node requires the known party layout, both info
+        # anchors and the full empty strip; info alone is still a transition.
+        # Missing-item confirmation has its own stable-frame requirement.
+        if self._hit("茶壶-识别无自动道具栏", image):
+            return TeapotFrame("absent")
         if self._hit("茶壶-识别交替过渡", image):
             return TeapotFrame("transition")
         if self._hit("茶壶-识别任意入口", image):
@@ -115,55 +130,39 @@ class TeapotRunner:
         return TeapotFrame("absent")
 
     def _initial(self):
-        previous = None
-        consecutive = 0
         absent_rounds = 0
-        saw_entry = False
+        saw_item = False
+        saw_formation = False
         for _ in range(OBSERVATION_ROUNDS):
             self._guard()
             frame = self.observe()
             self._guard()
+            saw_formation |= frame.kind != "unknown"
             if frame.kind == "absent":
                 absent_rounds += 1
-                previous, consecutive = None, 0
-                if absent_rounds == OBSERVATION_ROUNDS:
+                if absent_rounds >= ABSENT_STABLE_FRAMES:
                     return frame
                 continue
             absent_rounds = 0
-            saw_entry |= frame.kind in {"popup", "bar", "entry", "storm", "transition"}
-            # 明确的风暴罐或交替过渡只是同一入口的闪烁相位，不丢弃
-            # 上次茶壶读数；未知、冲突或弹窗不能作为中性帧。
-            if (frame.kind in {"storm", "transition"} and previous is not None
-                    and previous.kind == "bar"):
-                continue
-            ready = frame.kind in {"popup", "bar"} and type(frame.enabled) is bool
-            if not ready:
-                previous, consecutive = None, 0
-                continue
-            consecutive = consecutive + 1 if frame == previous else 1
-            previous = frame
-            if consecutive >= STABLE_FRAMES:
+            saw_item |= frame.kind in {"popup", "bar", "entry", "storm"}
+            # observe() 已联合识别茶壶及开关，并排除了开/关同时命中的冲突。
+            if frame.kind in {"popup", "bar"} and type(frame.enabled) is bool:
                 return frame
-        reason = "检测到茶壶入口，但无法确认开关状态" if saw_entry else "未能确认未遮挡的编队或茶壶设置界面"
+        if saw_item:
+            reason = "看到了道具栏，但未能识别茶壶开关状态；请等待编队页面显示完整后重试"
+        elif saw_formation:
+            reason = "未能稳定确认本关是否有茶壶栏；请等待编队页面显示稳定后重试"
+        else:
+            reason = "未能确认编队页面；请返回未被弹窗遮挡的编队确认页后重试"
         raise TeapotUnconfirmed(reason)
 
     def _wait(self, predicate, message):
-        consecutive = 0
-        previous = None
         for _ in range(OBSERVATION_ROUNDS):
             self._guard()
             frame = self.observe()
             self._guard()
-            if (frame.kind in {"storm", "transition"} and previous is not None and previous.kind == "bar"
-                    and predicate(previous)):
-                continue
             if predicate(frame):
-                consecutive = consecutive + 1 if frame == previous else 1
-                previous = frame
-                if consecutive >= STABLE_FRAMES:
-                    return frame
-            else:
-                previous, consecutive = None, 0
+                return frame
         raise TeapotUnconfirmed(message)
 
     def _popup(self, desired, frame=None):
@@ -199,6 +198,14 @@ class TeapotRunner:
         try:
             self._guard()
             desired = _settings(self.context)
+            if desired == "skip":
+                mfaalog.info("[茶壶] 已选择不检测，跳过茶壶检测和设置，沿用游戏内当前状态。")
+                return True
+            repeat_session = self._repeat_session()
+            if repeat_session and sessions.teapot_confirmed(*repeat_session, desired):
+                self._guard()
+                mfaalog.info(f"[茶壶] 本次连续作战已确认{'开启' if desired else '关闭'}，沿用设置并跳过重复检查。")
+                return True
             frame = self._initial()
             mfaalog.info(f"[茶壶] 界面={frame.kind}，当前状态={frame.enabled}，目标={'开启' if desired else '关闭'}")
             if frame.kind == "absent":
@@ -221,6 +228,11 @@ class TeapotRunner:
                 if response.kind == "popup":
                     self._popup(desired, response)
             self._guard()
+            # An absent bar permits this quest to continue, but never proves
+            # the inherited ON/OFF setting for a later quest with a real bar.
+            if repeat_session:
+                sessions.confirm_teapot(*repeat_session, desired)
+            self._guard()
             mfaalog.info(f"[茶壶] 已确认{'开启' if desired else '关闭'}")
             return True
         except _Stopped:
@@ -234,6 +246,15 @@ class TeapotRunner:
                 except _Stopped:
                     pass
             return False
+
+    def _repeat_session(self):
+        # Standalone/older callers without a task session still perform the
+        # full check; only an active repeated-battle session may reuse it.
+        try:
+            root, token = context_session(self.context)
+        except (AttributeError, TypeError, ValueError):
+            return None
+        return (root, token) if sessions.valid(root, token, repeat=True) else None
 
 
 @AgentServer.custom_action("ensure_native_teapot")

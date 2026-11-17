@@ -2,9 +2,18 @@ import type {Catalog,Entry,Json,Servant} from './model';
 import {advanceActionRoster,initialActionRoster,isRetire,resolveActionActor} from './actionRoster';
 
 export type SpecialSkillChoiceField='tdTypeChanges'|'skillActSelectSelections';
-export interface SpecialSkillChoiceOption {value:number;label:string;target?:'ally'|'none';targets?:string[]}
-export interface SpecialSkillChoiceGroup {id:string;servantIds:(string|number)[];skillNumbers:number[];field:SpecialSkillChoiceField;options:SpecialSkillChoiceOption[];defaultValue:number;skillIds?:number[]}
+export interface SpecialSkillChoiceOption {value:number;label:string;target?:'ally'|'none';targets?:string[];cardType?:number;npId?:number;npIdsByBase?:Record<string,number>}
+export interface SpecialSkillChoiceGroup {id:string;servantIds:(string|number)[];skillNumbers:number[];field:SpecialSkillChoiceField;options:SpecialSkillChoiceOption[];defaultValue:number;skillIds?:number[];durationTurns?:number}
 export interface SpecialSkillChoiceCatalog {schemaVersion:1;groups:SpecialSkillChoiceGroup[]}
+export function specialSkillChoiceColor(option:SpecialSkillChoiceOption):'arts'|'buster'|'quick'|'' {
+ return option.cardType===1?'arts':option.cardType===2?'buster':option.cardType===3?'quick':/Arts/i.test(option.label)?'arts':/Buster/i.test(option.label)?'buster':/Quick/i.test(option.label)?'quick':'';
+}
+/** Resolve the actual NP, including strengthened families; never infer it from color. */
+export function specialSkillChoiceNP(option:SpecialSkillChoiceOption,initialNP:Json|undefined,servant:Servant|undefined):Json|undefined {
+ const id=option.npIdsByBase?option.npIdsByBase[String(initialNP?.id)]:option.npId;
+ if(typeof id!=='number'||!Number.isSafeInteger(id)||id<=0)return;
+ return servant?.npVariants?.find(np=>np.id===id)??(servant?.np?.id===id?servant.np:undefined);
+}
 /** Editor-only binding. Only raw actions and delegate queues are serialized. */
 export interface SpecialSkillChoiceBinding {groupId:string;field:SpecialSkillChoiceField;value:unknown;source:'queue'|'default'|'explicit';sourceQueueIndex?:number;sourceActionIndex?:number;missing?:boolean}
 export interface SpecialSkillChoiceDiagnostic {code:string;severity:'warning'|'error';message:string;field?:SpecialSkillChoiceField;actionIndex?:number}

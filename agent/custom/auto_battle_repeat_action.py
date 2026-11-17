@@ -18,9 +18,11 @@
 
 参数说明：
   battle_count (int): 战斗次数，默认 1，范围 1~999。可通过 custom_action_param
-    或入口节点（原生自动战斗_多次入口）的 attach.battle_count 注入，前者优先。
+    或当前次数入口节点的 attach.battle_count 注入，前者优先。
   reset_hit_nodes (list[str], 可选): 每场战斗前需要重置命中计数的节点列表。
     默认值包含跨场复用的有界节点，确保每场战斗重新获得命中预算。
+  battle_entry_node (str, 可选): 每场均重新调用的完整单场入口。用于地狱的试炼等
+    不提供连续出击、须结算返回活动页再进本的关卡；省略时保持普通连续出击流程。
   其余参数（chaldea_import_source / max_turns / strategy_profile / card_policy / skill_policy）
   会透传给 auto_battle custom action。
 """
@@ -63,13 +65,15 @@ _DEFAULT_RESET_HIT_NODES = [
     "结算推进_点击右上角",
     "结算推进_点击右上角_继续",
     "点击关卡",
+    "连续出击-记录初始编队",
     # These bounded entry nodes must get a fresh budget for each battle.
     "特殊编队-编成条件未满足",
     "特殊编队-打开自动编队",
     "特殊编队-限制提示关闭",
     "特殊编队-自动编成确认",
     "特殊编队-队伍决定",
-    "剧情奖励-展示继续"
+    "剧情奖励-展示继续",
+    "结算-羁绊升级继续"
 ]
 
 
@@ -82,7 +86,7 @@ class AutoBattleRepeatAction(CustomAction):
         bond_stops.begin(root)
         token = sessions.begin(root, repeat=True)
         try:
-            if context.tasker.stopping or not context.override_pipeline(session_override(token)):
+            if context.tasker.stopping or not context.override_pipeline(session_override(token, context)):
                 raise ValueError("cannot install repeat formation session")
             return self._run_session(context, argv, root, token)
         except Exception as exc:
@@ -94,12 +98,13 @@ class AutoBattleRepeatAction(CustomAction):
     def _run_session(self, context, argv, root, token):
         param = _load_param(argv.custom_action_param)
 
-        # "原生自动战斗次数" option 通过 attach 注入 battle_count（attach 与 action
+        # 次数 option 通过当前入口的 attach 注入 battle_count（attach 与 action
         # 是不同字段, 不会被 "Chaldea导入" 等 option 对 action 的 override 覆盖）。
         # 优先级: custom_action_param > 节点 attach。
         if "battle_count" not in param:
             try:
-                node_data = context.get_node_data("原生自动战斗_多次入口") or {}
+                entry_node = getattr(argv, "node_name", None) or "原生自动战斗_多次入口"
+                node_data = context.get_node_data(entry_node) or {}
                 attach = node_data.get("attach") or {}
                 if "battle_count" in attach:
                     param["battle_count"] = attach["battle_count"]
@@ -109,9 +114,14 @@ class AutoBattleRepeatAction(CustomAction):
 
         battle_count = _parse_battle_count(param)
         reset_hit_nodes = _parse_reset_hit_nodes(param)
+        battle_entry = param.get("battle_entry_node")
+        if battle_entry is not None and (not isinstance(battle_entry, str) or not battle_entry.strip()):
+            mfaalog.error("[auto_battle_repeat] 重复挑战的单场入口未设置，无法开始下一场。请更新资源包后重试。")
+            return CustomAction.RunResult(success=False)
 
-        # 需要透传给内层 auto_battle 的参数（去掉 battle_count 和 reset_hit_nodes）
-        inner_param = {k: v for k, v in param.items() if k not in ("battle_count", "reset_hit_nodes")}
+        # 只透传内层战斗参数，次数、入口和命中预算由外层循环消费。
+        inner_param = {k: v for k, v in param.items()
+                       if k not in ("battle_count", "reset_hit_nodes", "battle_entry_node")}
         battle_override = _build_battle_override(inner_param)
 
         mfaalog.info(
@@ -137,7 +147,10 @@ class AutoBattleRepeatAction(CustomAction):
             mfaalog.info(f"[auto_battle_repeat] === Battle {current}/{battle_count} ===")
 
             # 选择对应的 pipeline 入口节点
-            if is_first and is_last:
+            if battle_entry is not None:
+                # 试炼等结算返回活动页的关卡：完整重走单场入口，不点击连续出击。
+                entry = battle_entry
+            elif is_first and is_last:
                 # 只有 1 场：走原始完整流程（进本 → 战斗 → 结算 → 回主界面）
                 entry = "原生自动战斗调度"
             elif is_first:
@@ -153,8 +166,16 @@ class AutoBattleRepeatAction(CustomAction):
             # 在每场战斗前重置节点命中计数（修复 bug：Context.task_state_ 是共享的）
             _reset_hit_counts(context, reset_hit_nodes)
 
+            # 复用当前场次，在单场入口输出客户端可见提示，不受普通日志开关影响。
+            round_override = {
+                **battle_override,
+                entry: {
+                    **battle_override.get(entry, {}),
+                    "focus": {"Node.Action.Starting": f"当前第{current}场战斗。"},
+                },
+            }
             try:
-                detail = context.run_task(entry, pipeline_override=battle_override)
+                detail = context.run_task(entry, pipeline_override=round_override)
             except Exception as e:
                 last_error = f"异常: {e}"
                 mfaalog.error(f"[auto_battle_repeat] Battle {current} {last_error}")

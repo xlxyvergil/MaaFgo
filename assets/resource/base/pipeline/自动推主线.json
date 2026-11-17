@@ -16,10 +16,55 @@
       "battle_mode": "native",
       "auto_handle_restrictions": true,
       "use_spirit_stone": false,
+      "retry_without_spirit_stone": false,
+      "defeat_retry_limit": 3,
       "transition_timeout": 120
     }
   },
   "主线-结果提示": {},
+  "主线-御主资料返回": {
+    "doc": "点击地图节点后优先于副本列表检查，避免资料页经验条NEXT与左上关闭被误判为列表。右上标题OCR与左上关闭模板共同命中后，仅点击左上关闭；随后确认地图并复用巡-找到目标-设为中心。2026-11-16 MaaMCP实测国服御主资料OCR为0.999965、关闭模板0.983548，日服マスタープロフィールOCR为0.999545、关闭模板0.985829。日服活动地图实测：点击左下NEXT(144,540)误入资料，自动返回，以NEXT标记框(90,401,108,67)起拖居中，再按新点击点(665,440)打开列表并识别列表NEXT；没有点击列表关卡。返回地图淡入阶段可能先命中菜单和控件，必须在有界等待内同时找到目标才拖动，不能因首次NEXT未命中立即停止。国服只验收资料页识别，完整恢复链仅此日服现场实测。",
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "base/自动推主线/主线-御主资料返回/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [500, 0, 780, 95],
+                "expected": ["マスタープロフィール", "御主资料"],
+                "threshold": 0.8
+              }
+            }
+          },
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "后退按钮.png",
+                "roi": [0, 0, 230, 100],
+                "threshold": 0.8
+              }
+            }
+          }
+        ],
+        "box_index": 1
+      }
+    },
+    "action": {"type": "Click"}
+  },
+  "主线-地图NEXT标记": {
+    "doc": "仅用于资料页误触恢复的地图居中：返回NEXT标记框作为滑动起点，不能使用箭头下方的点击点（该处可能被御主头像覆盖）。地图已确认后调用，拖动动作复用巡-找到目标-设为中心；拖动后须重新截图识别主线-地图NEXT再点击。",
+    "recognition": {
+      "type": "Custom",
+      "param": {
+        "custom_recognition": "main_story_next",
+        "custom_recognition_param": {"panel": false, "marker_only": true}
+      }
+    }
+  },
   "主线-副本列表信息": {
     "recognition": {
       "type": "TemplateMatch",
@@ -112,7 +157,7 @@
       "type": "OCR",
       "param": {
         "roi": [520, 65, 240, 70],
-        "expected": ["编成限制", "编制限制", "編成制限"],
+        "expected": ["编成限制", "编制限制", "编制条件", "編成制限"],
         "threshold": 0.8
       }
     }

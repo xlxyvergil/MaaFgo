@@ -3,7 +3,7 @@
     "主线-是否自动使用灵脉石": {
       "type": "switch",
       "label": "是否自动使用灵脉石",
-      "description": "战败后使用灵脉石续战，每关最多3次；无道具或识别不确定时停止。续战改用默认战斗逻辑，不使用令咒或圣晶石。",
+      "description": "战败后使用灵脉石续战，每关最多3次。无道具时可按“灵脉石不足时退出重进”设置处理；识别不确定时停止。续战改用默认战斗逻辑，不使用令咒或圣晶石。",
       "default_case": "No",
       "cases": [
         {"name": "No", "label": "关闭", "pipeline_override": {"主线-配置": {"attach": {"use_spirit_stone": false}}}},
@@ -19,6 +19,23 @@
         {"name": "Yes", "label": "开启", "pipeline_override": {"主线-配置": {"attach": {"auto_handle_restrictions": true}}}},
         {"name": "No", "label": "关闭", "pipeline_override": {"主线-配置": {"attach": {"auto_handle_restrictions": false}}}}
       ]
+    },
+    "主线-灵脉石不足时退出重进": {
+      "type": "switch",
+      "label": "灵脉石不足时退出重进",
+      "description": "仅在确认战败且灵脉石库存为0或无法使用时，撤退回当前主线并重新挑战。重进会再次消耗关卡AP，使用当前苹果设置；不使用令咒或圣晶石。",
+      "default_case": "No",
+      "cases": [
+        {"name": "No", "label": "关闭", "pipeline_override": {"主线-配置": {"attach": {"retry_without_spirit_stone": false}}}},
+        {"name": "Yes", "label": "开启", "option": ["主线-战败重进次数上限"], "pipeline_override": {"主线-配置": {"attach": {"retry_without_spirit_stone": true}}}}
+      ]
+    },
+    "主线-战败重进次数上限": {
+      "type": "input",
+      "label": "战败重进次数上限",
+      "description": "同一主线进度最多重新挑战的次数，通关后为下一关重新计数；达到上限时保留战败现场。",
+      "inputs": [{"name": "count", "label": "重进次数", "default": "3", "verify": "^[1-9]$", "pipeline_type": "int"}],
+      "pipeline_override": {"主线-配置": {"attach": {"defeat_retry_limit": "{count}"}}}
     },
     "主线-推进上限": {
       "type": "input",
@@ -51,6 +68,7 @@
           "label": "原生自动战斗（推荐）",
           "option": [
             "主线-是否自动使用灵脉石",
+            "主线-灵脉石不足时退出重进",
             "主线-自动处理编队限制",
             "原生自动战斗是否使用茶壶",
             "原生自动战斗使用Chaldea队伍",

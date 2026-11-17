@@ -5,7 +5,8 @@ import {equipCandidatesForDisplay} from './equipRequirements';
 export const IMAGE_ACCEPT='image/png,image/jpeg,image/webp,.png,.jpg,.jpeg,.webp';
 export const MAX_IMAGE_BYTES=16*1024*1024;
 export interface ScreenshotSlot {slot:number;servantId:number|null;status:'empty'|'identified'|'unknown';support:boolean;equipId?:number|null;equipStatus?:'empty'|'identified'|'unknown';score?:number;equipScore?:number}
-export interface ScreenshotResult {kind?:'screenshot';slots:ScreenshotSlot[];warnings:string[];elapsedMs?:number;sourceSize?:number[]}
+export interface ScreenshotMysticCode {id:number|null;status:'identified'|'unknown';score?:number}
+export interface ScreenshotResult {kind?:'screenshot';slots:ScreenshotSlot[];mysticCode?:ScreenshotMysticCode;warnings:string[];elapsedMs?:number;sourceSize?:number[]}
 export interface ShareImageResult {kind:'share';schema:1;data:Json;warnings:string[];validation:Json|null;title?:string;elapsedMs?:number}
 export interface ChaldeaImageResult {kind:'chaldea';schema:1;teamId:number;source:string;data:Json;warnings:string[];validation:Json|null;title?:string;elapsedMs?:number}
 export type RestoredImageResult=ShareImageResult|ChaldeaImageResult;
@@ -22,10 +23,18 @@ export function clipboardImage(items:ArrayLike<{kind:string;type:string;getAsFil
  if(images.length>1)throw new Error('请每次粘贴一张编队截图或一图流。');
  return images[0]?.getAsFile()??null;
 }
+function readScreenshotMysticCode(value:any):ScreenshotMysticCode|undefined {
+ if(value==null)return undefined;
+ const validId=value.id===null||(typeof value.id==='number'&&Number.isSafeInteger(value.id)&&value.id>0);
+ const validScore=value.score===undefined||(typeof value.score==='number'&&Number.isFinite(value.score));
+ if(typeof value!=='object'||Array.isArray(value)||!validId||!validScore||value.status!==(value.id===null?'unknown':'identified'))throw new Error('御主礼装识别结果不完整，请重新识别图片。');
+ return {id:value.id,status:value.status,...(value.score===undefined?{}:{score:value.score})};
+}
 export function readScreenshotResult(value:any):ScreenshotResult {
  const id=(v:any)=>v==null||(typeof v==='number'&&Number.isSafeInteger(v)&&v>0);
  if(!value||!Array.isArray(value.slots)||value.slots.length!==6||value.slots.some((s:any,i:number)=>!s||s.slot!==i||!id(s.servantId)||!id(s.equipId)||!['empty','identified','unknown'].includes(s.status)||typeof s.support!=='boolean'))throw new Error('识别结果不完整，请重新识别。');
- return {...value,slots:value.slots.map((s:ScreenshotSlot)=>({...s})),warnings:Array.isArray(value.warnings)?value.warnings.filter((s:any)=>typeof s==='string'):[]};
+ const {mysticCode:rawMystic,...rest}=value,mysticCode=readScreenshotMysticCode(rawMystic);
+ return {...rest,...(mysticCode?{mysticCode}:{}),slots:value.slots.map((s:ScreenshotSlot)=>({...s})),warnings:Array.isArray(value.warnings)?value.warnings.filter((s:any)=>typeof s==='string'):[]};
 }
 /** Full plans from share markers or Chaldea IDs must never pass through screenshotTeam. */
 export function readImageImportResult(value:any):ImageImportResult {
@@ -45,7 +54,7 @@ export function readImageImportResult(value:any):ImageImportResult {
 }
 export function shareImagePreview(data:Json,catalog:Catalog) {
  const roster=members(data).map((member,slot)=>{
-  const servant=member?.svtId?servantFor(catalog,member.svtId):undefined;
+  const servant=member?.svtId?servantFor(catalog,member.svtId,member):undefined;
   const supportType=member?.supportType;
   const supportLabel=supportType==='friend'?'好友助战':supportType==='npc'?'NPC 助战':supportType==='fixed'?'固定助战':'';
   const equips=['equip1','equip2','equip3'].flatMap((key,equipIndex)=>{
@@ -62,7 +71,7 @@ export function shareImagePreview(data:Json,catalog:Catalog) {
  const actions:Json[]=Array.isArray(data.actions)?data.actions:[],mysticId=data.team?.mysticCode?.mysticCodeId;
  return {roster,title:typeof data.team?.name==='string'&&data.team.name?data.team.name:'一图流导入方案',turns:turnsOf(data).length,skills:actions.filter(action=>action?.type==='skill').length,cards:actions.reduce((count,action)=>count+(action?.type==='attack'&&Array.isArray(action.attacks)?action.attacks.filter((card:Json)=>card?.isAuto!==true).length:0),0),mystic:catalog.mysticCodes.find(item=>item.id===mysticId)?.name??(mysticId?`御主服 #${mysticId}`:'未指定御主服')};
 }
-export function screenshotTeam(slots:ScreenshotSlot[],catalog:Catalog):Json {
+export function screenshotTeam(slots:ScreenshotSlot[],catalog:Catalog,mysticCodeId:number|null=null):Json {
  const result=readScreenshotResult({slots});
  if(result.slots.filter(s=>s.support).length>1)throw new Error('请选择至多一个助战位置。');
  let count=0;
@@ -76,5 +85,10 @@ export function screenshotTeam(slots:ScreenshotSlot[],catalog:Catalog):Json {
   count++;return member;
  });
  if(!count)throw new Error('请至少选择一位从者或一个助战要求。');
- return {team:{name:'截图导入编队',onFieldSvts:roster.slice(0,3),backupSvts:roster.slice(3)},actions:[]};
+ const team:Json={name:'截图导入编队',onFieldSvts:roster.slice(0,3),backupSvts:roster.slice(3)};
+ if(mysticCodeId!==null){
+  if(!Number.isSafeInteger(mysticCodeId)||mysticCodeId<=0||!catalog.mysticCodes.some(item=>item.id===mysticCodeId))throw new Error('所选御主礼装不在当前图鉴中，请点击“选择 / 更换御主礼装”重新选择。');
+  team.mysticCode={mysticCodeId};
+ }
+ return {team,actions:[]};
 }

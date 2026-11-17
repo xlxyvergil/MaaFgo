@@ -15,6 +15,7 @@ from battle.runtime.formation_session import FormationSessions
 from auto_battle_repeat_action import AutoBattleRepeatAction
 from free_quest_action import FreeQuestRunner
 import free_quest_action as free
+import main_story_action as story
 
 
 class DeferredStateTests(unittest.TestCase):
@@ -40,9 +41,65 @@ class DeferredStateTests(unittest.TestCase):
         self.assertFalse(state.can_defer(99))
         token = state.begin(1)
         self.assertFalse(state.can_defer(1))
+        self.assertFalse(state.is_last_battle(1))
         self.assertIsNone(state.defer(1, token, message="默认不放行"))
+        self.assertIsNone(state.continue_last_upgrade(1, token, message="未声明预算不能假定末场"))
         state.battle_started(1, 1, another_battle_planned=False)
+        self.assertTrue(state.is_last_battle(1))
         self.assertIsNone(state.defer(1, token, message="末场不放行"))
+
+    def test_last_upgrade_is_copied_once_and_separate_from_stop_and_deferral(self):
+        state = BondStopStates()
+        token = state.begin(1)
+        state.battle_started(1, 2, another_battle_planned=False)
+        first, latest = np.full((2, 3, 3), 5, np.uint8), np.full((2, 3, 3), 8, np.uint8)
+        final = state.continue_last_upgrade(1, token, message="末场正常结算", image=first, latest_image=latest)
+        first.fill(0)
+        latest.fill(0)
+        self.assertEqual((final.reason, final.battle), ("bond_upgrade_final", 2))
+        self.assertIs(state.upgrade_continuation(1), final)
+        self.assertIsNone(state.deferred(1))
+        self.assertIsNone(state.get(1))
+        self.assertFalse(state.can_defer(1))
+        self.assertTrue(np.all(final.image == 5))
+        self.assertTrue(np.all(final.latest_image == 8))
+        again = state.continue_last_upgrade(1, token, message="不覆盖初次结算记录")
+        self.assertIs(again, final)
+        self.assertEqual(again.message, "末场正常结算")
+
+    def test_final_continuation_isolated_and_cleared_by_next_battle_restart_and_finish(self):
+        state = BondStopStates()
+        first = state.begin(1, "first")
+        second = state.begin(2, "second")
+        for root, token in ((1, first), (2, second)):
+            state.battle_started(root, 1, another_battle_planned=False)
+            state.continue_last_upgrade(root, token, message=f"任务{root}末场")
+        state.battle_started(1, 2)
+        self.assertIsNone(state.upgrade_continuation(1))
+        self.assertFalse(state.is_last_battle(1))
+        self.assertIsNotNone(state.upgrade_continuation(2))
+        state.battle_started(1, 3, another_battle_planned=False)
+        state.continue_last_upgrade(1, first, message="新的末场")
+        replacement = state.begin(1, "first")
+        state.battle_started(1, 1, another_battle_planned=False)
+        self.assertIsNone(state.upgrade_continuation(1))
+        self.assertIsNone(state.continue_last_upgrade(1, first, message="拒绝过期回调"))
+        self.assertIsNotNone(state.continue_last_upgrade(1, replacement, message="新会话末场"))
+        state.stop_owner("first")
+        self.assertIsNone(state.upgrade_continuation(1))
+        self.assertIsNotNone(state.upgrade_continuation(2))
+        state.finish(2)
+        self.assertIsNone(state.upgrade_continuation(2))
+
+    def test_pending_or_stopped_battle_cannot_be_marked_as_final_upgrade(self):
+        state = BondStopStates()
+        token = state.begin(1)
+        state.battle_started(1, 1, another_battle_planned=True)
+        self.assertIsNone(state.continue_last_upgrade(1, token, message="还有下一场"))
+        state.battle_started(1, 2, another_battle_planned=False)
+        stopped = state.latch(1, token, reason="bond_max", message="MAX优先停止")
+        self.assertIsNone(state.continue_last_upgrade(1, token, message="不可覆盖已停止"))
+        self.assertIs(state.get(1), stopped)
 
     def test_next_battle_clears_deferred_and_requires_new_explicit_budget(self):
         state = BondStopStates()
@@ -51,6 +108,8 @@ class DeferredStateTests(unittest.TestCase):
         state.defer(1, token, message="第一场")
         state.battle_started(1, 2)
         self.assertIsNone(state.deferred(1))
+        self.assertIsNone(state.upgrade_continuation(1))
+        self.assertFalse(state.is_last_battle(1))
         self.assertFalse(state.can_defer(1))
         self.assertIsNone(state.defer(1, token, message="第二场未指定余战"))
 
@@ -113,6 +172,26 @@ class Context:
 
 
 class BattleBudgetTests(unittest.TestCase):
+    def test_story_only_declares_last_battle_on_the_final_progression_stage(self):
+        ctx = Context(9935)
+        bond_stops.begin(ctx.root)
+        self.addCleanup(bond_stops.finish, ctx.root)
+        runner = object.__new__(story.StoryRunner)
+        runner.ctx, runner.limit, runner.completed, runner.battles = ctx, 2, 0, 0
+        runner._dialogue_choices = {}
+        runner.reset_restriction_state = Mock()
+        runner.locate = lambda: None
+        runner.settle = Mock()
+        observed = []
+        def fight():
+            observed.append((bond_stops.can_defer(ctx.root), bond_stops.is_last_battle(ctx.root)))
+        runner.fight = fight
+        message = runner.run()
+        self.assertEqual(observed, [(False, False), (False, True)])
+        self.assertEqual((runner.completed, runner.battles), (2, 2))
+        self.assertEqual(runner.settle.call_count, 2)
+        self.assertIn("达到推进上限", message)
+
     def test_repeat_deferral_never_adds_battles_and_final_battle_cannot_defer(self):
         for count in (1, 3):
             with self.subTest(count=count):
@@ -209,6 +288,23 @@ class FreeCompletionNoticeTests(unittest.TestCase):
             runner.return_value.run.return_value = normal
             result = free.FreeQuestAction().run(ctx, NS())
         self.assertTrue(result.success)
+        message = ctx.run_task.call_args.kwargs["pipeline_override"]["Free-结果提示"]["focus"]["Node.Action.Starting"]
+        self.assertEqual(message, normal)
+
+    def test_final_upgrade_completion_does_not_report_pending_next_battle_recheck(self):
+        ctx = self.context()
+        normal = "达到战斗上限：确认 CLEAR 1 个 Free 本，完成战斗 2 场"
+        def completed():
+            token = bond_stops.ensure(ctx.root)
+            bond_stops.battle_started(ctx.root, 2, another_battle_planned=False)
+            self.assertIsNotNone(bond_stops.continue_last_upgrade(ctx.root, token, message="末场正常结算"))
+            return normal
+        with patch.object(free, "FreeQuestRunner") as runner:
+            runner.return_value.run.side_effect = completed
+            result = free.FreeQuestAction().run(ctx, NS())
+        self.assertTrue(result.success)
+        self.assertIsNone(bond_stops.get(ctx.root))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
         message = ctx.run_task.call_args.kwargs["pipeline_override"]["Free-结果提示"]["focus"]["Node.Action.Starting"]
         self.assertEqual(message, normal)
 

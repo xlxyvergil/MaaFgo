@@ -1,6 +1,5 @@
 """羁绊停止状态、同帧证据及外层停止传播；不连接设备。"""
 import copy
-from dataclasses import dataclass
 from pathlib import Path
 import sys
 import tempfile
@@ -24,10 +23,15 @@ from battle.runtime.bond_stop_state import BondStopStates, bond_stops
 from battle.runtime.formation_session import FormationSessions
 
 
-@dataclass
-class Freeze:
-    time: int = 1000
-    timeout: int = 8000
+class FakeClock:
+    def __init__(self):
+        self.now = 0.0
+
+    def __call__(self):
+        return self.now
+
+    def advance(self, seconds=.1):
+        self.now += seconds
 
 
 def frame(marker=1):
@@ -39,24 +43,24 @@ def slots(support=3):
 
 
 class Context:
+    clock = FakeClock()
+
     def __init__(self, mode="all", target=6, root=8001, frames=None):
         self.root = root
         self.nodes = {
             action.CONFIG_NODE: {"attach": {"native_bond_stop_mode": mode, "native_bond_stop_slot": target}},
             action.GUARD_NODE: {"attach": {
-                "check_attempts": 3, "check_wait_node": "wait",
-                "positive_wait_node": "fast", "positive_attempts": 2, "positive_timeout_ms": 1000,
+                "observation_node": "observe", "observation_attempts": 80, "observation_timeout_ms": 4000,
                 "page_wait_node": "page_wait", "page_wait_attempts": 2, "page_wait_timeout_ms": 1000,
             }},
         }
         self.frames = list(frames or [frame(2), frame(3)])
         self.current = None
         self.tasker = NS(stopping=False, controller=NS(post_screencap=self.capture))
-        self.run_task = Mock(return_value=NS(status=NS(succeeded=True)))
+        self.run_task = Mock(side_effect=self.wait)
         self.run_recognition = Mock(return_value=NS(hit=False))
         self.wait_freezes = Mock(return_value=True)
         self.clear_hit_count = Mock()
-        self.freeze = Freeze()
 
     def get_task_job(self):
         return NS(job_id=self.root)
@@ -68,8 +72,9 @@ class Context:
     def get_node_data(self, name):
         return copy.deepcopy(self.nodes.get(name, {}))
 
-    def get_node_object(self, name):
-        return NS(post_wait_freezes=self.freeze)
+    def wait(self, node, *args, **kwargs):
+        self.clock.advance(.1 if node == "observe" else .05)
+        return NS(status=NS(succeeded=True))
 
     def override_pipeline(self, override):
         self.nodes.update(override)
@@ -80,6 +85,50 @@ class Context:
 
 
 class StateTests(unittest.TestCase):
+    def test_observation_reuses_zero_start_and_requires_a_started_window(self):
+        state = BondStopStates()
+        token = state.begin(1)
+        state.complete_observation(1, token)
+        self.assertFalse(state.observation_complete(1))
+        self.assertEqual(state.start_observation(1, token, 0.0), 0.0)
+        self.assertEqual(state.start_observation(1, token, 3.5), 0.0)
+        state.complete_observation(1, token)
+        self.assertTrue(state.observation_complete(1))
+
+    def test_new_battle_restart_and_finish_clear_only_their_observation(self):
+        for reset in ("battle", "root", "finish"):
+            with self.subTest(reset=reset):
+                state = BondStopStates()
+                token = state.begin(1, "a")
+                other = state.begin(2, "b")
+                state.start_observation(1, token, 0.0)
+                state.start_observation(2, other, 0.0)
+                state.complete_observation(1, token)
+                state.complete_observation(2, other)
+                if reset == "battle":
+                    state.battle_started(1, 2)
+                    self.assertEqual(state.start_observation(1, token, 10.0), 10.0)
+                elif reset == "root":
+                    current = state.begin(1, "a")
+                    self.assertIsNone(state.start_observation(1, token, 10.0))
+                    state.complete_observation(1, token)
+                    self.assertEqual(state.start_observation(1, current, 10.0), 10.0)
+                else:
+                    state.finish(1)
+                    self.assertIsNone(state.start_observation(1, token, 10.0))
+                self.assertFalse(state.observation_complete(1))
+                self.assertTrue(state.observation_complete(2))
+
+    def test_latched_max_overrides_completed_negative_observation(self):
+        state = BondStopStates()
+        token = state.begin(1)
+        state.start_observation(1, token, 0.0)
+        state.complete_observation(1, token)
+        self.assertTrue(state.observation_complete(1))
+        state.latch(1, token, reason="bond_max", message="MAX", image=frame(4))
+        self.assertFalse(state.observation_complete(1))
+        self.assertEqual(state.get(1).reason, "bond_max")
+
     def test_root_restart_rejects_stale_callback_and_isolates_other_roots(self):
         state = BondStopStates()
         old = state.begin(1, "a")
@@ -114,11 +163,18 @@ class StateTests(unittest.TestCase):
 class GuardTests(unittest.TestCase):
     def setUp(self):
         bond_stops.finish(8001)
+        self.clock = FakeClock()
+        self.clock_context = patch.object(Context, "clock", self.clock)
+        self.clock_context.start()
+        self.clock_runtime = patch.object(action.time, "monotonic", self.clock)
+        self.clock_runtime.start()
         self.page = patch.object(action, "read_bond_page", return_value=True)
         self.page.start()
 
     def tearDown(self):
         self.page.stop()
+        self.clock_runtime.stop()
+        self.clock_context.stop()
         bond_stops.finish(8001)
 
     def test_disabled_does_not_capture_or_inspect_a_page(self):
@@ -126,6 +182,49 @@ class GuardTests(unittest.TestCase):
         self.assertIsNone(action.inspect_bond_stop(ctx, frame()))
         action.read_bond_page.assert_not_called()
         ctx.run_task.assert_not_called()
+
+    def test_new_callback_gets_its_own_controller_once(self):
+        first = Context(frames=[frame(2), frame(3)])
+        previous_controller = Mock(post_screencap=Mock(side_effect=first.capture))
+        with patch.object(action, "read_any_bond_max", return_value=False):
+            self.assertIsNone(action.inspect_bond_stop(first, frame(1), controller=previous_controller))
+            previous_controller.post_screencap.side_effect = OSError("expired callback controller")
+            bond_stops.battle_started(first.root, 2)
+
+            second = Context(frames=[frame(5), frame(6)])
+            current_controller = Mock(post_screencap=Mock(side_effect=second.capture))
+            reads = []
+
+            class CurrentTasker:
+                stopping = False
+
+                @property
+                def controller(self):
+                    reads.append(True)
+                    if len(reads) > 1:
+                        raise AssertionError("controller acquired twice in one callback")
+                    return current_controller
+
+            second.tasker = CurrentTasker()
+            self.assertIsNone(action.inspect_bond_stop(second, frame(4)))
+        self.assertEqual(len(reads), 1)
+        self.assertGreater(current_controller.post_screencap.call_count, 0)
+
+    def test_explicit_controller_is_reused_without_reacquiring(self):
+        ctx = Context()
+        controller = Mock(post_screencap=Mock(side_effect=ctx.capture))
+
+        class CurrentTasker:
+            stopping = False
+
+            @property
+            def controller(self):
+                raise AssertionError("must reuse the controller supplied by this callback")
+
+        ctx.tasker = CurrentTasker()
+        with patch.object(action, "read_any_bond_max", return_value=False):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(), controller=controller))
+        self.assertGreater(controller.post_screencap.call_count, 0)
 
     def multiselect(self, targets, *, support=4, frames=None):
         ctx = Context(mode="slots", frames=frames)
@@ -146,7 +245,7 @@ class GuardTests(unittest.TestCase):
         with patch.object(action, "read_bond_max", return_value=(3,)):
             self.assertIsNone(action.inspect_bond_stop(ctx, frame()))
 
-    def test_default_all_uses_whole_row_without_mapping_and_does_not_defer(self):
+    def test_default_all_known_max_stops_before_any_upgrade_deferral(self):
         ctx = self.multiselect(range(1, 7))
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
         self.assertEqual(action._settings(ctx), ("all", 0))
@@ -212,9 +311,11 @@ class GuardTests(unittest.TestCase):
             self.assertEqual(action.inspect_bond_stop(ctx, frame()).reason, "bond_max")
         ctx.wait_freezes.assert_not_called()
 
-    def test_negative_then_popup_stops_unconfirmed_and_keeps_both_frames(self):
+    def test_negative_then_upgrade_with_unknown_budget_keeps_both_frames(self):
         ctx = Context(frames=[frame(9)])
-        with patch.object(action, "read_any_bond_max", side_effect=[False, ValueError("bond_result_page_not_visible")]):
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", return_value=False), \
+             patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9):
             result = action.inspect_bond_stop(ctx, frame(4))
         self.assertEqual(result.reason, "bond_check_unconfirmed")
         np.testing.assert_array_equal(result.image, frame(4))
@@ -244,26 +345,146 @@ class GuardTests(unittest.TestCase):
         ctx.run_task.assert_not_called()
         ctx.wait_freezes.assert_not_called()
 
-    def test_upgrade_does_not_defer_last_battle_or_all_mode(self):
-        for mode, remaining in (("slot", False), ("all", True)):
+    def test_last_battle_upgrade_continues_without_stop_or_deferral(self):
+        for mode in ("slot", "all"):
             with self.subTest(mode=mode):
                 ctx = Context(mode=mode)
                 bond_stops.begin(ctx.root)
-                bond_stops.battle_started(ctx.root, 1, another_battle_planned=remaining)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+                bond_stops.set_formation(ctx.root, slots(support=4))
+                action.read_bond_page.return_value = False
+                with patch.object(action, "read_bond_upgrade", return_value=True), \
+                     patch.object(action, "_save_evidence") as save:
+                    stopped = action.inspect_bond_stop(ctx, frame(9))
+                self.assertIsNone(stopped)
+                self.assertIsNone(bond_stops.get(ctx.root))
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+                continuation = bond_stops.upgrade_continuation(ctx.root)
+                self.assertEqual(continuation.reason, "bond_upgrade_final")
+                save.assert_not_called()
+                ctx.run_task.assert_not_called()
+
+    def test_unknown_battle_budget_still_stops_on_upgrade(self):
+        for mode in ("slot", "all"):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode)
+                bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1)
                 bond_stops.set_formation(ctx.root, slots(support=4))
                 action.read_bond_page.return_value = False
                 with patch.object(action, "read_bond_upgrade", return_value=True):
                     stopped = action.inspect_bond_stop(ctx, frame(9))
                 self.assertEqual(stopped.reason, "bond_check_unconfirmed")
                 self.assertIsNone(bond_stops.deferred(ctx.root))
-                self.assertNotIn("羁绊MAX，已停止", stopped.message)
+                self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+
+    def test_final_upgrade_does_not_recheck_later_experience_or_loot_as_missed_bond(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+        continuation = bond_stops.upgrade_continuation(ctx.root)
+        controller = Mock()
+        with patch.object(action, "read_bond_page", side_effect=AssertionError("finished upgrade was rechecked")), \
+             patch.object(action, "_reject_missed_bond_page", side_effect=AssertionError("finished upgrade reported as missed")):
+            for marker in (2, 3):
+                self.assertIsNone(action.inspect_bond_stop(ctx, frame(marker)))
+                self.assertIsNone(action.inspect_victory_settlement(
+                    ctx, NS(ok=True, reason="victory"), controller))
+        self.assertIs(bond_stops.upgrade_continuation(ctx.root), continuation)
+        self.assertIsNone(bond_stops.get(ctx.root))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        controller.post_screencap.assert_not_called()
+        ctx.run_task.assert_not_called()
+
+    def test_last_battle_visible_max_still_stops_before_upgrade_continuation(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        with patch.object(action, "read_any_bond_max", return_value=True), \
+             patch.object(action, "read_bond_upgrade", return_value=True) as upgrade:
+            stopped = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(stopped.reason, "bond_max")
+        self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+        upgrade.assert_not_called()
+
+    def test_last_battle_without_max_or_upgrade_completes_four_second_observation(self):
+        ctx = Context(mode="all", frames=[frame(9)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_any_bond_max", return_value=False), \
+             patch.object(action, "read_bond_upgrade", return_value=False):
+            stopped = action.inspect_bond_stop(ctx, frame(4))
+        self.assertIsNone(stopped)
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+
+    def test_all_checked_upgrade_defers_without_mapping_and_saves_once(self):
+        ctx = self.multiselect(range(1, 7))
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        bond_stops.clear_formation(ctx.root)
+        self.assertEqual(action._settings(ctx), ("all", 0))
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True), \
+             tempfile.TemporaryDirectory() as tmp, \
+             patch.object(action, "Path", side_effect=lambda value: Path(tmp) / value):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+            original = bond_stops.deferred(ctx.root)
+            self.assertIsNotNone(original)
+            self.assertEqual(original.reason, "bond_upgrade_deferred")
+            self.assertTrue(Path(original.screenshot_path).is_file())
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+            self.assertIs(bond_stops.deferred(ctx.root), original)
+            self.assertEqual(len(list(Path(tmp).rglob("*.png"))), 1)
+        self.assertIsNone(bond_stops.get(ctx.root))
+        ctx.run_task.assert_not_called()
+
+    def test_deferred_battle_frames_do_not_repeat_inference_or_latch_error(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True), \
+             patch.object(action, "_save_evidence") as save:
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+            deferred = bond_stops.deferred(ctx.root)
+            save.assert_called_once()
+        with patch.object(action, "read_bond_page", side_effect=AssertionError("deferred frame rechecked")), \
+             patch.object(action, "read_any_bond_max", side_effect=AssertionError("MAX inferred after deferral")), \
+             patch.object(action, "_save_evidence") as save:
+            for marker in (9, 9, 2):
+                self.assertIsNone(action.inspect_bond_stop(ctx, frame(marker)))
+            save.assert_not_called()
+        self.assertIs(bond_stops.deferred(ctx.root), deferred)
+        self.assertIsNone(bond_stops.get(ctx.root))
+        ctx.run_task.assert_not_called()
+
+    def test_all_mode_next_battle_clears_deferred_and_rechecks_max(self):
+        ctx = Context(mode="all")
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        action.read_bond_page.return_value = False
+        with patch.object(action, "read_bond_upgrade", return_value=True), \
+             patch.object(action, "_save_evidence"):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+        self.assertIsNotNone(bond_stops.deferred(ctx.root))
+        bond_stops.battle_started(ctx.root, 2, another_battle_planned=False)
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        action.read_bond_page.return_value = True
+        with patch.object(action, "read_any_bond_max", return_value=True) as maximum:
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_max")
+        self.assertEqual(result.battle, 2)
+        self.assertEqual(result.formation_slots, ())
+        maximum.assert_called_once_with(ctx, unittest.mock.ANY)
+        self.assertIsNone(bond_stops.deferred(ctx.root))
 
     def test_initial_bond_page_then_upgrade_defers_with_both_frames(self):
         ctx = Context(mode="slot", frames=[frame(9)])
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
         bond_stops.set_formation(ctx.root, slots(support=4))
-        with patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
-             patch.object(action, "read_bond_upgrade", return_value=True), \
+        with patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4), \
+             patch.object(action, "read_bond_max", return_value=()), \
+             patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9), \
              patch.object(action, "_save_evidence"):
             self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
         deferred = bond_stops.deferred(ctx.root)
@@ -271,23 +492,224 @@ class GuardTests(unittest.TestCase):
         np.testing.assert_array_equal(deferred.latest_image, frame(9))
         self.assertIsNone(bond_stops.get(ctx.root))
 
-    def test_upgrade_preventing_freeze_can_defer_but_other_errors_cannot(self):
-        for upgrade in (True, False):
-            with self.subTest(upgrade=upgrade):
-                ctx = Context(mode="slot", frames=[frame(2), frame(3), frame(9)])
-                ctx.wait_freezes.return_value = False
+    def test_initial_bond_page_waits_through_unlabelled_animation_until_upgrade_text(self):
+        ctx = Context(frames=[frame(7), frame(9)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+
+        def wait_without_permission(node):
+            self.assertEqual(node, "observe")
+            self.assertIsNone(bond_stops.deferred(ctx.root))
+            return ctx.wait(node)
+
+        ctx.run_task.side_effect = wait_without_permission
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9),
+            patch.object(action, "_save_evidence"),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        deferred = bond_stops.deferred(ctx.root)
+        self.assertIsNotNone(deferred)
+        np.testing.assert_array_equal(deferred.image, frame(4))
+        np.testing.assert_array_equal(deferred.latest_image, frame(9))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["observe", "observe"])
+        self.assertAlmostEqual(self.clock.now, .2)
+        self.assertIsNone(bond_stops.get(ctx.root))
+
+    def test_unlabelled_animation_is_negative_only_after_the_shared_four_seconds(self):
+        ctx = Context(frames=[frame(7)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
+        self.assertTrue(all(call.args[0] == "observe" for call in ctx.run_task.call_args_list))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        self.assertIsNone(bond_stops.get(ctx.root))
+
+    def test_existing_observation_deadline_is_not_restarted_by_another_callback(self):
+        ctx = Context()
+        token = bond_stops.ensure(ctx.root)
+        self.assertEqual(bond_stops.start_observation(ctx.root, token, self.clock()), 0)
+        self.clock.advance(3.5)
+        with (
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
+        self.assertLessEqual(ctx.run_task.call_count, 6)
+
+    def test_observation_rejects_experience_or_loot_before_clicking(self):
+        for late_node in ("战斗_经验结算页", "战斗_战利品弹窗"):
+            with self.subTest(late_node=late_node):
+                ctx = Context(frames=[frame(7), frame(8), frame(9)])
                 bond_stops.begin(ctx.root)
                 bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
-                bond_stops.set_formation(ctx.root, slots(support=4))
-                with patch.object(action, "read_bond_max", return_value=()), \
-                     patch.object(action, "read_bond_upgrade", return_value=upgrade), \
-                     patch.object(action, "_save_evidence"):
+                ctx.run_recognition.side_effect = lambda node, image: NS(
+                    hit=node == late_node and int(image[0, 0, 0]) == 8)
+                with (
+                    patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+                    patch.object(action, "read_any_bond_max", return_value=False),
+                    patch.object(action, "read_bond_upgrade", return_value=False),
+                ):
                     result = action.inspect_bond_stop(ctx, frame(4))
-                self.assertEqual(bool(bond_stops.deferred(ctx.root)), upgrade)
-                if upgrade:
-                    self.assertIsNone(result)
-                else:
-                    self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertIn("本场无法补查", result.message)
+                np.testing.assert_array_equal(result.image, frame(4))
+                np.testing.assert_array_equal(result.latest_image, frame(8))
+                self.assertEqual(len(ctx.frames), 1)
+                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["observe", "observe"])
+                self.assertFalse(bond_stops.observation_complete(ctx.root))
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_observation_cancellation_or_expired_root_does_not_complete_or_defer(self):
+        for cancelled in (True, False):
+            with self.subTest(cancelled=cancelled):
+                ctx = Context(frames=[frame(7), frame(9)])
+                bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+
+                def interrupt_during_wait(node):
+                    result = ctx.wait(node)
+                    if ctx.run_task.call_count == 2:
+                        if cancelled:
+                            ctx.tasker.stopping = True
+                        else:
+                            bond_stops.finish(ctx.root)
+                    return result
+
+                ctx.run_task.side_effect = interrupt_during_wait
+                with (
+                    patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+                    patch.object(action, "read_any_bond_max", return_value=False),
+                    patch.object(action, "read_bond_upgrade", return_value=False),
+                ):
+                    self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+                self.assertIsNone(bond_stops.get(ctx.root))
+                self.assertIsNone(bond_stops.deferred(ctx.root))
+                self.assertFalse(bond_stops.observation_complete(ctx.root))
+                self.assertEqual(len(ctx.frames), 1)
+                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["observe", "observe"])
+
+    def test_observation_failed_capture_preserves_last_visible_frame(self):
+        ctx = Context(frames=[frame(7), None])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        self.assertIn("截图失败", result.message)
+        np.testing.assert_array_equal(result.image, frame(4))
+        np.testing.assert_array_equal(result.latest_image, frame(7))
+        self.assertFalse(bond_stops.observation_complete(ctx.root))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_reappearing_bond_page_max_wins_before_upgrade_in_the_same_window(self):
+        ctx = Context(frames=[frame(7), frame(5)])
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) in (4, 5)),
+            patch.object(action, "read_any_bond_max", side_effect=[False, True]),
+            patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 5) as upgrade,
+        ):
+            result = action.inspect_bond_stop(ctx, frame(4))
+        self.assertEqual(result.reason, "bond_max")
+        np.testing.assert_array_equal(result.image, frame(5))
+        self.assertEqual([int(call.args[1][0, 0, 0]) for call in upgrade.call_args_list], [4, 7])
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["observe", "observe"])
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+
+    def test_negative_observation_ignores_legacy_freeze_state(self):
+        ctx = Context()
+        ctx.wait_freezes.side_effect = AssertionError("legacy freeze must not run")
+        with patch.object(action, "read_any_bond_max", return_value=False):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        ctx.wait_freezes.assert_not_called()
+
+    def test_max_on_a_fresh_four_second_frame_is_checked_before_negative_completion(self):
+        ctx = Context()
+
+        def capture():
+            captured = frame(8 if self.clock() >= 4 else 2)
+            return NS(wait=lambda: NS(get=lambda: captured))
+
+        ctx.tasker.controller.post_screencap = capture
+        with (
+            patch.object(action, "read_any_bond_max", side_effect=lambda c, image: int(image[0, 0, 0]) == 8),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            result = action.inspect_bond_stop(ctx, frame(1))
+        self.assertEqual(result.reason, "bond_max")
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        np.testing.assert_array_equal(result.image, frame(8))
+        self.assertFalse(bond_stops.observation_complete(ctx.root))
+
+    def test_upgrade_on_the_fresh_four_second_frame_is_not_discarded(self):
+        ctx = Context()
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+
+        def capture():
+            captured = frame(9 if self.clock() >= 4 else 2)
+            return NS(wait=lambda: NS(get=lambda: captured))
+
+        ctx.tasker.controller.post_screencap = capture
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) != 9),
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", side_effect=lambda c, image: int(image[0, 0, 0]) == 9),
+            patch.object(action, "_save_evidence"),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(1)))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        deferred = bond_stops.deferred(ctx.root)
+        self.assertIsNotNone(deferred)
+        np.testing.assert_array_equal(deferred.latest_image, frame(9))
+        self.assertFalse(bond_stops.observation_complete(ctx.root))
+
+    def test_capture_cost_counts_toward_window_and_final_capture_starts_after_deadline(self):
+        ctx = Context()
+        starts = []
+
+        def capture():
+            starts.append(self.clock())
+            self.clock.advance(.35)
+            return NS(wait=lambda: NS(get=lambda: frame(2)))
+
+        ctx.tasker.controller.post_screencap = capture
+        with (
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(1)))
+        self.assertGreaterEqual(starts[-1], 4.0)
+        self.assertLess(starts[-2], 4.0)
+        self.assertLess(self.clock.now, 4.5)
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
+
+    def test_attempt_bound_cannot_release_negative_before_four_seconds(self):
+        ctx = Context()
+        ctx.nodes[action.GUARD_NODE]["attach"]["observation_attempts"] = 2
+        with (
+            patch.object(action, "read_any_bond_max", return_value=False),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            stopped = action.inspect_bond_stop(ctx, frame(1))
+        self.assertEqual(stopped.reason, "bond_check_unconfirmed")
+        self.assertIn("完整时限", stopped.message)
+        self.assertLess(self.clock.now, 4.0)
+        self.assertFalse(bond_stops.observation_complete(ctx.root))
 
     def test_upgrade_never_bypasses_missing_mapping_even_with_remaining_battles(self):
         ctx = Context(mode="slot")
@@ -310,15 +732,20 @@ class GuardTests(unittest.TestCase):
         self.assertIsNone(bond_stops.deferred(ctx.root))
         upgrade.assert_not_called()
 
-    def test_unrecognized_obstruction_does_not_use_remaining_budget(self):
+    def test_unrecognized_animation_does_not_fabricate_upgrade_deferral(self):
         ctx = Context(mode="slot", frames=[frame(9)])
         bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
         bond_stops.set_formation(ctx.root, slots(support=4))
-        with patch.object(action, "read_bond_max", side_effect=[(), ValueError("bond_result_page_not_visible")]), \
-             patch.object(action, "read_bond_upgrade", return_value=False):
-            result = action.inspect_bond_stop(ctx, frame(4))
-        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        with (
+            patch.object(action, "read_bond_page", side_effect=lambda c, image: int(image[0, 0, 0]) == 4),
+            patch.object(action, "read_bond_max", return_value=()),
+            patch.object(action, "read_bond_upgrade", return_value=False),
+        ):
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(4)))
+        self.assertAlmostEqual(self.clock.now, 4.0)
+        self.assertTrue(bond_stops.observation_complete(ctx.root))
         self.assertIsNone(bond_stops.deferred(ctx.root))
+        self.assertIsNone(bond_stops.get(ctx.root))
 
     def test_next_battle_after_deferred_upgrade_stops_on_selected_max(self):
         ctx = Context(mode="slot", target=6)
@@ -338,19 +765,25 @@ class GuardTests(unittest.TestCase):
         self.assertEqual(result.formation_slots, (6,))
         self.assertIsNone(bond_stops.deferred(ctx.root))
 
-    def test_freeze_failure_never_releases_a_negative_result(self):
-        ctx = Context()
-        ctx.wait_freezes.return_value = False
-        with patch.object(action, "read_any_bond_max", return_value=False) as read:
-            result = action.inspect_bond_stop(ctx, frame())
-        self.assertEqual(result.reason, "bond_check_unconfirmed")
-        self.assertGreaterEqual(read.call_count, 1)
+    def test_invalid_observation_budget_stops_without_assuming_negative(self):
+        for field, invalid in (("observation_timeout_ms", 0), ("observation_attempts", False),
+                               ("observation_node", "")):
+            with self.subTest(field=field):
+                ctx = Context()
+                bond_stops.begin(ctx.root)
+                ctx.nodes[action.GUARD_NODE]["attach"][field] = invalid
+                with patch.object(action, "read_any_bond_max", return_value=False):
+                    result = action.inspect_bond_stop(ctx, frame(4))
+                self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertFalse(bond_stops.observation_complete(ctx.root))
+                ctx.run_task.assert_not_called()
 
     def test_slot_uses_non_support_order_and_ignores_other_max(self):
         ctx = Context(mode="slot", target=6)
         bond_stops.set_formation(ctx.root, slots(support=1))
         with patch.object(action, "read_bond_max", return_value=(4,)):
             self.assertIsNone(action.inspect_bond_stop(ctx, frame()))
+        bond_stops.battle_started(ctx.root, 2, keep_formation=True)
         ctx.frames = [frame(4), frame(5)]
         with patch.object(action, "read_bond_max", return_value=(5,)):
             result = action.inspect_bond_stop(ctx, frame(9))
@@ -369,16 +802,26 @@ class GuardTests(unittest.TestCase):
                 self.assertEqual(result.reason, "bond_check_unconfirmed")
                 read.assert_not_called()
 
-    def test_same_negative_image_cached_changed_image_rechecked(self):
+    def test_completed_negative_does_not_restart_for_same_or_changed_frames(self):
         ctx = Context()
-        first = frame()
         with patch.object(action, "read_any_bond_max", return_value=False) as read:
-            self.assertIsNone(action.inspect_bond_stop(ctx, first))
-            self.assertIsNone(action.inspect_bond_stop(ctx, first))
-            self.assertEqual(read.call_count, 5)
-            ctx.frames = [frame(6), frame(7)]
-            self.assertIsNone(action.inspect_bond_stop(ctx, frame(8)))
-            self.assertEqual(read.call_count, 10)
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(1)))
+            first_reads = read.call_count
+            first_waits = ctx.run_task.call_count
+            self.assertTrue(bond_stops.observation_complete(ctx.root))
+            controller = Mock()
+            with patch.object(action, "read_bond_page", side_effect=AssertionError("completed window re-read")):
+                self.assertIsNone(action.inspect_bond_stop(ctx, frame(1), controller=controller))
+                self.assertIsNone(action.inspect_bond_stop(ctx, frame(8), controller=controller))
+                self.assertIsNone(action.inspect_victory_settlement(
+                    ctx, NS(ok=True, reason="victory"), controller))
+            self.assertEqual(read.call_count, first_reads)
+            self.assertEqual(ctx.run_task.call_count, first_waits)
+            controller.post_screencap.assert_not_called()
+            self.assertAlmostEqual(self.clock.now, 4.0)
+        bond_stops.battle_started(ctx.root, 2)
+        with patch.object(action, "read_any_bond_max", return_value=True):
+            self.assertEqual(action.inspect_bond_stop(ctx, frame(9)).reason, "bond_max")
 
     def test_screenshot_keeps_hit_frame_and_failure_keeps_stop(self):
         ctx = Context()
@@ -395,6 +838,87 @@ class GuardTests(unittest.TestCase):
             action.save_bond_stop(ctx)
         self.assertEqual(bond_stops.get(ctx.root).reason, "bond_max")
         self.assertIn("disk full", result.screenshot_error)
+
+
+class UpgradeContinueAuthorizationTests(unittest.TestCase):
+    def tearDown(self):
+        bond_stops.finish(8001)
+
+    def allowed(self, context):
+        return action.NativeBondUpgradeContinue().analyze(context, NS(image=frame(9))) is not None
+
+    def test_disabled_guard_allows_popup_skip_without_deferral(self):
+        ctx = Context(mode="off")
+        self.assertTrue(self.allowed(ctx))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        ctx.run_task.assert_not_called()
+        token = bond_stops.ensure(ctx.root)
+        bond_stops.latch(ctx.root, token, reason="bond_max", message="MAX", image=frame(4))
+        self.assertFalse(self.allowed(ctx))
+
+    def test_enabled_guard_needs_registered_deferral_and_no_latched_stop(self):
+        for mode in ("all", "slot"):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode)
+                token = bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=True)
+                self.assertFalse(self.allowed(ctx))
+                self.assertIsNotNone(bond_stops.defer(ctx.root, token, message="次场复核", image=frame(9)))
+                self.assertTrue(self.allowed(ctx))
+                bond_stops.latch(ctx.root, token, reason="bond_max", message="MAX", image=frame(4))
+                self.assertFalse(self.allowed(ctx))
+                ctx.run_task.assert_not_called()
+
+    def test_last_battle_without_confirmed_upgrade_does_not_authorize_skip(self):
+        ctx = Context(mode="all")
+        token = bond_stops.begin(ctx.root)
+        bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+        self.assertIsNone(bond_stops.defer(ctx.root, token, message="无剩余场次", image=frame(9)))
+        self.assertFalse(self.allowed(ctx))
+        ctx.run_task.assert_not_called()
+
+    def test_completed_window_allows_late_upgrade_but_stop_or_new_battle_revokes_it(self):
+        ctx = Context(mode="all")
+        token = bond_stops.begin(ctx.root)
+        bond_stops.complete_observation(ctx.root, token)
+        self.assertFalse(self.allowed(ctx))
+        bond_stops.start_observation(ctx.root, token, 0.0)
+        bond_stops.complete_observation(ctx.root, token)
+        self.assertTrue(self.allowed(ctx))
+        self.assertIsNone(bond_stops.deferred(ctx.root))
+        self.assertIsNone(bond_stops.upgrade_continuation(ctx.root))
+        ctx.tasker.stopping = True
+        self.assertFalse(self.allowed(ctx))
+        ctx.tasker.stopping = False
+        bond_stops.battle_started(ctx.root, 2)
+        self.assertFalse(self.allowed(ctx))
+        bond_stops.start_observation(ctx.root, token, 4.0)
+        bond_stops.complete_observation(ctx.root, token)
+        bond_stops.latch(ctx.root, token, reason="bond_max", message="MAX", image=frame(4))
+        self.assertFalse(self.allowed(ctx))
+        ctx.run_task.assert_not_called()
+
+    def test_registered_last_upgrade_allows_skip_but_latched_max_or_user_stop_does_not(self):
+        for mode in ("all", "slot"):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode)
+                token = bond_stops.begin(ctx.root)
+                bond_stops.battle_started(ctx.root, 1, another_battle_planned=False)
+                final = bond_stops.continue_last_upgrade(ctx.root, token, message="末场正常结算", image=frame(9))
+                self.assertEqual(final.reason, "bond_upgrade_final")
+                self.assertTrue(self.allowed(ctx))
+                ctx.tasker.stopping = True
+                self.assertFalse(self.allowed(ctx))
+                ctx.tasker.stopping = False
+                bond_stops.latch(ctx.root, token, reason="bond_max", message="MAX", image=frame(4))
+                self.assertFalse(self.allowed(ctx))
+                ctx.run_task.assert_not_called()
+
+    def test_user_stop_denies_skip_even_when_guard_is_disabled(self):
+        ctx = Context(mode="off")
+        ctx.tasker.stopping = True
+        self.assertFalse(self.allowed(ctx))
+        ctx.run_task.assert_not_called()
 
 
 class OuterLoopTests(unittest.TestCase):
@@ -444,6 +968,33 @@ class OuterLoopTests(unittest.TestCase):
         np.testing.assert_array_equal(result.image, frame(1))
         np.testing.assert_array_equal(result.latest_image, frame(9))
         ctx.wait_freezes.assert_not_called()
+
+    def test_late_experience_or_loot_stops_without_click_or_max_inference(self):
+        for node, label in (("战斗_经验结算页", "经验结算页"), ("战斗_战利品弹窗", "战利品页")):
+            with self.subTest(node=node):
+                bond_stops.finish(8001)
+                ctx = Context(frames=[frame(2)])
+                ctx.run_recognition.side_effect = lambda name, image: NS(hit=name == node)
+                with patch.object(action, "read_bond_page", return_value=False), \
+                     patch.object(action, "read_any_bond_max") as maximum, \
+                     patch.object(action, "save_bond_stop"):
+                    result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+                self.assertEqual(result.reason, "bond_check_unconfirmed")
+                self.assertIn(label, result.message)
+                self.assertIn("本场无法补查", result.message)
+                maximum.assert_not_called()
+                ctx.run_task.assert_not_called()
+
+    def test_experience_appearing_during_wait_stops_before_more_waits(self):
+        ctx = Context(frames=[frame(1), frame(2)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(
+            hit=name == "战斗_经验结算页" and int(image[0, 0, 0]) == 2)
+        with patch.object(action, "read_bond_page", return_value=False), \
+             patch.object(action, "save_bond_stop"):
+            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+        self.assertEqual(result.reason, "bond_check_unconfirmed")
+        ctx.run_task.assert_called_once_with("page_wait")
+        np.testing.assert_array_equal(result.latest_image, frame(2))
 
     def test_victory_handoff_recognizes_upgrade_before_bond_page_and_defers(self):
         ctx = Context(mode="slot", frames=[frame(1), frame(9)])

@@ -16,7 +16,6 @@ class LocalEditorLinkTest(unittest.TestCase):
     def test_every_battle_entry_offers_portable_cmd_and_existing_service(self):
         entries = (
             ("options/Chaldea导入手动输入.json", "option", "原生自动战斗使用Chaldea队伍"),
-            ("options/Chaldea导入手动输入.json", "option", "Chaldea导入手动输入"),
             ("options/chaldea_team_config.json", "option", "chaldea_team_config"),
             ("tasks/原生自动战斗.json", "task", None),
             ("tasks/Chaldea自动编队.json", "task", None),

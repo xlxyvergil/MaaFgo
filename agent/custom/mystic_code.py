@@ -11,7 +11,10 @@ import time
 import cv2
 import numpy as np
 
-import mfaalog
+try:
+    import mfaalog
+except ModuleNotFoundError:
+    from . import mfaalog
 
 
 DATA_PATH = Path(__file__).with_name("mystic_code_data.json")
@@ -83,18 +86,26 @@ def _icons(formation, item):
     return icons
 
 
-def match_icon(image, icons, scene):
-    """按游戏界面的固定显示比例匹配衣服内部，透明区不参与评分。"""
+def match_icon(image, icons, scene, *, roi=None, scale=None):
+    """Match clothing interiors without transparent pixels.
+
+    The default keeps the live game's 1280x720 scene coordinates. Screenshot
+    import may pass ``roi`` in original-image pixels and ``scale=(sx, sy)`` as
+    original pixels per 1280x720 game pixel, avoiding resampling a small icon.
+    """
     if image is None or image.size == 0:
         return None
-    sx, sy = image.shape[1] / 1280, image.shape[0] / 720
-    roi, scales = {
+    sx, sy = scale if scale is not None else (image.shape[1] / 1280, image.shape[0] / 720)
+    default_roi, scales = {
         "team": (TEAM_ROI, (0.370, 0.375, 0.380)),
         "selected": (SELECTED_ROI, (0.99, 1.00, 1.01)),
         "list": (LIST_ROI, (0.495, 0.500, 0.505)),
     }[scene]
-    x, y, width, height = roi
-    x, y, width, height = (round(x * sx), round(y * sy), round(width * sx), round(height * sy))
+    if roi is None:
+        x, y, width, height = default_roi
+        x, y, width, height = (round(x * sx), round(y * sy), round(width * sx), round(height * sy))
+    else:
+        x, y, width, height = roi
     region = image[y:y + height, x:x + width]
     best = None
     fallback = None

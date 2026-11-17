@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "purpose": "Versioned provenance and calibration for native bond-stop templates; not a runtime resource index.",
-  "date": "2026-11-01",
+  "date": "2026-11-07",
   "status": "mixed_local_screenshots_and_temporary_bbc_fallbacks",
   "bbc_version": "3.90.20260817",
   "bbc_exe_sha256": "abf9356a74bc515bd68ceed6df721d7771ed4efa6be7541c4d1698a16e40322d",
@@ -10,41 +10,8 @@
     720
   ],
   "layout": "Specified-member mapping currently calibrated for five non-support result columns; all-mode MAX scans the full bond row and does not attribute a formation position.",
-  "source_note": "JP bond-page/MAX and upgrade-presentation templates use retained local game screenshots; JP RESULT header also uses a local screenshot. CN templates remain temporary BBC references pending real positive screens. No BBC executable or module was run.",
+  "source_note": "JP/CN complete bond-page and upgrade text comes from the corresponding extracted FGO game assets. JP MAX/RESULT retain local screenshot sources. CN MAX/RESULT remain temporary BBC references pending device calibration. No BBC executable or module was run.",
   "templates": [
-    {
-      "source": "tests/fixtures/bond_stop/jp_bond_slot5_max.png",
-      "source_sha256": "7d818261241ea05f488441f2c27d09c3fef4fdba0578bc6c444b672df8497dd3",
-      "source_size": [
-        1280,
-        720
-      ],
-      "source_mode": "RGB",
-      "server": "JP",
-      "output": "assets/resource/base/image/battle/bond/羁绊结算页.png",
-      "output_size": [
-        67,
-        34
-      ],
-      "output_sha256": "33856ce4035e8dc0c9d53cf2ba8143cef2b03bbe830c731429a0e3f37bacd83f",
-      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
-      "capture_source": ".workbuddy/runtime/bond-stop-live-20261101/battle2_after.png",
-      "capture_sha256": "7d818261241ea05f488441f2c27d09c3fef4fdba0578bc6c444b672df8497dd3",
-      "crop_xywh": [
-        79,
-        169,
-        67,
-        34
-      ],
-      "status": "local_game_screenshot_calibrated_20261101",
-      "supersedes": {
-        "source": "BBchannel/assets/battle/JP/battleFinish1.png",
-        "source_sha256": "b0a40f274980e1009390cef332a51d639d6649faed9a1f32a50f53b8ad5be216",
-        "output_sha256": "b019cb8db4d83d787d4c090d1da6e0cbf340b7fb4fe4924216a19469be2622de",
-        "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720"
-      },
-      "calibration_note": "JP five-own-servant results; original formation slot6, support slot4, result column5 MAX; production stop screenshot retained."
-    },
     {
       "source": "tests/fixtures/bond_stop/jp_bond_slot5_max.png",
       "source_sha256": "7d818261241ea05f488441f2c27d09c3fef4fdba0578bc6c444b672df8497dd3",
@@ -77,24 +44,6 @@
         "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720"
       },
       "calibration_note": "JP five-own-servant results; original formation slot6, support slot4, result column5 MAX; production stop screenshot retained."
-    },
-    {
-      "source": "BBchannel/assets/battle/CH/battleFinish1.png",
-      "source_sha256": "36d6f7ebe78d771b9dfccf50759d9adf9313f23e6bf07071cdbb8520505e2c8e",
-      "source_size": [
-        101,
-        52
-      ],
-      "source_mode": "RGB",
-      "server": "CH",
-      "output": "assets/resource/cn/image/battle/bond/羁绊结算页.png",
-      "output_size": [
-        67,
-        35
-      ],
-      "output_sha256": "a9964bdc4e99245aa92a9b06a5a8674df409bbf6b41de71fa38ccb7cdce5dd35",
-      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
-      "status": "temporary_bbc_fallback_pending_device_calibration"
     },
     {
       "source": "BBchannel/assets/battle/CH/jbMax.png",
@@ -151,94 +100,277 @@
       "status": "temporary_bbc_fallback_pending_device_calibration"
     },
     {
-      "source": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
-      "source_sha256": "75fe2fc318b389f32a4c671e34a7737c1af3acedc7ae1efbd6c9dadf589779ad",
-      "source_size": [
-        1280,
-        720
-      ],
-      "source_mode": "RGB",
+      "source_root": "FGO整包",
+      "source": "图标拆分/Battle/img_txt_servantbonds01.png",
+      "source_sha256": "56d7a48aa22553ff39d030c74e6734d3469165899995af61cf1054079447f685",
       "server": "JP",
-      "output": "assets/resource/base/image/battle/bond/升级标题.png",
+      "output": "assets/resource/base/image/battle/bond/img_txt_servantbonds01.png",
+      "output_sha256": "648ff7389713206317e712c9b8f22f5f3e473303a219a6fe3d167779d8ce95a5",
+      "operation": "resize complete extracted bond text; replace non-text background with pure green",
+      "source_size": [
+        247,
+        34
+      ],
+      "source_mode": "RGBA",
       "output_size": [
-        105,
-        145
+        309,
+        43
       ],
-      "output_sha256": "4a500195e0b723ab3037fdeb266fb86f051091119072943f5620eaab1bf3aaaf",
-      "crop_xywh": [
-        1120,
-        74,
-        105,
-        145
-      ],
-      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
-      "status": "local_game_screenshot_calibrated_20261101",
-      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
-      "reference_bbc_template": "BBchannel/assets/battle/JP/jbup1.png"
+      "output_mode": "RGB",
+      "scale": 1.25,
+      "size_rounding": "floor(source_dimension * scale + 0.5)",
+      "image_interpolation": "cv2.INTER_LINEAR",
+      "mask_interpolation": "cv2.INTER_NEAREST",
+      "mask": {
+        "foreground_expression": "(G - 0.6 * R > 2) & (R > 140) & (B < 100)",
+        "green_red_ratio": 0.6,
+        "green_red_offset": 2.0,
+        "min_red_exclusive": 140,
+        "max_blue_exclusive": 100,
+        "transparent_pixels_excluded": true,
+        "background_rgb": [
+          0,
+          255,
+          0
+        ],
+        "foreground_pixels": 3365,
+        "background_pixels": 9922
+      },
+      "padding": 0,
+      "encoder": {
+        "library": "opencv",
+        "version": "4.12.0",
+        "png_compression": 9
+      },
+      "runtime_match": {
+        "method": 5,
+        "green_mask": true
+      },
+      "status": "extracted_game_text_jp_screenshot_calibrated_20261107",
+      "recognizes": "unobstructed bond-results page",
+      "calibration_note": "JP 1280x720 retained result/upgrade frames; dynamic heading and card animation are excluded",
+      "calibration": {
+        "method": "real Maa TemplateMatch replay; no device input",
+        "samples": [
+          {
+            "file": "tests/fixtures/bond_stop/jp_bond_slot5_max.png",
+            "score": 0.909551,
+            "box": [
+              78,
+              164,
+              309,
+              43
+            ]
+          }
+        ]
+      }
     },
     {
-      "source": "BBchannel/assets/battle/CH/jbup1.png",
-      "source_sha256": "bcbfab373ae4e4141fa8f35015ac75e69a3de60a1c90e928f54c5dc573db7efb",
-      "source_size": [
-        172,
-        188
-      ],
-      "source_mode": "RGB",
-      "server": "CH",
-      "output": "assets/resource/cn/image/battle/bond/升级标题.png",
-      "output_size": [
-        115,
-        125
-      ],
-      "output_sha256": "b92e08d048cea8c139d699449001724f6cb110fb17e756eef4aab10b90a4ab83",
-      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
-      "status": "temporary_bbc_fallback_pending_device_calibration",
-      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution"
-    },
-    {
-      "source": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
-      "source_sha256": "75fe2fc318b389f32a4c671e34a7737c1af3acedc7ae1efbd6c9dadf589779ad",
-      "source_size": [
-        1280,
-        720
-      ],
-      "source_mode": "RGB",
+      "source_root": "FGO整包",
+      "source": "图标拆分/Battle/img_txt_servantbonds02.png",
+      "source_sha256": "24459b04835140f9f9c08ffba3ba0ba0c685a5fb92f4061c149a4ab9ccd13592",
       "server": "JP",
-      "output": "assets/resource/base/image/battle/bond/升级说明.png",
+      "output": "assets/resource/base/image/battle/bond/img_txt_servantbonds02.png",
+      "output_sha256": "7ba696262c00a129ca31183fcbc7b0ad50cea599ac161a19eb1211826952a570",
+      "operation": "resize complete extracted bond text; replace non-text background with pure green",
+      "source_size": [
+        413,
+        34
+      ],
+      "source_mode": "RGBA",
       "output_size": [
-        69,
-        31
+        516,
+        43
       ],
-      "output_sha256": "eb92bc8db4adbd85b9ba66f858a93505b6122c9885c642faa930af9d5898bfe5",
-      "crop_xywh": [
-        662,
-        328,
-        69,
-        31
-      ],
-      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
-      "status": "local_game_screenshot_calibrated_20261101",
-      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
-      "reference_bbc_template": "BBchannel/assets/battle/JP/jbup.png"
+      "output_mode": "RGB",
+      "scale": 1.25,
+      "size_rounding": "floor(source_dimension * scale + 0.5)",
+      "image_interpolation": "cv2.INTER_LINEAR",
+      "mask_interpolation": "cv2.INTER_NEAREST",
+      "mask": {
+        "foreground_expression": "(G - 0.6 * R > 2) & (R > 140) & (B < 100)",
+        "green_red_ratio": 0.6,
+        "green_red_offset": 2.0,
+        "min_red_exclusive": 140,
+        "max_blue_exclusive": 100,
+        "transparent_pixels_excluded": true,
+        "background_rgb": [
+          0,
+          255,
+          0
+        ],
+        "foreground_pixels": 6170,
+        "background_pixels": 16018
+      },
+      "padding": 0,
+      "encoder": {
+        "library": "opencv",
+        "version": "4.12.0",
+        "png_compression": 9
+      },
+      "runtime_match": {
+        "method": 5,
+        "green_mask": true
+      },
+      "status": "extracted_game_text_jp_screenshot_calibrated_20261107",
+      "recognizes": "bond-level-up presentation only; never MAX/current cap or servant attribution",
+      "calibration_note": "JP 1280x720 retained result/upgrade frames; dynamic heading and card animation are excluded",
+      "calibration": {
+        "method": "real Maa TemplateMatch replay; no device input",
+        "samples": [
+          {
+            "file": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
+            "score": 0.88793,
+            "box": [
+              661,
+              321,
+              516,
+              43
+            ]
+          },
+          {
+            "file": "tests/fixtures/bond_stop/jp_bond_upgrade_panel.png",
+            "score": 0.886285,
+            "box": [
+              661,
+              321,
+              516,
+              43
+            ]
+          }
+        ]
+      },
+      "verification": {
+        "live_mcp_20261107": {
+          "entry": "JP Elisabeth Halloween bond 5 to 6 upgrade details already visible",
+          "resource": "development assets/resource/base; packaged installation was not changed",
+          "test_configuration": {
+            "mode": "all",
+            "reconstructed_battle_number": 5,
+            "another_battle_planned": true,
+            "skip_max_hit_override": 1
+          },
+          "score": 0.886312,
+          "threshold": 0.8,
+          "box": [
+            661,
+            321,
+            516,
+            43
+          ],
+          "handoff": "production inspect_victory_settlement registered bond_upgrade_deferred",
+          "action": "one call to production 结算-羁绊升级继续; original action and coordinates retained",
+          "result": "experience page recognized and visually confirmed; upgrade no longer matched; deferred state retained until task finished",
+          "coverage_limit": "existing late upgrade screen only; animation transition and next-battle MAX recheck remain framework-replay coverage",
+          "evidence_directory": ".workbuddy/runtime/bond-live-pass-20261107",
+          "report": "agent-report.json",
+          "before": "run-before.png",
+          "after": "run-after.png",
+          "cleanup": "task completed; MCP stop_pipeline disconnected/killed agent and removed controller registration; client closed"
+        }
+      }
     },
     {
-      "source": "BBchannel/assets/battle/CH/jbup.png",
-      "source_sha256": "617bf915c75035547b638ecfb367823314318ca8cb294abcce0865a9ae444179",
+      "source_root": "FGO整包",
+      "source": "国服图标拆分/Battle/img_txt_servantbonds01.png",
+      "source_sha256": "6c22ea2285bbc91776df3dc0e0cd2a98df82e8550b14c6116f8d41877efec983",
+      "server": "CN",
+      "output": "assets/resource/cn/image/battle/bond/img_txt_servantbonds01.png",
+      "output_sha256": "15286bb09054fbd1b425fdbd592e220fd95886c8f20408ec855c279a67244c7b",
+      "operation": "resize complete extracted bond text; replace non-text background with pure green",
       "source_size": [
-        110,
-        54
+        180,
+        33
       ],
-      "source_mode": "RGB",
-      "server": "CH",
-      "output": "assets/resource/cn/image/battle/bond/升级说明.png",
+      "source_mode": "RGBA",
       "output_size": [
-        73,
-        36
+        225,
+        41
       ],
-      "output_sha256": "0c3d206f3f70f2f153b1f039b1a40976a3606332cb26569c00140ce0c4a7205a",
-      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
-      "status": "temporary_bbc_fallback_pending_device_calibration",
-      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution"
+      "output_mode": "RGB",
+      "scale": 1.25,
+      "size_rounding": "floor(source_dimension * scale + 0.5)",
+      "image_interpolation": "cv2.INTER_LINEAR",
+      "mask_interpolation": "cv2.INTER_NEAREST",
+      "mask": {
+        "foreground_expression": "(G - 0.6 * R > 2) & (R > 140) & (B < 100)",
+        "green_red_ratio": 0.6,
+        "green_red_offset": 2.0,
+        "min_red_exclusive": 140,
+        "max_blue_exclusive": 100,
+        "transparent_pixels_excluded": true,
+        "background_rgb": [
+          0,
+          255,
+          0
+        ],
+        "foreground_pixels": 3797,
+        "background_pixels": 5428
+      },
+      "padding": 0,
+      "encoder": {
+        "library": "opencv",
+        "version": "4.12.0",
+        "png_compression": 9
+      },
+      "runtime_match": {
+        "method": 5,
+        "green_mask": true
+      },
+      "status": "extracted_cn_game_text_pending_device_calibration",
+      "recognizes": "unobstructed bond-results page",
+      "calibration_note": "Chinese source text visually verified; common 1.25x scale agrees with prior 720p partial-template lettering; full CN screenshot calibration is pending"
+    },
+    {
+      "source_root": "FGO整包",
+      "source": "国服图标拆分/Battle/img_txt_servantbonds02.png",
+      "source_sha256": "1345a3bec490399a2a8408686feca6ec44da9c6e1188d326ba2201be78c1738f",
+      "server": "CN",
+      "output": "assets/resource/cn/image/battle/bond/img_txt_servantbonds02.png",
+      "output_sha256": "893514267030d56124e7600ca4dd9141c8db29e6a923d397430c138d86bb87a9",
+      "operation": "resize complete extracted bond text; replace non-text background with pure green",
+      "source_size": [
+        252,
+        33
+      ],
+      "source_mode": "RGBA",
+      "output_size": [
+        315,
+        41
+      ],
+      "output_mode": "RGB",
+      "scale": 1.25,
+      "size_rounding": "floor(source_dimension * scale + 0.5)",
+      "image_interpolation": "cv2.INTER_LINEAR",
+      "mask_interpolation": "cv2.INTER_NEAREST",
+      "mask": {
+        "foreground_expression": "(G - 0.6 * R > 2) & (R > 140) & (B < 100)",
+        "green_red_ratio": 0.6,
+        "green_red_offset": 2.0,
+        "min_red_exclusive": 140,
+        "max_blue_exclusive": 100,
+        "transparent_pixels_excluded": true,
+        "background_rgb": [
+          0,
+          255,
+          0
+        ],
+        "foreground_pixels": 4877,
+        "background_pixels": 8038
+      },
+      "padding": 0,
+      "encoder": {
+        "library": "opencv",
+        "version": "4.12.0",
+        "png_compression": 9
+      },
+      "runtime_match": {
+        "method": 5,
+        "green_mask": true
+      },
+      "status": "extracted_cn_game_text_pending_device_calibration",
+      "recognizes": "bond-level-up presentation only; never MAX/current cap or servant attribution",
+      "calibration_note": "Chinese source text visually verified; common 1.25x scale agrees with prior 720p partial-template lettering; full CN screenshot calibration is pending"
     }
   ],
   "result_header_note": "JP complete RESULT header cropped from the retained local screenshot. CH uses the BBC battleFinish character as temporary fallback. The enabled option replaces only the existing victory TemplateMatch; the default remains the original next-step template. ROI [450,0,400,120] was checked against 33 battle negatives; CH positive screen remains uncalibrated.",
@@ -252,7 +384,171 @@
       "file": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
       "sha256": "75fe2fc318b389f32a4c671e34a7737c1af3acedc7ae1efbd6c9dadf589779ad",
       "role": "JP 12 to13 bond level-up overlay, not an unobstructed bond page"
+    },
+    {
+      "file": "tests/fixtures/bond_stop/jp_bond_upgrade_panel.png",
+      "sha256": "62fc598a7a49f86de92dd45f626a9d0075d781054a9c9cba4f0c039987abb9b9",
+      "role": "JP late bond-level-up frame; complete right-side explanatory text visible after the heading/card animation",
+      "capture_source": ".workbuddy/runtime/bond-asset-text-20261107/current.png",
+      "retained_roi_xywh": [
+        630,
+        285,
+        625,
+        110
+      ],
+      "operation": "retain original-position text ROI in a 1280x720 frame; fill all other pixels black"
     }
   ],
-  "upgrade_note": "Upgrade presentation requires both fixed-ROI heading and explanatory-line templates, each threshold0.8 via Pipeline And leaf references. JP uses the retained12-to13 level-up frame; this confirms an overlay, not MAX/current cap. CH remains an uncalibrated BBC fallback. The digit1 jblevel10 template and bond>=10 heuristic are intentionally excluded."
+  "upgrade_note": "A single fixed right-side complete img_txt_servantbonds02 template identifies the upgrade presentation. The left-side img_txt_servantbonds01 identifies the ordinary bond-results page. Both use method5 and a pure-green background mask; heading/card OCR branches are retired. An upgrade presentation does not establish MAX/current cap. CN complete text uses Chinese source assets and awaits full real-screen calibration.",
+  "text_template_generator": "tools/generate_bond_text_templates.py",
+  "text_template_rebuild": "python tools/generate_bond_text_templates.py --source-root <FGO整包路径>",
+  "retired_templates": [
+    {
+      "source": "tests/fixtures/bond_stop/jp_bond_slot5_max.png",
+      "source_sha256": "7d818261241ea05f488441f2c27d09c3fef4fdba0578bc6c444b672df8497dd3",
+      "source_size": [
+        1280,
+        720
+      ],
+      "source_mode": "RGB",
+      "server": "JP",
+      "output_size": [
+        67,
+        34
+      ],
+      "output_sha256": "33856ce4035e8dc0c9d53cf2ba8143cef2b03bbe830c731429a0e3f37bacd83f",
+      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
+      "capture_source": ".workbuddy/runtime/bond-stop-live-20261101/battle2_after.png",
+      "capture_sha256": "7d818261241ea05f488441f2c27d09c3fef4fdba0578bc6c444b672df8497dd3",
+      "crop_xywh": [
+        79,
+        169,
+        67,
+        34
+      ],
+      "supersedes": {
+        "source": "BBchannel/assets/battle/JP/battleFinish1.png",
+        "source_sha256": "b0a40f274980e1009390cef332a51d639d6649faed9a1f32a50f53b8ad5be216",
+        "output_sha256": "b019cb8db4d83d787d4c090d1da6e0cbf340b7fb4fe4924216a19469be2622de",
+        "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720"
+      },
+      "calibration_note": "JP five-own-servant results; original formation slot6, support slot4, result column5 MAX; production stop screenshot retained.",
+      "retired_output": "assets/resource/base/image/battle/bond/羁绊结算页.png",
+      "previous_status": "local_game_screenshot_calibrated_20261101",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    },
+    {
+      "source": "BBchannel/assets/battle/CH/battleFinish1.png",
+      "source_sha256": "36d6f7ebe78d771b9dfccf50759d9adf9313f23e6bf07071cdbb8520505e2c8e",
+      "source_size": [
+        101,
+        52
+      ],
+      "source_mode": "RGB",
+      "server": "CH",
+      "output_size": [
+        67,
+        35
+      ],
+      "output_sha256": "a9964bdc4e99245aa92a9b06a5a8674df409bbf6b41de71fa38ccb7cdce5dd35",
+      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
+      "retired_output": "assets/resource/cn/image/battle/bond/羁绊结算页.png",
+      "previous_status": "temporary_bbc_fallback_pending_device_calibration",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    },
+    {
+      "source": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
+      "source_sha256": "75fe2fc318b389f32a4c671e34a7737c1af3acedc7ae1efbd6c9dadf589779ad",
+      "source_size": [
+        1280,
+        720
+      ],
+      "source_mode": "RGB",
+      "server": "JP",
+      "output_size": [
+        105,
+        145
+      ],
+      "output_sha256": "4a500195e0b723ab3037fdeb266fb86f051091119072943f5620eaab1bf3aaaf",
+      "crop_xywh": [
+        1120,
+        74,
+        105,
+        145
+      ],
+      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
+      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
+      "reference_bbc_template": "BBchannel/assets/battle/JP/jbup1.png",
+      "retired_output": "assets/resource/base/image/battle/bond/升级标题.png",
+      "previous_status": "local_game_screenshot_calibrated_20261101",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    },
+    {
+      "source": "BBchannel/assets/battle/CH/jbup1.png",
+      "source_sha256": "bcbfab373ae4e4141fa8f35015ac75e69a3de60a1c90e928f54c5dc573db7efb",
+      "source_size": [
+        172,
+        188
+      ],
+      "source_mode": "RGB",
+      "server": "CH",
+      "output_size": [
+        115,
+        125
+      ],
+      "output_sha256": "b92e08d048cea8c139d699449001724f6cb110fb17e756eef4aab10b90a4ab83",
+      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
+      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
+      "retired_output": "assets/resource/cn/image/battle/bond/升级标题.png",
+      "previous_status": "temporary_bbc_fallback_pending_device_calibration",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    },
+    {
+      "source": "tests/fixtures/bond_stop/jp_bond_level_up_overlay.png",
+      "source_sha256": "75fe2fc318b389f32a4c671e34a7737c1af3acedc7ae1efbd6c9dadf589779ad",
+      "source_size": [
+        1280,
+        720
+      ],
+      "source_mode": "RGB",
+      "server": "JP",
+      "output_size": [
+        69,
+        31
+      ],
+      "output_sha256": "eb92bc8db4adbd85b9ba66f858a93505b6122c9885c642faa930af9d5898bfe5",
+      "crop_xywh": [
+        662,
+        328,
+        69,
+        31
+      ],
+      "operation": "crop RGB game screenshot at crop_xywh in 1280x720, no resize or retouch",
+      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
+      "reference_bbc_template": "BBchannel/assets/battle/JP/jbup.png",
+      "retired_output": "assets/resource/base/image/battle/bond/升级说明.png",
+      "previous_status": "local_game_screenshot_calibrated_20261101",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    },
+    {
+      "source": "BBchannel/assets/battle/CH/jbup.png",
+      "source_sha256": "617bf915c75035547b638ecfb367823314318ca8cb294abcce0865a9ae444179",
+      "source_size": [
+        110,
+        54
+      ],
+      "source_mode": "RGB",
+      "server": "CH",
+      "output_size": [
+        73,
+        36
+      ],
+      "output_sha256": "0c3d206f3f70f2f153b1f039b1a40976a3606332cb26569c00140ce0c4a7205a",
+      "operation": "convert RGB, Lanczos resize 2/3 from 1920x1080 to 1280x720",
+      "recognizes": "bond-level-up presentation only; never MAX/current-cap or servant attribution",
+      "retired_output": "assets/resource/cn/image/battle/bond/升级说明.png",
+      "previous_status": "temporary_bbc_fallback_pending_device_calibration",
+      "status": "retired_replaced_by_complete_extracted_text_20261107"
+    }
+  ]
 }

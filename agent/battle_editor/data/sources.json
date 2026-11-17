@@ -49,7 +49,7 @@
       "bytes": 193947
     }
   ],
-  "servantCatalogSha256": "7b34ab18afa27b297804c4a310a1ec85d8c4836c5dc13a64dfa2dee3f1b330d0",
+  "servantCatalogSha256": "505c486ebc716884c2419a45b5a72ba0d5c46e60b9d26d93d1e6bb6c741751a5",
   "missingServantIds": [],
   "noActiveSkillMetadataIds": [
     1700100,
@@ -776,6 +776,147 @@
         }
       ],
       "method": "incremental; existing servant, equip, mystic, and media records preserved"
+    },
+    {
+      "date": "2026-11-05",
+      "servantId": 800100,
+      "sourceFields": [
+        "forms",
+        "defaultFormKey"
+      ],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/export/JP/nice_servant.json",
+          "sha256": "f0c3cf65d9f54e512b45bedaf6ca349884b826f9ebed7425a2cfad877d9d3697",
+          "bytes": 69257176
+        },
+        {
+          "url": "https://raw.githubusercontent.com/chaldea-center/chaldea-data/156e8e88609c7536faf4cf476ba613257e3e1206/dist/constData.json",
+          "sha256": "029021cf72520f9ce2a852bf792fa1b92458a0e7152877ddd96b5fa244c36d0a",
+          "bytes": 264800
+        }
+      ],
+      "chaldeaCommit": "7dbad7dbc8a5713439658ab648ea2263d4621c79",
+      "chaldeaDataCommit": "156e8e88609c7536faf4cf476ba613257e3e1206",
+      "method": "incremental offline Mash form facts; same svtId=800100; existing servant/CE/mystic/skill/NP fields unchanged",
+      "compatibilityNotes": [
+        "Chaldea writes costume battleCharaId to limitCount and retains explicit skillIds/tdId",
+        "Historical Ortinax skill/TD presets share one costume identity; restored preset is the group default",
+        "Costume 800210/20 shares Paladin facts: Atlas rarity/COST overwrite and NP800107 releaseCondition confirm the group"
+      ]
+    },
+    {
+      "date": "2026-11-12",
+      "servantIds": [
+        2801400,
+        406100,
+        705500
+      ],
+      "costumeServantIds": [
+        204700
+      ],
+      "equipIds": [
+        9409660,
+        9409670,
+        9409680,
+        9409690,
+        9312640,
+        9312670,
+        9312660
+      ],
+      "sourceOnlyEquipIds": [
+        9312630,
+        9312600,
+        9809900,
+        9809910
+      ],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/2801400",
+          "sha256": "9872fe519e540e1304ee2ac786f063a7c08c3a043f152e7f1fe9bcef4518f808"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/406100",
+          "sha256": "7e9185180a1fac6d3645a8efcff39aaed8e7f49ef3b1082d1bf4012ee7eb808e"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
+          "sha256": "80e3078a38ed70795faa9322983895b5d1b4fd1335b1d4996d3fc2b2a4eb1861"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/204700",
+          "sha256": "b9a5645a8d0db21a65d44b196df5436d28ff3a5db577b0aafc7c1fec3aa18ef8"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409660",
+          "sha256": "6b6d713cc531fe75c34dbd13cf29b08a217f3ede2b17c5c334d4f109671751a0"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409670",
+          "sha256": "89709e84b9b2551c3264b192e9505b1ace7567241933ac716e3f5a25a818ab85"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409680",
+          "sha256": "d38e2b6e82bc0bf858c87aef2af53e98ffef57eaa4faa4c1f2fbc06db82fb9ac"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9409690",
+          "sha256": "229ff997088b0aee4b2ae4842bdb007eb04ba746972afd8e2eb8b1ebeac95261"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312640",
+          "sha256": "c2207a7874b192bf56d4134135674e615b41c45a93617aaecc6f3fbe90b94c98"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312670",
+          "sha256": "fa8a3f0d229e459a4ca33f9e01848362a52bf0988783b6ef104dd571af06339c"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312660",
+          "sha256": "8aa0ae22e737b26a4c57923c6f01ea9f31b40cf9a948c1d2d6e90e5169d2bcfd"
+        }
+      ],
+      "missingCostume": {
+        "servantId": 705500,
+        "costumeId": 705530,
+        "reason": "Atlas HTTP 404; user approved regular forms only"
+      },
+      "method": "incremental; no existing facts overwritten"
+    },
+    {
+      "date": "2026-11-16",
+      "servantIds": [
+        2501700
+      ],
+      "costumeServantIds": [
+        705500
+      ],
+      "equipIds": [
+        9312650
+      ],
+      "sourceOnlyEquipIds": [],
+      "sources": [
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/2501700",
+          "sha256": "9b0e64f6dd9a619ded65fdd156f60f682bebff8e2b11fb6831902b068a77c3d7"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/servant/705500",
+          "sha256": "409c3304ae99173ccdca5b23442f4d70d3e91d986599615a00fa59f6165cc8ee"
+        },
+        {
+          "url": "https://api.atlasacademy.io/nice/JP/equip/9312650",
+          "sha256": "e2368bbd4b3648ba922eec4d7a3fcfe9cfc7e49070944efe066dcc0f506de692"
+        }
+      ],
+      "resolvedCostumes": [
+        {
+          "servantId": 705500,
+          "costumeId": 705530,
+          "previousMissingDate": "2026-11-12"
+        }
+      ],
+      "method": "incremental; existing facts preserved except explicitly appended costume assets"
     }
   ]
 }

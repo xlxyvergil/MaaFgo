@@ -21,3 +21,12 @@ npm run build
 
 支持的字段与边界以仓库制作方案、服务端校验报告为准。未支持动作保留原数据，
 可以下载保真副本；正式保存必须通过当前执行能力检查。
+
+冠位编队的 COST 显示与羁绊规划均自动计入从者和普通礼装（`equip1`），
+羁绊礼装（`equip2`）与报酬提升礼装（`equip3`）免费，助战整槽免费。
+规则依据：[FGO 官方冠位编队说明](https://news.fate-go.jp/2025/grand_graph_system/)。
+回归样本 `tests/fixtures/battle_editor/chaldea_94255.json` 的初始 COST 为40。
+
+导入新草稿时，若 `delegate.actWeightSelections` 仅包含 `-1`，会移除这条
+“跳过随机效果”的模拟记录；实际技能选择、宝具类型、换人及未知字段保持原样。
+打开已有方案、恢复草稿或编辑原始 JSON 时不自动清理；外部源文件也不会改写。

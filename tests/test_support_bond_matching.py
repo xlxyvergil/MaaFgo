@@ -16,6 +16,27 @@ with patch.object(AgentServer, "custom_action", lambda *args: lambda cls: cls):
 
 
 class SupportBondMatchingTests(unittest.TestCase):
+    def test_jp_screenshot_effects_with_real_templates(self):
+        for effect, fixture in (("50np", "jp_np50.png"), ("original", "jp_original.png")):
+            with self.subTest(effect=effect):
+                crop = support._imread(str(ROOT / "tests/fixtures/support_bond" / fixture))
+                self.assertIsNotNone(crop)
+                frame = np.zeros((160, 250, 3), dtype=np.uint8)
+                frame[70:130, 170:230] = crop
+                action = support.SupportAction()
+                self.assertTrue(action._match_bond(frame, 0, 0, effect))
+                other = "original" if effect == "50np" else "50np"
+                self.assertFalse(action._match_bond(frame, 0, 0, other))
+
+    def test_flat_image_does_not_confirm_an_effect(self):
+        frame = np.full((160, 250, 3), 255, dtype=np.uint8)
+        for effect in ("50np", "original"):
+            self.assertFalse(support.SupportAction()._match_bond(frame, 0, 0, effect))
+
+    def test_clipped_screen_does_not_raise_or_confirm(self):
+        frame = np.zeros((100, 200, 3), dtype=np.uint8)
+        self.assertFalse(support.SupportAction()._match_bond(frame, 0, 0, "50np"))
+
     def matches(self, np_score, original_score, expected):
         frame = np.zeros((720, 1280, 3), dtype=np.uint8)
         template = np.zeros((10, 10, 3), dtype=np.uint8)

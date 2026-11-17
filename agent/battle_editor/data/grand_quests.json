@@ -1,0 +1,1311 @@
+{
+  "version": 1,
+  "verifiedAt": "2026-11-06",
+  "sources": {
+    "atlasWars": [
+      "https://api.atlasacademy.io/nice/JP/war/8396",
+      "https://api.atlasacademy.io/nice/JP/war/8406",
+      "https://api.atlasacademy.io/nice/JP/war/8399",
+      "https://api.atlasacademy.io/nice/JP/war/8404",
+      "https://api.atlasacademy.io/nice/JP/war/8407",
+      "https://api.atlasacademy.io/nice/JP/war/8405",
+      "https://api.atlasacademy.io/nice/JP/war/8398",
+      "https://api.atlasacademy.io/nice/JP/war/8402",
+      "https://api.atlasacademy.io/nice/JP/war/8403",
+      "https://api.atlasacademy.io/nice/JP/war/8413",
+      "https://api.atlasacademy.io/nice/JP/war/8401"
+    ],
+    "chaldeaSameQuestRemap": "https://raw.githubusercontent.com/chaldea-center/chaldea-data/156e8e88609c7536faf4cf476ba613257e3e1206/dist/constData.json",
+    "notes": "同难度、同路线的历次重开关卡仅按 Chaldea 官方 sameQuestRemap 合并；EXⅠ火/地和EXⅡ风/水分开。冠位名代战为额外分类。目录使用 Chaldea / Atlas JP 关卡标识，列表不代表当前账号或服务器已开放。"
+  },
+  "classes": [
+    {
+      "id": "saber",
+      "label": "剑"
+    },
+    {
+      "id": "archer",
+      "label": "弓"
+    },
+    {
+      "id": "lancer",
+      "label": "枪"
+    },
+    {
+      "id": "rider",
+      "label": "骑"
+    },
+    {
+      "id": "caster",
+      "label": "术"
+    },
+    {
+      "id": "assassin",
+      "label": "杀"
+    },
+    {
+      "id": "berserker",
+      "label": "狂"
+    },
+    {
+      "id": "ex1",
+      "label": "EXⅠ"
+    },
+    {
+      "id": "ex2",
+      "label": "EXⅡ"
+    },
+    {
+      "id": "extra",
+      "label": "EX名代战"
+    }
+  ],
+  "quests": [
+    {
+      "id": "saber-94145437",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94145437,
+        94145407
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅶ"
+    },
+    {
+      "id": "saber-94145436",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94145436,
+        94145406
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅵ"
+    },
+    {
+      "id": "saber-94145435",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94145435,
+        94145405
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅴ"
+    },
+    {
+      "id": "saber-94145434",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94145434,
+        94145404
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅳ"
+    },
+    {
+      "id": "saber-94145433",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94145433,
+        94145403
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅲ"
+    },
+    {
+      "id": "saber-94145432",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94145432,
+        94145402
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅱ"
+    },
+    {
+      "id": "saber-94145431",
+      "classId": "saber",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94145431,
+        94145401
+      ],
+      "sourceName": "冠位研鑽戦〔セイバー〕 Ⅰ"
+    },
+    {
+      "id": "saber-94145410",
+      "classId": "saber",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94145410
+      ],
+      "sourceName": "冠位認定戦〔セイバー〕"
+    },
+    {
+      "id": "saber-94145400",
+      "classId": "saber",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94145400
+      ],
+      "sourceName": "冠位解放戦〔セイバー〕"
+    },
+    {
+      "id": "archer-94150847",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94150847,
+        94150817,
+        94150807
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅶ"
+    },
+    {
+      "id": "archer-94150846",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94150846,
+        94150816,
+        94150806
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅵ"
+    },
+    {
+      "id": "archer-94150845",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94150845,
+        94150815,
+        94150805
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅴ"
+    },
+    {
+      "id": "archer-94150844",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94150844,
+        94150814,
+        94150804
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅳ"
+    },
+    {
+      "id": "archer-94150843",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94150843,
+        94150813,
+        94150803
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅲ"
+    },
+    {
+      "id": "archer-94150842",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94150842,
+        94150812,
+        94150802
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅱ"
+    },
+    {
+      "id": "archer-94150841",
+      "classId": "archer",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94150841,
+        94150811,
+        94150801
+      ],
+      "sourceName": "冠位研鑽戦〔アーチャー〕 Ⅰ"
+    },
+    {
+      "id": "archer-94150810",
+      "classId": "archer",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94150810
+      ],
+      "sourceName": "冠位認定戦〔アーチャー〕"
+    },
+    {
+      "id": "archer-94150800",
+      "classId": "archer",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94150800
+      ],
+      "sourceName": "冠位解放戦〔アーチャー〕"
+    },
+    {
+      "id": "lancer-94146837",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94146837,
+        94146807
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅶ"
+    },
+    {
+      "id": "lancer-94146836",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94146836,
+        94146806
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅵ"
+    },
+    {
+      "id": "lancer-94146835",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94146835,
+        94146805
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅴ"
+    },
+    {
+      "id": "lancer-94146834",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94146834,
+        94146804
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅳ"
+    },
+    {
+      "id": "lancer-94146833",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94146833,
+        94146803
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅲ"
+    },
+    {
+      "id": "lancer-94146832",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94146832,
+        94146802
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅱ"
+    },
+    {
+      "id": "lancer-94146831",
+      "classId": "lancer",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94146831,
+        94146801
+      ],
+      "sourceName": "冠位研鑽戦〔ランサー〕 Ⅰ"
+    },
+    {
+      "id": "lancer-94146810",
+      "classId": "lancer",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94146810
+      ],
+      "sourceName": "冠位認定戦〔ランサー〕"
+    },
+    {
+      "id": "lancer-94146800",
+      "classId": "lancer",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94146800
+      ],
+      "sourceName": "冠位解放戦〔ランサー〕"
+    },
+    {
+      "id": "rider-94149837",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94149837,
+        94149807
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅶ"
+    },
+    {
+      "id": "rider-94149836",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94149836,
+        94149806
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅵ"
+    },
+    {
+      "id": "rider-94149835",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94149835,
+        94149805
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅴ"
+    },
+    {
+      "id": "rider-94149834",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94149834,
+        94149804
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅳ"
+    },
+    {
+      "id": "rider-94149833",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94149833,
+        94149803
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅲ"
+    },
+    {
+      "id": "rider-94149832",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94149832,
+        94149802
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅱ"
+    },
+    {
+      "id": "rider-94149831",
+      "classId": "rider",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94149831,
+        94149801
+      ],
+      "sourceName": "冠位研鑽戦〔ライダー〕 Ⅰ"
+    },
+    {
+      "id": "rider-94149810",
+      "classId": "rider",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94149810
+      ],
+      "sourceName": "冠位認定戦〔ライダー〕"
+    },
+    {
+      "id": "rider-94149800",
+      "classId": "rider",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94149800
+      ],
+      "sourceName": "冠位解放戦〔ライダー〕"
+    },
+    {
+      "id": "caster-94151247",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94151247,
+        94151217,
+        94151207
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅶ"
+    },
+    {
+      "id": "caster-94151246",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94151246,
+        94151216,
+        94151206
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅵ"
+    },
+    {
+      "id": "caster-94151245",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94151245,
+        94151215,
+        94151205
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅴ"
+    },
+    {
+      "id": "caster-94151244",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94151244,
+        94151214,
+        94151204
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅳ"
+    },
+    {
+      "id": "caster-94151243",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94151243,
+        94151213,
+        94151203
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅲ"
+    },
+    {
+      "id": "caster-94151242",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94151242,
+        94151212,
+        94151202
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅱ"
+    },
+    {
+      "id": "caster-94151241",
+      "classId": "caster",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94151241,
+        94151211,
+        94151201
+      ],
+      "sourceName": "冠位研鑽戦〔キャスター〕 Ⅰ"
+    },
+    {
+      "id": "caster-94151210",
+      "classId": "caster",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94151210
+      ],
+      "sourceName": "冠位認定戦〔キャスター〕"
+    },
+    {
+      "id": "caster-94151200",
+      "classId": "caster",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94151200
+      ],
+      "sourceName": "冠位解放戦〔キャスター〕"
+    },
+    {
+      "id": "assassin-94150537",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94150537,
+        94150507
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅶ"
+    },
+    {
+      "id": "assassin-94150536",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94150536,
+        94150506
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅵ"
+    },
+    {
+      "id": "assassin-94150535",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94150535,
+        94150505
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅴ"
+    },
+    {
+      "id": "assassin-94150534",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94150534,
+        94150504
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅳ"
+    },
+    {
+      "id": "assassin-94150533",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94150533,
+        94150503
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅲ"
+    },
+    {
+      "id": "assassin-94150532",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94150532,
+        94150502
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅱ"
+    },
+    {
+      "id": "assassin-94150531",
+      "classId": "assassin",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94150531,
+        94150501
+      ],
+      "sourceName": "冠位研鑽戦〔アサシン〕 Ⅰ"
+    },
+    {
+      "id": "assassin-94150510",
+      "classId": "assassin",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94150510
+      ],
+      "sourceName": "冠位認定戦〔アサシン〕"
+    },
+    {
+      "id": "assassin-94150500",
+      "classId": "assassin",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94150500
+      ],
+      "sourceName": "冠位解放戦〔アサシン〕"
+    },
+    {
+      "id": "berserker-94146537",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94146537,
+        94146507
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅶ"
+    },
+    {
+      "id": "berserker-94146536",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94146536,
+        94146506
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅵ"
+    },
+    {
+      "id": "berserker-94146535",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94146535,
+        94146505
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅴ"
+    },
+    {
+      "id": "berserker-94146534",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94146534,
+        94146504
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅳ"
+    },
+    {
+      "id": "berserker-94146533",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94146533,
+        94146503
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅲ"
+    },
+    {
+      "id": "berserker-94146532",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94146532,
+        94146502
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅱ"
+    },
+    {
+      "id": "berserker-94146531",
+      "classId": "berserker",
+      "label": "冠位研钻战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94146531,
+        94146501
+      ],
+      "sourceName": "冠位研鑽戦〔バーサーカー〕 Ⅰ"
+    },
+    {
+      "id": "berserker-94146510",
+      "classId": "berserker",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94146510
+      ],
+      "sourceName": "冠位認定戦〔バーサーカー〕"
+    },
+    {
+      "id": "berserker-94146500",
+      "classId": "berserker",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94146500
+      ],
+      "sourceName": "冠位解放戦〔バーサーカー〕"
+    },
+    {
+      "id": "ex1-94148937",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94148937,
+        94148907
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅶ"
+    },
+    {
+      "id": "ex1-94148947",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94148947,
+        94148917
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅶ"
+    },
+    {
+      "id": "ex1-94148936",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94148936,
+        94148906
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅵ"
+    },
+    {
+      "id": "ex1-94148946",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94148946,
+        94148916
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅵ"
+    },
+    {
+      "id": "ex1-94148935",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94148935,
+        94148905
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅴ"
+    },
+    {
+      "id": "ex1-94148945",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94148945,
+        94148915
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅴ"
+    },
+    {
+      "id": "ex1-94148934",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94148934,
+        94148904
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅳ"
+    },
+    {
+      "id": "ex1-94148944",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94148944,
+        94148914
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅳ"
+    },
+    {
+      "id": "ex1-94148933",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94148933,
+        94148903
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅲ"
+    },
+    {
+      "id": "ex1-94148943",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94148943,
+        94148913
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅲ"
+    },
+    {
+      "id": "ex1-94148932",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94148932,
+        94148902
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅱ"
+    },
+    {
+      "id": "ex1-94148942",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94148942,
+        94148912
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅱ"
+    },
+    {
+      "id": "ex1-94148931",
+      "classId": "ex1",
+      "label": "冠位研钻战 火Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94148931,
+        94148901
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 火Ⅰ"
+    },
+    {
+      "id": "ex1-94148941",
+      "classId": "ex1",
+      "label": "冠位研钻战 地Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94148941,
+        94148911
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅠ〕 地Ⅰ"
+    },
+    {
+      "id": "ex1-94148910",
+      "classId": "ex1",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94148910
+      ],
+      "sourceName": "冠位認定戦〔エクストラⅠ〕"
+    },
+    {
+      "id": "ex1-94148900",
+      "classId": "ex1",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94148900
+      ],
+      "sourceName": "冠位解放戦〔エクストラ〕"
+    },
+    {
+      "id": "ex2-94149037",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94149037,
+        94149007
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅶ"
+    },
+    {
+      "id": "ex2-94149047",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94149047,
+        94149017
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅶ"
+    },
+    {
+      "id": "ex2-94149036",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94149036,
+        94149006
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅵ"
+    },
+    {
+      "id": "ex2-94149046",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94149046,
+        94149016
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅵ"
+    },
+    {
+      "id": "ex2-94149035",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94149035,
+        94149005
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅴ"
+    },
+    {
+      "id": "ex2-94149045",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94149045,
+        94149015
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅴ"
+    },
+    {
+      "id": "ex2-94149034",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94149034,
+        94149004
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅳ"
+    },
+    {
+      "id": "ex2-94149044",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94149044,
+        94149014
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅳ"
+    },
+    {
+      "id": "ex2-94149033",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94149033,
+        94149003
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅲ"
+    },
+    {
+      "id": "ex2-94149043",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94149043,
+        94149013
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅲ"
+    },
+    {
+      "id": "ex2-94149032",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94149032,
+        94149002
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅱ"
+    },
+    {
+      "id": "ex2-94149042",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94149042,
+        94149012
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅱ"
+    },
+    {
+      "id": "ex2-94149031",
+      "classId": "ex2",
+      "label": "冠位研钻战 风Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94149031,
+        94149001
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 風Ⅰ"
+    },
+    {
+      "id": "ex2-94149041",
+      "classId": "ex2",
+      "label": "冠位研钻战 水Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94149041,
+        94149011
+      ],
+      "sourceName": "冠位研鑽戦〔エクストラⅡ〕 水Ⅰ"
+    },
+    {
+      "id": "ex2-94149010",
+      "classId": "ex2",
+      "label": "冠位认定战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94149010
+      ],
+      "sourceName": "冠位認定戦〔エクストラⅡ〕"
+    },
+    {
+      "id": "ex2-94148900",
+      "classId": "ex2",
+      "label": "冠位解放战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94148900
+      ],
+      "sourceName": "冠位解放戦〔エクストラ〕"
+    },
+    {
+      "id": "extra-94163708",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅶ",
+      "difficulty": "100★★★",
+      "phase": 1,
+      "questIds": [
+        94163708
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅶ"
+    },
+    {
+      "id": "extra-94163707",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅵ",
+      "difficulty": "100★★",
+      "phase": 1,
+      "questIds": [
+        94163707
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅵ"
+    },
+    {
+      "id": "extra-94163706",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅴ",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94163706
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅴ"
+    },
+    {
+      "id": "extra-94163705",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅳ",
+      "difficulty": "100+++",
+      "phase": 1,
+      "questIds": [
+        94163705
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅳ"
+    },
+    {
+      "id": "extra-94163704",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅲ",
+      "difficulty": "100++",
+      "phase": 1,
+      "questIds": [
+        94163704
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅲ"
+    },
+    {
+      "id": "extra-94163703",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅱ",
+      "difficulty": "100+",
+      "phase": 1,
+      "questIds": [
+        94163703
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅱ"
+    },
+    {
+      "id": "extra-94163702",
+      "classId": "extra",
+      "label": "冠位名代迎击战 Ⅰ",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94163702
+      ],
+      "sourceName": "冠位名代 迎撃戦 Ⅰ"
+    },
+    {
+      "id": "extra-94163709",
+      "classId": "extra",
+      "label": "冠位名代烂舞战",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94163709
+      ],
+      "sourceName": "冠位名代 爛舞戦"
+    },
+    {
+      "id": "extra-94163710",
+      "classId": "extra",
+      "label": "冠位名代烂舞战（活动版）",
+      "difficulty": "100★",
+      "phase": 1,
+      "questIds": [
+        94163710
+      ],
+      "sourceName": "冠位名代 爛舞戦"
+    },
+    {
+      "id": "extra-94163701",
+      "classId": "extra",
+      "label": "冠位扩张战",
+      "difficulty": "100",
+      "phase": 1,
+      "questIds": [
+        94163701
+      ],
+      "sourceName": "冠位拡張戦〔エクストラ〕"
+    }
+  ]
+}

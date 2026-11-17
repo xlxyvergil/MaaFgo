@@ -44,6 +44,9 @@ class ValidationTests(unittest.TestCase):
             (root / "invalid.json").write_text('{"import":"not-a-list"}', encoding="utf-8")
             self.assertFalse(validate_interface_references(interface))
 
+    def test_shipped_interface_task_entries_exist(self):
+        self.assertTrue(validate_interface_references(ROOT / "assets/interface.json"))
+
     def test_local_only_import_cannot_pass_release_check(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)

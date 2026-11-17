@@ -27,6 +27,7 @@ def _module(name, path):
 _CORE = _module("_bbc_import_special_core", Path(__file__).resolve().parents[1] / "battle/core/special_skills.py")
 SPECIAL_SKILL_GROUPS = _CORE.SPECIAL_SKILL_GROUPS
 _SPACE_ISHTAR = "战斗_仇凛2技能_色卡选择"
+_BB_DUBAI = "战斗_BB迪拜3技能_宝具类型选择"
 _NAMED = {
     "Prelati": ("战斗_普雷拉蒂1技能_不换形态选择", {"不替换": 0, "替换": 1}),
     "Lilith": ("战斗_莉莉丝3技能_不赋予选择", {"不付与即死": 0, "付与即死": 1}),
@@ -122,8 +123,16 @@ class BbcSpecialSkillChoices:
             return None
         opcode = raw[0]
         if opcode == "BBDubai":
-            raise ValueError(f"{location}: BBC BB迪拜专属选项尚无对应原生菜单，不能忽略选项当作普通技能导入")
-        if isinstance(opcode, str) and opcode in _NAMED:
+            if len(raw) != 3:
+                raise ValueError(f"{location}: BB迪拜宝具切换指令缺少技能位置或宝具类型，无法确定要点击的选项。请在 BBC 中重新设置该技能，保存后重新导入。")
+            if type(raw[1]) is not int or not 1 <= raw[1] <= 9 or (raw[1] - 1) % 3 != 2:
+                raise ValueError(f"{location}: BB迪拜宝具切换没有指向前排的技能3，无法按此指令释放。请在 BBC 中改为当前 BB迪拜的技能3，保存后重新导入。")
+            if type(raw[2]) is not int or raw[2] not in (0, 1):
+                raise ValueError(f"{location}: BB迪拜宝具类型 {raw[2]!r} 无法对应游戏选项。请在 BBC 中重新选择“攻击类型”或“防御类型”，保存后重新导入。")
+            # BBC BBDUBAI_POS is indexed left-to-right (attack/defense) by 0/1.
+            # Chaldea stores the corresponding 1-based NP variant, not its color.
+            root, number, choice = _BB_DUBAI, raw[1], raw[2] + 1
+        elif isinstance(opcode, str) and opcode in _NAMED:
             root, values = _NAMED[opcode]
             if len(raw) != 3 or type(raw[1]) is not int or not 1 <= raw[1] <= 9 or not isinstance(raw[2], str) or raw[2] not in values:
                 raise ValueError(f"{location}: {opcode} 专属指令的技能号或选项无效: {raw!r}")

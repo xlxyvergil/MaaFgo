@@ -1,0 +1,16 @@
+{
+    "MXU_KILLPROC": {
+        "doc": "供预设引用的 MXU 内置结束进程入口；动作由 MXU 客户端注册，安卓打包时移除。",
+        "recognition": "DirectHit",
+        "action": {
+            "type": "Custom",
+            "param": {
+                "custom_action": "MXU_KILLPROC_ACTION",
+                "custom_action_param": {
+                    "kill_self": true
+                },
+                "target": [0, 0, 1, 1]
+            }
+        }
+    }
+}

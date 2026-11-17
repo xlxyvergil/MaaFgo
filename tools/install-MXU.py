@@ -77,14 +77,17 @@ def validate_editor_bundle(root, *, packaged=False):
         "agent/battle_editor/__init__.py", "agent/battle_editor/main.py",
         "agent/battle_editor/launcher.py", "agent/battle_editor/server.py",
         "agent/battle_editor/catalog.py", "agent/battle_editor/storage.py",
+        "agent/support_ce.py",
         "agent/battle_editor/validation.py", "agent/battle_editor/bond_optimizer.py",
         "agent/battle_editor/special_choices.py", "agent/battle/core/special_skills.py",
         "agent/battle/core/advanced_strategy.py",
         "agent/battle_editor/equip_filters.py",
         "agent/battle_editor/np_cards.py", "agent/battle_editor/np_card_metadata.py",
         "agent/battle_editor/screenshot_import.py", "agent/battle/perception/formation_candidates.py",
+        "agent/custom/mystic_code.py", "agent/custom/mfaalog.py",
         "agent/battle_editor/share_image.py",
         "agent/battle_editor/chaldea_image.py",
+        "agent/battle_editor/common_teams.py",
         "agent/battle_editor/bbc_import.py", "agent/chaldea/bbc_importer.py", "agent/chaldea/bbc_special_skills.py", "agent/chaldea/servant_types.py",
         "agent/custom/battle_editor_action.py", "agent/custom/bond_matcher.py",
         "agent/chaldea/servant_aliases.py", "agent/battle/card_composer.py",
@@ -96,7 +99,35 @@ def validate_editor_bundle(root, *, packaged=False):
                      "agent/chaldea/bbc_servant_ids.json", "agent/utils/Chaldea/equip_names_CN.json",
                      "agent/custom/bond_completion_costs.json"):
         document(root / relative)
-    document(data / "catalog.json")
+    catalog = document(data / "catalog.json")
+    mystic_codes = document(root / "agent/custom/mystic_code_data.json")
+    records = mystic_codes.get("mysticCodes")
+    if mystic_codes.get("schemaVersion") != 1 or not isinstance(records, list) or not records:
+        raise RuntimeError("编队编辑器御主礼装识别清单不完整，请重新生成御主礼装资源后打包")
+    code_ids, image_ids = set(), set()
+    for item in records:
+        if (not isinstance(item, dict) or type(item.get("id")) is not int
+                or item["id"] <= 0 or item["id"] in code_ids
+                or not isinstance(item.get("sources"), dict)):
+            raise RuntimeError("编队编辑器御主礼装识别记录无效或重复，请检查御主礼装资源清单")
+        code_ids.add(item["id"])
+        for gender in ("male", "female"):
+            image_id = item.get(gender + "ImageId")
+            if type(image_id) is not int or image_id <= 0 or image_id in image_ids:
+                raise RuntimeError(f"编队编辑器御主礼装 {item['id']} 的男女款图片编号无效或重复")
+            image_ids.add(image_id)
+            relative = f"MysticCodes/masterequip{image_id:05d}.png"
+            checked_asset(resource / "base/image", relative, item["sources"].get(gender))
+            # CN overrides are optional, but every explicitly registered file
+            # must ship intact; missing unregistered overrides use base assets.
+            if gender + "Cn" in item["sources"]:
+                checked_asset(resource / "cn/image", relative, item["sources"][gender + "Cn"])
+    choices = catalog.get("mysticCodes")
+    if (not isinstance(choices, list)
+            or any(not isinstance(item, dict) or type(item.get("id")) is not int
+                   or item["id"] not in code_ids for item in choices)):
+        raise RuntimeError("编队编辑器御主礼装选项缺少对应识别资源，请同步御主礼装清单后打包")
+    document(data / "grand_quests.json")
     filter_path = data / "equip_filters.json"
     filters = document(filter_path)
     filter_sources = document(data / "equip_filters_sources.json")

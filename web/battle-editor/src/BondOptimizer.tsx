@@ -6,7 +6,7 @@ import {filterCatalog,members} from './model';
 import type {Catalog,Json,Servant} from './model';
 import {reservedBondSupport} from './bondOptimizerModel';
 import {loadBondOptimizerPreferences,saveBondOptimizerPreferences} from './bondOptimizerPreferences';
-import {savePartyCostLimit} from './partyCost';
+import {partyCost,savePartyCostLimit} from './partyCost';
 import './bondOptimizer.css';
 
 function ExcludedServantChoice({servant,catalog,checked,onChange}:{servant:Servant;catalog:Catalog;checked:boolean;onChange:(checked:boolean)=>void}) {
@@ -34,20 +34,25 @@ export function BondOptimizer({data,catalog,onApply,onClose,initialCostLimit,onC
  const [settings,setSettings]=useState<Json|null>(null),[error,setError]=useState(''),[busy,setBusy]=useState(false),[result,setResult]=useState<Json|null>(null);
  const [costLimit,setCostLimit]=useState(String(initialCostLimit)),[bondBase,setBondBase]=useState(String(preferences.bondBase)),[rarity,setRarity]=useState(preferences.preferredRarity);
  const [ownedServants,setOwnedServants]=useState(preferences.ownedServantsOnly),[ownedEquips,setOwnedEquips]=useState(preferences.ownedEquipsOnly),[modifyEquips,setModifyEquips]=useState(preferences.modifyEquips),[confirmedMlb,setConfirmedMlb]=useState(preferences.confirmedMlbOnly);
- const [reserved,setReserved]=useState<number|null>(()=>reservedBondSupport(data,preferences.reservedSupportSlot??preferredSupportSlot)),[currentCost,setCurrentCost]=useState('');
+ const [reserved,setReserved]=useState<number|null>(()=>reservedBondSupport(data,preferences.reservedSupportSlot??preferredSupportSlot));
  const [excluded,setExcluded]=useState<number[]>(preferences.excludeServantIds),[query,setQuery]=useState(''),[rememberFailed,setRememberFailed]=useState(false);
  const resultRef=useRef<HTMLDivElement>(null);
  useEffect(()=>{if(result)resultRef.current?.scrollIntoView({block:'nearest'});},[result]);
  const roster=members(data),support=roster.findIndex(m=>m&&['friend','npc','fixed'].includes(m.supportType));
  const effectiveReserved=reservedBondSupport(data,reserved);
  const grand=roster.some((m,i)=>i!==support&&m?.grandSvt);
- useEffect(()=>{setCurrentCost('');},[data]);
+ const costSummary=useMemo(()=>partyCost(data,catalog),[data,catalog]);
  useEffect(()=>{let active=true;api('/bond/settings').then(value=>{if(active)setSettings(value);}).catch(e=>{if(active)setError(e.message);});return()=>{active=false;};},[]);
  const excludedChoices=useMemo(()=>filterCatalog('servant',catalog,{query}) as Servant[],[catalog,query]);
  const inventory=settings?.inventory??{};
  const blocked=!!settings&&((ownedServants&&!inventory.servants?.available)||(ownedEquips&&!inventory.equips?.available));
  const validInteger=(value:string,min:number,max:number)=>/^\d+$/.test(value)&&Number(value)>=min&&Number(value)<=max;
- const invalid=!validInteger(costLimit,1,300)||!validInteger(bondBase,1,1000000)||(grand&&!validInteger(currentCost,0,1000))||effectiveReserved===null;
+ const invalidReason=!validInteger(costLimit,1,300)?'“队伍COST上限”需要填写1～300的整数。'
+  :!validInteger(bondBase,1,1000000)?'“关卡基础羁绊”需要填写1～1000000的整数。'
+  :effectiveReserved===null?'没有可用的助战槽位，无法补齐队伍。请先在编队中清出一个空位或将一位成员设为助战。':'';
+ const invalid=!!invalidReason;
+ const disabledReason=!settings?(error?'羁绊资料读取失败，请关闭弹窗后重新打开。':'正在读取本地羁绊资料和库存…')
+  :blocked?'勾选的本地库存不可用。请先在Maa构建个人从者礼装库，或取消对应的“仅使用本地已持有”选项。':invalidReason;
  const execute=async()=>{
   if(!settings||busy||blocked||invalid)return;
   const remembered=saveBondOptimizerPreferences({version:1,bondBase:Number(bondBase),preferredRarity:rarity,
@@ -59,7 +64,7 @@ export function BondOptimizer({data,catalog,onApply,onClose,initialCostLimit,onC
   try {
    const response=await api('/bond/optimize','POST',{data:snapshot,options:{costLimit:Number(costLimit),bondBase:Number(bondBase),preferredRarity:rarity,
     ownedServantsOnly:ownedServants,ownedEquipsOnly:ownedEquips,modifyEquips,confirmedMlbOnly:confirmedMlb,
-    reservedSupportSlot:effectiveReserved,excludeServantIds:excluded,currentCost:grand?Number(currentCost):null}});
+    reservedSupportSlot:effectiveReserved,excludeServantIds:excluded,currentCost:null}});
    onApply(response,snapshot);setResult(response);
   } catch(e){setError((e as Error).message);} finally {setBusy(false);}
  };
@@ -80,7 +85,7 @@ export function BondOptimizer({data,catalog,onApply,onClose,initialCostLimit,onC
     {(!ownedServants||!ownedEquips)&&<div className="bond-message"><AlertTriangle size={16}/><span>已取消部分持有限制，可能补入尚未持有的从者或礼装；礼装仍限工程可识别范围，请在执行后核对。</span></div>}
     <div className="bond-option-grid two">
      <label className="field"><span>助战槽位</span><select aria-label="助战槽位" value={effectiveReserved??''} disabled={support>=0} onChange={e=>setReserved(Number(e.target.value))}>{effectiveReserved===null&&<option value="">请先清出一个空位或指定助战</option>}{roster.map((m,i)=>(!m?.svtId||i===support)&&<option value={i} key={i}>第{i+1}槽{support===i?' · 沿用当前助战':' · 保留空位，稍后选择助战'}</option>)}</select><small>优先沿用当前助战；记住的槽位已占用时自动选择空位</small></label>
-     {grand&&<label className="field"><span>已有编队实际COST（冠位）</span><input aria-label="已有编队实际COST" type="number" min={0} max={1000} value={currentCost} onChange={e=>setCurrentCost(e.target.value)} placeholder="填写游戏中当前已用COST"/><small>冠位三礼装保持，以实际COST起算</small></label>}
+     {grand&&<div className="field"><span>已有编队COST（自动计算）</span><strong>{costSummary.complete?costSummary.knownTotal:'部分资料待确认'}</strong><small>冠位从者按原COST计费；普通礼装计费，羁绊礼装与报酬提升礼装免费；助战不计费。</small></div>}
     </div>
     <label className="check-field"><input type="checkbox" checked={modifyEquips} onChange={e=>setModifyEquips(e.target.checked)}/>允许更换已有普通礼装</label>
     <p className="bond-option-help">默认保留已选礼装，只填未要求礼装的位置。开启后会重新搭配普通礼装，请核对战斗所需礼装；冠位三礼装和助战始终保留。</p>
@@ -96,6 +101,6 @@ export function BondOptimizer({data,catalog,onApply,onClose,initialCostLimit,onC
    {busy&&<div className="bond-running" role="status"><LoaderCircle size={18}/>正在规划从者与礼装组合，请稍候…</div>}
    {result&&<div ref={resultRef} className="bond-result" role="status"><h3><CheckCircle2 size={19}/>已应用到当前草稿</h3><div className="bond-result-grid"><span>COST<strong>{result.summary.beforeCost} → {result.summary.afterCost}<small> / {result.summary.costLimit}</small></strong></span><span>预估总羁绊<strong>{result.summary.beforeBond.toLocaleString()} → {result.summary.afterBond.toLocaleString()}</strong></span><span>预计增加<strong>+{result.summary.gain.toLocaleString()}</strong></span></div><p>补入{result.summary.addedServants}名从者，调整{result.summary.changedSlots}个槽位。关闭弹窗后可用Ctrl+Z撤销本次结果。</p><ul>{result.warnings.map((text:string)=><li key={text}>{text}</li>)}</ul></div>}
   </div>
-  <div className="modal-bottom bond-modal-footer"><button className="button" disabled={busy} onClick={onClose}>{result?'完成':'取消'}</button><button className="button primary" disabled={!settings||busy||blocked||invalid} onClick={()=>void execute()}>{busy?<LoaderCircle size={16}/>:<Play size={16}/>}执行羁绊最大化</button></div>
+  <div className="modal-bottom bond-modal-footer"><p id="bond-disabled-reason" className="bond-disabled-reason" role="status">{!busy&&disabledReason}</p><div className="bond-footer-actions"><button className="button" disabled={busy} onClick={onClose}>{result?'完成':'取消'}</button><button className="button primary" aria-describedby={!busy&&disabledReason?'bond-disabled-reason':undefined} disabled={!settings||busy||blocked||invalid} onClick={()=>void execute()}>{busy?<LoaderCircle className="bond-spinner" size={16}/>:<Play size={16}/>}执行羁绊最大化</button></div></div>
  </Modal>;
 }

@@ -1,5 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
 import type {Catalog,Json} from './model';
 import {
  DEFAULT_PARTY_COST_LIMIT,PARTY_COST_STORAGE_KEY,loadPartyCostLimit,
@@ -91,10 +92,11 @@ test('unknown or missing costs leave a useful partial total and never infer from
  }
 });
 
-test('grand own slots remain unpriced and inactive extra essences never affect normal slots',()=>{
+test('grand extra slots cost zero and inactive extra essences never affect normal slots',()=>{
  const grand=partyCost(team({svtId:100,grandSvt:true,equip1:{id:10},equip2:{id:20},equip3:{id:30}},{svtId:200}),catalog);
- assert.equal(grand.knownTotal,12);assert.equal(grand.complete,false);assert.equal(grand.issues[0].slot,0);
- assert.match(grand.issues[0].message,/冠位.*游戏内实际 COST/);
+ assert.deepEqual(grand,{knownTotal:40,complete:true,issues:[]});
+ // Free Grand slots do not need an essence ID or COST entry to price the team.
+ assert.deepEqual(partyCost(team({svtId:100,grandSvt:true,equip2:{id:999},equip3:{id:999}}),catalog),{knownTotal:16,complete:true,issues:[]});
  for(const grandSvt of [undefined,null,false]){
   assert.deepEqual(partyCost(team({svtId:100,grandSvt,equip1:{id:10},equip2:'bad',equip3:{id:999}}),catalog),{knownTotal:28,complete:true,issues:[]});
  }
@@ -143,14 +145,20 @@ test('cost warning follows limit changes and vanishes at or below the limit',()=
  for(const invalid of [0,301,1.5,NaN,Infinity])assert.equal(partyCostLimitWarning(summary,invalid),null);
 });
 
-test('unknown or grand costs report only a proven over-limit subtotal',()=>{
+test('unknown costs report only a proven over-limit subtotal including known grand costs',()=>{
  const summary=partyCost(team({svtId:100,equip1:{id:999}},{svtId:200,grandSvt:true}),catalog),before=structuredClone(summary);
- assert.equal(summary.complete,false);assert.equal(summary.knownTotal,16);
- assert.equal(partyCostLimitWarning(summary,16),null);assert.equal(partyCostLimitWarning(summary,117),null);
+ assert.equal(summary.complete,false);assert.equal(summary.knownTotal,28);
+ assert.equal(partyCostLimitWarning(summary,28),null);assert.equal(partyCostLimitWarning(summary,117),null);
  const warning=partyCostLimitWarning(summary,10)!;
- assert.equal(warning.severity,'warning');assert.match(warning.message,/已知 COST 小计 16/);
- assert.match(warning.message,/至少超出 6/);assert.match(warning.message,/部分 COST 待确认/);assert.match(warning.message,/不影响保存/);
+ assert.equal(warning.severity,'warning');assert.match(warning.message,/已知 COST 小计 28/);
+ assert.match(warning.message,/至少超出 18/);assert.match(warning.message,/部分 COST 待确认/);assert.match(warning.message,/不影响保存/);
  assert.deepEqual(summary,before);
+});
+
+test('Chaldea 94255 prices grand Tonelico plus main essence and Circe at 40',()=>{
+ const data=JSON.parse(readFileSync(new URL('../../../tests/fixtures/battle_editor/chaldea_94255.json',import.meta.url),'utf-8'));
+ const actual:Catalog={servants:[{id:505300,name:'雨之魔女梣',cost:16},{id:503300,name:'喀耳刻',cost:12}],equips:[{id:9408060,name:'手稿之翼',cost:12}],mysticCodes:[]};
+ assert.deepEqual(partyCost(data,actual),{knownTotal:40,complete:true,issues:[]});
 });
 
 test('support slots and cleared requirements cannot create stale over-limit warnings',()=>{

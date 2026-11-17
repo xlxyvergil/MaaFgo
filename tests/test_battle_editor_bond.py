@@ -142,12 +142,30 @@ class BondEditorTests(unittest.TestCase):
         self.assertEqual(result['data']['team']['onFieldSvts'][0],m)
         self.assertEqual(result['summary']['beforeBond'],1584)
 
-    def test_grand_requires_explicit_actual_cost_and_keeps_three_equips(self):
-        data=self.data(); m=data['team']['onFieldSvts'][0];m.update(grandSvt=True,equip2={'id':10},equip3={'id':20},classBoardData={'future':3})
-        with self.assertRaisesRegex(EditorError,'实际COST'): self.planner().optimize(data,{})
-        result=self.planner().optimize(data,{'currentCost':28,'modifyEquips':True})
+    def test_grand_automatically_prices_only_main_equip_and_keeps_three_equips(self):
+        data=self.data(); m=data['team']['onFieldSvts'][0];m.update(grandSvt=True,equip2={'id':10,'limitBreak':True},equip3={'id':20,'limitBreak':True},classBoardData={'future':3})
+        result=self.planner().optimize(data,{'modifyEquips':True})
         self.assertEqual(result['data']['team']['onFieldSvts'][0],m)
         self.assertEqual(result['summary']['beforeCost'],28)
+        # Free extra CEs still contribute their known bond effects.
+        self.assertEqual(result['summary']['beforeBond'],1872)
+        self.assertLessEqual(result['summary']['afterCost'],117)
+
+    def test_free_grand_slots_do_not_require_cost_catalog_entries(self):
+        data=self.data(); m=data['team']['onFieldSvts'][0]
+        m.update(grandSvt=True,equip2={'id':987654321},equip3={'id':20})
+        result=self.planner().optimize(data,{})
+        self.assertEqual(result['summary']['beforeCost'],28)
+        self.assertEqual(result['data']['team']['onFieldSvts'][0],m)
+        self.assertTrue(any('987654321' in text and '零加成' in text for text in result['warnings']))
+
+    def test_multiple_grand_members_charge_only_servants_and_main_equips(self):
+        data=self.data()
+        data['team']['onFieldSvts'][0].update(grandSvt=True,equip2={'id':10},equip3={'id':20})
+        data['team']['onFieldSvts'][1]={'svtId':200,'grandSvt':True,'equip1':{'id':30},'equip2':{'id':20},'equip3':{'id':10}}
+        result=self.planner().optimize(data,{})
+        self.assertEqual(result['summary']['beforeCost'],49)
+        self.assertEqual(result['data']['team']['onFieldSvts'][:2],data['team']['onFieldSvts'][:2])
 
     def test_unknown_fixed_equip_effect_keeps_known_cost(self):
         data=self.data();data['team']['onFieldSvts'][0]['equip1']={'id':99,'future':1}
@@ -208,6 +226,25 @@ class BondEditorTests(unittest.TestCase):
         result=self.planner().optimize(self.data(),{})
         self.assertEqual(result['summary']['candidateEquips'],0)
         self.assertTrue(any('没有可用' in s for s in result['warnings']))
+
+
+class Chaldea94255RegressionTests(unittest.TestCase):
+    def test_real_share_import_and_bond_plan_preserve_combat_and_grand_slots(self):
+        from agent.battle_editor.validation import validate_battle
+        root=Path(__file__).resolve().parents[1]
+        data=json.loads((root/'tests/fixtures/battle_editor/chaldea_94255.json').read_text('utf-8'))
+        before=copy.deepcopy(data)
+        planner=BondPlanner(root)
+        report=validate_battle(data,planner.catalog)
+        self.assertTrue(report['valid'],report)
+        result=planner.optimize(data,{'ownedServantsOnly':False,'ownedEquipsOnly':False})
+        self.assertEqual(result['summary']['beforeCost'],40)
+        self.assertLessEqual(result['summary']['afterCost'],117)
+        self.assertEqual(result['summary']['addedServants'],3)
+        self.assertEqual(result['data']['team']['onFieldSvts'][:2],data['team']['onFieldSvts'][:2])
+        self.assertEqual(result['data']['actions'],data['actions'])
+        self.assertEqual(result['data']['delegate'],{'actWeightSelections':[-1,-1]})
+        self.assertEqual(data,before)
 
 
 class BondWorkerTests(unittest.TestCase):

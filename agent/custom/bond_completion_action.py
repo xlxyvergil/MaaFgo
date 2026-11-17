@@ -105,7 +105,11 @@ STANDARD_SERVANT_CLASSES = frozenset({
     "assassin",
     "berserker",
 })
-GRAND_QUEST_CLASSES = STANDARD_SERVANT_CLASSES | {"ex1", "ex2"}
+GRAND_EXTRA_CLASSES = {
+    "ex1": frozenset({"ruler", "avenger", "moonCancer", "shielder"}),
+    "ex2": frozenset({"alterEgo", "foreigner", "pretender", "beast"}),
+}
+GRAND_QUEST_CLASSES = STANDARD_SERVANT_CLASSES | frozenset(GRAND_EXTRA_CLASSES)
 SHORT_PARTY_CONFIRM_ROI = (650, 540, 350, 120)
 SHORT_PARTY_POLL_SECONDS = 5.0
 SERVANT_SLOT_VERIFY_TIMEOUT_SECONDS = platform_timeout(6.0, 20.0)
@@ -506,6 +510,9 @@ class CompleteBondFormation(AutoFormationFromChaldea):
         }
         try:
             settings["optimizer_version"] = OPTIMIZER_VERSION
+            if self.quest_type == "grand" and self.grand_class in GRAND_EXTRA_CLASSES:
+                # 旧版 EX 不分组；仅使受影响任务的自动记忆失效，防止跳过重新规划。
+                settings["grand_candidate_classes"] = sorted(GRAND_EXTRA_CLASSES[self.grand_class])
             # 按实际生效模式区分有效本地库与读取失败后的实时回退。
             for kind in ("servant", "equip"):
                 active = getattr(self, f"local_{kind}_inventory_active", False)
@@ -968,8 +975,8 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             return True
         servant_class = str(servant.get("class") or "").strip()
         grand_class = getattr(self, "grand_class", "")
-        if grand_class in {"ex1", "ex2"}:
-            return bool(servant_class) and servant_class not in STANDARD_SERVANT_CLASSES
+        if grand_class in GRAND_EXTRA_CLASSES:
+            return servant_class in GRAND_EXTRA_CLASSES[grand_class]
         return servant_class == grand_class
 
     # ---------- COST 与编队状态 ----------

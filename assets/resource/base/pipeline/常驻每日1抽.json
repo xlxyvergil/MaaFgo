@@ -259,6 +259,8 @@
                     "菜单.png"
                 ],
                 "green_mask": true,
+                "roi": [800, 400, 480, 320],
+                "order_by": "Score",
                 "threshold": [
                     0.6
                 ]

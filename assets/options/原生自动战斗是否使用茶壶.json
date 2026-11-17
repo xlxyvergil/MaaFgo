@@ -1,14 +1,23 @@
 {
   "option": {
     "原生自动战斗是否使用茶壶": {
-      "type": "switch",
+      "type": "select",
       "label": "是否使用茶壶",
-      "description": "进入战斗前将茶壶开关调整为所选状态；关闭时也会检测并关闭已开启的茶壶。无茶壶选项的副本提示后继续。",
+      "description": "使用：确认并开启茶壶；不使用：确认并关闭茶壶；不检测：跳过茶壶检测和设置，沿用游戏内当前状态。",
       "default_case": "No",
       "cases": [
         {
+          "name": "Yes",
+          "label": "使用",
+          "pipeline_override": {
+            "原生战斗-茶壶配置": {
+              "attach": {"use_teapot": true}
+            }
+          }
+        },
+        {
           "name": "No",
-          "label": "关闭",
+          "label": "不使用",
           "pipeline_override": {
             "原生战斗-茶壶配置": {
               "attach": {"use_teapot": false}
@@ -16,11 +25,11 @@
           }
         },
         {
-          "name": "Yes",
-          "label": "开启",
+          "name": "Skip",
+          "label": "不检测",
           "pipeline_override": {
             "原生战斗-茶壶配置": {
-              "attach": {"use_teapot": true}
+              "attach": {"use_teapot": "skip"}
             }
           }
         }
