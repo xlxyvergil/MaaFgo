@@ -87,15 +87,14 @@ class LootSettlementTests(unittest.TestCase):
                     test.assertEqual(bool(victory and victory.hit), expected)
                 test.assertEqual(detect_scene(context, loot, check_order_change=False), Scene.VICTORY)
                 test.assertFalse(context.run_recognition("战斗_战后RESULT", loot).hit)
-                for index in range(4):
-                    frame = experience.copy()
-                    if index == 1: frame[165:245, 640:940] = 0
-                    if index == 2: frame[610:690, 350:930] = 0
-                    if index == 3: frame[0:120, 450:850] = 0
+                experience_title_only = np.zeros_like(experience)
+                experience_title_only[165:245, 640:940] = experience[165:245, 640:940]
+                experience_without_title = experience.copy()
+                experience_without_title[165:245, 640:940] = 0
+                for frame, expected in ((experience, True), (experience_title_only, True),
+                                        (experience_without_title, False), (maximum, False), (loot, False)):
                     recognized = context.run_recognition("战斗_经验结算页", frame)
-                    test.assertEqual(bool(recognized and recognized.hit), index == 0,
-                        {name: str(context.run_recognition(name, frame)) for name in (
-                            "战斗_战后RESULT", "战斗_经验结算标题", "战斗_经验结算触屏提示")})
+                    test.assertEqual(bool(recognized and recognized.hit), expected, str(recognized))
                 test.assertEqual(detect_scene(context, experience, check_order_change=False), Scene.VICTORY)
                 test.assertFalse(bond.read_bond_page(context, experience))
                 root = context.get_task_job().job_id

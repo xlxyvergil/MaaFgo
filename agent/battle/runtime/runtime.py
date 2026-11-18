@@ -29,7 +29,7 @@ from ..core.validator import (
     validate_main_action,
 )
 from ..execution.executor import Executor
-from ..data.servant_identity import canonical_servant_id, servant_has_attack_np, servant_name
+from ..data.servant_identity import canonical_servant_id, servant_name
 from ..perception import perception
 from ..perception.frontline import FrontlineIdentity
 from ..perception.status_catalog import StatusCatalogRecognizer
@@ -47,6 +47,7 @@ _PICK_DELAY_S = 0.3
 # 主战斗界面首次出现后，等待技能 CD 数字渲染完成再重新截图感知。
 _MAIN_BATTLE_SETTLE_S = 1.0
 _NP_GLARE_MAX_FRAMES = 3
+_FRONTLINE_RECOVERY_LIMIT = 2  # 每场每个槽位最多补查两次
 
 # —— 等待上限（秒）：安卓为慢速 OCR 留余量；识别成功立即继续 ——
 _OPEN_CARDS_TIMEOUT_S = 15.0        # 手机单轮 OCR 可耗时 5～6 秒，允许至少两轮确认选卡
@@ -83,7 +84,8 @@ class AutoBattleRuntime:
     candidate_servant_ids: tuple[str | None, ...] = ()
     servant_recognizer = None
     _startup_frontline_pending = False
-    _startup_frontline_ids: tuple[str | None, ...] = ()
+    _use_positional_skills = False
+    _last_seen_frontline_ids: tuple[str | None, ...] = (None,) * 3
 
     def __init__(self, context, controller, decider: Decider, profile: StrategyProfile,
                  battle_policy: BattlePolicy | None = None, *,
@@ -118,6 +120,7 @@ class AutoBattleRuntime:
         self._special_skill_servant_ids, self._special_skill_scope_reason = self._special_skill_roster()
         self.servant_recognizer = None
         self._startup_frontline_pending = True
+        self._frontline_recovery_attempts: Counter[int] = Counter()
         self.executor = Executor(context, controller)
         self._turn_index = 0
         self._selection_cards = ()
@@ -462,7 +465,7 @@ class AutoBattleRuntime:
         frontline = self.roster_servant_ids[:3]
         candidates = self.candidate_servant_ids or self.roster_servant_ids
         perception_args = {}
-        if self._startup_frontline_ids:
+        if self._use_positional_skills:
             # Portraits learned in battle are evidence for card matching.
             # They are not a complete roster for filtering skill cooldown reads.
             perception_args = dict(frontline_servant_ids=frontline, candidate_servant_ids=())
@@ -506,9 +509,9 @@ class AutoBattleRuntime:
             if settle_main:
                 scan = self._startup_frontline_pending and not any(candidates)
                 self._startup_frontline_pending = False
-                if (scan or self._startup_frontline_ids) and not self.ctx.tasker.stopping:
-                    result = self._enrich_startup_frontline(result, img)
-            update_roster = settle_main if self._startup_frontline_ids else any(candidates)
+                if (scan or self._use_positional_skills or any(candidates)) and not self.ctx.tasker.stopping:
+                    result = self._observe_frontline(result, img, scan, read_skill_cooldowns)
+            update_roster = settle_main if self._use_positional_skills else any(candidates)
             if update_roster:
                 self._update_frontline(result.servants)
 
@@ -521,44 +524,85 @@ class AutoBattleRuntime:
         mfaalog.diagnostic(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
         return result
 
-    def _enrich_startup_frontline(self, state: BattleState, image) -> BattleState:
-        expected = self._startup_frontline_ids
+    def _observe_frontline(self, state: BattleState, image, scan: bool,
+                           read_skill_cooldowns: bool) -> BattleState:
+        if scan:
+            matches = self._match_frontline_catalog(image)
+            state = self._apply_frontline_matches(state, image, matches, read_skill_cooldowns)
+            self._use_positional_skills = any(servant.servant_id for servant in state.servants)
+        elif self._use_positional_skills:
+            matches = self._recheck_frontline_portraits(image)
+            state = self._apply_frontline_matches(state, image, matches, read_skill_cooldowns)
+
+        # Keep the last confirmed identity even when the current slot becomes
+        # unknown. A missing portrait alone does not prove a replacement.
+        seen = {servant.slot: servant.servant_id for servant in state.servants if servant.servant_id}
+        missing = tuple(slot for slot, old in enumerate(self._last_seen_frontline_ids, 1)
+                        if old and slot not in seen
+                        and self._frontline_recovery_attempts[slot] < _FRONTLINE_RECOVERY_LIMIT)
+        if missing and not self.ctx.tasker.stopping:
+            self._frontline_recovery_attempts.update(missing)
+            matches = self._match_frontline_catalog(image, slots=missing)
+            replacements = {slot: match for slot, match in matches.items() if slot in missing
+                            and match.servant_id != self._last_seen_frontline_ids[slot - 1]}
+            state = self._apply_frontline_matches(state, image, replacements, read_skill_cooldowns)
+            seen = {servant.slot: servant.servant_id for servant in state.servants if servant.servant_id}
+            for slot in replacements.keys() & seen.keys():
+                sid = seen[slot]
+                if not self._use_positional_skills and sid not in self.candidate_servant_ids:
+                    self.candidate_servant_ids = (*self.candidate_servant_ids, sid)
+                if self._special_skill_servant_ids is not None and sid not in self._special_skill_servant_ids:
+                    self._special_skill_servant_ids = None
+                    self._special_skill_scope_reason = "frontline_changed_outside_formation"
+
+        self._last_seen_frontline_ids = tuple(seen.get(slot, old)
+                                              for slot, old in enumerate(self._last_seen_frontline_ids, 1))
+        return state
+
+    def _recheck_frontline_portraits(self, image) -> dict[int, FrontlineIdentity]:
         try:
-            if expected:
-                if self.servant_recognizer is None:
-                    self.servant_recognizer = perception.FrontlineServantRecognizer.from_context(self.ctx)
-                matches = {
-                    match.slot: match for match in self.servant_recognizer.detect(image, expected)
-                    if match.servant_id is not None and match.servant_id == expected[match.slot - 1]
-                }
-            else:
-                if not hasattr(image, "to_numpy") and getattr(image, "ndim", None) != 3:
-                    return state
-                report = StatusCatalogRecognizer().detect(image)
-                matches = {
-                    match.slot: FrontlineIdentity(
-                        match.slot, match.servant_id,
-                        Confidence(match.best_score, "status_catalog"), match.margin, match.matched_template,
-                    )
-                    for match in report.slots if match.servant_id is not None
-                }
-                mfaalog.diagnostic(
-                    f"[战斗内头像] 确认 {len(matches)}/3 个前排身份，"
-                    f"匹配耗时 {report.elapsed_seconds:.2f}s"
-                )
-            servants = tuple(
-                replace(servant, servant_id=match.servant_id, confidence=match.confidence,
-                        has_attack_np=servant_has_attack_np(match.servant_id))
-                if (match := matches.get(servant.slot)) is not None else servant
-                for servant in state.servants
-            )
-            if not expected and matches:
-                identities = {servant.slot: servant.servant_id for servant in servants}
-                self._startup_frontline_ids = tuple(identities.get(slot) for slot in (1, 2, 3))
-            return replace(state, servants=servants)
+            if self.servant_recognizer is None:
+                self.servant_recognizer = perception.FrontlineServantRecognizer.from_context(self.ctx)
+            expected = self._last_seen_frontline_ids
+            return {match.slot: match for match in self.servant_recognizer.detect(image, expected)
+                    if match.servant_id is not None and match.servant_id == expected[match.slot - 1]}
         except Exception as exc:
             mfaalog.diagnostic(f"[战斗内头像] 未能确认身份，按位置继续战斗：{exc}")
+            return {}
+
+    @staticmethod
+    def _match_frontline_catalog(image, *, slots=None) -> dict[int, FrontlineIdentity]:
+        try:
+            if not hasattr(image, "to_numpy") and getattr(image, "ndim", None) != 3:
+                return {}
+            matcher = StatusCatalogRecognizer()
+            report = matcher.detect(image) if slots is None else matcher.detect(image, slots=slots)
+            mfaalog.diagnostic(
+                f"[战斗内头像] 识别前排位置 {slots or (1, 2, 3)}，匹配耗时 {report.elapsed_seconds:.2f}s"
+            )
+            return {match.slot: FrontlineIdentity(
+                match.slot, match.servant_id,
+                Confidence(match.best_score, "status_catalog"), match.margin, match.matched_template,
+            ) for match in report.slots if match.servant_id is not None}
+        except Exception as exc:
+            mfaalog.diagnostic(f"[战斗内头像] 跳过本次识别，继续战斗：{exc}")
+            return {}
+
+    def _apply_frontline_matches(self, state: BattleState, image, matches: dict[int, FrontlineIdentity],
+                                read_skill_cooldowns: bool) -> BattleState:
+        if not matches:
             return state
+        servants = {servant.slot: servant for servant in state.servants}
+        for slot, match in matches.items():
+            existing = servants.get(slot)
+            try:
+                servants[slot] = perception.servant_state_from_identity(
+                    self.ctx, image, match, read_skill_cooldowns=read_skill_cooldowns,
+                    skills=existing.skills if existing is not None else None,
+                )
+            except Exception as exc:
+                mfaalog.diagnostic(f"[战斗内头像] 未能补充前排 {slot} 的资料，继续战斗：{exc}")
+        return replace(state, servants=tuple(servants[slot] for slot in sorted(servants)))
 
     def _update_frontline(self, servants) -> None:
         identities = {servant.slot: servant.servant_id for servant in servants}
@@ -571,7 +615,7 @@ class AutoBattleRuntime:
             if after is not None and after != before and after in reserves:
                 reserves.remove(after)
         self.roster_servant_ids = frontline + tuple(reserves) + (None,) * (3 - len(reserves))
-        unknown = "未识别，按位置处理技能" if self._startup_frontline_ids else "未识别，跳过技能"
+        unknown = "未识别，按位置处理技能" if self._use_positional_skills else "未识别，跳过技能"
         mfaalog.info(
             "[当前前排] " + " | ".join(
                 f"{slot}:{servant_name(sid) if sid else unknown}"

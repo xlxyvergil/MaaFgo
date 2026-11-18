@@ -19,6 +19,7 @@ import time
 import cv2
 import numpy as np
 
+from ..core.models import is_slot
 from ..data.servant_identity import servant_template_ids
 from .frontline import _status_roots
 
@@ -227,13 +228,13 @@ class StatusCatalogRecognizer:
                           interpolation=cv2.INTER_AREA), (width, height)
 
     @staticmethod
-    def _regions(frame):
+    def _regions(frame, rois):
         return tuple(frame[round(y * ANALYSIS_SCALE):round((y + height) * ANALYSIS_SCALE),
                            round(x * ANALYSIS_SCALE):round((x + width) * ANALYSIS_SCALE)]
-                     for x, y, width, height in STATUS_ROIS)
+                     for x, y, width, height in rois)
 
     def _shortlists(self, regions):
-        scores = np.full((3, len(self._ids)), -1.0, np.float32)
+        scores = np.full((len(regions), len(self._ids)), -1.0, np.float32)
         for (height, width), owners, centered, weights, counts in self._groups:
             queries, slots = [], []
             for slot, region in enumerate(regions):
@@ -282,22 +283,35 @@ class StatusCatalogRecognizer:
             ranked.append((best_score, sid, best_name))
         return sorted(ranked, key=lambda row: (-row[0], row[1]))
 
-    def detect(self, image, *, full_audit=False):
+    def detect(self, image, *, full_audit=False, slots=None):
         """Return fresh per-slot identities; weak/ambiguous results stay unknown.
 
+        With ``slots``, only search the specified 1-based frontline positions.
+        Matches are returned in position order. None searches all three.
         ``full_audit`` is an explicit slow path that certifies the best and runner
         among all loaded identities. Fast mode never silently starts that scan.
         ``elapsed_seconds`` excludes construction of the reusable static index.
         """
         started = time.perf_counter()
+        if slots is None:
+            selected = range(1, len(STATUS_ROIS) + 1)
+        else:
+            try:
+                requested = tuple(slots)
+            except TypeError as exc:
+                raise ValueError("无法读取待识别的前排位置。请传入 1 至 3 的整数位置列表。") from exc
+            if any(not is_slot(slot, 1, len(STATUS_ROIS)) for slot in requested):
+                raise ValueError("待识别的前排位置无效。请使用 1 至 3 的整数位置。")
+            selected = sorted(set(requested))
+        rois = tuple(STATUS_ROIS[slot - 1] for slot in selected)
         frame, image_size = self._normalize(image)
-        regions = self._regions(frame)
+        regions = self._regions(frame, rois)
         coarse_started = time.perf_counter()
         pools = (tuple((self._ids, False) for _ in regions) if full_audit
                  else self._shortlists(regions))
         coarse_seconds = 0.0 if full_audit else time.perf_counter() - coarse_started
         matches = []
-        for index, (region, (candidates, weak)) in enumerate(zip(regions, pools)):
+        for slot, roi, region, (candidates, weak) in zip(selected, rois, regions, pools):
             ranked = self._rank(region, candidates)
             best = ranked[0] if ranked else (0.0, None, "")
             runner = ranked[1] if len(ranked) > 1 else (0.0, None, "")
@@ -315,12 +329,12 @@ class StatusCatalogRecognizer:
             else:
                 reason = "identified"
             matches.append(StatusCatalogMatch(
-                slot=index + 1, servant_id=best[1] if reason == "identified" else None,
+                slot=slot, servant_id=best[1] if reason == "identified" else None,
                 best_candidate_id=best[1], best_score=float(best[0]),
                 runner_up_id=runner[1], runner_up_score=float(runner[0]), margin=margin,
                 margin_scope="catalog" if full_audit else "shortlist",
                 matched_template=best[2], reason=reason, candidate_count=len(candidates),
-                roi=STATUS_ROIS[index],
+                roi=roi,
             ))
         return StatusCatalogResult(tuple(matches), time.perf_counter() - started,
                                    coarse_seconds, bool(full_audit), image_size)

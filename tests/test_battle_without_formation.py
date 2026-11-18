@@ -47,6 +47,13 @@ def runtime(*, plan=None, roster=None):
     return result
 
 
+def catalog_report(*members):
+    return NS(elapsed_seconds=.5, slots=tuple(
+        NS(slot=slot, servant_id=servant_id, best_score=.97, margin=.1, matched_template="portrait")
+        for slot, servant_id in members
+    ))
+
+
 class WithoutFormationTests(unittest.TestCase):
     def test_missing_candidates_collects_all_nine_cooldowns_without_claiming_identity(self):
         for candidates in ((), (None,) * 6):
@@ -146,8 +153,94 @@ class WithoutFormationTests(unittest.TestCase):
         skills = rt.decider.decide(state).servant_skills
         self.assertEqual([(s.servant_slot, s.skill_index) for s in skills], AVAILABLE)
         self.assertEqual({s.target_ally for s in skills}, {1})
-        catalog.assert_called_once_with()
-        catalog.return_value.detect.assert_called_once_with(image)
+        self.assertEqual(catalog.return_value.detect.call_args_list, [call(image), call(image, slots=(2,))])
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_portrait_recovery_updates_only_missing_slot_with_new_identity(self, catalog, _sleep):
+        rt = runtime()
+        image = NS(ndim=3)
+        rt.controller.post_screencap.return_value.wait.return_value.get.return_value = image
+        catalog.return_value.detect.side_effect = (
+            catalog_report((1, "504500"), (2, "100100")),
+            catalog_report((2, "304800")),
+        )
+        rt._observe(settle_main=True)
+        rt.servant_recognizer = NS(detect=Mock(return_value=(
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, None, Confidence(.3)),
+        )))
+        state = rt._observe(settle_main=True)
+        self.assertEqual(rt.roster_servant_ids[:3], ("504500", "304800", None))
+        self.assertEqual([servant.servant_id for servant in state.servants], ["504500", "304800", None])
+        self.assertEqual({skill.target_ally for skill in rt.decider.decide(state).servant_skills}, {2})
+        self.assertEqual(rt._semantic_roster(), (None,) * 6)
+        self.assertEqual(catalog.return_value.detect.call_args_list, [call(image), call(image, slots=(2,))])
+
+        rt.servant_recognizer.detect.return_value = (
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, "304800", Confidence(.95)),
+        )
+        rt._observe(settle_main=True)
+        rt.servant_recognizer.detect.assert_called_with(image, ("504500", "304800", None))
+        self.assertEqual(catalog.return_value.detect.call_count, 2)
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_portrait_recovery_limits_attempts_per_slot_even_after_failure(self, catalog, _sleep):
+        rt = runtime()
+        image = NS(ndim=3)
+        rt.controller.post_screencap.return_value.wait.return_value.get.return_value = image
+        catalog.return_value.detect.side_effect = (
+            catalog_report((1, "504500"), (2, "100100")),
+            ValueError("portrait catalog unavailable"),
+            catalog_report((2, "100100")),
+            catalog_report((1, "304800")),
+        )
+        rt._observe(settle_main=True)
+        rt.servant_recognizer = NS(detect=Mock(return_value=(
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, None, Confidence(.3)),
+        )))
+        for _ in range(3):
+            state = rt._observe(settle_main=True)
+            self.assertEqual(rt.roster_servant_ids[:3], ("504500", None, None))
+            self.assertEqual([(s.servant_slot, s.skill_index)
+                              for s in rt.decider.decide(state).servant_skills], AVAILABLE)
+        rt.servant_recognizer.detect.return_value = ()
+        rt._observe(settle_main=True)
+        self.assertEqual(rt.roster_servant_ids[:3], ("304800", None, None))
+        self.assertEqual(catalog.return_value.detect.call_args_list, [
+            call(image), call(image, slots=(2,)), call(image, slots=(2,)), call(image, slots=(1,)),
+        ])
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_original_roster_is_preserved_when_a_frontline_replacement_is_found(self, catalog, _sleep):
+        roster = ("504500", "100100", None, "503900", None, None)
+        rt = runtime(roster=roster)
+        image = NS(ndim=3)
+        rt.controller.post_screencap.return_value.wait.return_value.get.return_value = image
+        rt.servant_recognizer = NS(detect=Mock(return_value=(
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, "100100", Confidence(.95)),
+        )))
+        rt._observe(settle_main=True)
+        catalog.assert_not_called()
+        rt.servant_recognizer.detect.return_value = (
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, None, Confidence(.3)),
+        )
+        catalog.return_value.detect.return_value = catalog_report((2, "304800"))
+        state = rt._observe(settle_main=True)
+        catalog.return_value.detect.assert_called_once_with(image, slots=(2,))
+        self.assertEqual(rt.roster_servant_ids[:3], ("504500", "304800", None))
+        self.assertIn("304800", rt.candidate_servant_ids)
+        self.assertEqual(rt._semantic_roster(), roster)
+        self.assertFalse(rt._actor_matches(ActorBinding(1, "100100"), 2))
+        self.assertEqual([(s.servant_slot, s.skill_index)
+                          for s in rt.decider.decide(state).servant_skills if s.servant_slot == 2],
+                         [(2, 2), (2, 3)])
 
     @patch("battle.runtime.runtime.time.sleep")
     @patch("battle.runtime.runtime.StatusCatalogRecognizer")
