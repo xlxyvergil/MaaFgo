@@ -9,13 +9,14 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
 
 from battle.core.decider import RuleDecider
-from battle.core.enums import PrimitiveKind, Scene
+from battle.core.enums import CardColor, PrimitiveKind, Scene
 from battle.core.models import (ActorBinding, BattleAction, BattlePlan, Confidence,
                                 PlannedCard, ServantSkillAction, TurnPlan)
 from battle.core.policy import BattlePolicy, SkillPolicy, StrategyProfile
 from battle.core.validator import skip_unusable_servant_skills, validate_main_action
 from battle.execution import coords
 from battle.perception import config, perception
+from battle.perception.frontline import FrontlineIdentity
 from battle.runtime.runtime import AutoBattleRuntime
 
 
@@ -101,6 +102,88 @@ class WithoutFormationTests(unittest.TestCase):
                 f"战斗_技能目标子屏_选从者{slot}": {} if slot == 1 else {"enabled": False}
                 for slot in (1, 2, 3)
             })
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_startup_uses_partial_portrait_evidence_for_skills_and_np(self, catalog, _sleep):
+        rt = runtime()
+        image = NS(ndim=3)
+        rt.controller.post_screencap.return_value.wait.return_value.get.return_value = image
+        catalog.return_value.detect.return_value = NS(elapsed_seconds=.5, slots=(
+            NS(slot=1, servant_id="504500", best_score=.96, margin=.1, matched_template="support"),
+            NS(slot=2, servant_id="100100", best_score=.97, margin=.1, matched_template="attacker"),
+            NS(slot=3, servant_id=None),
+        ))
+        state = rt._observe(settle_main=True)
+        self.assertEqual([servant.servant_id for servant in state.servants], ["504500", "100100", None])
+        skills = rt.decider.decide(state).servant_skills
+        self.assertEqual([(s.servant_slot, s.skill_index) for s in skills], AVAILABLE)
+        self.assertEqual({s.target_ally for s in skills}, {2})
+        self.assertEqual(rt._semantic_roster(), (None,) * 6)
+        self.assertIsNone(rt._special_skill_servant_ids)
+
+        np = NS(ui_slot=2, owner_slot=2, servant_id="100100", visual_present=True,
+                authoritative=True, color=CardColor.BUSTER, reason="identified",
+                confidence=Confidence(.96, "composed_card"), matched_template="np")
+        with patch.object(perception, "_detect_scene", return_value=(Scene.COMMAND_SELECTION, 1.0)), \
+                patch.object(perception.ComposedCardRecognizer, "default") as composer:
+            composer.return_value.detect_all.return_value = ((), (np,))
+            rt.ctx.run_task = Mock(return_value=NS(status=NS(succeeded=True)))
+            state = rt._observe(settle_main=True)
+            composer.return_value.detect_all.assert_called_once_with(image, ("504500", "100100", None))
+        self.assertEqual(rt.decider.decide(state).picks[0].kind, PrimitiveKind.SELECT_NP)
+        self.assertEqual(state.np_cards[0].owner_servant_id, "100100")
+
+        # The old slot 2 portrait no longer matches. It must stop informing
+        # card recognition, even if a hit appears in a previously unknown slot.
+        rt.servant_recognizer = NS(detect=Mock(return_value=(
+            FrontlineIdentity(1, "504500", Confidence(.95)),
+            FrontlineIdentity(2, None, Confidence(.3)),
+            FrontlineIdentity(3, "100100", Confidence(.95)),
+        )))
+        state = rt._observe(settle_main=True)
+        self.assertEqual(rt.roster_servant_ids[:3], ("504500", None, None))
+        skills = rt.decider.decide(state).servant_skills
+        self.assertEqual([(s.servant_slot, s.skill_index) for s in skills], AVAILABLE)
+        self.assertEqual({s.target_ally for s in skills}, {1})
+        catalog.assert_called_once_with()
+        catalog.return_value.detect.assert_called_once_with(image)
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_startup_portrait_failure_falls_back_and_is_not_retried(self, catalog, _sleep):
+        for failure in ("exception", "no_match"):
+            with self.subTest(failure=failure):
+                catalog.reset_mock(side_effect=True)
+                catalog.return_value.detect.side_effect = (
+                    ValueError("no usable portrait assets") if failure == "exception" else None
+                )
+                catalog.return_value.detect.return_value = NS(elapsed_seconds=.5, slots=(
+                    NS(slot=1, servant_id=None), NS(slot=2, servant_id=None), NS(slot=3, servant_id=None),
+                ))
+                rt = runtime()
+                rt.controller.post_screencap.return_value.wait.return_value.get.return_value = NS(ndim=3)
+                for _ in range(2):
+                    state = rt._observe(settle_main=True)
+                    self.assertEqual(rt.roster_servant_ids, (None,) * 6)
+                    self.assertEqual([(s.servant_slot, s.skill_index)
+                                      for s in rt.decider.decide(state).servant_skills], AVAILABLE)
+                catalog.assert_called_once_with()
+
+    @patch("battle.runtime.runtime.time.sleep")
+    @patch("battle.runtime.runtime.StatusCatalogRecognizer")
+    def test_starting_in_card_selection_waits_for_main_battle_to_search(self, catalog, _sleep):
+        rt = runtime()
+        rt.controller.post_screencap.return_value.wait.return_value.get.return_value = NS(ndim=3)
+        rt.ctx.run_task = Mock(return_value=NS(status=NS(succeeded=True)))
+        catalog.return_value.detect.return_value = NS(elapsed_seconds=.5, slots=())
+        with patch.object(perception, "_detect_scene", return_value=(Scene.COMMAND_SELECTION, 1.0)), \
+                patch.object(perception.ComposedCardRecognizer, "default") as composer:
+            composer.return_value.detect_all.return_value = ((), ())
+            self.assertIs(rt._observe(settle_main=True).scene, Scene.COMMAND_SELECTION)
+        catalog.assert_not_called()
+        self.assertIs(rt._observe(settle_main=True).scene, Scene.MAIN_BATTLE)
+        catalog.assert_called_once_with()
 
     def test_auto_skill_targets_leftmost_confirmed_attack_np_then_leftmost_frontline(self):
         for frontline, expected in (

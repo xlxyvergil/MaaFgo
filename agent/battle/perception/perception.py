@@ -114,7 +114,8 @@ def build(
                 unknown.append(f"card[{c.ui_slot}].owner_slot")
     elif scene is Scene.MAIN_BATTLE:
         servants = _detect_servants(
-            context, img, candidate_servant_ids or frontline_servant_ids or (),
+            context, img, (candidate_servant_ids if candidate_servant_ids is not None
+                           else frontline_servant_ids or ()),
             recognizer=servant_recognizer,
             read_skill_cooldowns=read_skill_cooldowns,
         )
