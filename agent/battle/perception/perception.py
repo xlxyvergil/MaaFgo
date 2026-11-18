@@ -23,7 +23,7 @@ from ..data.servant_identity import servant_has_attack_np
 from . import config
 from .card_owner import CommandCardOwnerRecognizer
 from .composed_card import ComposedCardRecognizer
-from .frontline import FrontlineServantRecognizer
+from .frontline import FrontlineIdentity, FrontlineServantRecognizer
 
 
 def build(
@@ -290,12 +290,20 @@ def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None,
                          f"crop_top={getattr(identity, 'visible_top', 35)} template={identity.matched_template}")
         if identity.servant_id is None:
             continue
-        slot = identity.slot
-        out.append(ServantState(slot, (_detect_servant_skills(context, img, slot) if read_skill_cooldowns
-                                     else _planned_skills()),
-                                identity.confidence, identity.servant_id,
-                                has_attack_np=servant_has_attack_np(identity.servant_id)))
+        out.append(servant_state_from_identity(
+            context, img, identity, read_skill_cooldowns=read_skill_cooldowns,
+        ))
     return tuple(out)
+
+
+def servant_state_from_identity(context, img, identity: FrontlineIdentity, *,
+                                read_skill_cooldowns: bool,
+                                skills: Tuple[SkillState, SkillState, SkillState] | None = None) -> ServantState:
+    if skills is None:
+        skills = (_detect_servant_skills(context, img, identity.slot)
+                  if read_skill_cooldowns else _planned_skills())
+    return ServantState(identity.slot, skills, identity.confidence, identity.servant_id,
+                        has_attack_np=servant_has_attack_np(identity.servant_id))
 
 
 def _planned_skills() -> Tuple[SkillState, SkillState, SkillState]:

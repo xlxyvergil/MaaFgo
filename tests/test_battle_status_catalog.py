@@ -5,6 +5,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 import cv2
 import numpy as np
@@ -12,7 +13,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
 
-from battle.perception.status_catalog import StatusCatalogRecognizer
+from battle.perception.status_catalog import STATUS_ROIS, StatusCatalogRecognizer
 
 
 IDS = ("9000001", "9000002", "9000003", "9000004")
@@ -91,6 +92,28 @@ class StatusCatalogTests(unittest.TestCase):
             self.assertEqual(slot.candidate_count, 4)
             self.assertNotEqual(slot.runner_up_id, slot.servant_id)
             self.assertAlmostEqual(slot.margin, slot.best_score - slot.runner_up_score)
+
+    def test_selected_slot_only_runs_matching_for_that_region(self):
+        recognizer = self.recognizer()
+        frame = battle_frame(self.portraits)
+        with patch.object(recognizer, "_shortlists", wraps=recognizer._shortlists) as shortlist, \
+                patch.object(recognizer, "_rank", wraps=recognizer._rank) as rank:
+            result = recognizer.detect(frame, slots=(2,))
+        self.assertEqual(len(shortlist.call_args.args[0]), 1)
+        rank.assert_called_once()
+        self.assertEqual([(slot.slot, slot.servant_id, slot.roi) for slot in result.slots],
+                         [(2, IDS[1], STATUS_ROIS[1])])
+
+    def test_selected_slot_order_and_validation(self):
+        recognizer = self.recognizer()
+        frame = battle_frame(self.portraits)
+        result = recognizer.detect(frame, full_audit=True, slots=(3, 1, 3))
+        self.assertEqual([(slot.slot, slot.servant_id) for slot in result.slots],
+                         [(1, IDS[0]), (3, IDS[2])])
+        self.assertEqual(recognizer.detect(frame, slots=()).slots, ())
+        for slots in (2, (False,), ("2",), (0,), (4,)):
+            with self.subTest(slots=slots), self.assertRaises(ValueError):
+                recognizer.detect(frame, slots=slots)
 
     def test_transparent_resource_edges_do_not_require_the_same_battlefield_background(self):
         for sid, pixels in self.portraits.items():
