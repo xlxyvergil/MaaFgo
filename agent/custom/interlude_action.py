@@ -268,10 +268,11 @@ class InterludeRunner(StoryRunner):
     def _story_visible(self, image):
         # 关闭跳剧情也需要观察剧情出现；只做识别，动作仍尊重原选项。
         probe = self.ctx.clone()
-        result = probe.run_recognition("跳过剧情-点击跳过", image, {
-            "跳过剧情-点击跳过": {"enabled": True}
-        })
-        return bool(result and result.hit)
+        for name in ("跳过剧情-强制选项", "跳过剧情-灰色继续", "跳过剧情-点击跳过"):
+            result = probe.run_recognition(name, image, {name: {"enabled": True}})
+            if result and result.hit:
+                return True
+        return False
 
     def enter(self, target):
         node, result = target

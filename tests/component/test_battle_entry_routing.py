@@ -27,6 +27,8 @@ from main_story_action import _BATTLE_RESET
 
 GUARD = "进本-盲点跳过剧情"
 BLIND = "跳过剧情-直接点击跳过"
+CHOICE = "跳过剧情-强制选项"
+CONTINUE = "跳过剧情-灰色继续"
 REPEAT = "原生自动战斗_多次入口"
 MAIN = "进本-战斗主界面已出现"
 RECONNECT = "进本-断网重连"
@@ -39,7 +41,7 @@ class EntryRoutingTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = {}
-        for name in ("原生自动战斗", "日常战斗", "进本流程", "跳过剧情", "自动编队"):
+        for name in ("原生自动战斗", "日常战斗", "进本流程", "跳过剧情", "剧情通用选项", "自动编队"):
             cls.source.update(json.loads((ROOT / f"assets/resource/base/pipeline/{name}.json").read_text("utf-8")))
 
     def run_graph(self, nodes, entry, screens=(), *, succeeds=True, runs=1):
@@ -116,7 +118,7 @@ class EntryRoutingTests(unittest.TestCase):
                  "进本-自动编队确认", "自动编队-编队决定",
                  "进本-编成条件提示",
                  "进本-攻略提示关闭",
-                 "进本-队伍确认", MAIN, RECONNECT, GUARD, BLIND,
+                 "进本-队伍确认", MAIN, RECONNECT, GUARD, BLIND, CHOICE, CONTINUE,
                  "跳过剧情-确认跳过", "跳过剧情-无确认弹窗", "跳过剧情-点击跳过",
                  "跳过剧情-确认跳过-已消失", "跳过-可能在主界面", "完成跳过剧情")
         nodes = {name: copy.deepcopy(self.source[name]) for name in names}
@@ -272,20 +274,38 @@ class EntryRoutingTests(unittest.TestCase):
         self.assertIn("跳过剧情-确认跳过", seen)
         self.assertEqual(seen[-1], MAIN)
 
+    def test_forced_choice_precedes_blind_skip_and_returns_to_entry(self):
+        seen = self.run_graph(self.entry_graph(), "进本流程",
+                              [{CHOICE, "跳过剧情-点击跳过"}, {MAIN}])
+        self.assertIn(CHOICE, seen)
+        self.assertNotIn(BLIND, seen)
+        self.assertEqual(seen[-1], MAIN)
+
+    def test_hidden_choice_continues_before_choice_and_blind_skip(self):
+        seen = self.run_graph(self.entry_graph(), "进本流程",
+                              [{CONTINUE, "跳过剧情-点击跳过"}, {CHOICE}, {MAIN}])
+        self.assertLess(seen.index(CONTINUE), seen.index(CHOICE))
+        self.assertNotIn(BLIND, seen)
+        self.assertEqual(seen[-1], MAIN)
+
     def test_skip_disabled_never_blind_clicks(self):
         nodes = self.entry_graph()
         option = json.loads((ROOT / "assets/options/原生自动战斗跳过剧情.json").read_text("utf-8"))
         off = next(case for case in option["option"]["原生自动战斗跳过剧情"]["cases"] if case["name"] == "No")
         for name, override in off["pipeline_override"].items():
             nodes[name].update(override)
-        seen = self.run_graph(nodes, "进本流程", succeeds=False)
+        seen = self.run_graph(nodes, "进本流程", [{CHOICE, CONTINUE}], succeeds=False)
         self.assertNotIn(GUARD, seen)
         self.assertNotIn(BLIND, seen)
+        self.assertNotIn(CHOICE, seen)
+        self.assertNotIn(CONTINUE, seen)
 
     def test_per_battle_and_story_reset_only_blind_budget(self):
         self.assertEqual(self.source[GUARD]["max_hit"], 60)
         self.assertIn(GUARD, _DEFAULT_RESET_HIT_NODES)
         self.assertIn(GUARD, _BATTLE_RESET)
+        self.assertIn(CONTINUE, _DEFAULT_RESET_HIT_NODES)
+        self.assertIn(CONTINUE, _BATTLE_RESET)
         self.assertNotIn(REPEAT, _DEFAULT_RESET_HIT_NODES)
         self.assertNotIn(REPEAT, _BATTLE_RESET)
 

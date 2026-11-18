@@ -131,6 +131,53 @@ class ConfigurationTests(unittest.TestCase):
         self.assertEqual(recognition_detail(response), report)
 
 
+class ForcedStoryChoiceTests(unittest.TestCase):
+    def test_choice_only_story_returns_to_list_after_selection(self):
+        runtime, context = runner([{"跳过剧情-强制选项"}, LIST])
+        target = ("幕间-可挑战条目", NS(box=[700, 200, 1, 1]))
+        self.assertEqual(runtime.enter(target), "story")
+        self.assertEqual([name for name, _ in context.actions],
+                         ["幕间-可挑战条目", "跳过剧情-强制选项"])
+        self.assertEqual((runtime.completed, runtime.battles), (0, 0))
+
+    def test_disabled_skip_observes_choice_without_clicking_or_enabling_it(self):
+        runtime, context = runner([{"跳过剧情-强制选项"}, LIST])
+        for name in ("跳过剧情-强制选项", "跳过剧情-点击跳过"):
+            runtime.ctx.nodes[name]["enabled"] = False
+        self.assertTrue(runtime._story_visible({"跳过剧情-强制选项"}))
+        target = ("幕间-可挑战条目", NS(box=[700, 200, 1, 1]))
+        # 下一帧返回列表模拟用户手动选择，观察剧情不会自动点击选项。
+        self.assertEqual(runtime.enter(target), "story")
+        self.assertEqual([name for name, _ in context.actions], ["幕间-可挑战条目"])
+        self.assertFalse(runtime.ctx.nodes["跳过剧情-强制选项"]["enabled"])
+        self.assertFalse(runtime.ctx.nodes["跳过剧情-点击跳过"]["enabled"])
+
+    def test_hidden_choice_continues_then_selects_before_returning_to_list(self):
+        hidden, choice, skip = "跳过剧情-灰色继续", "跳过剧情-强制选项", "跳过剧情-点击跳过"
+        runtime, context = runner([{hidden, skip}, {choice, skip}, LIST])
+        target = ("幕间-可挑战条目", NS(box=[700, 200, 1, 1]))
+        self.assertEqual(runtime.enter(target), "story")
+        self.assertEqual([name for name, _ in context.actions],
+                         ["幕间-可挑战条目", hidden, choice])
+        self.assertEqual((runtime.completed, runtime.battles), (0, 0))
+
+    def test_disabled_skip_observes_hidden_choice_without_continuing(self):
+        hidden, skip = "跳过剧情-灰色继续", "跳过剧情-点击跳过"
+        runtime, context = runner([{hidden}, LIST])
+        for name in (hidden, skip):
+            runtime.ctx.nodes.setdefault(name, {})["enabled"] = False
+        self.assertTrue(runtime._story_visible({hidden}))
+        target = ("幕间-可挑战条目", NS(box=[700, 200, 1, 1]))
+        self.assertEqual(runtime.enter(target), "story")
+        self.assertEqual([name for name, _ in context.actions], ["幕间-可挑战条目"])
+        self.assertFalse(runtime.ctx.nodes[hidden]["enabled"])
+
+    def test_ordinary_list_is_not_story(self):
+        runtime, context = runner()
+        self.assertFalse(runtime._story_visible(LIST))
+        self.assertEqual(context.actions, [])
+
+
 class ProgressTests(unittest.TestCase):
     def tearDown(self):
         bond_stops.finish(12345)

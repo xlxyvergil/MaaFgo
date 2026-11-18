@@ -47,6 +47,18 @@ class GlobalStrategyValidationTests(unittest.TestCase):
         self.assertFalse(report['valid'])
         self.assertIn('maaAdvancedStrategy.openingHand.maxWaitTurns', [i['path'] for i in report['issues']])
 
+    def test_attacker_choices_validate_without_rewriting_imported_preferences(self):
+        for preferred in ('', 1, 2, 3, '504500', '999999999999'):
+            data = {'maaAdvancedStrategy': {'preferredAttacker': preferred,
+                    'nativeStrategyOverrides': {'preferred_slots': [1, 2], 'preferred_servant_ids': ['605300']}}}
+            before = copy.deepcopy(data)
+            self.assertTrue(validate_battle(data)['valid'])
+            self.assertEqual(data, before)
+        for preferred in (None, True, 0, 4, 2.0, '0', '0504500', 'bad'):
+            report = validate_battle({'maaAdvancedStrategy': {'preferredAttacker': preferred}})
+            self.assertFalse(report['valid'])
+            self.assertIn('maaAdvancedStrategy.preferredAttacker', [i['path'] for i in report['issues']])
+
 
 class GlobalStrategyHTTPTests(unittest.TestCase):
     def setUp(self):
@@ -77,6 +89,7 @@ class GlobalStrategyHTTPTests(unittest.TestCase):
 
     def test_save_reload_draft_and_partial_editor_document_keep_strategy_exactly(self):
         data = {'maaAdvancedStrategy': {'preset': 'brave', 'maxTurns': 52, 'autoServantSkills': False,
+                                      'preferredAttacker': '504500',
                                       'openingHand': {'enabled': False, 'maxWaitTurns': 3},
                                       'future': {'keep': [None, False]}}, 'future': '保留'}
         status, saved = self.request('POST', '/api/battles', {'name': '仅全局策略.json', 'data': data})
@@ -92,12 +105,19 @@ class GlobalStrategyHTTPTests(unittest.TestCase):
         self.assertEqual(draft['data'], data)
         changed = copy.deepcopy(data)
         changed['maaAdvancedStrategy']['preset'] = 'mighty'
+        changed['maaAdvancedStrategy']['preferredAttacker'] = 2
         status, updated = self.request('PUT', '/api/battles/%E4%BB%85%E5%85%A8%E5%B1%80%E7%AD%96%E7%95%A5.json', {'data': changed, 'expectedHash': loaded['hash']})
         self.assertEqual(status, 200, updated)
         self.assertEqual(updated['data'], changed)
 
     def test_invalid_advanced_strategy_cannot_be_formally_saved(self):
         status, result = self.request('POST', '/api/battles', {'name': '无效策略.json', 'data': {'maaAdvancedStrategy': {'maxTurns': 0}}})
+        self.assertEqual(status, 422)
+        self.assertEqual(result['error']['code'], 'validation_failed')
+
+    def test_invalid_attacker_choice_cannot_be_formally_saved(self):
+        status, result = self.request('POST', '/api/battles', {'name': '无效主输出.json',
+                                     'data': {'maaAdvancedStrategy': {'preferredAttacker': True}}})
         self.assertEqual(status, 422)
         self.assertEqual(result['error']['code'], 'validation_failed')
 

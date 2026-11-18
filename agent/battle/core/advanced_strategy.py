@@ -3,12 +3,14 @@ from __future__ import annotations
 
 import copy
 import math
+import re
 from typing import Any
 
 ADVANCED_STRATEGY_FIELD = "maaAdvancedStrategy"
 PRESET_NAMES = ("balanced", "mighty", "brave", "np", "legacy")
 _DEFAULT = {
     "preset": "balanced",
+    "preferredAttacker": "",
     "openingHand": {"enabled": False, "servantId": None, "servantSlot": None,
                     "requiredColors": ["B", "Q"], "maxWaitTurns": 2},
     "nativeStrategyOverrides": {}, "autoServantSkills": True, "maxTurns": 40,
@@ -138,6 +140,17 @@ def validate_advanced_strategy(value: Any, path: str = ADVANCED_STRATEGY_FIELD) 
         return issues
     if "preset" in value and (type(value["preset"]) is not str or value["preset"] not in PRESET_NAMES):
         error(path + ".preset", "未知的补牌预设")
+    if "preferredAttacker" in value:
+        preferred = value["preferredAttacker"]
+        if preferred == "0":
+            error(path + ".preferredAttacker",
+                  "尚未选择主输出从者，无法保存或执行此方案。请在「全局高级策略 → 主输出从者」选择一位从者。")
+        elif not ((type(preferred) is int and 1 <= preferred <= 3)
+                or (isinstance(preferred, str) and
+                    (preferred == "" or re.fullmatch(r"[1-9][0-9]{0,11}", preferred)))):
+            error(path + ".preferredAttacker",
+                  "主输出偏好无法识别，无法保存或执行此方案。请在「全局高级策略 → 主输出偏好」"
+                  "重新选择「沿用补牌策略」「按前排位置」或「按从者」。")
     if "openingHand" in value:
         opening(value["openingHand"], path + ".openingHand", True)
     if "nativeStrategyOverrides" in value:
@@ -186,6 +199,13 @@ def advanced_strategy_to_param(value: dict | None = None) -> dict:
               "color_weights": {"B": 1, "A": 4, "Q": 2} if preset == "np"
               else {"B": 3, "A": 2, "Q": 1}}
     native = _merge(native, config["nativeStrategyOverrides"])
+    # A dedicated choice wins over both preference lists in imported JSON.
+    # Empty means inherit, retaining ordered or mixed preferences unchanged.
+    preferred = config["preferredAttacker"]
+    if type(preferred) is int:
+        native.update(preferred_slots=[preferred], preferred_servant_ids=[])
+    elif preferred:
+        native.update(preferred_slots=[], preferred_servant_ids=[preferred])
     opening = native.get("opening_hand", {}).copy()
     dedicated = config["openingHand"]
     opening.update(enabled=dedicated["enabled"], max_wait_turns=dedicated["maxWaitTurns"])

@@ -13,6 +13,9 @@ ATTACKER = "原生自动战斗主输出偏好"
 ATTACKER_SLOT = "原生自动战斗主输出位置"
 ATTACKER_CLASS = "原生自动战斗主输出职阶"
 ATTACKER_FILE = "assets/options/原生自动战斗主输出从者.json"
+OPENING_CLASS = "原生自动战斗开局等牌目标职阶"
+OPENING_FILE = "assets/options/原生自动战斗开局等牌目标从者.json"
+OPENING_SELECTED = "native_battle_opening_hand_selected_servant"
 
 
 def load(relative):
@@ -68,6 +71,36 @@ class NativeAdvancedStrategyResourcesTests(unittest.TestCase):
         self.assertEqual([case["name"] for case in self.options[ATTACKER_SLOT]["cases"]], ["1", "2", "3"])
         self.assertEqual(self.options[ATTACKER_CLASS]["default"], "none")
         self.assertIn("原生自动战斗主输出从者-caster", self.reachable_options([ATTACKER]))
+
+    def test_opening_picker_uses_picture_choices_only_when_waiting_is_enabled(self):
+        waiting = self.options["原生自动战斗开局等待关键牌"]
+        cases = {case["name"]: case for case in waiting["cases"]}
+        self.assertEqual(cases["Yes"]["option"], [OPENING_CLASS, "原生自动战斗开局等牌条件"])
+        self.assertNotIn(OPENING_CLASS, self.reachable_options(cases["No"].get("option", [])))
+        self.assertEqual(self.options[OPENING_CLASS]["default"], "inherit")
+        self.assertEqual(self.options[OPENING_CLASS]["cases"][0]["name"], "inherit")
+        self.assertIn("原生自动战斗开局等牌目标从者-caster", self.reachable_options([OPENING_CLASS]))
+        caster = self.options["原生自动战斗开局等牌目标从者-caster"]
+        selected = next(case for case in caster["cases"] if case["name"] == "504500")
+        self.assertTrue((ROOT / "assets" / selected["icon"]).is_file())
+        self.assertEqual(selected["pipeline_override"], {CONFIG: {"attach": {OPENING_SELECTED: "504500"}}})
+        self.assertEqual(caster["cases"][0]["pipeline_override"], {CONFIG: {"attach": {OPENING_SELECTED: ""}}})
+
+    def test_generated_picture_choices_match_local_catalog_and_both_documents(self):
+        sys.path.insert(0, str(ROOT / "tools"))
+        import generate_native_attacker_options as generator
+        documents = generator.build_documents(ROOT)
+        self.assertEqual(set(documents), {ATTACKER_FILE, OPENING_FILE})
+        for relative, expected in documents.items():
+            self.assertEqual(load(relative), expected)
+        attacker = load(ATTACKER_FILE)["option"]
+        opening = load(OPENING_FILE)["option"]
+        for name, option in attacker.items():
+            if name == ATTACKER_CLASS:
+                continue
+            counterpart = opening[name.replace("原生自动战斗主输出从者", "原生自动战斗开局等牌目标从者")]
+            self.assertEqual([(case["name"], case.get("icon")) for case in option["cases"]],
+                             [(case["name"], case.get("icon")) for case in counterpart["cases"]])
 
     def test_manual_defaults_match_shared_contract(self):
         self.assertEqual(self.shared["原生自动战斗补牌预设"]["default"], "平衡")
@@ -175,6 +208,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
         cls.profile = staticmethod(_parse_strategy_profile)
         cls.options = load("assets/options/原生自动战斗高级策略.json")["option"]
         cls.options.update(load(ATTACKER_FILE)["option"])
+        cls.options.update(load(OPENING_FILE)["option"])
 
     def context(self, mode, additional=None):
         nodes = copy.deepcopy(load("assets/resource/base/pipeline/原生自动战斗.json"))
@@ -224,6 +258,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
     def test_default_and_editor_ignore_invalid_hidden_manual_values(self):
         hidden = {"native_strategy_overrides": "{broken", "native_battle_max_turns": 1000,
                   "native_battle_preferred_attacker": "504500",
+                  OPENING_SELECTED: "broken-hidden-id",
                   "native_battle_opening_hand_enabled": True,
                   "native_battle_auto_servant_skills": "invalid"}
         source = {"chaldea_import_source": "retained.json", "plan": {"turns": []}}
@@ -265,8 +300,9 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
         manual = {
             **self.manual_defaults("三色"),
             **self.case_attach("原生自动战斗开局等待关键牌", "Yes"),
+            **self.case_attach("原生自动战斗开局等牌目标从者-caster", "504500"),
             **self.input_attach("原生自动战斗开局等牌条件", {
-                "opening_hand_servant_id": "205500", "opening_hand_servant_slot": "3",
+                "opening_hand_servant_slot": "3",
                 "opening_hand_required_colors": "Q,Q", "opening_hand_max_wait_turns": "5",
             }),
             **self.input_attach("原生自动战斗策略微调", {"native_strategy_overrides": json.dumps({
@@ -278,10 +314,11 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
         selected = self.policy(self.read(self.context("manual", manual))).card.native_strategy
         self.assertEqual(selected.mighty_chain_weight, 47)
         self.assertTrue(selected.opening_hand.enabled)
-        self.assertEqual(selected.opening_hand.servant_id, "205500")
+        self.assertEqual(selected.opening_hand.servant_id, "504500")
         self.assertEqual(selected.opening_hand.servant_slot, 3)
         self.assertEqual([color.value for color in selected.opening_hand.required_colors], ["Q", "Q"])
         self.assertEqual(selected.opening_hand.max_wait_turns, 5)
+        manual.update(self.case_attach(OPENING_CLASS, "none"))
         manual.update(self.input_attach("原生自动战斗开局等牌条件", {
             "opening_hand_required_colors": "B,Q", "opening_hand_max_wait_turns": "0",
         }))
@@ -289,6 +326,49 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
         self.assertEqual(selected.opening_hand.servant_id, "605300")
         self.assertEqual(selected.opening_hand.servant_slot, 1)
         self.assertEqual(selected.opening_hand.max_wait_turns, 0)
+
+    def test_new_picture_selection_ignores_hidden_legacy_id_and_preserves_legacy_callers(self):
+        base = {**self.manual_defaults(),
+                **self.case_attach("原生自动战斗开局等待关键牌", "Yes"),
+                **self.input_attach("原生自动战斗开局等牌条件", {"opening_hand_servant_slot": "2"})}
+        for selected in ("", "504500"):
+            attach = {**base, OPENING_SELECTED: selected, "native_battle_opening_hand_servant_id": "broken-hidden-id"}
+            opening = self.policy(self.read(self.context("manual", attach))).card.native_strategy.opening_hand
+            self.assertEqual(opening.servant_id, selected or None)
+            self.assertEqual(opening.servant_slot, 2)
+        legacy = {**base, "native_battle_opening_hand_servant_id": "205500"}
+        opening = self.policy(self.read(self.context("manual", legacy))).card.native_strategy.opening_hand
+        self.assertEqual(opening.servant_id, "205500")
+        for invalid in (None, 504500, True, "0", " 504500", "bad"):
+            with self.subTest(invalid=invalid):
+                with self.assertRaisesRegex(ValueError, "目标从者职阶"):
+                    self.action._manual_advanced_strategy_param({**base, OPENING_SELECTED: invalid})
+
+    def test_upgraded_mxu_profile_keeps_old_target_until_explicitly_replaced(self):
+        # MXU drops saved input values absent from the current input definition.
+        # Apply the new defaults to an old profile through actual UI overrides.
+        old_values = {"opening_hand_servant_id": "205500",
+                      "opening_hand_servant_slot": "0",
+                      "opening_hand_required_colors": "A,A",
+                      "opening_hand_max_wait_turns": "3"}
+        fields = {item["name"] for item in self.options["原生自动战斗开局等牌条件"]["inputs"]}
+        restored = {key: value for key, value in old_values.items() if key in fields}
+        attach = {**self.manual_defaults(),
+                  **self.case_attach("原生自动战斗开局等待关键牌", "Yes"),
+                  **self.case_attach(OPENING_CLASS, self.options[OPENING_CLASS]["cases"][0]["name"]),
+                  **self.input_attach("原生自动战斗开局等牌条件", restored)}
+        opening = self.policy(self.read(self.context("manual", attach))).card.native_strategy.opening_hand
+        self.assertEqual(opening.servant_id, "205500")
+        self.assertEqual([color.value for color in opening.required_colors], ["A", "A"])
+        self.assertEqual(opening.max_wait_turns, 3)
+        attach.update(self.case_attach("原生自动战斗开局等牌目标从者-caster", "504500"))
+        opening = self.policy(self.read(self.context("manual", attach))).card.native_strategy.opening_hand
+        self.assertEqual(opening.servant_id, "504500")
+        attach.update(self.case_attach(OPENING_CLASS, "none"))
+        attach.update(self.input_attach("原生自动战斗开局等牌条件", {**restored, "opening_hand_servant_slot": "2"}))
+        opening = self.policy(self.read(self.context("manual", attach))).card.native_strategy.opening_hand
+        self.assertIsNone(opening.servant_id)
+        self.assertEqual(opening.servant_slot, 2)
 
 
 if __name__ == "__main__":

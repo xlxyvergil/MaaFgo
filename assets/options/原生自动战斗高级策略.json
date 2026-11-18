@@ -281,6 +281,7 @@
           "name": "Yes",
           "label": "开启",
           "option": [
+            "原生自动战斗开局等牌目标职阶",
             "原生自动战斗开局等牌条件"
           ],
           "pipeline_override": {
@@ -307,14 +308,8 @@
     "原生自动战斗开局等牌条件": {
       "type": "input",
       "label": "开局等牌条件",
-      "description": "设置目标从者ID或当前前排位置；ID优先。留空ID且位置为0时，可在补牌策略JSON的opening_hand中设置目标。牌色用B、A、Q表示红、蓝、绿，例如B,Q；允许重复。等待0回合表示只检查开局牌，不满足即停止。",
+      "description": "在“目标从者职阶”和“目标从者”中按头像选人；默认沿用旧版目标以保留升级前的设置。明确选择“未指定从者”后，使用当前前排位置或补牌策略 JSON 的 opening_hand 目标；位置 0 表示未指定。牌色用 B、A、Q 表示红、蓝、绿，例如 B,Q，可重复。等待 0 回合表示只检查开局牌，不满足即停止。",
       "inputs": [
-        {
-          "name": "opening_hand_servant_id",
-          "label": "目标从者ID（可留空）",
-          "default": "",
-          "verify": "^(?:[1-9][0-9]{0,11})?$"
-        },
         {
           "name": "opening_hand_servant_slot",
           "label": "目标前排位置（0=未指定，1～3）",
@@ -334,15 +329,22 @@
           "default": "2",
           "pipeline_type": "int",
           "verify": "^[0-5]$"
+        },
+        {
+          "name": "opening_hand_servant_id",
+          "label": "旧版目标兼容值（升级保留，无需填写）",
+          "description": "沿用旧版目标时保留原有设置；选择头像或明确选择未指定后忽略此值。",
+          "default": "",
+          "verify": "^([1-9][0-9]{0,11})?$"
         }
       ],
       "pipeline_override": {
         "原生自动战斗-高级策略配置": {
           "attach": {
-            "native_battle_opening_hand_servant_id": "{opening_hand_servant_id}",
             "native_battle_opening_hand_servant_slot": "{opening_hand_servant_slot}",
             "native_battle_opening_hand_required_colors": "{opening_hand_required_colors}",
-            "native_battle_opening_hand_max_wait_turns": "{opening_hand_max_wait_turns}"
+            "native_battle_opening_hand_max_wait_turns": "{opening_hand_max_wait_turns}",
+            "native_battle_opening_hand_servant_id": "{opening_hand_servant_id}"
           }
         }
       }
