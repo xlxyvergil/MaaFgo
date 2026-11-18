@@ -10,6 +10,7 @@
 import copy
 import json
 import os
+import re
 import sys
 from dataclasses import replace
 
@@ -387,6 +388,17 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
         _deep_merge(advanced_strategy_to_param()["card_policy"]["native_strategy"], preset_native),
         {**copy.deepcopy(overrides), "opening_hand": result["card_policy"]["native_strategy"]["opening_hand"]},
     )
+    # The select cases write one scalar: an integer position or a string ID.
+    # An empty selection preserves preferences from existing strategy JSON.
+    preferred = attach.get("native_battle_preferred_attacker", "")
+    if preferred != "":
+        native = result["card_policy"]["native_strategy"]
+        if type(preferred) is int and 1 <= preferred <= 3:
+            native.update(preferred_slots=[preferred], preferred_servant_ids=[])
+        elif isinstance(preferred, str) and re.fullmatch(r"[1-9][0-9]{0,11}", preferred):
+            native.update(preferred_slots=[], preferred_servant_ids=[preferred])
+        else:
+            raise ValueError("主输出偏好无法识别。请在「高级策略 → 手动 → 主输出偏好」重新选择前排位置或从者。")
     return result
 
 
