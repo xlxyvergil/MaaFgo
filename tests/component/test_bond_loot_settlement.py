@@ -11,8 +11,10 @@ from unittest.mock import patch
 import cv2
 import maa
 import numpy as np
+from maa.context import ContextEventSink
 from maa.custom_action import CustomAction
 from maa.define import LoggingLevelEnum
+from maa.event_sink import NotificationType
 from maa.library import Library
 from maa.resource import Resource
 from maa.tasker import Tasker
@@ -39,21 +41,32 @@ class LootSettlementTests(unittest.TestCase):
     def test_bond_max_stops_before_experience_or_loot(self):
         self.check_handoff(stage="bond")
 
-    def test_experience_page_after_missed_bond_stops_without_click(self):
+    def test_experience_page_after_missed_bond_reports_and_releases_guard(self):
         self.check_handoff(stage="experience")
 
-    def test_loot_page_after_missed_bond_stops_without_click(self):
-        self.check_handoff(stage="loot")
+    def test_third_miss_at_loot_page_runs_stop_exit_before_any_clicks(self):
+        self.check_handoff(stage="loot", missed_battles=3)
 
-    def check_handoff(self, *, stage):
+    def check_handoff(self, *, stage, missed_battles=1):
         loot = image("jp_loot_header_and_next.png")
         experience = image("jp_experience_result.png")
         maximum = image("jp_bond_slot5_max.png")
         self.assertEqual(loot.shape, (720, 1280, 3))
         report = {}
         test = self
+        notices = []
+        stop_notices = []
 
         controller = MemoryController({"bond": maximum, "experience": experience, "loot": loot}[stage])
+
+        class Notices(ContextEventSink):
+            def on_node_action(self, context, noti_type, detail):
+                if noti_type != NotificationType.Starting:
+                    return
+                if detail.name == bond.SKIP_NOTICE_NODE:
+                    notices.append(detail.focus["Node.Action.Starting"])
+                elif detail.name == "结算-羁绊停止出口":
+                    stop_notices.append(detail.focus["Node.Action.Starting"])
 
         class Probe(CustomAction):
             def run(self, context, argv):
@@ -85,15 +98,34 @@ class LootSettlementTests(unittest.TestCase):
                             "战斗_战后RESULT", "战斗_经验结算标题", "战斗_经验结算触屏提示")})
                 test.assertEqual(detect_scene(context, experience, check_order_change=False), Scene.VICTORY)
                 test.assertFalse(bond.read_bond_page(context, experience))
-                with patch.object(bond, "save_bond_stop"):
-                    stopped = bond.inspect_victory_settlement(context, NS(ok=True, reason="victory"), context.tasker.controller)
-                test.assertIsNotNone(stopped)
-                expected = "bond_max" if stage == "bond" else "bond_check_unconfirmed"
-                test.assertEqual(stopped.reason, expected)
-                if stage != "bond":
-                    test.assertIn("本场无法补查", stopped.message)
+                root = context.get_task_job().job_id
+                victory = NS(ok=True, reason="victory")
+                with patch.object(bond, "_save_evidence", side_effect=lambda _, result: result):
+                    for battle_number in range(1, missed_battles + 1):
+                        bond.bond_stops.battle_started(root, battle_number)
+                        stopped = bond.inspect_victory_settlement(context, victory, context.tasker.controller)
+                        if battle_number < missed_battles:
+                            test.assertIsNone(stopped)
+                            test.assertFalse(context.run_recognition("结算-羁绊满停止", experience).hit)
+                    if missed_battles == 3:
+                        context.run_task("结束战斗_不回主界面")
+                if stage == "bond":
+                    test.assertIsNotNone(stopped)
+                    test.assertEqual(stopped.reason, "bond_max")
+                    test.assertEqual(notices, [])
+                elif missed_battles == 3:
+                    test.assertIsNotNone(stopped)
+                    test.assertEqual(stopped.reason, "bond_check_unconfirmed")
+                    test.assertEqual(stopped.battle, 3)
+                    test.assertEqual(len(notices), 2)
+                    test.assertEqual(stop_notices, [stopped.message])
+                else:
+                    test.assertIsNone(stopped)
+                    test.assertIsNone(bond.bond_stops.get(context.get_task_job().job_id))
+                    # 后续真实结算守卫必须让位给经验页推进或战利品的“下一步”。
+                    test.assertFalse(context.run_recognition("结算-羁绊满停止", experience).hit)
+                    test.assertEqual(notices, ["第1场未能确认是否满羁绊，已跳过本场羁绊检查，继续结算。"])
                 test.assertEqual(controller.inputs, 0)
-                report["reason"] = stopped.reason
                 report["passed"] = True
                 return True
 
@@ -108,9 +140,12 @@ class LootSettlementTests(unittest.TestCase):
             self.assertTrue(resource.post_bundle(ROOT / "assets/resource/base").wait().succeeded)
             self.assertTrue(resource.post_bundle(temp).wait().succeeded)
             resource.register_custom_action("probe", Probe())
+            resource.register_custom_action("save_native_bond_stop", bond.SaveNativeBondStop())
+            resource.register_custom_recognition("native_bond_max", bond.NativeBondMax())
             self.assertTrue(controller.post_connection().wait().succeeded)
             tasker = Tasker()
             self.assertTrue(tasker.bind(resource, controller))
+            self.assertIsNotNone(tasker.add_context_sink(Notices()))
             try:
                 self.assertTrue(tasker.post_task("probe").wait().succeeded, report)
                 self.assertTrue(report.get("passed"), report)
