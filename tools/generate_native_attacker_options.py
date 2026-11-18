@@ -39,7 +39,9 @@ def build_document(root=ROOT, *, opening=False):
         }
 
     classes = [selection_case("none", empty_label)]
-    options = {class_option: {"type": "select", "label": "目标从者职阶" if opening else "职阶", "default": "none", "cases": classes}}
+    if opening:
+        classes.insert(0, selection_case("inherit", "沿用旧版目标（无旧值则使用位置或微调）", "inherit"))
+    options = {class_option: {"type": "select", "label": "目标从者职阶" if opening else "职阶", "default": "inherit" if opening else "none", "cases": classes}}
     class_labels = {**catalog["class_cn"], "loreGrandCaster": "冠位术"}
     for job_class in (*class_labels, *sorted(groups.keys() - class_labels.keys())):
         servants = groups.get(job_class)

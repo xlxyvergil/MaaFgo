@@ -165,3 +165,21 @@ test('attacker controls render a portrait picker while preserving imported ident
  const missing=render('999999');assert.match(missing,/从者 #999999/);assert.match(missing,/目录中暂无资料 · ID 999999/);
  const pending=render('0');assert.match(pending,/请选择主输出从者/);assert.match(pending,/尚未选择主输出从者/);
 });
+
+
+test('opening target shows inherited JSON identity after clearing the dedicated picker',()=>{
+ const base={maaAdvancedStrategy:{openingHand:{enabled:true,servantSlot:2},nativeStrategyOverrides:{opening_hand:{servant_id:'505500'}}}};
+ for(const servantId of [undefined,null]){
+  const data=structuredClone(base);if(servantId===null)Object.assign(data.maaAdvancedStrategy.openingHand,{servantId});
+  const before=structuredClone(data);
+  const html=renderToStaticMarkup(createElement(AdvancedStrategy,{data,onChange:()=>{},onError:()=>{}}));
+  assert.match(html,/继承微调目标：505500/);assert.match(html,/该从者身份优先于前排位置/);
+  assert.match(html,/请同时移除微调 opening_hand.servant_id/);assert.deepEqual(data,before);
+ }
+ const selected=structuredClone(base);Object.assign(selected.maaAdvancedStrategy.openingHand,{servantId:'504500'});
+ const selectedHtml=renderToStaticMarkup(createElement(AdvancedStrategy,{data:selected,onChange:()=>{},onError:()=>{}}));
+ assert.doesNotMatch(selectedHtml,/继承微调目标：505500/);assert.match(selectedHtml,/从者 #504500/);
+ const positionOnly=structuredClone(base);delete (positionOnly.maaAdvancedStrategy.nativeStrategyOverrides.opening_hand as Record<string,unknown>).servant_id;
+ const positionHtml=renderToStaticMarkup(createElement(AdvancedStrategy,{data:positionOnly,onChange:()=>{},onError:()=>{}}));
+ assert.match(positionHtml,/未指定目标从者/);assert.doesNotMatch(positionHtml,/继承微调目标/);
+});
