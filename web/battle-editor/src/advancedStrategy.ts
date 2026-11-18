@@ -8,13 +8,28 @@ export const STRATEGY_PRESETS=[
 export type StrategyPreset=typeof STRATEGY_PRESETS[number][0];
 export interface AdvancedStrategy extends Json {
  preset:StrategyPreset;
+ preferredAttacker:string|number;
  openingHand:{enabled:boolean;servantId:string|number|null;servantSlot:number|null;requiredColors:string[];maxWaitTurns:number;[key:string]:unknown};
  nativeStrategyOverrides:Json;
  autoServantSkills:boolean;
  maxTurns:number;
 }
-export const defaultAdvancedStrategy=():AdvancedStrategy=>({preset:'balanced',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
+export const defaultAdvancedStrategy=():AdvancedStrategy=>({preset:'balanced',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
 export const strategyObject=(value:unknown):value is Json=>value!==null&&typeof value==='object'&&!Array.isArray(value);
+
+/** Match the manual MXU option: integers are positions, strings are identities. */
+export function preferredAttackerMode(value:unknown):'inherit'|'slot'|'servant'|'invalid' {
+ if(value==='')return 'inherit';
+ if(Number.isSafeInteger(value)&&Number(value)>=1&&Number(value)<=3)return 'slot';
+ if(typeof value==='string')return 'servant';
+ return 'invalid';
+}
+
+export function preferredAttackerIssue(value:unknown):string {
+ if(value==='0')return '尚未选择主输出从者，无法使用按从者的偏好。请在「主输出从者」中选择一位从者。';
+ if(value===''||(Number.isSafeInteger(value)&&Number(value)>=1&&Number(value)<=3)||(typeof value==='string'&&/^[1-9][0-9]{0,11}$/.test(value)))return '';
+ return '主输出偏好无法识别，无法确定要优先补谁的指令卡。请在「主输出偏好」重新选择前排位置或从者。';
+}
 
 /** Viewing an old or partial document never materializes defaults in its tree. */
 export function advancedStrategyOf(data:Json):AdvancedStrategy {
@@ -53,6 +68,7 @@ export function advancedStrategyIssues(data:Json):string[] {
  if(!strategyObject(raw))return ['全局高级策略必须是 JSON 对象。'];
  const issues:string[]=[];
  if(raw.preset!==undefined&&!STRATEGY_PRESETS.some(([key])=>key===raw.preset))issues.push('补牌预设无效，请重新选择。');
+ if(raw.preferredAttacker!==undefined){const issue=preferredAttackerIssue(raw.preferredAttacker);if(issue)issues.push(issue);}
  if(raw.autoServantSkills!==undefined&&typeof raw.autoServantSkills!=='boolean')issues.push('自动补放从者技能必须是布尔值。');
  if(raw.maxTurns!==undefined&&(!Number.isSafeInteger(raw.maxTurns)||raw.maxTurns<1||raw.maxTurns>100))issues.push('最大战斗回合必须是 1～100 的整数。');
  if(raw.nativeStrategyOverrides!==undefined&&!strategyObject(raw.nativeStrategyOverrides))issues.push('补牌策略微调必须是 JSON 对象。');

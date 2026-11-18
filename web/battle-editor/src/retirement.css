@@ -3,6 +3,10 @@
 .battle-servant-avatar:hover{background:var(--purple-bg)}
 .battle-servant-avatar:focus-visible{outline:2px solid var(--purple);outline-offset:3px}
 .battle-servant-avatar:disabled{cursor:default;opacity:.45}
+.battle-retirement-button{position:absolute;top:7px;right:7px;z-index:1;display:grid;place-items:center;width:32px;height:32px;padding:0;border:1px solid var(--line);border-radius:4px;background:var(--surface-2);color:var(--danger,#bd3b42);cursor:pointer}
+.battle-retirement-button:hover:not(:disabled){border-color:currentColor;background:var(--surface)}
+.battle-retirement-button:focus-visible{outline:2px solid currentColor;outline-offset:2px}
+.battle-retirement-button:disabled{cursor:default;opacity:.4}
 .retirement-context-menu{width:270px}
 .retirement-context-menu .retirement-menu-action{color:var(--danger,#bd3b42);font-weight:600}
 .retirement-context-menu small+small{border-top:1px solid var(--line);margin-top:8px;padding-top:8px}

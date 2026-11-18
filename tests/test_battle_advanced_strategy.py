@@ -41,6 +41,7 @@ class StrategyContractTests(unittest.TestCase):
         self.assertEqual(policy.card.native_strategy.brave_chain_weight, 8)
         self.assertEqual(policy.card.native_strategy.mighty_chain_weight, 12)
         self.assertEqual(policy.card.native_strategy.preferred_servant_ids, ())
+        self.assertEqual(config["preferredAttacker"], "")
         config["openingHand"]["requiredColors"].clear()
         self.assertEqual(default_advanced_strategy()["openingHand"]["requiredColors"], ["B", "Q"])
 
@@ -84,6 +85,42 @@ class StrategyContractTests(unittest.TestCase):
         self.assertTrue(opening.enabled)
         self.assertEqual((opening.servant_id, opening.required_colors, opening.max_wait_turns),
                          ("605300", (CardColor.ARTS, CardColor.ARTS), 1))
+
+    def test_attacker_choice_wins_over_json_without_changing_other_fields_or_source(self):
+        overrides = {"preferred_servant_ids": [605300, "504500"], "preferred_slots": [1, 2],
+                     "brave_chain_weight": 21, "np_colors_by_servant_id": {"605300": "A"},
+                     "futureNative": {"keep": [None, False]}}
+        for choice, ids, slots in (("", [605300, "504500"], [1, 2]),
+                                   (1, [], [1]), (2, [], [2]), (3, [], [3]),
+                                   ("504500", ["504500"], []),
+                                   ("999999999999", ["999999999999"], [])):
+            with self.subTest(choice=choice):
+                config = {"preferredAttacker": choice, "nativeStrategyOverrides": overrides}
+                before = copy.deepcopy(config)
+                self.assertEqual(validate_advanced_strategy(config), [])
+                native = advanced_strategy_to_param(config)["card_policy"]["native_strategy"]
+                self.assertEqual(native["preferred_servant_ids"], ids)
+                self.assertEqual(native["preferred_slots"], slots)
+                for key in ("brave_chain_weight", "np_colors_by_servant_id", "futureNative"):
+                    self.assertEqual(native[key], overrides[key])
+                self.assertEqual(config, before)
+        # Old documents have the same inheritance behavior without materializing a field.
+        old = {"nativeStrategyOverrides": overrides}
+        self.assertEqual(advanced_strategy_to_param(old)["card_policy"]["native_strategy"]["preferred_slots"], [1, 2])
+        self.assertNotIn("preferredAttacker", old)
+
+    def test_invalid_attacker_choices_report_the_exact_path_and_cannot_execute(self):
+        for choice in (None, True, False, 0, 4, -1, 1.0, [], {}, " ", "0", "0504500",
+                       "504500 ", "-1", "1.5", "１２３", "1000000000000"):
+            with self.subTest(choice=choice):
+                config = {"preferredAttacker": choice}
+                issues = validate_advanced_strategy(config)
+                self.assertEqual([item["path"] for item in issues], ["maaAdvancedStrategy.preferredAttacker"])
+                self.assertIn("主输出", issues[0]["message"])
+                if choice == "0":
+                    self.assertIn("尚未选择主输出从者", issues[0]["message"])
+                with self.assertRaises(ValueError):
+                    advanced_strategy_to_param(config)
 
 
 class StrategySourceTests(unittest.TestCase):
@@ -144,6 +181,17 @@ class StrategySourceTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 self.resolve(context("manual", native_strategy_overrides=raw))
 
+    def test_editor_attacker_choice_is_isolated_from_hidden_manual_choice(self):
+        ctx = context("editor", native_battle_preferred_attacker=1)
+        share = {"maaAdvancedStrategy": {"preferredAttacker": "504500",
+                 "nativeStrategyOverrides": {"preferred_slots": [2]}}}
+        policy = _parse_battle_policy(self.resolve(ctx, share=share))
+        self.assertEqual(policy.card.native_strategy.preferred_servant_ids, ("504500",))
+        self.assertEqual(policy.card.native_strategy.preferred_slots, ())
+        manual = _parse_battle_policy(self.resolve(context("manual", native_battle_preferred_attacker=3), share=share))
+        self.assertEqual(manual.card.native_strategy.preferred_servant_ids, ())
+        self.assertEqual(manual.card.native_strategy.preferred_slots, (3,))
+
 
 class StrategyActionHandoffTests(unittest.TestCase):
     def run_action(self, ctx, param, *, fallback=False):
@@ -166,7 +214,8 @@ class StrategyActionHandoffTests(unittest.TestCase):
         self.assertEqual(runtime.call_args.kwargs["roster_servant_ids"], (None,) * 6)
 
     def test_single_fetch_supplies_editor_config_and_keeps_explicit_plan(self):
-        share = {"maaAdvancedStrategy": {"maxTurns": 76, "autoServantSkills": False},
+        share = {"maaAdvancedStrategy": {"maxTurns": 76, "autoServantSkills": False,
+                                        "preferredAttacker": "505700"},
                  "actions": [{"type": "attack", "attacks": []}]}
         param = {"chaldea_import_source": "local.json", "plan": {"turns": [{"np_order": [2]}]}}
         with patch.object(action, "fetch_share_data", return_value=(share, "0", "local")) as fetch:
@@ -175,6 +224,7 @@ class StrategyActionHandoffTests(unittest.TestCase):
         fetch.assert_called_once_with("local.json")
         self.assertEqual(runtime.call_args.args[3].max_turns, 76)
         self.assertEqual(runtime.call_args.args[2].plan.turns[0].np_order, (2,))
+        self.assertEqual(runtime.call_args.args[4].card.native_strategy.preferred_servant_ids, ("505600",))
 
     def test_old_actions_share_uses_defaults_and_keeps_empty_fixed_turn(self):
         share = {"actions": [{"type": "attack", "attacks": []}]}

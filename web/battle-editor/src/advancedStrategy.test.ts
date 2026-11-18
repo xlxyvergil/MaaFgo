@@ -4,11 +4,11 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {newBattle,assertEditable,turnsOf} from './model';
 import {GlobalAdvancedStrategy as AdvancedStrategy} from './GlobalAdvancedStrategy';
-import {advancedStrategyOf,defaultAdvancedStrategy,patchAdvancedStrategy,parseNativeStrategyOverrides,strategyInteger,advancedStrategyIssues} from './advancedStrategy';
+import {advancedStrategyOf,defaultAdvancedStrategy,patchAdvancedStrategy,parseNativeStrategyOverrides,strategyInteger,advancedStrategyIssues,preferredAttackerMode} from './advancedStrategy';
 
 test('new documents carry independent unified strategy defaults',()=>{
  const first=newBattle(),second=newBattle();
- assert.deepEqual(first.maaAdvancedStrategy,{preset:'balanced',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
+ assert.deepEqual(first.maaAdvancedStrategy,{preset:'balanced',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
  first.maaAdvancedStrategy.openingHand.requiredColors.push('A');(first.maaAdvancedStrategy.nativeStrategyOverrides as Record<string,unknown>).preferred_slots=[2];
  assert.deepEqual(second.maaAdvancedStrategy,defaultAdvancedStrategy());
 });
@@ -18,7 +18,7 @@ test('viewing old and partial plans or focusing unchanged controls never writes 
   const before=structuredClone(data);assertEditable(data);assert.doesNotThrow(()=>turnsOf(data));
   const projected=advancedStrategyOf(data);
   assert.equal(projected.preset,'balanced');assert.equal(projected.autoServantSkills,true);
-  patchAdvancedStrategy(data,{nativeStrategyOverrides:{}});patchAdvancedStrategy(data,{openingHand:{servantSlot:null,requiredColors:['B','Q']}});
+  patchAdvancedStrategy(data,{nativeStrategyOverrides:{}});patchAdvancedStrategy(data,{openingHand:{servantSlot:null,requiredColors:['B','Q']}});patchAdvancedStrategy(data,{preferredAttacker:''});
   assert.deepEqual(data,before);
   projected.openingHand.requiredColors.push('A');assert.deepEqual(data,before);
  }
@@ -87,4 +87,35 @@ test('global strategy renders collapsed without a selected action or formation',
  assert.match(html,/type="checkbox"[^>]*checked=""/);
  const withOpening=renderToStaticMarkup(createElement(AdvancedStrategy,{data:{maaAdvancedStrategy:{openingHand:{enabled:true,servantSlot:2}}},onChange:()=>{},onError:()=>{}}));
  assert.match(withOpening,/开局等牌目标从者 ID/);assert.match(withOpening,/开局等牌所需牌色/);
+});
+
+test('attacker identity types survive editing, drafts and undo without changing JSON preferences',()=>{
+ const data={maaAdvancedStrategy:{nativeStrategyOverrides:{preferred_slots:[2,3],preferred_servant_ids:['605300'],future:{keep:true}}}};
+ const original=structuredClone(data);
+ assert.equal(advancedStrategyOf(data).preferredAttacker,'');
+ for(const preferredAttacker of [2,'2','605300','']){
+  patchAdvancedStrategy(data,{preferredAttacker});
+  const restored=JSON.parse(JSON.stringify(data));
+  assert.equal(restored.maaAdvancedStrategy.preferredAttacker,preferredAttacker);
+  assert.deepEqual(restored.maaAdvancedStrategy.nativeStrategyOverrides,original.maaAdvancedStrategy.nativeStrategyOverrides);
+  assert.deepEqual(advancedStrategyIssues(restored),[]);
+ }
+ assert.equal(preferredAttackerMode(2),'slot');assert.equal(preferredAttackerMode('2'),'servant');
+ assert.equal(preferredAttackerMode(advancedStrategyOf(original).preferredAttacker),'inherit');
+ for(const invalid of ['0','01',0,4,null,true,[],{},'broken','1000000000000']){
+  const draft={maaAdvancedStrategy:{preferredAttacker:invalid}};
+  assert.ok(advancedStrategyIssues(draft).some(issue=>issue.includes('主输出')));
+  assert.deepEqual(JSON.parse(JSON.stringify(draft)).maaAdvancedStrategy.preferredAttacker,invalid);
+ }
+});
+
+test('attacker controls render positions, searchable identities and imported missing catalogue IDs',()=>{
+ const catalog={servants:[{id:605300,name:'斯卡哈·斯卡蒂',collectionNo:215,className:'术',aliases:[605399]}],equips:[],mysticCodes:[]};
+ const render=(preferredAttacker:unknown)=>renderToStaticMarkup(createElement(AdvancedStrategy,{data:{team:{backupSvts:[{svtId:605399}]},maaAdvancedStrategy:{preferredAttacker}},catalog,onChange:()=>{},onError:()=>{}}));
+ const inherited=render('');assert.match(inherited,/value="inherit" selected=""/);assert.doesNotMatch(inherited,/aria-label="主输出从者"/);
+ const position=render(3);assert.match(position,/aria-label="主输出位置"/);assert.match(position,/value="3" selected=""/);
+ const identity=render('605300');assert.match(identity,/aria-label="搜索主输出从者"/);assert.match(identity,/【编队中】215\. 斯卡哈·斯卡蒂/);assert.match(identity,/value="605300" selected=""/);
+ const alias=render('605399');assert.match(alias,/斯卡哈·斯卡蒂（当前选择）/);assert.match(alias,/value="605399" selected=""/);
+ const missing=render('999999');assert.match(missing,/从者 #999999（目录中暂无资料）/);assert.match(missing,/value="999999" selected=""/);
+ const pending=render('0');assert.match(pending,/请选择主输出从者/);assert.match(pending,/尚未选择主输出从者/);
 });
