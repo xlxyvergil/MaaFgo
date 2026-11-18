@@ -40,6 +40,13 @@ def canonical_servant_id(servant_id: object) -> str | None:
     return str(servant["id"]) if servant is not None else sid
 
 
+def servant_has_attack_np(servant_id: str) -> bool:
+    """Confirm an attack NP only when all listed types deal damage."""
+    servant = _servant_lookup().get(servant_id, {})
+    np_type = servant.get("np_type")
+    return isinstance(np_type, str) and set(np_type.split("/")) <= {"单体输出", "群体输出"}
+
+
 def servant_template_ids(servant_id: object) -> tuple[str, ...]:
     """同一规范身份的资源目录，包含目录中明确声明的变身形态。"""
     sid = _positive_servant_id(servant_id)

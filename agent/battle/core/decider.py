@@ -333,18 +333,21 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     - skip_skill_indexes → 跳过指定技能索引
     - max_skills_per_turn > 0 → 每回合最多放 N 个技能
     - available is True → 加入技能序列；False（CD）或 None（未知）→ 跳过
+    - 需要选择队友时优先选攻击宝具从者，同类按前排位置从左到右
     技能可用性过滤由 Runtime 的统一安全门（skip_unusable_servant_skills）兜底。
     """
     if not skill_policy.auto_servant_skills:
         return ()
 
+    frontline = tuple(servant for servant in state.servants if is_slot(servant.slot, 1, 3))
+    if not frontline:
+        return ()
+    target_ally = min(frontline, key=lambda servant: (not servant.has_attack_np, servant.slot)).slot
     slots = set(skill_policy.servant_slots) if skill_policy.servant_slots else None
     skip = set(skill_policy.skip_skill_indexes)
 
     skills: List[ServantSkillAction] = []
-    for servant in state.servants:
-        if not is_slot(servant.slot, 1, 3):
-            continue
+    for servant in frontline:
         if slots is not None and servant.slot not in slots:
             continue
         for idx, skill_state in enumerate(servant.skills, start=1):
@@ -354,6 +357,7 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
                 skills.append(ServantSkillAction(
                     servant_slot=servant.slot,
                     skill_index=idx,
+                    target_ally=target_ally,
                 ))
         if skill_policy.max_skills_per_turn > 0 and len(skills) >= skill_policy.max_skills_per_turn:
             break

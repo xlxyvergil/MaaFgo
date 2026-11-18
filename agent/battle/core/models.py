@@ -140,6 +140,7 @@ class ServantState:
     skills: Tuple[SkillState, SkillState, SkillState]
     confidence: Confidence
     servant_id: str | None = None
+    has_attack_np: bool = False
 
 
 @dataclass(frozen=True)

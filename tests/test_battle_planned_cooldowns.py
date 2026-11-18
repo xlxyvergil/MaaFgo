@@ -86,8 +86,8 @@ class PlannedCooldownTests(unittest.TestCase):
                 self.assertFalse(state.servants[0].skills[0].available)
                 self.assertFalse(state.master_skills[0].available)
                 action = run.decider.decide(state, turn_index=turn)
-                self.assertNotIn(ServantSkillAction(1, 1), action.servant_skills)
-                self.assertIn(ServantSkillAction(1, 2), action.servant_skills)
+                self.assertNotIn(ServantSkillAction(1, 1, target_ally=1), action.servant_skills)
+                self.assertIn(ServantSkillAction(1, 2, target_ally=1), action.servant_skills)
 
     def test_opening_wait_reads_real_cd_then_plan_resumes_without_reusing_cd(self):
         run = runtime()

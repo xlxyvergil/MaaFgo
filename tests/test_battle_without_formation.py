@@ -96,12 +96,44 @@ class WithoutFormationTests(unittest.TestCase):
         self.assertEqual(rt.candidate_servant_ids, (None,) * 6)
         self.assertEqual(rt._semantic_roster(), (None,) * 6)
         self.assertIsNone(rt._special_skill_servant_ids)
-        for args, key in zip(rt._run_special_skill_pipeline.call_args_list, AVAILABLE):
-            selected = key[0]
+        for args in rt._run_special_skill_pipeline.call_args_list:
             self.assertEqual(args.args[0], {
-                f"战斗_技能目标子屏_选从者{slot}": {} if slot == selected else {"enabled": False}
+                f"战斗_技能目标子屏_选从者{slot}": {} if slot == 1 else {"enabled": False}
                 for slot in (1, 2, 3)
             })
+
+    def test_auto_skill_targets_leftmost_confirmed_attack_np_then_leftmost_frontline(self):
+        for frontline, expected in (
+            (("100100", "504500", "304800"), 1),
+            (("504500", "304800", "100100"), 2),
+            (("2300600", "504500", "100100"), 3),
+            (("504500", "9999999", "503900"), 1),
+            ((None, "504500", "503900"), 2),
+        ):
+            with self.subTest(frontline=frontline), patch("battle.runtime.runtime.time.sleep"):
+                rt = runtime(roster=(*frontline, None, None, None))
+                rt.servant_recognizer = NS(detect=Mock(return_value=tuple(
+                    NS(slot=slot, servant_id=sid, confidence=Confidence(.98),
+                       margin=.2, matched_template="portrait")
+                    for slot, sid in enumerate(frontline, 1)
+                )))
+                state = rt._observe()
+                action = rt.decider.decide(state)
+                self.assertEqual({skill.target_ally for skill in action.servant_skills}, {expected})
+                self.assertTrue(rt._execute_skills(action))
+                for args in rt._run_special_skill_pipeline.call_args_list:
+                    self.assertEqual(args.args[0], {
+                        f"战斗_技能目标子屏_选从者{slot}": {} if slot == expected else {"enabled": False}
+                        for slot in (1, 2, 3)
+                    })
+
+    def test_fixed_target_is_kept_until_the_plan_ends(self):
+        planned_skill = ServantSkillAction(2, 2, target_ally=3)
+        rt = runtime(plan=BattlePlan((TurnPlan(servant_skills=(planned_skill,)),)))
+        self.assertEqual(rt.decider.decide(rt._observe()).servant_skills, (planned_skill,))
+        rt._turn_index = 1
+        action = rt.decider.decide(rt._observe(), turn_index=1)
+        self.assertEqual({skill.target_ally for skill in action.servant_skills}, {1})
 
     def test_auto_skill_switch_still_disables_position_only_casts(self):
         rt = runtime()
