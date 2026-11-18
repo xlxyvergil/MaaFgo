@@ -357,7 +357,15 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
                                ("native_battle_opening_hand_max_wait_turns", "maxWaitTurns")):
         if external in attach:
             opening[internal] = attach[external]
-    raw_id = attach.get("native_battle_opening_hand_servant_id")
+    # New picture selections supersede old hidden ID inputs, including an
+    # explicit empty selection. Keep legacy callers working when absent.
+    selected_key = "native_battle_opening_hand_selected_servant"
+    if selected_key in attach:
+        raw_id = attach[selected_key]
+        if not isinstance(raw_id, str) or (raw_id != "" and not re.fullmatch(r"[1-9][0-9]{0,11}", raw_id)):
+            raise ValueError("开局等牌的目标从者无法识别，无法确认要等待谁的牌。请在「高级策略 → 手动 → 开局等待关键牌」下重新选择「目标从者职阶」和「目标从者」。")
+    else:
+        raw_id = attach.get("native_battle_opening_hand_servant_id")
     if raw_id is not None and str(raw_id).strip():
         opening["servantId"] = str(raw_id).strip()
     raw_slot = attach.get("native_battle_opening_hand_servant_slot")

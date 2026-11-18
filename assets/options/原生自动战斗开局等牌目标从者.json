@@ -1,0 +1,6171 @@
+{
+  "option": {
+    "原生自动战斗开局等牌目标职阶": {
+      "type": "select",
+      "label": "目标从者职阶",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "saber",
+          "label": "剑(saber)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-saber"
+          ]
+        },
+        {
+          "name": "archer",
+          "label": "弓(archer)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-archer"
+          ]
+        },
+        {
+          "name": "lancer",
+          "label": "枪(lancer)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-lancer"
+          ]
+        },
+        {
+          "name": "rider",
+          "label": "骑(rider)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-rider"
+          ]
+        },
+        {
+          "name": "caster",
+          "label": "术(caster)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-caster"
+          ]
+        },
+        {
+          "name": "assassin",
+          "label": "杀(assassin)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-assassin"
+          ]
+        },
+        {
+          "name": "berserker",
+          "label": "狂(berserker)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-berserker"
+          ]
+        },
+        {
+          "name": "ruler",
+          "label": "尺(ruler)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-ruler"
+          ]
+        },
+        {
+          "name": "avenger",
+          "label": "仇(avenger)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-avenger"
+          ]
+        },
+        {
+          "name": "moonCancer",
+          "label": "月(moonCancer)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-moonCancer"
+          ]
+        },
+        {
+          "name": "alterEgo",
+          "label": "他(alterEgo)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-alterEgo"
+          ]
+        },
+        {
+          "name": "foreigner",
+          "label": "降(foreigner)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-foreigner"
+          ]
+        },
+        {
+          "name": "pretender",
+          "label": "伪(pretender)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-pretender"
+          ]
+        },
+        {
+          "name": "shielder",
+          "label": "盾(shielder)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-shielder"
+          ]
+        },
+        {
+          "name": "beast",
+          "label": "兽(beast)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-beast"
+          ]
+        },
+        {
+          "name": "unBeast",
+          "label": "兽(unBeast)",
+          "option": [
+            "原生自动战斗开局等牌目标从者-unBeast"
+          ]
+        },
+        {
+          "name": "loreGrandCaster",
+          "label": "冠位术",
+          "option": [
+            "原生自动战斗开局等牌目标从者-loreGrandCaster"
+          ]
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-saber": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "106700",
+          "label": "472. 格蕾·Lily",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1067000.png"
+        },
+        {
+          "name": "106600",
+          "label": "466. 雅克·德·莫莱",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1066000.png"
+        },
+        {
+          "name": "106500",
+          "label": "461. 领主洛格雷斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1065000.png"
+        },
+        {
+          "name": "106400",
+          "label": "456. 近藤勇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1064000.png"
+        },
+        {
+          "name": "106300",
+          "label": "445. Passionlip",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1063000.png"
+        },
+        {
+          "name": "106200",
+          "label": "434. 黑姬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1062000.png"
+        },
+        {
+          "name": "106100",
+          "label": "432. 理查一世",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1061000.png"
+        },
+        {
+          "name": "106000",
+          "label": "405. 宫本伊织",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "106000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1060000.png"
+        },
+        {
+          "name": "105900",
+          "label": "402. 大和武尊",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1059000.png"
+        },
+        {
+          "name": "105800",
+          "label": "396. 忒修斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1058000.png"
+        },
+        {
+          "name": "105600",
+          "label": "384. 美杜莎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1056000.png"
+        },
+        {
+          "name": "105700",
+          "label": "379. 瑟坦特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1057000.png"
+        },
+        {
+          "name": "105500",
+          "label": "363. 山南敬助",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1055000.png"
+        },
+        {
+          "name": "105400",
+          "label": "354. 加雷斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1054000.png"
+        },
+        {
+          "name": "104300",
+          "label": "344. 罗兰",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1043000.png"
+        },
+        {
+          "name": "105200",
+          "label": "343. 查理曼",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1052000.png"
+        },
+        {
+          "name": "105300",
+          "label": "337. 征氏姐妹",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1053000.png"
+        },
+        {
+          "name": "105100",
+          "label": "317. 冲田总司〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1051000.png"
+        },
+        {
+          "name": "105000",
+          "label": "310. 妖精骑士高文",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "105000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1050000.png"
+        },
+        {
+          "name": "104900",
+          "label": "302. 千子村正",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1049000.png"
+        },
+        {
+          "name": "104800",
+          "label": "301. 迦尔纳〔圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1048000.png"
+        },
+        {
+          "name": "104600",
+          "label": "299. 伊吹童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1046000.png"
+        },
+        {
+          "name": "104700",
+          "label": "298. 渡边纲",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1047000.png"
+        },
+        {
+          "name": "104400",
+          "label": "293. 斋藤一",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1044000.png"
+        },
+        {
+          "name": "104500",
+          "label": "290. 巴御前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1045000.png"
+        },
+        {
+          "name": "104200",
+          "label": "278. 狄俄斯库里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1042000.png"
+        },
+        {
+          "name": "104100",
+          "label": "270. 阿斯托尔福",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1041000.png"
+        },
+        {
+          "name": "104000",
+          "label": "264. 葛饰北斋",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "104000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1040000.png"
+        },
+        {
+          "name": "103800",
+          "label": "254. 伊阿宋",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1038000.png"
+        },
+        {
+          "name": "103900",
+          "label": "245. 拉克什米·芭伊",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1039000.png"
+        },
+        {
+          "name": "103700",
+          "label": "234. 红阎魔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1037000.png"
+        },
+        {
+          "name": "103600",
+          "label": "227. 兰陵王",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1036000.png"
+        },
+        {
+          "name": "103500",
+          "label": "223. 迪尔姆德·奥迪那",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1035000.png"
+        },
+        {
+          "name": "103400",
+          "label": "221. 女王梅芙",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1034000.png"
+        },
+        {
+          "name": "103300",
+          "label": "213. 齐格鲁德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1033000.png"
+        },
+        {
+          "name": "103200",
+          "label": "187. 柳生但马守宗矩",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1032000.png"
+        },
+        {
+          "name": "103100",
+          "label": "176. 弗兰肯斯坦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1031000.png"
+        },
+        {
+          "name": "103000",
+          "label": "165. 铃鹿御前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "103000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1030000.png"
+        },
+        {
+          "name": "102900",
+          "label": "160. 亚瑟·潘德拉贡〔Prototype〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1029000.png"
+        },
+        {
+          "name": "101700",
+          "label": "153. 宫本武藏",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1017000.png"
+        },
+        {
+          "name": "101000",
+          "label": "138. 伊丽莎白·巴托里〔勇者〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1010000.png"
+        },
+        {
+          "name": "101200",
+          "label": "126. 贝德维尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1012000.png"
+        },
+        {
+          "name": "100700",
+          "label": "123. 高文",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1007000.png"
+        },
+        {
+          "name": "102000",
+          "label": "121. 兰斯洛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1020000.png"
+        },
+        {
+          "name": "101900",
+          "label": "101. 罗摩",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1019000.png"
+        },
+        {
+          "name": "102800",
+          "label": "91. 两仪式",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1028000.png"
+        },
+        {
+          "name": "100600",
+          "label": "90. 尼禄·克劳狄乌斯〔新娘〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1006000.png"
+        },
+        {
+          "name": "100900",
+          "label": "76. 莫德雷德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1009000.png"
+        },
+        {
+          "name": "101400",
+          "label": "72. 弗格斯·马克·罗伊",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1014000.png"
+        },
+        {
+          "name": "102700",
+          "label": "68. 冲田总司",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1027000.png"
+        },
+        {
+          "name": "102600",
+          "label": "10. 骑士迪昂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1026000.png"
+        },
+        {
+          "name": "102200",
+          "label": "9. 吉尔·德·雷",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "102200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1022000.png"
+        },
+        {
+          "name": "101800",
+          "label": "8. 阿蒂拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1018000.png"
+        },
+        {
+          "name": "101300",
+          "label": "7. 盖乌斯·尤利乌斯·恺撒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "101300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1013000.png"
+        },
+        {
+          "name": "100800",
+          "label": "6. 齐格飞",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1008000.png"
+        },
+        {
+          "name": "100500",
+          "label": "5. 尼禄·克劳狄乌斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1005000.png"
+        },
+        {
+          "name": "100300",
+          "label": "4. 阿尔托莉雅·潘德拉贡〔Lily〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1003000.png"
+        },
+        {
+          "name": "100200",
+          "label": "3. 阿尔托莉雅·潘德拉贡〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1002000.png"
+        },
+        {
+          "name": "100100",
+          "label": "2. 阿尔托莉雅·潘德拉贡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "100100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_1001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-archer": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "205600",
+          "label": "480. 小野小町",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2056000.png"
+        },
+        {
+          "name": "205500",
+          "label": "470. 乌尔德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2055000.png"
+        },
+        {
+          "name": "205400",
+          "label": "450. 幼体／提亚马特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2054000.png"
+        },
+        {
+          "name": "205300",
+          "label": "427. 图坦卡蒙",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2053000.png"
+        },
+        {
+          "name": "205200",
+          "label": "399. 杂贺孙一",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2052000.png"
+        },
+        {
+          "name": "205100",
+          "label": "395. 杉谷善住坊",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2051000.png"
+        },
+        {
+          "name": "205000",
+          "label": "394. 托勒密",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "205000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2050000.png"
+        },
+        {
+          "name": "204900",
+          "label": "391. ＵＤＫ－巴格斯特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2049000.png"
+        },
+        {
+          "name": "204800",
+          "label": "383. 杜尔伽",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2048000.png"
+        },
+        {
+          "name": "204700",
+          "label": "375. 高杉晋作",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2047000.png"
+        },
+        {
+          "name": "204600",
+          "label": "350. 源为朝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2046000.png"
+        },
+        {
+          "name": "204500",
+          "label": "325. 芝诺比阿",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2045000.png"
+        },
+        {
+          "name": "204400",
+          "label": "318. 阿纳斯塔西娅＆维",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2044000.png"
+        },
+        {
+          "name": "204300",
+          "label": "311. 妖精骑士崔斯坦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2043000.png"
+        },
+        {
+          "name": "204100",
+          "label": "294. 织田信胜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2041000.png"
+        },
+        {
+          "name": "204200",
+          "label": "286. 伊莉雅丝菲尔·冯·爱因兹贝伦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2042000.png"
+        },
+        {
+          "name": "204000",
+          "label": "276. 清少纳言",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "204000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2040000.png"
+        },
+        {
+          "name": "203800",
+          "label": "272. 超人俄里翁",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2038000.png"
+        },
+        {
+          "name": "203900",
+          "label": "271. 南丁格尔〔圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2039000.png"
+        },
+        {
+          "name": "203700",
+          "label": "269. 灾星简",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2037000.png"
+        },
+        {
+          "name": "203600",
+          "label": "262. 刑部姬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2036000.png"
+        },
+        {
+          "name": "203500",
+          "label": "255. 帕里斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2035000.png"
+        },
+        {
+          "name": "203300",
+          "label": "248. 马嘶",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2033000.png"
+        },
+        {
+          "name": "203400",
+          "label": "246. 威廉·退尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2034000.png"
+        },
+        {
+          "name": "203200",
+          "label": "216. 贞德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2032000.png"
+        },
+        {
+          "name": "203100",
+          "label": "212. 拿破仑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2031000.png"
+        },
+        {
+          "name": "203000",
+          "label": "207. 喀戎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "203000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2030000.png"
+        },
+        {
+          "name": "202900",
+          "label": "200. 浅上藤乃",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2029000.png"
+        },
+        {
+          "name": "202200",
+          "label": "197. 阿蒂拉·the·San〔ta〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2022000.png"
+        },
+        {
+          "name": "202100",
+          "label": "184. 巴御前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2021000.png"
+        },
+        {
+          "name": "202800",
+          "label": "180. 海伦娜·布拉瓦茨基",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2028000.png"
+        },
+        {
+          "name": "201600",
+          "label": "157. 卫宫〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2016000.png"
+        },
+        {
+          "name": "202300",
+          "label": "156. 詹姆斯·莫里亚蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2023000.png"
+        },
+        {
+          "name": "202000",
+          "label": "142. 伊什塔尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2020000.png"
+        },
+        {
+          "name": "202700",
+          "label": "137. 克洛伊·冯·爱因兹贝伦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2027000.png"
+        },
+        {
+          "name": "202500",
+          "label": "131. 安妮·伯妮＆玛莉·瑞德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2025000.png"
+        },
+        {
+          "name": "202600",
+          "label": "129. 阿尔托莉雅·潘德拉贡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2026000.png"
+        },
+        {
+          "name": "201400",
+          "label": "125. 俵藤太",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2014000.png"
+        },
+        {
+          "name": "200800",
+          "label": "122. 崔斯坦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2008000.png"
+        },
+        {
+          "name": "201000",
+          "label": "105. 比利小子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2010000.png"
+        },
+        {
+          "name": "201800",
+          "label": "95. 幼吉尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2018000.png"
+        },
+        {
+          "name": "201500",
+          "label": "84. 阿周那",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2015000.png"
+        },
+        {
+          "name": "201100",
+          "label": "77. 尼古拉·特斯拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2011000.png"
+        },
+        {
+          "name": "202400",
+          "label": "69. 织田信长",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "202400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2024000.png"
+        },
+        {
+          "name": "200600",
+          "label": "63. 大卫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2006000.png"
+        },
+        {
+          "name": "200900",
+          "label": "60. 俄里翁",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2009000.png"
+        },
+        {
+          "name": "201300",
+          "label": "16. 阿拉什",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2013000.png"
+        },
+        {
+          "name": "201200",
+          "label": "15. 尤瑞艾莉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "201200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2012000.png"
+        },
+        {
+          "name": "200500",
+          "label": "14. 阿塔兰忒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2005000.png"
+        },
+        {
+          "name": "200300",
+          "label": "13. 罗宾汉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2003000.png"
+        },
+        {
+          "name": "200200",
+          "label": "12. 吉尔伽美什",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2002000.png"
+        },
+        {
+          "name": "200100",
+          "label": "11. 卫宫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "200100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_2001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-lancer": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "306300",
+          "label": "473. 格蕾·Lily",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "306300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3063000.png"
+        },
+        {
+          "name": "306400",
+          "label": "465. 得墨忒耳",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "306400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3064000.png"
+        },
+        {
+          "name": "306200",
+          "label": "457. 伊丽莎白·巴托里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "306200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3062000.png"
+        },
+        {
+          "name": "306100",
+          "label": "455. 原田左之助",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "306100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3061000.png"
+        },
+        {
+          "name": "306000",
+          "label": "449. 美游·艾德费尔特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "306000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3060000.png"
+        },
+        {
+          "name": "305900",
+          "label": "442. 因陀罗",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3059000.png"
+        },
+        {
+          "name": "305800",
+          "label": "439. 阿育王",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3058000.png"
+        },
+        {
+          "name": "305700",
+          "label": "433. 比肖内",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3057000.png"
+        },
+        {
+          "name": "305600",
+          "label": "428. 梵高〔矿工〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3056000.png"
+        },
+        {
+          "name": "305500",
+          "label": "419. 多布雷尼亚·尼基季奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3055000.png"
+        },
+        {
+          "name": "305400",
+          "label": "381. 怖军",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3054000.png"
+        },
+        {
+          "name": "305300",
+          "label": "368. 布里托玛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3053000.png"
+        },
+        {
+          "name": "305100",
+          "label": "347. 堂·吉诃德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3051000.png"
+        },
+        {
+          "name": "304900",
+          "label": "341. 玛丽·安宁",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3049000.png"
+        },
+        {
+          "name": "305000",
+          "label": "329. 坂本龙马",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "305000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3050000.png"
+        },
+        {
+          "name": "304700",
+          "label": "313. 珀西瓦尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3047000.png"
+        },
+        {
+          "name": "304800",
+          "label": "312. 妖精骑士兰斯洛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3048000.png"
+        },
+        {
+          "name": "304600",
+          "label": "300. 弗栗多",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3046000.png"
+        },
+        {
+          "name": "304400",
+          "label": "288. 雏罂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3044000.png"
+        },
+        {
+          "name": "304300",
+          "label": "283. 宇津见绘里濑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3043000.png"
+        },
+        {
+          "name": "304200",
+          "label": "280. 罗穆路斯·奎里努斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3042000.png"
+        },
+        {
+          "name": "304100",
+          "label": "279. 凯妮斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3041000.png"
+        },
+        {
+          "name": "304000",
+          "label": "266. 谜之Alterego·Λ",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "304000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3040000.png"
+        },
+        {
+          "name": "303900",
+          "label": "256. 加雷斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3039000.png"
+        },
+        {
+          "name": "303800",
+          "label": "252. 长尾景虎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3038000.png"
+        },
+        {
+          "name": "303600",
+          "label": "232. 布拉达曼特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3036000.png"
+        },
+        {
+          "name": "303500",
+          "label": "228. 忠贞",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3035000.png"
+        },
+        {
+          "name": "303400",
+          "label": "217. 茨木童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3034000.png"
+        },
+        {
+          "name": "303300",
+          "label": "214. 瓦尔基里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3033000.png"
+        },
+        {
+          "name": "303200",
+          "label": "196. 埃列什基伽勒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3032000.png"
+        },
+        {
+          "name": "303100",
+          "label": "193. 莲偶",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3031000.png"
+        },
+        {
+          "name": "301400",
+          "label": "186. 宝藏院胤舜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3014000.png"
+        },
+        {
+          "name": "303000",
+          "label": "183. 帕尔瓦蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "303000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3030000.png"
+        },
+        {
+          "name": "302900",
+          "label": "181. 源赖光",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3029000.png"
+        },
+        {
+          "name": "302800",
+          "label": "148. 豹人",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3028000.png"
+        },
+        {
+          "name": "302700",
+          "label": "146. 美杜莎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3027000.png"
+        },
+        {
+          "name": "300800",
+          "label": "143. 恩奇都",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3008000.png"
+        },
+        {
+          "name": "302600",
+          "label": "141. 贞德·Alter·Santa·Lily",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3026000.png"
+        },
+        {
+          "name": "300300",
+          "label": "140. 弗拉德三世〔EXTRA〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3003000.png"
+        },
+        {
+          "name": "302500",
+          "label": "134. 清姬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3025000.png"
+        },
+        {
+          "name": "302400",
+          "label": "128. 玉藻前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3024000.png"
+        },
+        {
+          "name": "302000",
+          "label": "119. 阿尔托莉雅·潘德拉贡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "302000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3020000.png"
+        },
+        {
+          "name": "301700",
+          "label": "102. 李书文",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3017000.png"
+        },
+        {
+          "name": "301200",
+          "label": "88. 布伦希尔德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3012000.png"
+        },
+        {
+          "name": "301100",
+          "label": "87. 芬恩·麦克库尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3011000.png"
+        },
+        {
+          "name": "300400",
+          "label": "85. 迦尔纳",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3004000.png"
+        },
+        {
+          "name": "301900",
+          "label": "78. 阿尔托莉雅·潘德拉贡〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3019000.png"
+        },
+        {
+          "name": "300200",
+          "label": "71. 迪尔姆德·奥迪那",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3002000.png"
+        },
+        {
+          "name": "301300",
+          "label": "70. 斯卡哈",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3013000.png"
+        },
+        {
+          "name": "301600",
+          "label": "64. 赫克托耳",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3016000.png"
+        },
+        {
+          "name": "301000",
+          "label": "22. 罗穆路斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "301000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3010000.png"
+        },
+        {
+          "name": "300900",
+          "label": "21. 列奥尼达一世",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3009000.png"
+        },
+        {
+          "name": "300700",
+          "label": "20. 库·丘林〔Prototype〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3007000.png"
+        },
+        {
+          "name": "300600",
+          "label": "19. 武藏坊弁庆",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3006000.png"
+        },
+        {
+          "name": "300500",
+          "label": "18. 伊丽莎白·巴托里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3005000.png"
+        },
+        {
+          "name": "300100",
+          "label": "17. 库·丘林",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "300100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_3001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-rider": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "406100",
+          "label": "485. 杂贺孙一",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "406100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4061000.png"
+        },
+        {
+          "name": "406000",
+          "label": "483. タマモアリア",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "406000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4060000.png"
+        },
+        {
+          "name": "405900",
+          "label": "478. 莉莉丝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4059000.png"
+        },
+        {
+          "name": "405600",
+          "label": "468. 希波吕忒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4056000.png"
+        },
+        {
+          "name": "405700",
+          "label": "452. 尼莫／诺亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4057000.png"
+        },
+        {
+          "name": "405800",
+          "label": "446. 克里姆希尔德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4058000.png"
+        },
+        {
+          "name": "405500",
+          "label": "406. 安德洛墨达",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4055000.png"
+        },
+        {
+          "name": "405300",
+          "label": "401. 尼莫〔圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4053000.png"
+        },
+        {
+          "name": "405200",
+          "label": "397. 武田晴信",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4052000.png"
+        },
+        {
+          "name": "405000",
+          "label": "387. 铃鹿御前〔暑假〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "405000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4050000.png"
+        },
+        {
+          "name": "404900",
+          "label": "366. 黄飞虎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4049000.png"
+        },
+        {
+          "name": "404800",
+          "label": "349. 曲亭马琴",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4048000.png"
+        },
+        {
+          "name": "404700",
+          "label": "342. 君士坦丁十一世",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4047000.png"
+        },
+        {
+          "name": "404400",
+          "label": "332. 多布雷尼亚·尼基季奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4044000.png"
+        },
+        {
+          "name": "404300",
+          "label": "331. 太公望",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4043000.png"
+        },
+        {
+          "name": "404600",
+          "label": "326. 伊丽莎白·巴托里〔灰姑娘〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4046000.png"
+        },
+        {
+          "name": "404500",
+          "label": "322. 凯妮斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4045000.png"
+        },
+        {
+          "name": "404200",
+          "label": "315. 哈贝特洛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4042000.png"
+        },
+        {
+          "name": "403700",
+          "label": "296. 尼莫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4037000.png"
+        },
+        {
+          "name": "404100",
+          "label": "291. 紫式部",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4041000.png"
+        },
+        {
+          "name": "403800",
+          "label": "277. 奥德修斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4038000.png"
+        },
+        {
+          "name": "404000",
+          "label": "274. 欧罗巴",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "404000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4040000.png"
+        },
+        {
+          "name": "403900",
+          "label": "273. 曼迪卡尔多",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4039000.png"
+        },
+        {
+          "name": "403600",
+          "label": "263. 卡米拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4036000.png"
+        },
+        {
+          "name": "403400",
+          "label": "257. 巴沙洛缪·罗伯茨",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4034000.png"
+        },
+        {
+          "name": "403500",
+          "label": "253. 莱昂纳多·达·芬奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4035000.png"
+        },
+        {
+          "name": "403200",
+          "label": "241. 莱妮丝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4032000.png"
+        },
+        {
+          "name": "403100",
+          "label": "231. 丹驹",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4031000.png"
+        },
+        {
+          "name": "403000",
+          "label": "211. 坂本龙马",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "403000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4030000.png"
+        },
+        {
+          "name": "402900",
+          "label": "206. 阿喀琉斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4029000.png"
+        },
+        {
+          "name": "402800",
+          "label": "205. 伊凡雷帝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4028000.png"
+        },
+        {
+          "name": "402600",
+          "label": "182. 伊什塔尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4026000.png"
+        },
+        {
+          "name": "402700",
+          "label": "179. 阿尔托莉雅·潘德拉贡〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4027000.png"
+        },
+        {
+          "name": "402500",
+          "label": "172. 克里斯托弗·哥伦布",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4025000.png"
+        },
+        {
+          "name": "401800",
+          "label": "144. 魁札尔·科亚特尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4018000.png"
+        },
+        {
+          "name": "402400",
+          "label": "132. 莫德雷德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4024000.png"
+        },
+        {
+          "name": "401200",
+          "label": "118. 奥斯曼狄斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4012000.png"
+        },
+        {
+          "name": "402300",
+          "label": "115. 坂田金时",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4023000.png"
+        },
+        {
+          "name": "400200",
+          "label": "108. 伊斯坎达尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4002000.png"
+        },
+        {
+          "name": "401300",
+          "label": "99. 女王梅芙",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4013000.png"
+        },
+        {
+          "name": "400400",
+          "label": "94. 阿斯托尔福",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4004000.png"
+        },
+        {
+          "name": "402200",
+          "label": "73. 阿尔托莉雅·潘德拉贡〔圣诞Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "402200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4022000.png"
+        },
+        {
+          "name": "400900",
+          "label": "66. 安妮·伯妮＆玛莉·瑞德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4009000.png"
+        },
+        {
+          "name": "400300",
+          "label": "65. 弗朗西斯·德雷克",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4003000.png"
+        },
+        {
+          "name": "401900",
+          "label": "30. 玛尔达",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4019000.png"
+        },
+        {
+          "name": "401700",
+          "label": "29. 玛丽·安托瓦内特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4017000.png"
+        },
+        {
+          "name": "401500",
+          "label": "28. 亚历山大",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4015000.png"
+        },
+        {
+          "name": "401400",
+          "label": "27. 牛若丸",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4014000.png"
+        },
+        {
+          "name": "401100",
+          "label": "26. 布狄卡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "401100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4011000.png"
+        },
+        {
+          "name": "400800",
+          "label": "25. 爱迪·萨奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4008000.png"
+        },
+        {
+          "name": "400600",
+          "label": "24. 乔尔乔斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4006000.png"
+        },
+        {
+          "name": "400100",
+          "label": "23. 歌果",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "400100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_4001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-caster": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "506000",
+          "label": "477. 比肖内",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "506000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5060000.png"
+        },
+        {
+          "name": "505600",
+          "label": "467. 普勒拉蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5056000.png"
+        },
+        {
+          "name": "505900",
+          "label": "462. 花咲翁",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5059000.png"
+        },
+        {
+          "name": "505800",
+          "label": "435. 小野小町",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5058000.png"
+        },
+        {
+          "name": "505500",
+          "label": "415. 久远寺有珠",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5055000.png"
+        },
+        {
+          "name": "505400",
+          "label": "404. 由井正雪",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5054000.png"
+        },
+        {
+          "name": "505300",
+          "label": "385. 雨之魔女梣",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5053000.png"
+        },
+        {
+          "name": "505200",
+          "label": "358. 周照",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5052000.png"
+        },
+        {
+          "name": "505100",
+          "label": "348. 张角",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5051000.png"
+        },
+        {
+          "name": "504700",
+          "label": "340. 大黑天",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5047000.png"
+        },
+        {
+          "name": "505000",
+          "label": "330. 玛尔达〔圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "505000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5050000.png"
+        },
+        {
+          "name": "504900",
+          "label": "327. 出云阿国",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5049000.png"
+        },
+        {
+          "name": "504800",
+          "label": "319. 夏洛特·科黛",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5048000.png"
+        },
+        {
+          "name": "504600",
+          "label": "307. 克莱恩小姐",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5046000.png"
+        },
+        {
+          "name": "504500",
+          "label": "284. 阿尔托莉雅·卡斯特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5045000.png"
+        },
+        {
+          "name": "504400",
+          "label": "258. 陈宫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5044000.png"
+        },
+        {
+          "name": "504300",
+          "label": "249. 阿斯克勒庇俄斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5043000.png"
+        },
+        {
+          "name": "504200",
+          "label": "237. 紫式部",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5042000.png"
+        },
+        {
+          "name": "504100",
+          "label": "236. 美游·艾德费尔特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5041000.png"
+        },
+        {
+          "name": "504000",
+          "label": "225. 酒吞童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "504000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5040000.png"
+        },
+        {
+          "name": "503900",
+          "label": "215. 斯卡哈·斯卡蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5039000.png"
+        },
+        {
+          "name": "503800",
+          "label": "208. 齐格",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5038000.png"
+        },
+        {
+          "name": "503600",
+          "label": "203. 阿维斯布隆",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5036000.png"
+        },
+        {
+          "name": "503500",
+          "label": "201. 阿纳斯塔西娅",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5035000.png"
+        },
+        {
+          "name": "503400",
+          "label": "194. 示巴女王",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5034000.png"
+        },
+        {
+          "name": "503300",
+          "label": "192. 喀耳刻",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5033000.png"
+        },
+        {
+          "name": "503200",
+          "label": "175. 尼禄·克劳狄乌斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5032000.png"
+        },
+        {
+          "name": "503000",
+          "label": "169. 山鲁佐德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "503000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5030000.png"
+        },
+        {
+          "name": "9935530",
+          "label": "152. 所罗门",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "9935530"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_99355000.png"
+        },
+        {
+          "name": "500800",
+          "label": "150. 梅林",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5008000.png"
+        },
+        {
+          "name": "501800",
+          "label": "145. 吉尔伽美什",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5018000.png"
+        },
+        {
+          "name": "502800",
+          "label": "136. 伊莉雅丝菲尔·冯·爱因兹贝伦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5028000.png"
+        },
+        {
+          "name": "502700",
+          "label": "130. 玛丽·安托瓦内特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5027000.png"
+        },
+        {
+          "name": "500900",
+          "label": "127. 莱昂纳多·达·芬奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5009000.png"
+        },
+        {
+          "name": "501200",
+          "label": "120. 尼托克丽丝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5012000.png"
+        },
+        {
+          "name": "502200",
+          "label": "113. 西行者",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5022000.png"
+        },
+        {
+          "name": "502000",
+          "label": "111. 爱丽丝菲尔〔天之衣〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5020000.png"
+        },
+        {
+          "name": "501600",
+          "label": "104. 杰罗尼莫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5016000.png"
+        },
+        {
+          "name": "502500",
+          "label": "103. 托马斯·爱迪生",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5025000.png"
+        },
+        {
+          "name": "502300",
+          "label": "100. 海伦娜·布拉瓦茨基",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5023000.png"
+        },
+        {
+          "name": "501100",
+          "label": "80. 查尔斯·巴贝奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5011000.png"
+        },
+        {
+          "name": "501000",
+          "label": "79. 冯·霍恩海姆·帕拉塞尔苏斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5010000.png"
+        },
+        {
+          "name": "500400",
+          "label": "74. 童谣",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5004000.png"
+        },
+        {
+          "name": "501700",
+          "label": "67. 美狄亚〔Lily〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5017000.png"
+        },
+        {
+          "name": "500300",
+          "label": "62. 玉藻前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5003000.png"
+        },
+        {
+          "name": "502600",
+          "label": "61. 伊丽莎白·巴托里〔万圣节〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5026000.png"
+        },
+        {
+          "name": "502100",
+          "label": "38. 库·丘林",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "502100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5021000.png"
+        },
+        {
+          "name": "501900",
+          "label": "37. 诸葛孔明〔埃尔梅罗Ⅱ世〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5019000.png"
+        },
+        {
+          "name": "501500",
+          "label": "36. 沃尔夫冈·阿马德乌斯·莫扎特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5015000.png"
+        },
+        {
+          "name": "501400",
+          "label": "35. 梅菲斯托费勒斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "501400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5014000.png"
+        },
+        {
+          "name": "500700",
+          "label": "34. 威廉·莎士比亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5007000.png"
+        },
+        {
+          "name": "500500",
+          "label": "33. 汉斯·克里斯蒂安·安徒生",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5005000.png"
+        },
+        {
+          "name": "500200",
+          "label": "32. 吉尔·德·雷",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5002000.png"
+        },
+        {
+          "name": "500100",
+          "label": "31. 美狄亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "500100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_5001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-assassin": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "605300",
+          "label": "474. 哈桑·萨巴赫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "605300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6053000.png"
+        },
+        {
+          "name": "605200",
+          "label": "463. 蛇女房",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "605200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6052000.png"
+        },
+        {
+          "name": "605100",
+          "label": "453. 河上彦斋",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "605100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6051000.png"
+        },
+        {
+          "name": "605000",
+          "label": "408. 耀星哈桑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "605000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6050000.png"
+        },
+        {
+          "name": "604900",
+          "label": "380. 果心居士",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6049000.png"
+        },
+        {
+          "name": "604800",
+          "label": "378. 洛库斯塔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6048000.png"
+        },
+        {
+          "name": "604700",
+          "label": "371. 特斯卡特利波卡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6047000.png"
+        },
+        {
+          "name": "604600",
+          "label": "365. 吾绰",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6046000.png"
+        },
+        {
+          "name": "604300",
+          "label": "361. 奥特琳德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6043000.png"
+        },
+        {
+          "name": "604400",
+          "label": "360. 希露德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6044000.png"
+        },
+        {
+          "name": "604500",
+          "label": "359. 斯露德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6045000.png"
+        },
+        {
+          "name": "604200",
+          "label": "314. 光之高扬斯卡娅",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6042000.png"
+        },
+        {
+          "name": "604100",
+          "label": "304. 鬼一法眼",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6041000.png"
+        },
+        {
+          "name": "604000",
+          "label": "267. 冲田·J·总司",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "604000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6040000.png"
+        },
+        {
+          "name": "603800",
+          "label": "259. 夏洛特·科黛",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6038000.png"
+        },
+        {
+          "name": "603900",
+          "label": "243. 格蕾",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6039000.png"
+        },
+        {
+          "name": "603700",
+          "label": "239. 迦摩",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6037000.png"
+        },
+        {
+          "name": "603600",
+          "label": "235. 李书文",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6036000.png"
+        },
+        {
+          "name": "603500",
+          "label": "230. 雏罂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6035000.png"
+        },
+        {
+          "name": "603400",
+          "label": "218. 牛若丸",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6034000.png"
+        },
+        {
+          "name": "603300",
+          "label": "210. 冈田以藏",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6033000.png"
+        },
+        {
+          "name": "603200",
+          "label": "199. 塞弥拉弥斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6032000.png"
+        },
+        {
+          "name": "603100",
+          "label": "189. 刑部姬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6031000.png"
+        },
+        {
+          "name": "603000",
+          "label": "188. 加藤段藏",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "603000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6030000.png"
+        },
+        {
+          "name": "602900",
+          "label": "185. 望月千代女",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6029000.png"
+        },
+        {
+          "name": "602800",
+          "label": "177. 尼托克丽丝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6028000.png"
+        },
+        {
+          "name": "602700",
+          "label": "170. 周照",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6027000.png"
+        },
+        {
+          "name": "602600",
+          "label": "159. 燕青",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6026000.png"
+        },
+        {
+          "name": "602500",
+          "label": "154. “山中老人”",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6025000.png"
+        },
+        {
+          "name": "600800",
+          "label": "139. 克娄巴特拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6008000.png"
+        },
+        {
+          "name": "602400",
+          "label": "133. 斯卡哈",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6024000.png"
+        },
+        {
+          "name": "600900",
+          "label": "124. 静谧哈桑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6009000.png"
+        },
+        {
+          "name": "601900",
+          "label": "117. 风魔小太郎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6019000.png"
+        },
+        {
+          "name": "602100",
+          "label": "112. 酒吞童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6021000.png"
+        },
+        {
+          "name": "600300",
+          "label": "110. 百貌哈桑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6003000.png"
+        },
+        {
+          "name": "601500",
+          "label": "109. 卫宫〔Assassin〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6015000.png"
+        },
+        {
+          "name": "602300",
+          "label": "92. 两仪式",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "602300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6023000.png"
+        },
+        {
+          "name": "601800",
+          "label": "86. 谜之女主角X",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6018000.png"
+        },
+        {
+          "name": "600700",
+          "label": "81. 亨利·杰基尔＆海德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6007000.png"
+        },
+        {
+          "name": "600500",
+          "label": "75. 雾都弃子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6005000.png"
+        },
+        {
+          "name": "601700",
+          "label": "46. 卡米拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6017000.png"
+        },
+        {
+          "name": "601400",
+          "label": "45. 玛塔·哈丽",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6014000.png"
+        },
+        {
+          "name": "601300",
+          "label": "44. 剧院魅影",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6013000.png"
+        },
+        {
+          "name": "601200",
+          "label": "43. 夏尔·亨利·桑松",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6012000.png"
+        },
+        {
+          "name": "601100",
+          "label": "42. 匕见",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6011000.png"
+        },
+        {
+          "name": "601000",
+          "label": "41. 斯忒诺",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "601000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6010000.png"
+        },
+        {
+          "name": "600200",
+          "label": "40. 咒腕哈桑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6002000.png"
+        },
+        {
+          "name": "600100",
+          "label": "39. 佐佐木小次郎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "600100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_6001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-berserker": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "705500",
+          "label": "486. 松永久秀",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7055000.png"
+        },
+        {
+          "name": "705400",
+          "label": "482. 代达罗斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7054000.png"
+        },
+        {
+          "name": "705300",
+          "label": "475. 红阎魔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7053000.png"
+        },
+        {
+          "name": "705200",
+          "label": "447. 吾绰",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7052000.png"
+        },
+        {
+          "name": "705100",
+          "label": "440. 莉莉丝",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7051000.png"
+        },
+        {
+          "name": "705000",
+          "label": "429. 娄希",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "705000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7050000.png"
+        },
+        {
+          "name": "704900",
+          "label": "414. 静希草十郎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7049000.png"
+        },
+        {
+          "name": "704800",
+          "label": "398. 永仓新八",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7048000.png"
+        },
+        {
+          "name": "704700",
+          "label": "386. 阿尔托莉雅·卡斯特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7047000.png"
+        },
+        {
+          "name": "704600",
+          "label": "382. 难敌",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7046000.png"
+        },
+        {
+          "name": "704400",
+          "label": "362. 千利休",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7044000.png"
+        },
+        {
+          "name": "704300",
+          "label": "355. 伊吹童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7043000.png"
+        },
+        {
+          "name": "704200",
+          "label": "345. 克里姆希尔德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7042000.png"
+        },
+        {
+          "name": "704100",
+          "label": "323. 清少纳言",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7041000.png"
+        },
+        {
+          "name": "704000",
+          "label": "309. 摩根",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "704000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7040000.png"
+        },
+        {
+          "name": "703900",
+          "label": "306. 伽拉忒亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7039000.png"
+        },
+        {
+          "name": "703800",
+          "label": "287. 布伦希尔德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7038000.png"
+        },
+        {
+          "name": "703700",
+          "label": "282. 鬼女红叶",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7037000.png"
+        },
+        {
+          "name": "703600",
+          "label": "261. 宫本武藏",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7036000.png"
+        },
+        {
+          "name": "703400",
+          "label": "260. 莎乐美",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7034000.png"
+        },
+        {
+          "name": "703500",
+          "label": "251. 森长可",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7035000.png"
+        },
+        {
+          "name": "703300",
+          "label": "247. 阿周那〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7033000.png"
+        },
+        {
+          "name": "703200",
+          "label": "226. 重瞳",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7032000.png"
+        },
+        {
+          "name": "703100",
+          "label": "219. 贞德〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7031000.png"
+        },
+        {
+          "name": "703000",
+          "label": "202. 阿塔兰忒〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "703000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7030000.png"
+        },
+        {
+          "name": "702900",
+          "label": "178. 织田信长",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7029000.png"
+        },
+        {
+          "name": "702800",
+          "label": "174. 保罗·班扬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7028000.png"
+        },
+        {
+          "name": "702700",
+          "label": "171. 彭忒西勒亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7027000.png"
+        },
+        {
+          "name": "702600",
+          "label": "162. 茶茶",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7026000.png"
+        },
+        {
+          "name": "702500",
+          "label": "161. 土方岁三",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7025000.png"
+        },
+        {
+          "name": "702400",
+          "label": "155. 谜之女主角X〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7024000.png"
+        },
+        {
+          "name": "702200",
+          "label": "116. 茨木童子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7022000.png"
+        },
+        {
+          "name": "702300",
+          "label": "114. 源赖光",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7023000.png"
+        },
+        {
+          "name": "702000",
+          "label": "98. 库·丘林〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "702000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7020000.png"
+        },
+        {
+          "name": "701400",
+          "label": "97. 南丁格尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7014000.png"
+        },
+        {
+          "name": "700800",
+          "label": "89. 贝奥武夫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7008000.png"
+        },
+        {
+          "name": "700400",
+          "label": "82. 弗兰肯斯坦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7004000.png"
+        },
+        {
+          "name": "701600",
+          "label": "58. 玉藻猫",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7016000.png"
+        },
+        {
+          "name": "701500",
+          "label": "57. 血斧埃里克",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7015000.png"
+        },
+        {
+          "name": "701300",
+          "label": "56. 清姬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7013000.png"
+        },
+        {
+          "name": "701100",
+          "label": "55. 大流士三世",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7011000.png"
+        },
+        {
+          "name": "701000",
+          "label": "54. 卡利古拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "701000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7010000.png"
+        },
+        {
+          "name": "700900",
+          "label": "53. 阿斯忒里俄斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7009000.png"
+        },
+        {
+          "name": "700700",
+          "label": "52. 弗拉德三世",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7007000.png"
+        },
+        {
+          "name": "700600",
+          "label": "51. 坂田金时",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7006000.png"
+        },
+        {
+          "name": "700500",
+          "label": "50. 斯巴达克斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7005000.png"
+        },
+        {
+          "name": "700300",
+          "label": "49. 虎狼",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7003000.png"
+        },
+        {
+          "name": "700200",
+          "label": "48. 兰斯洛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7002000.png"
+        },
+        {
+          "name": "700100",
+          "label": "47. 赫拉克勒斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "700100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_7001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-ruler": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "901900",
+          "label": "438. 梅塔特隆·贞德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9019000.png"
+        },
+        {
+          "name": "901800",
+          "label": "400. 上杉谦信",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9018000.png"
+        },
+        {
+          "name": "901700",
+          "label": "390. 梅柳齐娜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9017000.png"
+        },
+        {
+          "name": "901600",
+          "label": "374. 女教皇若安",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9016000.png"
+        },
+        {
+          "name": "901500",
+          "label": "364. 壹与",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9015000.png"
+        },
+        {
+          "name": "901400",
+          "label": "357. 斯卡哈·斯卡蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9014000.png"
+        },
+        {
+          "name": "901300",
+          "label": "346. 詹姆斯·莫里亚蒂",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9013000.png"
+        },
+        {
+          "name": "901200",
+          "label": "320. 莱昂纳多·达·芬奇",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9012000.png"
+        },
+        {
+          "name": "901100",
+          "label": "305. 阿摩耳〔卡莲〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9011000.png"
+        },
+        {
+          "name": "901000",
+          "label": "292. 卑弥呼",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "901000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9010000.png"
+        },
+        {
+          "name": "900900",
+          "label": "265. 阿尔托莉雅·潘德拉贡",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9009000.png"
+        },
+        {
+          "name": "900800",
+          "label": "242. 阿斯特赖亚",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9008000.png"
+        },
+        {
+          "name": "900700",
+          "label": "233. 魁札尔·科亚特尔〔桑巴／圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9007000.png"
+        },
+        {
+          "name": "900600",
+          "label": "229. 祖政",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9006000.png"
+        },
+        {
+          "name": "900500",
+          "label": "173. 夏洛克·福尔摩斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9005000.png"
+        },
+        {
+          "name": "900400",
+          "label": "135. 玛尔达",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9004000.png"
+        },
+        {
+          "name": "900200",
+          "label": "93. 天草四郎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9002000.png"
+        },
+        {
+          "name": "900100",
+          "label": "59. 贞德",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "900100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_9001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-avenger": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "1102300",
+          "label": "479. Kingprotea·Alter",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1102300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11023000.png"
+        },
+        {
+          "name": "1102000",
+          "label": "469. 无地王约翰",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1102000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11020000.png"
+        },
+        {
+          "name": "1102200",
+          "label": "458. 终结之伊丽莎白",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1102200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11022000.png"
+        },
+        {
+          "name": "1102100",
+          "label": "454. 藤堂平助",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1102100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11021000.png"
+        },
+        {
+          "name": "1101900",
+          "label": "420. 方巿",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11019000.png"
+        },
+        {
+          "name": "1101700",
+          "label": "409. 岩窟王　基督山",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11017000.png"
+        },
+        {
+          "name": "1101300",
+          "label": "407. 玛丽·安托瓦内特〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11013000.png"
+        },
+        {
+          "name": "1101800",
+          "label": "403. 源赖光／丑御前",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11018000.png"
+        },
+        {
+          "name": "1101600",
+          "label": "388. 克洛伊·冯·爱因兹贝伦",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11016000.png"
+        },
+        {
+          "name": "1101500",
+          "label": "370. 尼托克丽丝〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11015000.png"
+        },
+        {
+          "name": "1101400",
+          "label": "356. 宇津见绘里濑",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11014000.png"
+        },
+        {
+          "name": "1101200",
+          "label": "328. 谜之兰丸X",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11012000.png"
+        },
+        {
+          "name": "1101100",
+          "label": "321. 迦摩",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11011000.png"
+        },
+        {
+          "name": "1101000",
+          "label": "303. 平景清",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1101000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11010000.png"
+        },
+        {
+          "name": "1100900",
+          "label": "268. 太空伊什塔尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11009000.png"
+        },
+        {
+          "name": "1100700",
+          "label": "250. 织田信长",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11007000.png"
+        },
+        {
+          "name": "1100600",
+          "label": "204. 安东尼奥·萨列里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11006000.png"
+        },
+        {
+          "name": "1100500",
+          "label": "158. 黑森·罗伯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11005000.png"
+        },
+        {
+          "name": "1100400",
+          "label": "147. 戈耳工",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11004000.png"
+        },
+        {
+          "name": "1100100",
+          "label": "107. 安哥拉曼纽",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11001000.png"
+        },
+        {
+          "name": "1100300",
+          "label": "106. 贞德〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11003000.png"
+        },
+        {
+          "name": "1100200",
+          "label": "96. 岩窟王",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1100200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_11002000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-moonCancer": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "2301200",
+          "label": "476. Kingprotea",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2301200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23012000.png"
+        },
+        {
+          "name": "2301100",
+          "label": "448. 玉兔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2301100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23011000.png"
+        },
+        {
+          "name": "2300800",
+          "label": "425. 岸波白野",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23008000.png"
+        },
+        {
+          "name": "2300700",
+          "label": "424. 岸波白野",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23007000.png"
+        },
+        {
+          "name": "2301000",
+          "label": "422. 特诺奇蒂特兰",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2301000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23010000.png"
+        },
+        {
+          "name": "2300600",
+          "label": "421. ＢＢ迪拜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23006000.png"
+        },
+        {
+          "name": "2300900",
+          "label": "418. 谜之代行者C.I.E.L",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23009000.png"
+        },
+        {
+          "name": "2300500",
+          "label": "351. Archetype：Earth",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23005000.png"
+        },
+        {
+          "name": "2300400",
+          "label": "285. 瞑生院祈荒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23004000.png"
+        },
+        {
+          "name": "2300300",
+          "label": "244. 伟大的石像神",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23003000.png"
+        },
+        {
+          "name": "2300200",
+          "label": "220. BB",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23002000.png"
+        },
+        {
+          "name": "2300100",
+          "label": "166. BB",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2300100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_23001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-alterEgo": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "1002200",
+          "label": "471. 阿斯卡拉福斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1002200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10022000.png"
+        },
+        {
+          "name": "1002000",
+          "label": "464. 芙萝拉",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1002000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10020000.png"
+        },
+        {
+          "name": "1001900",
+          "label": "451. 热内斯·克莱恩",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10019000.png"
+        },
+        {
+          "name": "1001800",
+          "label": "426. Kazuradrop",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10018000.png"
+        },
+        {
+          "name": "1001700",
+          "label": "416. 响＆千键",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10017000.png"
+        },
+        {
+          "name": "1001600",
+          "label": "376. 幼体／提亚马特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10016000.png"
+        },
+        {
+          "name": "1001500",
+          "label": "369. 格里戈里·拉斯普京",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10015000.png"
+        },
+        {
+          "name": "1001400",
+          "label": "352. 方巿",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10014000.png"
+        },
+        {
+          "name": "1001300",
+          "label": "339. 超级班扬",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10013000.png"
+        },
+        {
+          "name": "1001200",
+          "label": "338. 太岁星君",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10012000.png"
+        },
+        {
+          "name": "1001100",
+          "label": "336. 马纳南·麦克·利尔〔巴泽特〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10011000.png"
+        },
+        {
+          "name": "1001000",
+          "label": "297. 芦屋道满",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1001000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10010000.png"
+        },
+        {
+          "name": "1000900",
+          "label": "238. Kingprotea",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10009000.png"
+        },
+        {
+          "name": "1000800",
+          "label": "224. 志度内",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10008000.png"
+        },
+        {
+          "name": "1000700",
+          "label": "209. 冲田总司〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10007000.png"
+        },
+        {
+          "name": "1000500",
+          "label": "191. 机械伊丽亲Ⅱ号机",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10005000.png"
+        },
+        {
+          "name": "1000400",
+          "label": "190. 机械伊丽亲",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10004000.png"
+        },
+        {
+          "name": "1000300",
+          "label": "167. 瞑生院祈荒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10003000.png"
+        },
+        {
+          "name": "1000100",
+          "label": "164. Passionlip",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10001000.png"
+        },
+        {
+          "name": "1000200",
+          "label": "163. Meltryllis",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1000200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_10002000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-foreigner": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "2501700",
+          "label": "487. 炸药利休",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25017000.png"
+        },
+        {
+          "name": "2501600",
+          "label": "423. 谜之女主角XX〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25016000.png"
+        },
+        {
+          "name": "2501400",
+          "label": "413. 苍崎青子",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25014000.png"
+        },
+        {
+          "name": "2501300",
+          "label": "393. 旺吉娜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25013000.png"
+        },
+        {
+          "name": "2501200",
+          "label": "389. 诺克娜蕾·雅兰杜",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25012000.png"
+        },
+        {
+          "name": "2501100",
+          "label": "373. 库库尔坎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25011000.png"
+        },
+        {
+          "name": "2500900",
+          "label": "334. 暗之高扬斯卡娅",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25009000.png"
+        },
+        {
+          "name": "2501000",
+          "label": "324. 雅克·德·莫莱",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2501000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25010000.png"
+        },
+        {
+          "name": "2500800",
+          "label": "308. 谜之偶像X〔Alter〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25008000.png"
+        },
+        {
+          "name": "2500600",
+          "label": "295. 梵高",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25006000.png"
+        },
+        {
+          "name": "2500700",
+          "label": "289. 阿比盖尔·威廉姆斯〔夏〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25007000.png"
+        },
+        {
+          "name": "2500500",
+          "label": "281. 旅行者",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25005000.png"
+        },
+        {
+          "name": "2500400",
+          "label": "275. 琰女",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25004000.png"
+        },
+        {
+          "name": "2500300",
+          "label": "222. 谜之女主角XX",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25003000.png"
+        },
+        {
+          "name": "2500200",
+          "label": "198. 葛饰北斋",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25002000.png"
+        },
+        {
+          "name": "2500100",
+          "label": "195. 阿比盖尔·威廉姆斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2500100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_25001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-pretender": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "2801400",
+          "label": "484. 卑弥呼＆壹与",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2801400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28014000.png"
+        },
+        {
+          "name": "2801300",
+          "label": "481. 哈贝特洛特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2801300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28013000.png"
+        },
+        {
+          "name": "2801200",
+          "label": "459. 所罗门",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2801200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28012000.png"
+        },
+        {
+          "name": "2801100",
+          "label": "441. 堤丰·厄斐墨洛斯",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2801100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28011000.png"
+        },
+        {
+          "name": "2801000",
+          "label": "437. 但丁·阿利吉耶里",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2801000"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28010000.png"
+        },
+        {
+          "name": "2800900",
+          "label": "431. Phantasmoon",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800900"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28009000.png"
+        },
+        {
+          "name": "2800800",
+          "label": "430. 阿比盖尔·威廉姆斯〔圣诞〕",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800800"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28008000.png"
+        },
+        {
+          "name": "2800700",
+          "label": "410. 亚历山德罗·迪·卡利奥斯特罗",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800700"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28007000.png"
+        },
+        {
+          "name": "2800600",
+          "label": "392. 凯特·库·米可科尔",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800600"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28006000.png"
+        },
+        {
+          "name": "2800500",
+          "label": "372. 特拉洛克",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800500"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28005000.png"
+        },
+        {
+          "name": "2800400",
+          "label": "367. 九纹龙伊丽莎",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800400"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28004000.png"
+        },
+        {
+          "name": "2800300",
+          "label": "353. 阿瓦隆女士",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800300"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28003000.png"
+        },
+        {
+          "name": "2800200",
+          "label": "335. 赫费斯提翁",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28002000.png"
+        },
+        {
+          "name": "2800100",
+          "label": "316. 奥伯龙",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "2800100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_28001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-shielder": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "800100",
+          "label": "1. 玛修·基列莱特",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "800100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_8001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-beast": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "3300200",
+          "label": "417. 埃列什基伽勒",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "3300200"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_33002000.png"
+        },
+        {
+          "name": "3300100",
+          "label": "377. 所多玛之兽／德拉科",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "3300100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_33001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-unBeast": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "4000100",
+          "label": "444. Ｕ－奥尔加玛丽",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "4000100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_40001000.png"
+        }
+      ]
+    },
+    "原生自动战斗开局等牌目标从者-loreGrandCaster": {
+      "type": "select",
+      "label": "目标从者",
+      "default": "none",
+      "cases": [
+        {
+          "name": "none",
+          "label": "未指定从者（使用前排位置或微调）",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": ""
+              }
+            }
+          }
+        },
+        {
+          "name": "1700100",
+          "label": "ID 1700100. 所罗门",
+          "pipeline_override": {
+            "原生自动战斗-高级策略配置": {
+              "attach": {
+                "native_battle_opening_hand_selected_servant": "1700100"
+              }
+            }
+          },
+          "icon": "resource/base/image/servant_face/f_17001000.png"
+        }
+      ]
+    }
+  }
+}

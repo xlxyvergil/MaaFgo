@@ -83,10 +83,14 @@ test('global strategy renders collapsed without a selected action or formation',
  const html=renderToStaticMarkup(createElement(AdvancedStrategy,{data:{actions:[]},onChange:()=>{},onError:()=>{}}));
  assert.match(html,/<details[^>]+id="global-advanced-strategy"/);assert.doesNotMatch(html,/<details[^>]+\bopen(?:=|\s|>)/);
  assert.match(html,/全局高级策略/);assert.match(html,/使用编辑器\/chaldea配置/);assert.match(html,/value="40"/);
- assert.match(html,/value="balanced" selected=""/);assert.doesNotMatch(html,/开局等牌目标从者 ID/);
+ assert.match(html,/value="balanced" selected=""/);assert.doesNotMatch(html,/选择开局等牌目标从者/);
  assert.match(html,/type="checkbox"[^>]*checked=""/);
  const withOpening=renderToStaticMarkup(createElement(AdvancedStrategy,{data:{maaAdvancedStrategy:{openingHand:{enabled:true,servantSlot:2}}},onChange:()=>{},onError:()=>{}}));
- assert.match(withOpening,/开局等牌目标从者 ID/);assert.match(withOpening,/开局等牌所需牌色/);
+ assert.match(withOpening,/aria-label="选择开局等牌目标从者"[^>]*aria-haspopup="dialog"/);assert.doesNotMatch(withOpening,/开局等牌目标从者 ID/);assert.match(withOpening,/开局等牌所需牌色/);
+ for(const servantId of ['','0',605300]){
+  const imported=renderToStaticMarkup(createElement(AdvancedStrategy,{data:{maaAdvancedStrategy:{openingHand:{enabled:true,servantId}}},onChange:()=>{},onError:()=>{}}));
+  assert.match(imported,/aria-label="清除开局等牌目标从者"/);
+ }
 });
 
 test('attacker identity types survive editing, drafts and undo without changing JSON preferences',()=>{

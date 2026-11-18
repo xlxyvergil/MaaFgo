@@ -77,7 +77,7 @@ export function advancedStrategyIssues(data:Json):string[] {
   else{
    const o=raw.openingHand;
    if(o.enabled!==undefined&&typeof o.enabled!=='boolean')issues.push('开局等待关键牌必须是布尔值。');
-   if(o.servantId!=null&&!((Number.isSafeInteger(o.servantId)&&o.servantId>0&&o.servantId<1e12)||(typeof o.servantId==='string'&&/^\d{1,12}$/.test(o.servantId.trim())&&Number(o.servantId)>0)))issues.push('目标从者 ID 必须为正整数或数字文本。');
+   if(o.servantId!=null&&!((Number.isSafeInteger(o.servantId)&&o.servantId>0&&o.servantId<1e12)||(typeof o.servantId==='string'&&/^\d{1,12}$/.test(o.servantId.trim())&&Number(o.servantId)>0)))issues.push('开局等牌的目标从者无法识别。请点击「目标从者」重新选择，或清除选择后设置「目标当前前排位置」。');
    if(o.servantSlot!=null&&(!Number.isSafeInteger(o.servantSlot)||o.servantSlot<1||o.servantSlot>3))issues.push('目标前排位置必须是 1～3。');
    if(o.requiredColors!==undefined&&(!Array.isArray(o.requiredColors)||o.requiredColors.length===0||o.requiredColors.length>3||o.requiredColors.some((c:unknown)=>typeof c!=='string'||!['B','A','Q'].includes(c))))issues.push('所需牌色必须是 B、A、Q 构成的 1～3 项数组。');
    if(o.maxWaitTurns!==undefined&&(!Number.isSafeInteger(o.maxWaitTurns)||o.maxWaitTurns<0||o.maxWaitTurns>5))issues.push('最多普攻等待回合必须是 0～5 的整数。');
