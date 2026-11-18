@@ -34,7 +34,11 @@ export function preferredAttackerIssue(value:unknown):string {
 /** Viewing an old or partial document never materializes defaults in its tree. */
 export function advancedStrategyOf(data:Json):AdvancedStrategy {
  const defaults=defaultAdvancedStrategy(),raw=strategyObject(data[ADVANCED_STRATEGY_FIELD])?data[ADVANCED_STRATEGY_FIELD]:{};
- return structuredClone({...defaults,...raw,openingHand:{...defaults.openingHand,...(strategyObject(raw.openingHand)?raw.openingHand:{})}});
+ const explicitOpening=strategyObject(raw.openingHand)?raw.openingHand:{},openingHand={...defaults.openingHand,...explicitOpening};
+ const nativeOpening=strategyObject(raw.nativeStrategyOverrides?.opening_hand)?raw.nativeStrategyOverrides.opening_hand:{};
+ // Match runtime precedence for legacy JSON-only colors, without writing them.
+ if(!Object.hasOwn(explicitOpening,'requiredColors')&&Object.hasOwn(nativeOpening,'required_colors'))openingHand.requiredColors=structuredClone(nativeOpening.required_colors);
+ return structuredClone({...defaults,...raw,openingHand});
 }
 
 /** Apply inside the editor's ordinary undo/redo transaction; retain unknown keys. */
@@ -44,7 +48,10 @@ export function patchAdvancedStrategy(data:Json,patch:Json):void {
  if(raw?.openingHand!==undefined&&!strategyObject(raw.openingHand))throw new Error('开局等牌配置必须是 JSON 对象，请先在原始 JSON 中修正。');
  const current=advancedStrategyOf(data);
  if(Object.entries(patch).every(([key,value])=>key==='openingHand'&&strategyObject(value)?Object.entries(value).every(([name,item])=>JSON.stringify(current.openingHand[name])===JSON.stringify(item)):JSON.stringify(current[key])===JSON.stringify(value)))return;
- const next={...current,...structuredClone(patch),openingHand:{...current.openingHand,...(patch.openingHand??{})}};
+ // Display defaults must stay virtual: materializing an untouched default can
+ // override an older plan's nativeStrategyOverrides (notably required_colors).
+ const next={...structuredClone(raw??{}),...structuredClone(patch)};
+ if(strategyObject(patch.openingHand))next.openingHand={...structuredClone(raw?.openingHand??{}),...structuredClone(patch.openingHand)};
  data[ADVANCED_STRATEGY_FIELD]=next;
 }
 

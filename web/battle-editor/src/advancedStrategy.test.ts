@@ -24,13 +24,55 @@ test('viewing old and partial plans or focusing unchanged controls never writes 
  }
 });
 
-test('editing materializes global strategy without inventing a team or actions',()=>{
+test('editing writes only explicit strategy fields without inventing a team or actions',()=>{
  const data={future:{keep:[null,false]}};
  patchAdvancedStrategy(data,{maxTurns:65,openingHand:{enabled:true,servantSlot:2,requiredColors:['Q','Q']}});
  assert.equal('team' in data,false);assert.equal('actions' in data,false);
  const saved=JSON.parse(JSON.stringify(data));
+ assert.deepEqual(saved.maaAdvancedStrategy,{maxTurns:65,openingHand:{enabled:true,servantSlot:2,requiredColors:['Q','Q']}});
  assert.deepEqual(advancedStrategyOf(saved),{...defaultAdvancedStrategy(),maxTurns:65,openingHand:{...defaultAdvancedStrategy().openingHand,enabled:true,servantSlot:2,requiredColors:['Q','Q']}});
  assert.deepEqual(saved.future,{keep:[null,false]});
+});
+
+test('independent strategy edits retain JSON-only opening colors without materializing unrelated defaults',()=>{
+ const original={team:{onFieldSvts:[{svtId:100200,equip1:{id:42,lv:80}}]},actions:[{type:'attack',attacks:[]}],future:{keep:[null,false]},maaAdvancedStrategy:{
+  openingHand:{enabled:true,futureOpening:{keep:true}},
+  nativeStrategyOverrides:{opening_hand:{servant_id:'505500',required_colors:['A','A'],futureNative:{keep:[1,null]}}},
+  futureStrategy:{keep:'保留'},
+ }};
+ assert.deepEqual(advancedStrategyOf(original).openingHand.requiredColors,['A','A']);
+ const html=renderToStaticMarkup(createElement(AdvancedStrategy,{data:original,onChange:()=>{},onError:()=>{}}));
+ assert.match(html,/aria-label="开局等牌所需牌色"[^>]*value="A, A"/);
+ for(const patch of [{preferredAttacker:'702900'},{maxTurns:65},{openingHand:{servantId:'702900'}},{openingHand:{servantSlot:2}}]){
+  const data=structuredClone(original),before=structuredClone(data);
+  patchAdvancedStrategy(data,patch);
+  const expected={...before.maaAdvancedStrategy,...patch,openingHand:{...before.maaAdvancedStrategy.openingHand,...(patch.openingHand??{})}};
+  assert.deepEqual(data.maaAdvancedStrategy,expected);
+  assert.equal('requiredColors' in data.maaAdvancedStrategy.openingHand,false);
+  assert.deepEqual(data.maaAdvancedStrategy.nativeStrategyOverrides,before.maaAdvancedStrategy.nativeStrategyOverrides);
+  assert.deepEqual(data.team,before.team);assert.deepEqual(data.actions,before.actions);assert.deepEqual(data.future,before.future);
+ }
+ const selected={...structuredClone(original),maaAdvancedStrategy:{...structuredClone(original.maaAdvancedStrategy),openingHand:{...structuredClone(original.maaAdvancedStrategy.openingHand),servantId:'100200'}}};
+ const beforeClear=structuredClone(selected);
+ patchAdvancedStrategy(selected,{openingHand:{servantId:null}});
+ assert.deepEqual(selected.maaAdvancedStrategy,{...beforeClear.maaAdvancedStrategy,openingHand:{...beforeClear.maaAdvancedStrategy.openingHand,servantId:null}});
+ assert.deepEqual(selected.team,beforeClear.team);assert.deepEqual(selected.actions,beforeClear.actions);
+});
+
+test('explicit opening colors can override JSON with the displayed default while retaining unknown fields',()=>{
+ const data={maaAdvancedStrategy:{openingHand:{enabled:true,futureOpening:{keep:true}},nativeStrategyOverrides:{opening_hand:{servant_id:'505500',required_colors:['A','A'],futureNative:'保留'}},futureStrategy:{keep:[null,false]}}};
+ const before=structuredClone(data);
+ patchAdvancedStrategy(data,{openingHand:{requiredColors:['B','Q']}});
+ assert.deepEqual(data.maaAdvancedStrategy,{...before.maaAdvancedStrategy,openingHand:{...before.maaAdvancedStrategy.openingHand,requiredColors:['B','Q']}});
+ assert.deepEqual(data.maaAdvancedStrategy.nativeStrategyOverrides,before.maaAdvancedStrategy.nativeStrategyOverrides);
+});
+
+test('adding an attacker preference to an old plan does not add an opening hand object',()=>{
+ const data={team:{onFieldSvts:[{svtId:100200}]},actions:[],future:{keep:true}};
+ const before=structuredClone(data);
+ patchAdvancedStrategy(data,{preferredAttacker:'702900'});
+ assert.deepEqual(data,{...before,maaAdvancedStrategy:{preferredAttacker:'702900'}});
+ assert.equal('openingHand' in (data as Record<string,any>).maaAdvancedStrategy,false);
 });
 
 test('nested unknown fields survive independent edits and JSON roundtrips',()=>{
