@@ -3,7 +3,7 @@
         "原生自动战斗跳过剧情": {
             "type": "switch",
             "label": "跳过剧情",
-            "description": "开启后自动跳过可跳过的剧情；关闭后正常播放剧情。",
+            "description": "开启后自动跳过剧情；遇到必须选择的普通剧情选项时自动选择一项后继续跳过。关闭后正常播放剧情，不自动选择。",
             "default_case": "Yes",
             "cases": [
                 {
@@ -14,6 +14,12 @@
                     "name": "No",
                     "label": "否",
                     "pipeline_override": {
+                        "跳过剧情-强制选项": {
+                            "enabled": false
+                        },
+                        "跳过剧情-灰色继续": {
+                            "enabled": false
+                        },
                         "跳过剧情-点击跳过": {
                             "enabled": false
                         },

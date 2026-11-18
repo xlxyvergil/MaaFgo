@@ -30,7 +30,7 @@ class SettlementTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = {}
-        for name in ("原生自动战斗调度", "原生自动战斗", "地狱的试炼", "战斗完成", "跳过剧情", "Dummy"):
+        for name in ("原生自动战斗调度", "原生自动战斗", "地狱的试炼", "战斗完成", "跳过剧情", "剧情通用选项", "Dummy"):
             cls.source.update(json.loads((ROOT / f"assets/resource/base/pipeline/{name}.json").read_text("utf-8")))
 
     def run_scenario(self, entry, screens, *, succeeds=True, blind_limit=None,
@@ -128,6 +128,25 @@ class SettlementTests(unittest.TestCase):
         ])
         self.assertIn("跳过剧情-确认跳过", seen)
         self.assertIn("连续出击_继续", seen)
+
+    def test_forced_choice_precedes_skip_then_returns_to_settlement(self):
+        choice, skip = "跳过剧情-强制选项", "跳过剧情-点击跳过"
+        seen = self.run_scenario("结束战斗_连续出击继续", [
+            {choice, skip}, {skip}, {"跳过剧情-确认跳过"}, {"连续出击_继续"},
+        ])
+        self.assertLess(seen.index(choice), seen.index(skip))
+        self.assertIn("连续出击_继续", seen)
+        self.assertNotIn("结算推进_点击右上角_继续", seen)
+
+    def test_hidden_choice_continues_before_choice_skip_and_settlement(self):
+        advance, choice, skip = "跳过剧情-灰色继续", "跳过剧情-强制选项", "跳过剧情-点击跳过"
+        seen = self.run_scenario("结束战斗_连续出击继续", [
+            {advance, skip}, {choice, skip}, {skip}, {"跳过剧情-确认跳过"}, {"连续出击_继续"},
+        ])
+        self.assertLess(seen.index(advance), seen.index(choice))
+        self.assertLess(seen.index(choice), seen.index(skip))
+        self.assertIn("连续出击_继续", seen)
+        self.assertNotIn("结算推进_点击右上角_继续", seen)
 
     def test_unknown_screen_exhausts_blind_limit(self):
         seen = self.run_scenario("结束战斗_不回主界面", [], succeeds=False, blind_limit=3)

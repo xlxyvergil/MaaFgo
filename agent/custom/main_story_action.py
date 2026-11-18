@@ -14,7 +14,7 @@ from bond_stop_action import BondStopReached, check_settlement_bond_stop
 # Context 克隆隔离节点配置，但框架命中计数属于任务状态，跨关仍需重置。
 _BATTLE_RESET = (
     "执行进本", "进本流程-超时重试", "跳过剧情-点击跳过",
-    "进本-盲点跳过剧情",
+    "进本-盲点跳过剧情", "跳过剧情-强制选项", "跳过剧情-灰色继续",
     "自动编队-删除活动筛选点击", "自动编队-礼装删除活动筛选点击",
     "自动编队-礼装筛上滑找满破", "自动编队-礼装筛找满破",
     "羁绊补齐-从者删除活动筛选点击", "羁绊补齐-礼装删除活动筛选点击",
@@ -325,13 +325,14 @@ class StoryRunner:
             self.check_formation_restriction(image)
             if self._handle_restricted_formation(image):
                 return True
+        skip_enabled = (self.ctx.get_node_data("跳过剧情-点击跳过") or {}).get("enabled", True)
         # 强制剧情选项会使 SKIP 灰显，必须在跳过确认的等待窗口之前处理。
         for choice_node, label in (
             ("主线-剧情选择-不赞同魁札尔", "不赞同魁札尔·科亚特尔"),
             ("主线-剧情选择-埃列什基伽勒", "埃列什基伽勒"),
             ("主线-剧情选择-埃列什基伽勒没有错", "埃列什基伽勒没有错"),
         ):
-            choice = self.reco(choice_node, image)
+            choice = self.reco(choice_node, image) if skip_enabled else None
             if not choice:
                 continue
             count = self._dialogue_choices.get(choice_node, 0)
@@ -342,6 +343,32 @@ class StoryRunner:
             self.skip_confirm_until = 0
             self.skip_settle_until = self.clock() + 1
             mfaalog.info(f"[自动推主线] 已选择剧情选项：{label}")
+            return True
+        # 已有剧情答案优先；其他强制选项由灰色跳过与成对边框共同确认。
+        choice_node = "跳过剧情-强制选项"
+        choice = self.reco(choice_node, image) if skip_enabled else None
+        if choice:
+            count = self._dialogue_choices.get(choice_node, 0)
+            if count >= 60:
+                raise StoryStopped("本关自动选择剧情选项已达60次，仍未完成剧情，已保留现场。请手动选择当前选项并完成剧情后重试。")
+            self.action(choice_node, choice)
+            self._dialogue_choices[choice_node] = count + 1
+            self.skip_confirm_until = 0
+            self.skip_settle_until = self.clock() + 1
+            mfaalog.info("[自动推主线] 已选择强制剧情选项，继续等待可跳过的剧情")
+            return True
+        # 灰色 SKIP 可能仍停在对话末句，点击对话区域后才显示强制选项。
+        advance_node = "跳过剧情-灰色继续"
+        advance = self.reco(advance_node, image) if skip_enabled else None
+        if advance:
+            count = self._dialogue_choices.get(advance_node, 0)
+            if count >= 60:
+                raise StoryStopped("本关点击不可跳过的剧情已达60次，仍未确认剧情继续，已保留现场。请手动点击对话区域，并处理出现的选项后重试。")
+            self.action(advance_node, advance)
+            self._dialogue_choices[advance_node] = count + 1
+            self.skip_confirm_until = 0
+            self.skip_settle_until = self.clock() + 1
+            mfaalog.info("[自动推主线] 已点击不可跳过的剧情，重新检查选项或跳过按钮")
             return True
         if entering and self.reco("全局-战前吃体力", image):
             entry = self.ctx.get_node_data("全局-战前吃体力") or {}
@@ -523,7 +550,9 @@ class StoryRunner:
             if self.battle_ready(image):
                 return "battle"
             # AP/剧情/开始提示的优先级高于下方仍可见的列表。
-            is_story = bool(self.reco("跳过剧情-点击跳过", image))
+            is_story = bool(self.reco("跳过剧情-点击跳过", image)
+                            or self.reco("跳过剧情-强制选项", image)
+                            or self.reco("跳过剧情-灰色继续", image))
             if self.interrupt(image, entering=True):
                 story_seen |= is_story
                 departed |= is_story
@@ -550,7 +579,9 @@ class StoryRunner:
                 self.failure(image)
                 if self.battle_ready(image):
                     return "battle"
-                is_story = bool(self.reco("跳过剧情-点击跳过", image))
+                is_story = bool(self.reco("跳过剧情-点击跳过", image)
+                                or self.reco("跳过剧情-强制选项", image)
+                                or self.reco("跳过剧情-灰色继续", image))
                 if self.interrupt(image, entering=True):
                     story_seen |= is_story
                     departed |= is_story

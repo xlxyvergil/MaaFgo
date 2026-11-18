@@ -1270,6 +1270,26 @@ class AutoBattleRuntime:
         """None=不是剧情，True=已处理/按选项等待，False=处理失败。"""
         name = "跳过剧情-点击跳过"
         enabled = (self.ctx.get_node_data(name) or {}).get("enabled", True)
+        # 灰显 SKIP 的强制选项必须先处理；关闭自动跳过时仅识别，阻止右上盲点。
+        for advance_name, message, failure_message in (
+            ("跳过剧情-强制选项", "出卡后检测到强制剧情选项，选择后继续等待战斗或结算",
+             "未能完成剧情选项选择，已保留当前画面。请手动选择当前选项后重试。"),
+            ("跳过剧情-灰色继续", "出卡后检测到不可跳过的剧情，点击对话区域后重新识别",
+             "未能继续当前剧情，已保留画面。请手动点击对话区域，并处理出现的选项后重试。"),
+        ):
+            advance_enabled = (self.ctx.get_node_data(advance_name) or {}).get("enabled", True)
+            result = self.ctx.run_recognition(advance_name, image,
+                                             pipeline_override={advance_name: {"enabled": True}})
+            if not result or not result.hit:
+                continue
+            if not enabled or not advance_enabled:
+                return True
+            mfaalog.info(f"[AutoBattle] {message}")
+            detail = self.ctx.run_task(advance_name)
+            ok = bool(detail and detail.status.succeeded and not self.ctx.tasker.stopping)
+            if not ok:
+                mfaalog.error(f"[AutoBattle] {failure_message}")
+            return ok
         # 即使用户关闭自动跳过，也识别剧情以阻止右上角盲点；仅临时启用识别。
         result = self.ctx.run_recognition(name, image,
                                          pipeline_override={name: {"enabled": True}})

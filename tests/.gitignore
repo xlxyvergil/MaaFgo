@@ -39,3 +39,8 @@
 !fixtures/strengthening/jp_list_after_completion.png
 !fixtures/strengthening/jp_support_start.png
 !fixtures/strengthening/jp_formation_start.png
+# Anonymous forced-dialogue options and the real enabled SKIP button.
+!fixtures/main_story/
+!fixtures/main_story/cn_forced_choices_generic.png
+!fixtures/main_story/cn_story_skip_enabled.png
+!fixtures/main_story/cn_forced_choice_wait.png
