@@ -9,6 +9,10 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 KEY = "原生自动战斗高级策略"
 CONFIG = "原生自动战斗-高级策略配置"
+ATTACKER = "原生自动战斗主输出偏好"
+ATTACKER_SLOT = "原生自动战斗主输出位置"
+ATTACKER_CLASS = "原生自动战斗主输出职阶"
+ATTACKER_FILE = "assets/options/原生自动战斗主输出从者.json"
 
 
 def load(relative):
@@ -48,12 +52,22 @@ class NativeAdvancedStrategyResourcesTests(unittest.TestCase):
                          ["默认", "使用编辑器/chaldea配置", "手动"])
         for name in ("default", "editor"):
             self.assertFalse(cases[name].get("option"))
-        self.assertEqual(len(cases["manual"]["option"]), 5)
+        self.assertEqual(len(cases["manual"]["option"]), 6)
+        self.assertIn(ATTACKER, cases["manual"]["option"])
         for name, case in cases.items():
             self.assertEqual(case["pipeline_override"], {
                 CONFIG: {"attach": {"native_battle_strategy_source": name}},
             })
         self.reachable_options([KEY])
+
+    def test_attacker_picker_exposes_only_the_selected_branch(self):
+        option = self.options[ATTACKER]
+        self.assertEqual(option["default"], "inherit")
+        self.assertEqual({case["name"]: case.get("option", []) for case in option["cases"]},
+                         {"inherit": [], "slot": [ATTACKER_SLOT], "servant": [ATTACKER_CLASS]})
+        self.assertEqual([case["name"] for case in self.options[ATTACKER_SLOT]["cases"]], ["1", "2", "3"])
+        self.assertEqual(self.options[ATTACKER_CLASS]["default"], "none")
+        self.assertIn("原生自动战斗主输出从者-caster", self.reachable_options([ATTACKER]))
 
     def test_manual_defaults_match_shared_contract(self):
         self.assertEqual(self.shared["原生自动战斗补牌预设"]["default"], "平衡")
@@ -160,6 +174,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
         cls.policy = staticmethod(_parse_battle_policy)
         cls.profile = staticmethod(_parse_strategy_profile)
         cls.options = load("assets/options/原生自动战斗高级策略.json")["option"]
+        cls.options.update(load(ATTACKER_FILE)["option"])
 
     def context(self, mode, additional=None):
         nodes = copy.deepcopy(load("assets/resource/base/pipeline/原生自动战斗.json"))
@@ -185,6 +200,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
     def manual_defaults(self, preset="平衡"):
         return {
             **self.case_attach("原生自动战斗补牌预设", preset),
+            **self.case_attach(ATTACKER, "inherit"),
             **self.case_attach("原生自动战斗开局等待关键牌", "No"),
             **self.case_attach("原生自动战斗自动补放技能", "Yes"),
             **self.input_attach("原生自动战斗最大回合"),
@@ -207,6 +223,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
 
     def test_default_and_editor_ignore_invalid_hidden_manual_values(self):
         hidden = {"native_strategy_overrides": "{broken", "native_battle_max_turns": 1000,
+                  "native_battle_preferred_attacker": "504500",
                   "native_battle_opening_hand_enabled": True,
                   "native_battle_auto_servant_skills": "invalid"}
         source = {"chaldea_import_source": "retained.json", "plan": {"turns": []}}
@@ -222,6 +239,27 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
                 self.assertEqual(self.profile(actual).max_turns, expected["max_turns"])
                 self.assertEqual(actual["chaldea_import_source"], source["chaldea_import_source"])
                 self.assertEqual(actual["plan"], source["plan"])
+
+    def test_attacker_picker_overrides_only_attacker_preferences_from_json(self):
+        manual = {
+            **self.manual_defaults(),
+            **self.input_attach("原生自动战斗策略微调", {"native_strategy_overrides": json.dumps({
+                "preferred_servant_ids": ["605300"], "preferred_slots": [1, 2],
+                "brave_chain_weight": 21, "np_colors_by_servant_id": {"605300": "A"},
+            })}),
+        }
+        for option, choice, ids, slots in (
+            (ATTACKER, "inherit", ("605300",), (1, 2)),
+            (ATTACKER_SLOT, "3", (), (3,)),
+            ("原生自动战斗主输出从者-caster", "504500", ("504500",), ()),
+        ):
+            with self.subTest(option=option, choice=choice):
+                attach = {**manual, **self.case_attach(option, choice)}
+                strategy = self.policy(self.read(self.context("manual", attach))).card.native_strategy
+                self.assertEqual(strategy.preferred_servant_ids, ids)
+                self.assertEqual(strategy.preferred_slots, slots)
+                self.assertEqual(strategy.brave_chain_weight, 21)
+                self.assertEqual(strategy.np_colors_by_servant_id[0][0], "605300")
 
     def test_independent_opening_fields_win_while_empty_target_preserves_json(self):
         manual = {

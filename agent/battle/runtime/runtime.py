@@ -18,7 +18,7 @@ from ..core.decider import Decider, RuleDecider
 from ..core.special_skills import SPECIAL_SKILL_GROUPS, TD, SpecialSkillChoiceError, SpecialSkillChoices
 from .special_skills import DEFAULT_NP_MENU_ROOTS, NP_IDENTITY_GUARD, SpecialSkillDispatcher
 from ..core.enums import PrimitiveKind, Scene
-from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, InitialFormation,
+from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, Confidence, InitialFormation,
                            MasterSkillAction, OrderChangeAction, RetireAction,
                            ServantSkillAction, VERIFIED_FORMATION_SOURCE,
                            CONTINUOUS_FORMATION_SOURCE, is_slot)
@@ -29,8 +29,10 @@ from ..core.validator import (
     validate_main_action,
 )
 from ..execution.executor import Executor
-from ..data.servant_identity import canonical_servant_id, servant_name
+from ..data.servant_identity import canonical_servant_id, servant_has_attack_np, servant_name
 from ..perception import perception
+from ..perception.frontline import FrontlineIdentity
+from ..perception.status_catalog import StatusCatalogRecognizer
 import mfaalog
 from platform_waits import platform_timeout
 
@@ -80,6 +82,8 @@ class AutoBattleRuntime:
     roster_servant_ids: tuple[str | None, ...] = (None,) * 6
     candidate_servant_ids: tuple[str | None, ...] = ()
     servant_recognizer = None
+    _startup_frontline_pending = False
+    _startup_frontline_ids: tuple[str | None, ...] = ()
 
     def __init__(self, context, controller, decider: Decider, profile: StrategyProfile,
                  battle_policy: BattlePolicy | None = None, *,
@@ -113,6 +117,7 @@ class AutoBattleRuntime:
         self._retired_instances = set()
         self._special_skill_servant_ids, self._special_skill_scope_reason = self._special_skill_roster()
         self.servant_recognizer = None
+        self._startup_frontline_pending = True
         self.executor = Executor(context, controller)
         self._turn_index = 0
         self._selection_cards = ()
@@ -457,7 +462,11 @@ class AutoBattleRuntime:
         frontline = self.roster_servant_ids[:3]
         candidates = self.candidate_servant_ids or self.roster_servant_ids
         perception_args = {}
-        if any(candidates):
+        if self._startup_frontline_ids:
+            # Portraits learned in battle are evidence for card matching.
+            # They are not a complete roster for filtering skill cooldown reads.
+            perception_args = dict(frontline_servant_ids=frontline, candidate_servant_ids=())
+        elif any(candidates):
             if self.servant_recognizer is None:
                 self.servant_recognizer = perception.FrontlineServantRecognizer.from_context(self.ctx)
             perception_args = dict(frontline_servant_ids=frontline,
@@ -493,8 +502,15 @@ class AutoBattleRuntime:
             raise RuntimeError("np_glare_unresolved")
         # 阶段策略可能在确定本帧计划行后才决定补读 CD，必须使用同一张感知截图。
         self._observation_image = img
-        if result.scene is Scene.MAIN_BATTLE and any(candidates):
-            self._update_frontline(result.servants)
+        if result.scene is Scene.MAIN_BATTLE:
+            if settle_main:
+                scan = self._startup_frontline_pending and not any(candidates)
+                self._startup_frontline_pending = False
+                if (scan or self._startup_frontline_ids) and not self.ctx.tasker.stopping:
+                    result = self._enrich_startup_frontline(result, img)
+            update_roster = settle_main if self._startup_frontline_ids else any(candidates)
+            if update_roster:
+                self._update_frontline(result.servants)
 
         # 计划执行时已在感知入口跳过 CD；保留计划可用状态和空位过滤。
         # 计划外、开局等牌及策略等待不得覆盖本帧实际冷却。
@@ -504,6 +520,45 @@ class AutoBattleRuntime:
 
         mfaalog.diagnostic(f"[AutoBattle] _observe() -> perception built, scene={result.scene.name}")
         return result
+
+    def _enrich_startup_frontline(self, state: BattleState, image) -> BattleState:
+        expected = self._startup_frontline_ids
+        try:
+            if expected:
+                if self.servant_recognizer is None:
+                    self.servant_recognizer = perception.FrontlineServantRecognizer.from_context(self.ctx)
+                matches = {
+                    match.slot: match for match in self.servant_recognizer.detect(image, expected)
+                    if match.servant_id is not None and match.servant_id == expected[match.slot - 1]
+                }
+            else:
+                if not hasattr(image, "to_numpy") and getattr(image, "ndim", None) != 3:
+                    return state
+                report = StatusCatalogRecognizer().detect(image)
+                matches = {
+                    match.slot: FrontlineIdentity(
+                        match.slot, match.servant_id,
+                        Confidence(match.best_score, "status_catalog"), match.margin, match.matched_template,
+                    )
+                    for match in report.slots if match.servant_id is not None
+                }
+                mfaalog.diagnostic(
+                    f"[战斗内头像] 确认 {len(matches)}/3 个前排身份，"
+                    f"匹配耗时 {report.elapsed_seconds:.2f}s"
+                )
+            servants = tuple(
+                replace(servant, servant_id=match.servant_id, confidence=match.confidence,
+                        has_attack_np=servant_has_attack_np(match.servant_id))
+                if (match := matches.get(servant.slot)) is not None else servant
+                for servant in state.servants
+            )
+            if not expected and matches:
+                identities = {servant.slot: servant.servant_id for servant in servants}
+                self._startup_frontline_ids = tuple(identities.get(slot) for slot in (1, 2, 3))
+            return replace(state, servants=servants)
+        except Exception as exc:
+            mfaalog.diagnostic(f"[战斗内头像] 未能确认身份，按位置继续战斗：{exc}")
+            return state
 
     def _update_frontline(self, servants) -> None:
         identities = {servant.slot: servant.servant_id for servant in servants}
@@ -516,9 +571,10 @@ class AutoBattleRuntime:
             if after is not None and after != before and after in reserves:
                 reserves.remove(after)
         self.roster_servant_ids = frontline + tuple(reserves) + (None,) * (3 - len(reserves))
+        unknown = "未识别，按位置处理技能" if self._startup_frontline_ids else "未识别，跳过技能"
         mfaalog.info(
             "[当前前排] " + " | ".join(
-                f"{slot}:{servant_name(sid) if sid else '未识别，跳过技能'}"
+                f"{slot}:{servant_name(sid) if sid else unknown}"
                 for slot, sid in enumerate(frontline, start=1)
             )
         )

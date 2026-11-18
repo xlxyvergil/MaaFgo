@@ -85,6 +85,29 @@ class Context:
 
 
 class StateTests(unittest.TestCase):
+    def test_recognized_bond_page_or_upgrade_resets_consecutive_misses(self):
+        for recognized in ("page", "deferred_upgrade", "final_upgrade", "new_task"):
+            with self.subTest(recognized=recognized):
+                state = BondStopStates()
+                token = state.begin(1)
+                for battle_number in (1, 2):
+                    state.battle_started(1, battle_number)
+                    self.assertEqual(state.record_incomplete_check(1, token, stop_message="", image=None),
+                                     (battle_number, None))
+                state.battle_started(1, 3, another_battle_planned=recognized == "deferred_upgrade")
+                if recognized == "page":
+                    state.start_observation(1, token, 0.0)
+                    # 即使观察未完成，这场也已经识别到羁绊结算页。
+                    self.assertEqual(state.record_incomplete_check(1, token, stop_message="", image=None), (0, None))
+                elif recognized == "deferred_upgrade":
+                    self.assertIsNotNone(state.defer(1, token, message=""))
+                elif recognized == "final_upgrade":
+                    self.assertIsNotNone(state.continue_last_upgrade(1, token, message=""))
+                else:
+                    token = state.begin(1)
+                state.battle_started(1, 4)
+                self.assertEqual(state.record_incomplete_check(1, token, stop_message="", image=None), (1, None))
+
     def test_observation_reuses_zero_start_and_requires_a_started_window(self):
         state = BondStopStates()
         token = state.begin(1)
@@ -387,7 +410,7 @@ class GuardTests(unittest.TestCase):
         continuation = bond_stops.upgrade_continuation(ctx.root)
         controller = Mock()
         with patch.object(action, "read_bond_page", side_effect=AssertionError("finished upgrade was rechecked")), \
-             patch.object(action, "_reject_missed_bond_page", side_effect=AssertionError("finished upgrade reported as missed")):
+             patch.object(action, "_later_settlement_page", side_effect=AssertionError("finished upgrade reported as missed")):
             for marker in (2, 3):
                 self.assertIsNone(action.inspect_bond_stop(ctx, frame(marker)))
                 self.assertIsNone(action.inspect_victory_settlement(
@@ -546,7 +569,7 @@ class GuardTests(unittest.TestCase):
         self.assertTrue(bond_stops.observation_complete(ctx.root))
         self.assertLessEqual(ctx.run_task.call_count, 6)
 
-    def test_observation_rejects_experience_or_loot_before_clicking(self):
+    def test_observation_skips_check_if_experience_or_loot_appears(self):
         for late_node in ("战斗_经验结算页", "战斗_战利品弹窗"):
             with self.subTest(late_node=late_node):
                 ctx = Context(frames=[frame(7), frame(8), frame(9)])
@@ -560,12 +583,12 @@ class GuardTests(unittest.TestCase):
                     patch.object(action, "read_bond_upgrade", return_value=False),
                 ):
                     result = action.inspect_bond_stop(ctx, frame(4))
-                self.assertEqual(result.reason, "bond_check_unconfirmed")
-                self.assertIn("本场无法补查", result.message)
-                np.testing.assert_array_equal(result.image, frame(4))
-                np.testing.assert_array_equal(result.latest_image, frame(8))
+                self.assertIsNone(result)
+                self.assertTrue(bond_stops.check_skipped(ctx.root))
+                self.assertIsNone(bond_stops.get(ctx.root))
                 self.assertEqual(len(ctx.frames), 1)
-                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list], ["observe", "observe"])
+                self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                                 ["observe", "observe", action.SKIP_NOTICE_NODE])
                 self.assertFalse(bond_stops.observation_complete(ctx.root))
                 self.assertIsNone(bond_stops.deferred(ctx.root))
 
@@ -958,18 +981,36 @@ class OuterLoopTests(unittest.TestCase):
         self.assertEqual(ctx.run_task.call_args.args[0], "page_wait")
         ctx.wait_freezes.assert_not_called()
 
-    def test_front_result_without_bond_page_stops_unconfirmed_after_bound(self):
+    def test_front_result_without_bond_page_warns_once_and_continues(self):
         ctx = Context(frames=[frame(1), frame(9)])
-        with patch.object(action, "read_bond_page", return_value=False), \
-             patch.object(action, "save_bond_stop"):
-            result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
-        self.assertEqual(result.reason, "bond_check_unconfirmed")
-        self.assertEqual(ctx.run_task.call_count, 2)
-        np.testing.assert_array_equal(result.image, frame(1))
-        np.testing.assert_array_equal(result.latest_image, frame(9))
+        ctx.clock = FakeClock()
+        ctx.nodes[action.GUARD_NODE]["attach"].update(page_wait_attempts=80, page_wait_timeout_ms=100)
+        victory = NS(ok=True, reason="victory")
+        with patch.object(action.time, "monotonic", ctx.clock), \
+             patch.object(action, "read_bond_page", return_value=False), \
+             patch.object(action, "save_bond_stop") as save:
+            self.assertIsNone(action.inspect_victory_settlement(ctx, victory, ctx.tasker.controller))
+            self.assertIsNone(action.inspect_victory_settlement(ctx, victory, ctx.tasker.controller))
+            self.assertIsNone(action.inspect_bond_stop(ctx, frame(9)))
+        save.assert_not_called()
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["page_wait", "page_wait", action.SKIP_NOTICE_NODE])
+        notice = ctx.run_task.call_args.kwargs["pipeline_override"][action.SKIP_NOTICE_NODE]
+        message = notice["focus"]["Node.Action.Starting"]
+        self.assertIn("未能确认是否满羁绊", message)
+        self.assertIn("继续结算", message)
+        self.assertNotIn("超时", message)
+        self.assertTrue(bond_stops.check_skipped(ctx.root))
+        self.assertFalse(bond_stops.observation_complete(ctx.root))
+        self.assertIsNone(bond_stops.get(ctx.root))
         ctx.wait_freezes.assert_not_called()
+        bond_stops.battle_started(ctx.root, 2)
+        self.assertFalse(bond_stops.check_skipped(ctx.root))
+        with patch.object(action, "read_bond_page", return_value=True), \
+             patch.object(action, "read_any_bond_max", return_value=True):
+            self.assertEqual(action.inspect_bond_stop(ctx, frame(7)).reason, "bond_max")
 
-    def test_late_experience_or_loot_stops_without_click_or_max_inference(self):
+    def test_late_experience_or_loot_skips_with_a_bond_notice(self):
         for node, label in (("战斗_经验结算页", "经验结算页"), ("战斗_战利品弹窗", "战利品页")):
             with self.subTest(node=node):
                 bond_stops.finish(8001)
@@ -979,22 +1020,26 @@ class OuterLoopTests(unittest.TestCase):
                      patch.object(action, "read_any_bond_max") as maximum, \
                      patch.object(action, "save_bond_stop"):
                     result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
-                self.assertEqual(result.reason, "bond_check_unconfirmed")
-                self.assertIn(label, result.message)
-                self.assertIn("本场无法补查", result.message)
+                self.assertIsNone(result)
+                self.assertIsNone(bond_stops.get(ctx.root))
+                self.assertTrue(bond_stops.check_skipped(ctx.root))
                 maximum.assert_not_called()
-                ctx.run_task.assert_not_called()
+                self.assertEqual(ctx.run_task.call_args.args, (action.SKIP_NOTICE_NODE,))
+                self.assertEqual(ctx.run_task.call_count, 1)
+                notice = ctx.run_task.call_args.kwargs["pipeline_override"][action.SKIP_NOTICE_NODE]
+                self.assertNotIn(label, notice["focus"]["Node.Action.Starting"])
 
-    def test_experience_appearing_during_wait_stops_before_more_waits(self):
+    def test_experience_appearing_during_wait_continues_without_more_waits(self):
         ctx = Context(frames=[frame(1), frame(2)])
         ctx.run_recognition.side_effect = lambda name, image: NS(
             hit=name == "战斗_经验结算页" and int(image[0, 0, 0]) == 2)
         with patch.object(action, "read_bond_page", return_value=False), \
              patch.object(action, "save_bond_stop"):
             result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
-        self.assertEqual(result.reason, "bond_check_unconfirmed")
-        ctx.run_task.assert_called_once_with("page_wait")
-        np.testing.assert_array_equal(result.latest_image, frame(2))
+        self.assertIsNone(result)
+        self.assertTrue(bond_stops.check_skipped(ctx.root))
+        self.assertEqual([call.args[0] for call in ctx.run_task.call_args_list],
+                         ["page_wait", action.SKIP_NOTICE_NODE])
 
     def test_victory_handoff_recognizes_upgrade_before_bond_page_and_defers(self):
         ctx = Context(mode="slot", frames=[frame(1), frame(9)])
@@ -1041,6 +1086,28 @@ class OuterLoopTests(unittest.TestCase):
         self.assertEqual(ctx.run_task.call_count, 1)
         self.assertIn("条件达成停止", str(ctx.nodes["bbc弹窗信息输出"]))
         self.assertNotIn("共 3 场", str(ctx.nodes["bbc弹窗信息输出"]))
+
+    def test_repeat_reports_third_miss_as_error_and_does_not_start_a_fourth_battle(self):
+        ctx = Context(frames=[frame(1), frame(2), frame(3)])
+        ctx.run_recognition.side_effect = lambda name, image: NS(hit=name == "战斗_经验结算页")
+        battle_entries = []
+
+        def run_node(name, **kwargs):
+            if name != action.SKIP_NOTICE_NODE:
+                battle_entries.append(name)
+                action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), ctx.tasker.controller)
+            return NS(status=NS(succeeded=True, failed=False), entry=name)
+
+        ctx.run_task.side_effect = run_node
+        with patch.object(action, "_save_evidence", side_effect=lambda _, result: result):
+            result = repeat.AutoBattleRepeatAction().run(ctx, NS(custom_action_param='{"battle_count":4}'))
+        self.assertFalse(result.success)
+        self.assertEqual(len(battle_entries), 3)
+        stopped = bond_stops.get(ctx.root)
+        self.assertEqual(stopped.reason, "bond_check_unconfirmed")
+        self.assertEqual(stopped.battle, 3)
+        np.testing.assert_array_equal(stopped.image, frame(3))
+        self.assertIn("连续3场战斗未识别到羁绊结算界面", str(ctx.nodes["bbc弹窗信息输出"]))
 
     def test_story_and_free_settle_check_before_any_progress_input(self):
         for runner_type in (story.StoryRunner, free.FreeQuestRunner):

@@ -24,11 +24,12 @@ from maa.tasker import TaskerEventSink
 import mfaalog
 from battle.perception.bond_result import (read_bond_page, read_bond_max, read_any_bond_max, read_bond_upgrade,
                                          result_formation_order, result_slot_for_formation)
-from battle.runtime.bond_stop_state import BondStop, bond_stops
+from battle.runtime.bond_stop_state import BOND_PAGE_MISS_LIMIT, BondStop, bond_stops
 
 
 CONFIG_NODE = "原生自动战斗-羁绊停止配置"
 GUARD_NODE = "结算-羁绊满停止"
+SKIP_NOTICE_NODE = "结算-跳过羁绊检查提示"
 
 
 class BondStopReached(RuntimeError):
@@ -165,7 +166,8 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         return existing
     if context.tasker.stopping:
         return None
-    if bond_stops.upgrade_continuation(root) is not None or bond_stops.observation_complete(root):
+    if (bond_stops.check_skipped(root) or bond_stops.upgrade_continuation(root) is not None
+            or bond_stops.observation_complete(root)):
         return None
     token = bond_stops.ensure(root)
     evidence_image, current_image = image, None
@@ -202,7 +204,7 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
         for _ in range(attempts):
             if context.tasker.stopping or not bond_stops.valid(root, token):
                 return None
-            if bond_stops.observation_complete(root):
+            if bond_stops.check_skipped(root) or bond_stops.observation_complete(root):
                 return None
             if time.monotonic() < deadline and not _poll_wait(context, token, wait_node):
                 return None
@@ -225,7 +227,9 @@ def inspect_bond_stop(context, image, *, controller=None) -> BondStop | None:
             if recognized:
                 return stopped
             if not page_visible:
-                _reject_missed_bond_page(context, current_image)
+                late_page = _later_settlement_page(context, current_image)
+                if late_page:
+                    return _handle_incomplete_check(context, token, current_image, late_page)
             if context.tasker.stopping or not bond_stops.valid(root, token):
                 return None
             if captured_at >= deadline:
@@ -284,14 +288,44 @@ def check_settlement_bond_stop(context, image, *, controller=None) -> None:
         raise BondStopReached(result)
 
 
-def _reject_missed_bond_page(context, image) -> None:
+def _later_settlement_page(context, image) -> str | None:
     # 正常顺序是羁绊 → 经验 → 战利品。到达后两页不能再靠点击补查羁绊。
     for name, label in (("战斗_经验结算页", "经验结算页"), ("战斗_战利品弹窗", "战利品页")):
         recognized = context.run_recognition(name, image)
         if context.tasker.stopping:
-            return
+            return None
         if recognized and recognized.hit:
-            raise ValueError(f"已进入{label}，之前的羁绊页未完成检查，无法确认是否满羁绊，本场无法补查。请保留当前截图和日志反馈；已停止，不会继续点击或开始下一场。")
+            return label
+    return None
+
+
+def _handle_incomplete_check(context, token, image, late_page) -> BondStop | None:
+    if context.tasker.stopping:
+        return None
+    root = _root(context)
+    stop_message = (
+        f"连续{BOND_PAGE_MISS_LIMIT}场战斗未识别到羁绊结算界面，无法确认从者是否满羁绊。"
+        "已停止任务并保留当前结算画面。请使用客户端的“导出日志”反馈，并附上当前截图。"
+    )
+    recorded = bond_stops.record_incomplete_check(root, token, stop_message=stop_message, image=image)
+    if recorded is None:
+        return bond_stops.get(root) if bond_stops.valid(root, token) else None
+    misses, stopped = recorded
+    cause = f"已进入{late_page}" if late_page else "等待超时，未识别到羁绊结算页"
+    mfaalog.diagnostic(f"[羁绊结算] 第{bond_stops.battle_number(root)}场未完成检查，连续漏页{misses}场。原因：{cause}")
+    if stopped:
+        return stopped
+    message = f"第{bond_stops.battle_number(root)}场未能确认是否满羁绊，已跳过本场羁绊检查，继续结算。"
+    try:
+        detail = context.run_task(SKIP_NOTICE_NODE, pipeline_override={
+            SKIP_NOTICE_NODE: {"focus": {"Node.Action.Starting": html.escape(message)}}})
+        if not context.tasker.stopping and (detail is None or not detail.status.succeeded):
+            mfaalog.warning(message)
+    except Exception as exc:
+        mfaalog.diagnostic(f"[羁绊结算] 客户端提示发送失败：{exc}")
+        if not context.tasker.stopping:
+            mfaalog.warning(message)
+    return None
 
 
 def inspect_victory_settlement(context, battle_result, controller) -> BondStop | None:
@@ -307,7 +341,10 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         return None
     root = _root(context)
     token = bond_stops.ensure(root)
-    if bond_stops.upgrade_continuation(root) is not None or bond_stops.observation_complete(root):
+    if existing := bond_stops.get(root):
+        return existing
+    if (bond_stops.check_skipped(root) or bond_stops.upgrade_continuation(root) is not None
+            or bond_stops.observation_complete(root)):
         return None
     evidence_image, image = None, None
     try:
@@ -322,14 +359,14 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
         else:
             guard = (context.get_node_data(GUARD_NODE) or {}).get("attach") or {}
             wait_node, attempts, timeout = _poll_config(guard, "page_wait")
-            _reject_missed_bond_page(context, image)
-            if context.tasker.stopping:
-                return None
             deadline = time.monotonic() + timeout / 1000
             result = None
-            found_page = False
-            for _ in range(attempts):
-                if time.monotonic() >= deadline:
+            for attempt in range(attempts + 1):
+                if context.tasker.stopping or not bond_stops.valid(root, token):
+                    return None
+                late_page = _later_settlement_page(context, image)
+                if late_page or attempt == attempts or time.monotonic() >= deadline:
+                    result = _handle_incomplete_check(context, token, image, late_page)
                     break
                 if not _poll_wait(context, token, wait_node):
                     return None
@@ -337,12 +374,8 @@ def inspect_victory_settlement(context, battle_result, controller) -> BondStop |
                 if image is None:
                     raise ValueError("等待羁绊结算页时截图失败")
                 if read_bond_page(context, image) or read_bond_upgrade(context, image):
-                    found_page = True
                     result = inspect_bond_stop(context, image, controller=controller)
                     break
-                _reject_missed_bond_page(context, image)
-            if not found_page:
-                raise ValueError("已识别战斗结束，但未在配置时限内捕获羁绊结算页或羁绊升级展示。无法确认是否满羁绊，已停止；请保留当前截图反馈。")
     except Exception as exc:
         result = _latch_error(context, token, evidence_image, exc, latest_image=image)
     if result:
@@ -368,7 +401,7 @@ class NativeBondUpgradeContinue(CustomRecognition):
         root = _root(context)
         if bond_stops.get(root) is not None:
             return None
-        if (mode == "off" or bond_stops.upgrade_continuation(root) is not None
+        if (mode == "off" or bond_stops.check_skipped(root) or bond_stops.upgrade_continuation(root) is not None
                 or bond_stops.observation_complete(root)):
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"bond_upgrade_continue": True})
         return None

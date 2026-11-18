@@ -7,6 +7,9 @@ from typing import Any
 from uuid import uuid4
 
 
+BOND_PAGE_MISS_LIMIT = 3
+
+
 @dataclass
 class BondStop:
     reason: str
@@ -45,6 +48,8 @@ class _Run:
     final_upgrade: BondStop | None = None
     observation_started_at: float | None = None
     observation_completed: bool = False
+    check_skipped: bool = False
+    consecutive_page_misses: int = 0
 
 
 class BondStopStates:
@@ -83,6 +88,7 @@ class BondStopStates:
             run.final_upgrade = None
             run.observation_started_at = None
             run.observation_completed = False
+            run.check_skipped = False
             run.checked_images = ()
             if not keep_formation:
                 run.formation = ()
@@ -133,6 +139,7 @@ class BondStopStates:
             run = self._runs[root]
             if run.observation_started_at is None:
                 run.observation_started_at = now
+                run.consecutive_page_misses = 0
             return run.observation_started_at
 
     def observation_complete(self, root: int) -> bool:
@@ -147,6 +154,29 @@ class BondStopStates:
                 run = self._runs[root]
                 if run.observation_started_at is not None and run.stopped is None:
                     run.observation_completed = True
+
+    def check_skipped(self, root: int) -> bool:
+        with self._lock:
+            run = self._runs.get(root)
+            return bool(run and run.check_skipped)
+
+    def record_incomplete_check(
+        self, root: int, token: str, *, stop_message: str, image
+    ) -> tuple[int, BondStop | None] | None:
+        """每场只登记一次。已看到普通羁绊页但未完成观察不计作漏页。"""
+        with self._lock:
+            if not self.valid(root, token):
+                return None
+            run = self._runs[root]
+            if run.stopped or run.check_skipped or run.observation_completed or run.deferred or run.final_upgrade:
+                return None
+            if run.observation_started_at is None:
+                run.consecutive_page_misses += 1
+            if run.consecutive_page_misses >= BOND_PAGE_MISS_LIMIT:
+                result = self.latch(root, token, reason="bond_check_unconfirmed", message=stop_message, image=image)
+                return run.consecutive_page_misses, result
+            run.check_skipped = True
+            return run.consecutive_page_misses, None
 
     def latch(self, root: int, token: str, *, reason: str, message: str,
               image=None, latest_image=None, formation_slots=(), result_columns=()) -> BondStop | None:
@@ -199,6 +229,7 @@ class BondStopStates:
             if run.another_battle_planned is not False or run.stopped is not None:
                 return None
             if run.final_upgrade is None:
+                run.consecutive_page_misses = 0
                 run.final_upgrade = BondStop(
                     reason="bond_upgrade_final", message=message, battle=run.battle,
                     image=image.copy() if image is not None else None,
@@ -214,6 +245,7 @@ class BondStopStates:
                 return None
             run = self._runs[root]
             if run.deferred is None:
+                run.consecutive_page_misses = 0
                 run.deferred = BondStop(
                     reason="bond_upgrade_deferred", message=message, battle=run.battle,
                     image=image.copy() if image is not None else None,

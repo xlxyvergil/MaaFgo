@@ -135,6 +135,44 @@ class ProgressTests(unittest.TestCase):
     def tearDown(self):
         bond_stops.finish(12345)
 
+    def test_support_and_formation_resume_first_quest_and_respect_limit(self):
+        for page in ("主线-助战界面", "进本-队伍确认"):
+            with self.subTest(page=page):
+                runtime, _ = runner([{page}], {"quest_limit": 1})
+                with patch.object(runtime, "locate") as locate, \
+                     patch.object(runtime, "enter") as enter, \
+                     patch.object(runtime, "fight") as fight, \
+                     patch.object(runtime, "settle") as settle, \
+                     patch("interlude_action.bond_stops.battle_started") as budget:
+                    self.assertIn("完成 1", runtime.run())
+                locate.assert_not_called()
+                enter.assert_not_called()
+                fight.assert_called_once()
+                settle.assert_called_once()
+                budget.assert_called_once_with(12345, 1, another_battle_planned=False)
+                self.assertEqual((runtime.completed, runtime.battles), (1, 1))
+
+    def test_resumed_quest_settles_before_continuing_map_and_story_navigation(self):
+        runtime, _ = runner([{"主线-助战界面"}], {"quest_limit": 2})
+        events = []
+        with patch.object(runtime, "fight", side_effect=lambda: events.append("fight")), \
+             patch.object(runtime, "settle", side_effect=lambda: events.append("settle")), \
+             patch.object(runtime, "locate", side_effect=lambda: events.append("locate") or TARGET), \
+             patch.object(runtime, "enter", side_effect=("map", "story")):
+            runtime.run()
+        self.assertEqual(events, ["fight", "settle", "locate", "locate"])
+        self.assertEqual((runtime.completed, runtime.battles), (2, 1))
+
+    def test_resumed_quest_failed_settlement_does_not_count_or_select_next(self):
+        runtime, _ = runner([{"进本-队伍确认"}], {"quest_limit": 2})
+        with patch.object(runtime, "fight"), \
+             patch.object(runtime, "settle", side_effect=StoryStopped("未确认返回幕间界面")), \
+             patch.object(runtime, "locate") as locate, \
+             self.assertRaises(StoryStopped):
+            runtime.run()
+        locate.assert_not_called()
+        self.assertEqual((runtime.completed, runtime.battles), (0, 0))
+
     def test_different_interludes_continue_until_small_quest_limit(self):
         runtime, _ = runner(config={"quest_limit": 3})
         targets = [("幕间-第一项", object()), ("幕间-第一项", object()),
@@ -254,6 +292,13 @@ class NavigationSafetyTests(unittest.TestCase):
         with self.assertRaises(StoryStopped):
             runtime.run()
         self.assertEqual((runtime.completed, runtime.battles), (0, 0))
+        self.assertEqual(context.actions, [])
+        self.assertEqual(context.tasks, [])
+
+    def test_battle_screen_is_not_a_supported_start(self):
+        runtime, context = runner([{"进本-战斗主界面已出现"}])
+        with self.assertRaisesRegex(StoryStopped, "助战选择或编队确认"):
+            runtime.run()
         self.assertEqual(context.actions, [])
         self.assertEqual(context.tasks, [])
 

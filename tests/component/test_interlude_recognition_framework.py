@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import Mock, patch
 
 import cv2
 import numpy as np
@@ -72,6 +73,25 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             self.assertTrue(result and result.hit)
             return detail(result)
         return self.probe(image, callback, server)
+
+    def test_real_jp_support_and_formation_start_resume_current_interlude(self):
+        for name in ("jp_support_start.png", "jp_formation_start.png"):
+            with self.subTest(page=name):
+                image = cv2.imdecode(np.fromfile(
+                    ROOT / "tests/fixtures/strengthening" / name, np.uint8), 1)
+
+                def check(context):
+                    runner = InterludeRunner(context)
+                    runner.limit = 1
+                    runner.fight, runner.settle = Mock(), Mock()
+                    runner.locate, runner.enter = Mock(), Mock()
+                    with patch("interlude_action.bond_stops.battle_started"):
+                        self.assertIn("完成 1", runner.run())
+                    runner.fight.assert_called_once()
+                    runner.settle.assert_called_once()
+                    runner.locate.assert_not_called()
+                    runner.enter.assert_not_called()
+                self.probe(image, check, "jp")
 
     def test_real_stage_direct_ap_zero_and_locked_lists(self):
         cases = (

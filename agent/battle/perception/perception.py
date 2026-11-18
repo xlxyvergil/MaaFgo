@@ -19,6 +19,7 @@ import mfaalog
 from ..core.enums import CardColor, Scene
 from ..core.models import (BattleState, CommandCard, Confidence, EnemyState,
                            NpCard, ServantState, SkillState)
+from ..data.servant_identity import servant_has_attack_np
 from . import config
 from .card_owner import CommandCardOwnerRecognizer
 from .composed_card import ComposedCardRecognizer
@@ -113,7 +114,8 @@ def build(
                 unknown.append(f"card[{c.ui_slot}].owner_slot")
     elif scene is Scene.MAIN_BATTLE:
         servants = _detect_servants(
-            context, img, candidate_servant_ids or frontline_servant_ids or (),
+            context, img, (candidate_servant_ids if candidate_servant_ids is not None
+                           else frontline_servant_ids or ()),
             recognizer=servant_recognizer,
             read_skill_cooldowns=read_skill_cooldowns,
         )
@@ -291,7 +293,8 @@ def _detect_servants(context, img, candidate_servant_ids=(), *, recognizer=None,
         slot = identity.slot
         out.append(ServantState(slot, (_detect_servant_skills(context, img, slot) if read_skill_cooldowns
                                      else _planned_skills()),
-                                identity.confidence, identity.servant_id))
+                                identity.confidence, identity.servant_id,
+                                has_attack_np=servant_has_attack_np(identity.servant_id)))
     return tuple(out)
 
 
