@@ -109,13 +109,13 @@ test('attacker identity types survive editing, drafts and undo without changing 
  }
 });
 
-test('attacker controls render positions, searchable identities and imported missing catalogue IDs',()=>{
- const catalog={servants:[{id:605300,name:'斯卡哈·斯卡蒂',collectionNo:215,className:'术',aliases:[605399]}],equips:[],mysticCodes:[]};
- const render=(preferredAttacker:unknown)=>renderToStaticMarkup(createElement(AdvancedStrategy,{data:{team:{backupSvts:[{svtId:605399}]},maaAdvancedStrategy:{preferredAttacker}},catalog,onChange:()=>{},onError:()=>{}}));
- const inherited=render('');assert.match(inherited,/value="inherit" selected=""/);assert.doesNotMatch(inherited,/aria-label="主输出从者"/);
+test('attacker controls render a portrait picker while preserving imported identities and missing catalogue IDs',()=>{
+ const catalog={servants:[{id:605300,name:'斯卡哈·斯卡蒂',image:'/605300.png',collectionNo:215,className:'术',aliases:[605399]}],equips:[],mysticCodes:[]};
+ const render=(preferredAttacker:unknown)=>renderToStaticMarkup(createElement(AdvancedStrategy,{data:{team:{backupSvts:[{svtId:605399}]},maaAdvancedStrategy:{preferredAttacker}},catalog,onChange:()=>{},onError:()=>{},onChooseServant:()=>{}}));
+ const inherited=render('');assert.match(inherited,/value="inherit" selected=""/);assert.doesNotMatch(inherited,/aria-label="选择主输出从者"/);
  const position=render(3);assert.match(position,/aria-label="主输出位置"/);assert.match(position,/value="3" selected=""/);
- const identity=render('605300');assert.match(identity,/aria-label="搜索主输出从者"/);assert.match(identity,/【编队中】215\. 斯卡哈·斯卡蒂/);assert.match(identity,/value="605300" selected=""/);
- const alias=render('605399');assert.match(alias,/斯卡哈·斯卡蒂（当前选择）/);assert.match(alias,/value="605399" selected=""/);
- const missing=render('999999');assert.match(missing,/从者 #999999（目录中暂无资料）/);assert.match(missing,/value="999999" selected=""/);
+ const identity=render('605300');assert.match(identity,/<button[^>]*aria-label="选择主输出从者"[^>]*aria-haspopup="dialog"/);assert.match(identity,/src="\/605300.png"/);assert.match(identity,/斯卡哈·斯卡蒂/);assert.match(identity,/ID 605300/);assert.doesNotMatch(identity,/搜索主输出从者|<select[^>]*aria-label="主输出从者"/);
+ const alias=render('605399');assert.match(alias,/斯卡哈·斯卡蒂/);assert.match(alias,/ID 605399/);
+ const missing=render('999999');assert.match(missing,/从者 #999999/);assert.match(missing,/目录中暂无资料 · ID 999999/);
  const pending=render('0');assert.match(pending,/请选择主输出从者/);assert.match(pending,/尚未选择主输出从者/);
 });
