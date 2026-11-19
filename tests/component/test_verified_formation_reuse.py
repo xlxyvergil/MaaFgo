@@ -62,15 +62,13 @@ class VerifiedSessionTests(unittest.TestCase):
             store.publish_verified(1, token, revision, slots())
 
     def test_new_support_and_new_battle_do_not_reuse_verified_snapshot(self):
-        for fallback in (False, True):
-            store = FormationSessions()
-            token = store.begin(1, repeat=True)
-            store.publish_verified(1, token, store.begin_update(1, token), slots())
-            store.set_support_fallback(1, token, fallback)
-            self.assertIsNone(store.verified_snapshot(1, token))
-            self.assertIsNone(store.read(1, token)[0])
         store = FormationSessions()
         token = store.begin(1, repeat=True)
+        store.publish_verified(1, token, store.begin_update(1, token), slots())
+        store.support_selected(1, token, "405900")
+        self.assertIsNone(store.verified_snapshot(1, token))
+        self.assertIsNone(store.read(1, token)[0])
+
         store.publish_verified(1, token, store.begin_update(1, token), slots())
         store.battle_started(1, token, 2)
         self.assertIsNone(store.verified_snapshot(1, token))
@@ -78,6 +76,21 @@ class VerifiedSessionTests(unittest.TestCase):
         store.battle_started(1, token, 3)
         with self.assertRaises(ValueError):
             store.publish_verified(1, token, revision, slots())
+
+    def test_fallback_preserves_verified_own_slots_but_requires_fresh_capture(self):
+        store = FormationSessions()
+        token = store.begin(1)
+        original = store.publish_verified(1, token, store.begin_update(1, token), slots())
+        store.set_support_fallback(1, token, True)
+        self.assertIsNone(store.verified_snapshot(1, token))
+        updated, _ = store.read(1, token)
+        self.assertEqual(updated.slots[:2] + updated.slots[3:],
+                         original.slots[:2] + original.slots[3:])
+        support = updated.slots[2]
+        self.assertEqual((support.status, support.servant_id, support.is_support),
+                         ("unknown", None, True))
+        revision = store.begin_capture(1, token, reuse_verified=True)
+        self.assertEqual(store.capture_seed(1, token, revision), ())
 
     def test_cross_task_and_fallback_publication_are_rejected(self):
         store = FormationSessions()

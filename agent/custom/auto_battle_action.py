@@ -46,7 +46,7 @@ from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRunti
                                          trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
 from battle.runtime.skill_confirmation_reminder import skill_confirmation_reminders
-from bond_stop_action import inspect_victory_settlement
+from bond_stop_action import inspect_victory_settlement, skip_bond_check_for_restricted_formation
 from chaldea import fetch_share_data
 
 
@@ -95,6 +95,18 @@ class RememberContinuousFormation(CustomAction):
         return CustomAction.RunResult(success=True)
 
 
+@AgentServer.custom_action("mark_native_formation_restricted")
+class MarkNativeFormationRestricted(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        if context.tasker.stopping:
+            return CustomAction.RunResult(success=False)
+        root, token = context_session(context)
+        if sessions.valid(root, token):
+            sessions.invalidate(root, token, "")
+            skip_bond_check_for_restricted_formation(context)
+        return CustomAction.RunResult(success=True)
+
+
 @AgentServer.custom_action("auto_battle")
 class AutoBattleAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
@@ -115,13 +127,12 @@ class AutoBattleAction(CustomAction):
         continued_formation_reset = (formation_reset and initial_formation is not None
                                      and getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE)
         if support_fallback or formation_reset:
-            # 锁助战可能连带改变整队配置，不能读取旧攻略或旧编队身份。
+            # 使用实际采集或确认可继承的编队，舍弃绑定原助战的方案。
             param = {}
-            if support_fallback or continued_formation_reset:
+            if continued_formation_reset:
                 initial_formation = None
-                if continued_formation_reset and token:
-                    sessions.skip_capture(root, token)
-            mfaalog.warning("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
+                sessions.skip_capture(root, token)
+            mfaalog.warning("[auto_battle] 本场阵容有变动，使用高级策略及当前已确认的编队记录")
         plan = _parse_plan(param)
         chaldea_roster = None
         try:

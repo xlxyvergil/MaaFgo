@@ -8,7 +8,9 @@ from unittest.mock import patch
 
 from test_main_story import Context
 from main_story_action import StoryRunner, StoryStopped
-from battle.runtime.formation_session import sessions
+from battle.runtime.bond_stop_state import bond_stops
+from battle.runtime.formation_session import context_session, sessions
+from bond_stop_action import CONFIG_NODE
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -255,6 +257,7 @@ class RestrictedContextIsolationTests(unittest.TestCase):
     def setUp(self):
         sessions.finish(12345)
         self.addCleanup(sessions.finish, 12345)
+        self.addCleanup(bond_stops.finish, 12345)
 
     def make_runtime(self, *, restricted):
         runtime, context = runner([{"进本-战斗主界面已出现"}])
@@ -278,9 +281,12 @@ class RestrictedContextIsolationTests(unittest.TestCase):
 
     def test_restricted_battle_bypasses_chaldea_and_bond_without_mutating_parent(self):
         runtime, context = self.make_runtime(restricted=True)
+        context.nodes[CONFIG_NODE]["attach"].update(
+            native_bond_stop_mode="slots", native_bond_stop_slot_3=True)
         before = copy.deepcopy(context.nodes)
         with patch.object(runtime, "reach_formation"):
             runtime.fight()
+        self.assertTrue(bond_stops.check_skipped(12345))
         self.assertIs(runtime.ctx, context)
         self.assertEqual(context.nodes, before)
         self.assertEqual([name for name, _ in context.tasks], ["进本流程", "原生自动战斗入口"])
@@ -318,11 +324,17 @@ class RestrictedContextIsolationTests(unittest.TestCase):
 
     def test_next_normal_battle_restores_original_plan_after_restricted_battle(self):
         runtime, context = self.make_runtime(restricted=True)
+        context.nodes[CONFIG_NODE]["attach"].update(
+            native_bond_stop_mode="slots", native_bond_stop_slot_3=True)
         before = copy.deepcopy(context.nodes)
         with patch.object(runtime, "reach_formation"):
+            bond_stops.battle_started(12345, 1)
             runtime.fight()
+            self.assertTrue(bond_stops.check_skipped(12345))
             runtime.reset_restriction_state()
+            bond_stops.battle_started(12345, 2)
             runtime.fight()
+            self.assertFalse(bond_stops.check_skipped(12345))
         self.assertEqual(context.nodes, before)
         first_entry, first_battle, next_entry, next_battle = (nodes for _, nodes in context.executions)
         self.assertEqual(first_entry["进本-编队处理"]["next"], ["进本-点击队伍确认"])
@@ -393,6 +405,32 @@ class RestrictedContextIsolationTests(unittest.TestCase):
             "主线限制-编成条件未满足", "主线限制-打开自动编队",
             "主线限制-自动编成确认", "主线限制-编队决定"])
         self.assert_session_finished(context)
+
+    def test_support_fallback_with_restrictions_captures_formation_and_skips_only_selected_slots(self):
+        for mode, selected, skipped in (
+            ("slots", (2, 4), True),
+            ("slots", range(1, 7), False),
+            ("off", (), False),
+        ):
+            with self.subTest(mode=mode, selected=selected):
+                runtime, context = self.make_runtime(restricted=False)
+                attach = context.nodes[CONFIG_NODE]["attach"]
+                attach["native_bond_stop_mode"] = mode
+                attach.update({f"native_bond_stop_slot_{slot}": slot in selected for slot in range(1, 7)})
+                bond_stops.battle_started(12345, 1)
+
+                def select_fallback():
+                    root, token = context_session(runtime.ctx)
+                    sessions.set_support_fallback(root, token, True)
+                    runtime.interrupt({"进本-编成条件提示"}, forming=True)
+
+                with patch.object(runtime, "reach_formation", side_effect=select_fallback):
+                    runtime.fight()
+                entry = context.executions[0][1]
+                self.assertEqual(entry["进本-助战兜底跳过编队"]["next"], ["原生战斗-兜底校验茶壶"])
+                self.assertEqual(entry["原生战斗-兜底校验茶壶"]["next"], ["编队身份-采集"])
+                self.assertTrue(runtime.current_restricted)
+                self.assertEqual(bond_stops.check_skipped(12345), skipped)
 
     def test_fixed_marker_after_start_changes_subsequent_entry_without_rebuilding(self):
         runtime, context = self.make_runtime(restricted=False)

@@ -20,7 +20,7 @@ import main_story_action as story
 import free_quest_action as free
 from battle.core.models import FormationSlot
 from battle.runtime.bond_stop_state import BondStopStates, bond_stops
-from battle.runtime.formation_session import FormationSessions
+from battle.runtime.formation_session import FormationSessions, sessions, session_override
 
 
 class FakeClock:
@@ -85,8 +85,8 @@ class Context:
 
 
 class StateTests(unittest.TestCase):
-    def test_recognized_bond_page_or_upgrade_resets_consecutive_misses(self):
-        for recognized in ("page", "deferred_upgrade", "final_upgrade", "new_task"):
+    def test_completed_or_intentionally_skipped_check_resets_consecutive_misses(self):
+        for recognized in ("page", "deferred_upgrade", "final_upgrade", "skipped", "new_task"):
             with self.subTest(recognized=recognized):
                 state = BondStopStates()
                 token = state.begin(1)
@@ -103,6 +103,8 @@ class StateTests(unittest.TestCase):
                     self.assertIsNotNone(state.defer(1, token, message=""))
                 elif recognized == "final_upgrade":
                     self.assertIsNotNone(state.continue_last_upgrade(1, token, message=""))
+                elif recognized == "skipped":
+                    state.skip_check(1)
                 else:
                     token = state.begin(1)
                 state.battle_started(1, 4)
@@ -205,6 +207,28 @@ class GuardTests(unittest.TestCase):
         self.assertIsNone(action.inspect_bond_stop(ctx, frame()))
         action.read_bond_page.assert_not_called()
         ctx.run_task.assert_not_called()
+
+    def test_intentional_skip_bypasses_both_checks_and_allows_upgrade(self):
+        ctx = Context(mode="slots")  # Empty selection would normally stop the task.
+        controller = Mock()
+        bond_stops.battle_started(ctx.root, 1)
+        bond_stops.skip_check(ctx.root)
+
+        result = action.inspect_victory_settlement(ctx, NS(ok=True, reason="victory"), controller)
+        self.assertIsNone(result)
+        action.check_settlement_bond_stop(ctx, frame(), controller=controller)
+        self.assertIsNotNone(action.NativeBondUpgradeContinue().analyze(ctx, NS(image=frame(9))))
+        self.assertIsNone(bond_stops.get(ctx.root))
+        action.read_bond_page.assert_not_called()
+        controller.post_screencap.assert_not_called()
+        ctx.run_task.assert_not_called()
+
+        bond_stops.battle_started(ctx.root, 2)
+        ctx.nodes[action.CONFIG_NODE]["attach"]["native_bond_stop_slot_3"] = True
+        bond_stops.set_formation(ctx.root, slots(support=1))
+        with patch.object(action, "read_bond_max", return_value=(2,)):
+            result = action.inspect_bond_stop(ctx, frame())
+        self.assertEqual((result.reason, result.formation_slots), ("bond_max", (3,)))
 
     def test_new_callback_gets_its_own_controller_once(self):
         first = Context(frames=[frame(2), frame(3)])
@@ -947,6 +971,44 @@ class UpgradeContinueAuthorizationTests(unittest.TestCase):
 class OuterLoopTests(unittest.TestCase):
     def tearDown(self):
         bond_stops.finish(8001)
+
+    def test_special_formation_pipeline_invalidates_reused_fallback_slots_and_skips_check(self):
+        ctx = Context(mode="slot")
+        token = sessions.begin(ctx.root)
+        self.addCleanup(sessions.finish, ctx.root, token)
+        ctx.override_pipeline(session_override(token))
+        revision = sessions.begin_update(ctx.root, token)
+        sessions.publish_verified(ctx.root, token, revision, slots(support=1))
+        sessions.set_support_fallback(ctx.root, token, True)
+        self.assertEqual(len(bond_stops.formation(ctx.root)), 6)
+
+        self.assertTrue(battle.MarkNativeFormationRestricted().run(ctx, NS()).success)
+        self.assertTrue(sessions.support_fallback(ctx.root, token))
+        self.assertIsNone(sessions.read(ctx.root, token)[0])
+        self.assertEqual(bond_stops.formation(ctx.root), ())
+        self.assertTrue(bond_stops.check_skipped(ctx.root))
+
+    def test_special_formation_pipeline_allows_any_max_without_a_formation_mapping(self):
+        for root, mode in enumerate(("all", "slots"), start=8101):
+            with self.subTest(mode=mode):
+                ctx = Context(mode=mode, root=root)
+                token = sessions.begin(ctx.root)
+                self.addCleanup(sessions.finish, ctx.root, token)
+                self.addCleanup(bond_stops.finish, ctx.root)
+                ctx.override_pipeline(session_override(token))
+                ctx.nodes[action.CONFIG_NODE]["attach"].update(
+                    {f"native_bond_stop_slot_{slot}": True for slot in range(1, 7)})
+                bond_stops.battle_started(ctx.root, 1)
+                self.assertTrue(battle.MarkNativeFormationRestricted().run(ctx, NS()).success)
+                self.assertFalse(bond_stops.check_skipped(ctx.root))
+
+                with patch.object(action, "read_bond_page", return_value=True), \
+                     patch.object(action, "read_any_bond_max", return_value=True) as read_any_max, \
+                     patch.object(action, "_slot_mapping") as map_slots:
+                    result = action.inspect_bond_stop(ctx, frame())
+                read_any_max.assert_called_once()
+                map_slots.assert_not_called()
+                self.assertEqual(result.reason, "bond_max")
 
     def test_after_battle_handoff_only_checks_confirmed_victory(self):
         for ok, reason, mode, expected in (

@@ -115,8 +115,8 @@ class EntryRoutingTests(unittest.TestCase):
     def entry_graph(self, support="进本-选择助战", *, limit=3):
         names = ("进本流程", "进本流程-超时重试", "进本-等待战斗主界面或剧情",
                  "进本-关闭告知弹窗", "进本-选择助战", "助战action", "Chaldea助战action",
-                 "进本-自动编队确认", "自动编队-编队决定",
-                 "进本-编成条件提示",
+                 "进本-自动编队确认", "进本-限制编队决定", "自动编队-编队决定",
+                 "进本-编成条件提示", "进本-记录编队限制",
                  "进本-攻略提示关闭",
                  "进本-队伍确认", MAIN, RECONNECT, GUARD, BLIND, CHOICE, CONTINUE,
                  "跳过剧情-确认跳过", "跳过剧情-无确认弹窗", "跳过剧情-点击跳过",
@@ -159,7 +159,8 @@ class EntryRoutingTests(unittest.TestCase):
                                       [{support}, {popup, formation}, {"自动编队-编队决定"}, {formation}])
                 self.assertEqual(seen.count(popup), 1)
                 self.assertEqual(seen.count("自动编队-编队决定"), 1)
-                self.assertLess(seen.index(popup), seen.index("自动编队-编队决定"))
+                self.assertLess(seen.index(popup), seen.index("进本-限制编队决定"))
+                self.assertLess(seen.index("进本-限制编队决定"), seen.index("自动编队-编队决定"))
                 self.assertLess(seen.index("自动编队-编队决定"), seen.index(formation))
                 self.assertLess(seen.index(popup), seen.index(formation))
                 self.assertEqual(seen[-1], formation)
@@ -190,6 +191,7 @@ class EntryRoutingTests(unittest.TestCase):
                     screens = [{support}] + [{n} for n in order] + [{formation}]
                     seen = self.run_graph(self.entry_graph(support), "进本流程", screens)
                     self.assertEqual([n for n in seen if n in order], list(order))
+                    self.assertEqual(seen.count("进本-记录编队限制"), int(notice in order))
                     self.assertEqual(seen[-1], formation)
                     self.assertNotIn(BLIND, seen)
 

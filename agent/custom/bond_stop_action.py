@@ -54,7 +54,7 @@ def _settings(context) -> tuple[str, int | tuple[int, ...]]:
     attach = (getter(CONFIG_NODE) or {}).get("attach") or {}
     mode = attach.get("native_bond_stop_mode", "off")
     slot = attach.get("native_bond_stop_slot", 1)
-    if mode not in {"off", "all", "slot", "slots"}:
+    if not isinstance(mode, str) or mode not in {"off", "all", "slot", "slots"}:
         raise ValueError("无法读取羁绊停止设置。请重新选择“羁绊满时停止”开关后重试。")
     if mode == "slots":
         flags = tuple(attach.get(f"native_bond_stop_slot_{i}", False) for i in range(1, 7))
@@ -67,6 +67,20 @@ def _settings(context) -> tuple[str, int | tuple[int, ...]]:
     if mode == "slot" and (type(slot) is not int or not 1 <= slot <= 6):
         raise ValueError("羁绊停止目标号位无效")
     return mode, slot
+
+
+def skip_bond_check_for_restricted_formation(context) -> None:
+    try:
+        mode, _ = _settings(context)
+    except ValueError:
+        # 配置错误由原结算流程提示。
+        return
+    if mode not in {"slot", "slots"}:
+        return
+    root = _root(context)
+    if not bond_stops.check_skipped(root):
+        bond_stops.skip_check(root)
+        mfaalog.info("本场有编队限制，跳过指定号位的满羁绊检查，战后照常结算。")
 
 
 def _latch_error(context, token, image, exc, *, latest_image=None) -> BondStop | None:
@@ -397,11 +411,11 @@ class NativeBondUpgradeContinue(CustomRecognition):
     def analyze(self, context, argv):
         if context.tasker.stopping:
             return None
-        mode, _ = _settings(context)
         root = _root(context)
         if bond_stops.get(root) is not None:
             return None
-        if (mode == "off" or bond_stops.check_skipped(root) or bond_stops.upgrade_continuation(root) is not None
+        if (bond_stops.check_skipped(root) or _settings(context)[0] == "off"
+                or bond_stops.upgrade_continuation(root) is not None
                 or bond_stops.observation_complete(root)):
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail={"bond_upgrade_continue": True})
         return None

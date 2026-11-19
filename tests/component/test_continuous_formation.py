@@ -17,6 +17,7 @@ from test_formation_session import FakeContext
 from test_support_fallback import Context
 from support_action import SupportAction
 from battle.core.models import Confidence, FormationSlot, CONTINUOUS_FORMATION_SOURCE
+from battle.perception.bond_result import result_formation_order
 from battle.runtime.formation_session import FormationSessions, sessions, session_override, CONTINUE_NODE
 from battle.runtime.bond_stop_state import bond_stops
 
@@ -92,8 +93,6 @@ class ContinuationSessionTests(unittest.TestCase):
                 self.assertIsNone(self.store.support_selected(1, token, "100100"))
 
     def test_unknown_support_preserves_own_members_including_reserve_slot(self):
-        from battle.perception.bond_result import result_formation_order
-
         for support in (1, 4, 6):
             with self.subTest(support=support):
                 token = self.store.begin(1, repeat=True)
@@ -122,21 +121,16 @@ class ContinuationSessionTests(unittest.TestCase):
                 result = self.store.support_selected(1, token, "405900")
                 self.assertEqual(result.slots[support - 1].servant_id, "405900")
 
-    def test_single_battle_fallback_and_no_selection_do_not_reuse(self):
-        for mode in ("single", "fallback", "no_selection"):
-            with self.subTest(mode=mode):
-                token = self.store.begin(1, repeat=mode != "single")
-                publish(self.store, 1, token)
-                retained = self.store.prepare_continuation(1, token)
-                if mode == "single":
-                    self.assertFalse(retained)
-                    continue
-                self.store.battle_started(1, token, 2)
-                if mode == "fallback":
-                    self.store.set_support_fallback(1, token, True)
-                elif mode != "no_selection":
-                    self.store.support_selected(1, token, None)
-                self.assertIsNone(self.store.read(1, token)[0])
+    def test_single_battle_and_no_selection_do_not_reuse(self):
+        single = self.store.begin(1)
+        publish(self.store, 1, single)
+        self.assertFalse(self.store.prepare_continuation(1, single))
+
+        repeat = self.store.begin(1, repeat=True)
+        publish(self.store, 1, repeat)
+        self.assertTrue(self.store.prepare_continuation(1, repeat))
+        self.store.battle_started(1, repeat, 2)
+        self.assertIsNone(self.store.read(1, repeat)[0])
 
     def test_reenter_capture_or_edit_cannot_restore_old_continuation(self):
         for operation in ("capture", "edit", "skip", "invalidate"):
@@ -277,6 +271,47 @@ class ContinuationActionTests(unittest.TestCase):
                     self.assertIs(runtime.call_args.kwargs["initial_formation"], updated)
                 self.assertTrue(bond_stops.formation(ctx.root)[2]["is_support"])
                 self.assertEqual(bond_stops.formation(ctx.root)[2]["reason"], "continuous_support_selected")
+
+    def test_continuous_fallback_preserves_bond_mapping_and_runtime_own_members(self):
+        ctx = Context()
+        self.addCleanup(bond_stops.finish, ctx.root)
+        original = publish(sessions, ctx.root, ctx.token, initial_slots(support=4))
+        self.assertTrue(sessions.prepare_continuation(ctx.root, ctx.token))
+        sessions.battle_started(ctx.root, ctx.token, 2)
+
+        result = SupportAction()._select_fallback(ctx, ctx.tasker.controller, ctx.root, ctx.token)
+        self.assertTrue(result.success)
+        self.assertEqual(ctx.entries, ["助战兜底-选择首个助战"])
+        self.assertTrue(sessions.support_fallback(ctx.root, ctx.token))
+        fallback, _ = sessions.read(ctx.root, ctx.token)
+        self.assertEqual(fallback.captured_battle, 2)
+        self.assertEqual(fallback.source, CONTINUOUS_FORMATION_SOURCE)
+        for initial, current in zip(original.slots, fallback.slots):
+            if initial.is_support:
+                self.assertEqual((current.status, current.servant_id, current.is_support),
+                                 ("unknown", None, True))
+                self.assertEqual(current.identity_confidence.value, 0)
+            else:
+                self.assertIs(current, initial)
+        self.assertEqual(result_formation_order(bond_stops.formation(ctx.root)), (1, 2, 3, 5, 6))
+        with patch.object(battle, "AutoBattleRuntime") as runtime, \
+             patch.object(battle, "fetch_share_data") as fetch:
+            runtime.return_value.run.return_value = NS(ok=True, reason="fixture", turns=1)
+            self.assertTrue(battle.AutoBattleAction().run(ctx, NS(
+                custom_action_param='{"chaldea_import_source":"old-team"}')).success)
+            fetch.assert_not_called()
+            self.assertIs(runtime.call_args.kwargs["initial_formation"], fallback)
+            self.assertEqual(runtime.call_args.kwargs["roster_servant_ids"],
+                             tuple(slot.servant_id for slot in fallback.slots))
+
+        self.assertTrue(sessions.prepare_continuation(ctx.root, ctx.token))
+        sessions.battle_started(ctx.root, ctx.token, 3)
+        self.assertTrue(sessions.awaiting_continuous_support(ctx.root, ctx.token))
+        selected = sessions.support_selected(ctx.root, ctx.token, "405900")
+        self.assertFalse(sessions.support_fallback(ctx.root, ctx.token))
+        self.assertEqual(selected.slots[3].servant_id, "405900")
+        self.assertEqual(selected.slots[:3] + selected.slots[4:],
+                         original.slots[:3] + original.slots[4:])
 
     def test_marker_is_only_installed_for_native_session_after_continue_click(self):
         nodes = json.loads((ROOT / "assets/resource/base/pipeline/战斗完成.json").read_text("utf-8"))

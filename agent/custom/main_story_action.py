@@ -6,9 +6,10 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 
 import mfaalog
-from battle.runtime.formation_session import session_override, sessions
+from battle.runtime.formation_session import context_session, session_override, sessions
 from battle.runtime.bond_stop_state import bond_stops
-from bond_stop_action import BondStopReached, check_settlement_bond_stop
+from bond_stop_action import (BondStopReached, check_settlement_bond_stop,
+                              skip_bond_check_for_restricted_formation)
 
 
 # Context 克隆隔离节点配置，但框架命中计数属于任务状态，跨关仍需重置。
@@ -111,6 +112,10 @@ class StoryRunner:
             raise StoryStopped(f"限制编队处理重复无效：{name}，已停止，请手动检查")
         counts[name] = counts.get(name, 0) + 1
         self.action(name, result)
+        if name in ("主线限制-自动编成确认", "进本-自动编队确认", "主线限制-编队决定"):
+            root, token = context_session(self.ctx)
+            if sessions.valid(root, token):
+                sessions.invalidate(root, token, "")
         self.pause()
 
     def _handle_restricted_formation(self, image):
@@ -403,6 +408,8 @@ class StoryRunner:
         for name in names:
             result = self.reco(name, image)
             if result:
+                if self.mode == "native" and name == "进本-编成条件提示":
+                    self._mark_restricted(name)
                 self.action(name, result)
                 self.pause()
                 return True
@@ -705,6 +712,8 @@ class StoryRunner:
             for name in _BATTLE_RESET:
                 self.ctx.clear_hit_count(name)
             self._start_formation_battle()
+            if self.current_restricted:
+                skip_bond_check_for_restricted_formation(self.ctx)
             # 字符串整体替换，不能用空对象深合并后遗留原 plan/share/source。
             use_default = self.current_restricted or self._spirit_stones_used > 0
             while True:
