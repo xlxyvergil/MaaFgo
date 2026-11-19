@@ -80,7 +80,7 @@ class FrameworkTests(unittest.TestCase):
         self.fixture.setUp()
         self.addCleanup(self.fixture.doCleanups)
 
-    def run_pipeline(self, page_ok, fail_capture=False, verified_slots=None):
+    def run_pipeline(self, page_ok, fail_capture=False, verified_slots=None, *, expected_slots=None):
         source = json.loads((ROOT / "assets/resource/base/pipeline/自动编队.json").read_text(encoding="utf-8"))
         nodes = {n: v for n, v in source.items() if n.startswith("编队身份-")}
         nodes.update({
@@ -176,7 +176,11 @@ class FrameworkTests(unittest.TestCase):
             if page_ok and not fail_capture:
                 snapshot = observed[0]
                 self.assertEqual(snapshot.task_id, job.job_id)
-                self.assertTrue(all(slot.servant_id == "1000" for slot in snapshot.slots))
+                if expected_slots is None:
+                    self.assertTrue(all(slot.servant_id == "1000" for slot in snapshot.slots))
+                else:
+                    self.assertEqual([(slot.status, slot.is_support, slot.servant_id) for slot in snapshot.slots],
+                                     expected_slots)
                 if verified_slots is not None:
                     self.assertEqual(snapshot.source, VERIFIED_FORMATION_SOURCE)
                 self.assertFalse(sessions.valid(snapshot.task_id, snapshot.session_id))
@@ -189,6 +193,13 @@ class FrameworkTests(unittest.TestCase):
 
     def test_fresh_frames_and_root_identity_through_nested_run_task(self):
         self.run_pipeline(True)
+
+    def test_restricted_formation_publishes_all_supports_and_locked_slots(self):
+        self.fixture.image = self.fixture.restricted_formation((1, 4, 5))
+        self.run_pipeline(True, expected_slots=[
+            ("identified", True, "1000"), ("identified", False, "1000"), ("empty", False, None),
+            ("identified", True, "1000"), ("unknown", True, None), ("empty", False, None),
+        ])
 
     def test_failed_page_reaches_start_boundary_without_snapshot(self):
         self.run_pipeline(False)

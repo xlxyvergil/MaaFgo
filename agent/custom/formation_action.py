@@ -129,6 +129,10 @@ SERVANT_LIST_FEATURE_MARGIN = 0.12
 SELECT_PAGE_ENTER_TIMEOUT_SECONDS = platform_timeout(8.0, 20.0)
 EMPTY_SLOT_STD_THRESHOLD = 25.0
 EMPTY_SLOT_CHANNEL_DELTA_THRESHOLD = 6.0
+LOCKED_SLOT_THRESHOLD = 0.90
+LOCKED_SLOT_SEARCH_HEIGHT = 165
+# 固定成员横幅遮挡头像下部。仅已确认有多个助战时，用无遮挡的上部复核助战身份。
+MULTI_SUPPORT_IDENTITY_CROP = (0.08, 0.19, 0.92, 0.60)
 # 戴冠战空槽会在卡片中下部叠加黄色“仅限对应职阶”文字，导致整张槽位的
 # 标准差超过普通空槽阈值。额外检查卡片上方无遮挡的灰色内区，同时保留整卡
 # 检查以兼容普通编队页面。
@@ -2715,18 +2719,9 @@ class FormationIdentityReader(AutoFormationFromChaldea):
         self._candidate_index = None
         self._frame_match_cache = None
         self.identity_templates = {}
+        self.multi_support_templates = None
         if self.calibration.identity_crop:
-            left, top, right, bottom = self.calibration.identity_crop
-
-            def crop(template):
-                height, width = template.shape[:2]
-                return template[round(top * height):round(bottom * height),
-                                round(left * width):round(right * width)]
-
-            self.identity_templates = {
-                sid: tuple((name, crop(template)) for name, template in variants)
-                for sid, variants in self.templates.items()
-            }
+            self.identity_templates = self._crop_identity_templates(self.calibration.identity_crop)
         self.page_marker_paths = {
             name: self._template_path(f"battle/{name}.png")
             for name in ("配置变更", "开始任务", "战斗开始")
@@ -2740,6 +2735,7 @@ class FormationIdentityReader(AutoFormationFromChaldea):
             x is not None for x in self.start_markers
         ):
             raise ValueError("formation_page_resource_missing")
+        self.locked_slot_marker = self._load_named_template("battle/编队锁定空位.png")
         self.class_templates = {}
         for name, paths in self.calibration.class_templates:
             values = [(p, self._load_named_template(p)) for p in paths]
@@ -2747,12 +2743,27 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 raise ValueError(f"class_template_missing:{name}")
             self.class_templates[name] = values
 
-    def _rank(self, image, roi, identities, *, cropped=False):
+    def _crop_identity_templates(self, bounds):
+        left, top, right, bottom = bounds
+
+        def crop(template):
+            height, width = template.shape[:2]
+            return template[round(top * height):round(bottom * height),
+                            round(left * width):round(right * width)]
+
+        return {sid: tuple((name, crop(template)) for name, template in variants)
+                for sid, variants in self.templates.items()}
+
+    def _rank(self, image, roi, identities, *, cropped=False, multi_support_crop=False):
         scores = []
         templates = self.identity_templates if cropped else self.templates
+        if multi_support_crop:
+            if self.multi_support_templates is None:
+                self.multi_support_templates = self._crop_identity_templates(MULTI_SUPPORT_IDENTITY_CROP)
+            templates = self.multi_support_templates
         cache = self._frame_match_cache
         for sid in identities:
-            key = (tuple(roi), cropped, sid)
+            key = (tuple(roi), cropped, multi_support_crop, sid)
             if cache is not None and key in cache:
                 match = cache[key]
             else:
@@ -2785,6 +2796,14 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 and ranked[0][0] - ranked[1][0] >= c.class_margin):
             return ranked[0][1], Confidence(ranked[0][0], "formation_class_template")
         return None, Confidence(0.0, "class_uncertain")
+
+    def _empty_slot_reason(self, image, roi):
+        if self._is_empty_slot(image, roi):
+            return "existing_empty_slot_heuristic"
+        x, y, width, _ = roi
+        match = self._match_template(image, self.locked_slot_marker,
+                                     (x, y, width, LOCKED_SLOT_SEARCH_HEIGHT))
+        return "restricted_slot_locked" if match and match[0] >= LOCKED_SLOT_THRESHOLD else ""
 
     def read_frame(self, image, *, full_audit=False, diagnostics=False, known_slots=()):
         # 继承的 ROI 裁剪缓存只能在当前图像内使用。不能用 id(image) 在跨帧
@@ -2833,7 +2852,19 @@ class FormationIdentityReader(AutoFormationFromChaldea):
         # 显式全库审计仍独立识别全部槽；生产补识别只查询未知位置。
         known = {i: slot for i, slot in enumerate(known_slots)
                  if slot.status != "unknown"} if not full_audit else {}
-        pending = [(i, roi) for i, roi in enumerate(SLOT_ROIS) if i not in known]
+        empty_slots, support_flags = {}, {}
+        for i, roi in enumerate(SLOT_ROIS):
+            if i in known:
+                support_flags[i] = known[i].is_support
+                continue
+            empty_reason = self._empty_slot_reason(image, roi)
+            if empty_reason:
+                empty_slots[i] = empty_reason
+            else:
+                support = self._match_template(image, self.support_marker, roi)
+                support_flags[i] = None if support is None else support[0] >= SUPPORT_THRESHOLD
+        multiple_supports = sum(flag is True for flag in support_flags.values()) >= 2
+        pending = [(i, roi) for i, roi in enumerate(SLOT_ROIS) if i not in known and i not in empty_slots]
         pools = None
         if (pending and not full_audit and (c.verified or diagnostics)
                 and len(self.templates) >= IDENTITY_COARSE_MIN_IDENTITIES):
@@ -2856,16 +2887,15 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                     "slot": index + 1, "scope": "verified_reuse", "candidates": 0, "ms": 0.0,
                 })
                 continue
-            if self._is_empty_slot(image, roi):
+            if index in empty_slots:
                 slots.append(FormationSlot(index + 1, "empty", is_support=False,
-                                           reason="existing_empty_slot_heuristic"))
+                                           reason=empty_slots[index]))
                 self.last_match_stats["slots"].append({
                     "slot": index + 1, "scope": "empty", "candidates": 0,
                     "ms": (time.perf_counter() - slot_started) * 1000,
                 })
                 continue
-            support = self._match_template(image, self.support_marker, roi)
-            is_support = None if support is None else support[0] >= SUPPORT_THRESHOLD
+            is_support = support_flags[index]
             class_id, class_conf = self._class(image, roi)
             ranked, scope = [], "not_calibrated"
             pool = pools.get(index) if pools is not None else None
@@ -2898,9 +2928,15 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                         local = self._rank(image, roi, self.templates, cropped=True)
                         if self._accepted(local):
                             ranked, scope = local, "all_crop"
+            if multiple_supports and is_support is True and c.verified and not self._accepted(ranked):
+                # 全库比较同一裁剪范围，并继续使用已有的分数和不同身份分差门槛。
+                upper = self._rank(image, roi, self.templates, multi_support_crop=True)
+                if self._accepted(upper):
+                    ranked, scope = upper, "multi_support_crop"
             self.last_match_stats["slots"].append({
                 "slot": index + 1, "scope": scope,
-                "candidates": len(pool.ids) if pool is not None and not pool.fallback else len(self.templates),
+                "candidates": (len(pool.ids) if pool is not None and not pool.fallback
+                               and scope != "multi_support_crop" else len(self.templates)),
                 "ms": (time.perf_counter() - slot_started) * 1000,
             })
             identified = self._accepted(ranked)
