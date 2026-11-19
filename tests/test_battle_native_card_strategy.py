@@ -3,25 +3,31 @@ from dataclasses import replace
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
 
 from battle.core.decider import RuleDecider, _best_face_order, _native_card_score
 from battle.core.enums import CardColor as Color, PrimitiveKind as Kind, Scene
-from battle.core.models import BattleState, CardPick, CommandCard, Confidence, NpCard
+from battle.core.models import BattleState, CardPick, CommandCard, Confidence, NpCard, ServantState, SkillState
 from battle.core.plan_parser import _parse_battle_policy
 from battle.core.policy import CardPolicy, NativeCardStrategy
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 
 
-def face(slot, color=Color.BUSTER, owner=None, sid=None, *, blocked=False):
+def face(slot, color=Color.BUSTER, owner=None, sid=None, *, blocked=False, crit_percent=None):
     return CommandCard(slot, color, owner, Confidence(1),
-                       owner_servant_id=sid, can_attack=not blocked)
+                       owner_servant_id=sid, can_attack=not blocked, crit_percent=crit_percent)
 
 
-def state(cards, nps=()):
-    return BattleState(Scene.COMMAND_SELECTION, Confidence(1), tuple(cards), tuple(nps), ())
+def state(cards, nps=(), servants=()):
+    return BattleState(Scene.COMMAND_SELECTION, Confidence(1), tuple(cards), tuple(nps), (), tuple(servants))
+
+
+def servant(slot, sid, *, attacker=False):
+    return ServantState(slot, tuple(SkillState(None, Confidence(0)) for _ in range(3)),
+                        Confidence(1), sid, attacker)
 
 
 def policy(**changes):
@@ -49,6 +55,15 @@ class NativeStrategyParsingTests(unittest.TestCase):
         for config in (None, True, [], "enabled", {}, {"enabled": "true"}, {"enabled": 1}):
             with self.subTest(config=config):
                 self.assertFalse(self.parse(config).enabled)
+
+    def test_fill_priority_accepts_only_two_modes_and_defaults_to_chain(self):
+        for value in (None, True, False, 0, 1, [], {}, "", "weighted", "SERVANT"):
+            with self.subTest(value=value):
+                self.assertEqual(self.parse({"fill_priority": value}).fill_priority, "chain")
+        for value in ("chain", "servant"):
+            parsed = self.parse({"fill_priority": value})
+            self.assertEqual(parsed.fill_priority, value)
+            self.assertFalse(parsed.enabled)
 
     def test_editable_weights_ids_slots_and_colors_parse_without_mutating_source(self):
         config = {"enabled": True, "prefer_brave_chain": False,
@@ -102,6 +117,145 @@ class NativeStrategyParsingTests(unittest.TestCase):
 
 
 class NativeStrategyDecisionTests(unittest.TestCase):
+    def test_crit_tiebreak_keeps_planned_servants_colors_and_np_position(self):
+        cards = [face(1, owner=1, sid="100100", crit_percent=0),
+                 face(2, owner=1, sid="100100", crit_percent=80),
+                 face(3, Color.ARTS, 1, "100100", crit_percent=10),
+                 face(4, owner=2, sid="100100", crit_percent=100),
+                 face(5, Color.QUICK, 1, "100100", crit_percent=100)]
+        plan = planned([{"svt": 0, "card": 0, "cardType": 2}, NP1,
+                        {"svt": 0, "card": 1, "cardType": 1}])
+        snapshot = state(cards, (NpCard(1, Confidence(1)),))
+        for config in (CardPolicy(), policy()):
+            with self.subTest(native=config.native_strategy.enabled):
+                self.assertEqual(pairs(RuleDecider(config, plan).decide(snapshot).picks),
+                                 [(Kind.SELECT_CARD, 2), (Kind.SELECT_NP, 1), (Kind.SELECT_CARD, 3)])
+
+    def test_crit_tiebreak_uses_best_available_copies_during_automatic_fill(self):
+        cards = [face(1, owner=1, crit_percent=20), face(2, owner=1, crit_percent=80),
+                 face(3, owner=1, crit_percent=90), face(4, owner=1, crit_percent=100, blocked=True),
+                 face(5, Color.ARTS, 2, crit_percent=100)]
+        snapshot = state(cards, (NpCard(1, Confidence(1)),))
+        for config in (CardPolicy(), policy()):
+            with self.subTest(native=config.native_strategy.enabled):
+                self.assertEqual(pairs(RuleDecider(config).decide(snapshot).picks),
+                                 [(Kind.SELECT_NP, 1), (Kind.SELECT_CARD, 3), (Kind.SELECT_CARD, 2)])
+
+    def test_crit_tiebreak_preserves_equal_or_unread_chances(self):
+        nps = (NpCard(1, Confidence(1)), NpCard(2, Confidence(1)))
+        for first, second in ((None, 80), (0, None), (80, 80)):
+            with self.subTest(first=first, second=second):
+                cards = [face(1, owner=1, crit_percent=first), face(2, owner=1, crit_percent=second),
+                         face(3, owner=None, crit_percent=100), face(4, owner=2, crit_percent=100),
+                         face(5, Color.ARTS, 1, crit_percent=100)]
+                self.assertEqual(RuleDecider().decide(state(cards, nps)).picks[-1],
+                                 CardPick(Kind.SELECT_CARD, 1))
+
+    def test_servant_and_chain_priority_resolve_a_conflict_in_opposite_order(self):
+        cards = [face(1, Color.QUICK, 2, "200100"), face(2, Color.QUICK, 2, "200100"),
+                 face(3, Color.QUICK, 2, "200100"), face(4, Color.BUSTER, 1, "100100"),
+                 face(5, Color.ARTS, 3, "300100")]
+        base = policy(preferred_slots=(2,), servant_priority_weight=0,
+                      prefer_brave_chain=False, same_color_chain_weight=0,
+                      mighty_chain_weight=100)
+        servant_first = replace(base, native_strategy=replace(base.native_strategy, fill_priority="servant"))
+        chain_first = replace(base, native_strategy=replace(base.native_strategy, fill_priority="chain",
+                                                           servant_priority_weight=100))
+        by_servant = RuleDecider(servant_first).decide(state(cards)).picks
+        by_chain = RuleDecider(chain_first).decide(state(cards)).picks
+        self.assertEqual({pick.slot for pick in by_servant}, {1, 2, 3})
+        self.assertTrue({4, 5}.issubset({pick.slot for pick in by_chain}))
+
+    def test_servant_ties_use_chain_strategy_and_chain_ties_use_servant(self):
+        cards = [face(1, Color.BUSTER, 2), face(2, Color.QUICK, 2),
+                 face(3, Color.ARTS, 3), face(4, Color.BUSTER, 1), face(5, Color.QUICK, 1)]
+        by_servant = RuleDecider(policy(fill_priority="servant", preferred_slots=(2,),
+                                       mighty_chain_weight=100, prefer_brave_chain=False)).decide(state(cards)).picks
+        self.assertEqual({pick.slot for pick in by_servant}, {1, 2, 3})
+        same_color = [face(index, owner=1 if index < 3 else 2) for index in range(1, 6)]
+        by_chain = RuleDecider(policy(fill_priority="chain", preferred_slots=(2,),
+                                     prefer_brave_chain=False)).decide(state(same_color)).picks
+        self.assertEqual({pick.slot for pick in by_chain}, {3, 4, 5})
+
+    def test_automatic_main_attacker_uses_foremost_attacking_instance_not_equal_ids(self):
+        cards = [face(1, Color.QUICK, 2, "100100"), face(2, Color.QUICK, 2, "100100"),
+                 face(3, Color.BUSTER, 3, "100100"), face(4, Color.BUSTER, 3, "100100"),
+                 face(5, Color.BUSTER, 3, "100100")]
+        frontline = [servant(3, "100100", attacker=True), servant(1, "504500"),
+                     servant(2, "100100", attacker=True)]
+        selected = RuleDecider(policy(fill_priority="servant", brave_chain_weight=100)).decide(
+            state(cards, servants=frontline)).picks
+        self.assertTrue({1, 2}.issubset({pick.slot for pick in selected}))
+        self.assertEqual(len({pick.slot for pick in selected} & {3, 4, 5}), 1)
+
+    def test_automatic_attacker_recomputes_current_frontline_after_a_swap_or_retirement(self):
+        cards = [face(1, Color.QUICK, 1, "100100"), face(2, Color.QUICK, 1, "100100"),
+                 face(3, Color.BUSTER, 2, "200100"), face(4, Color.BUSTER, 2, "200100"),
+                 face(5, Color.BUSTER, 2, "200100")]
+        decider = RuleDecider(policy(fill_priority="servant", brave_chain_weight=100))
+        first = decider.decide(state(cards, servants=[servant(1, "100100", attacker=True),
+                                                      servant(2, "200100", attacker=True)])).picks
+        changed = decider.decide(state(cards, servants=[servant(1, "504500"),
+                                                        servant(2, "200100", attacker=True)])).picks
+        self.assertTrue({1, 2}.issubset({pick.slot for pick in first}))
+        self.assertEqual({pick.slot for pick in changed}, {3, 4, 5})
+
+    def test_missing_automatic_attacker_does_not_guess_from_card_colors_or_ids(self):
+        cards = [face(1, Color.QUICK, 2, "100100"), face(2, Color.QUICK, 2, "100100"),
+                 face(3, owner=3), face(4, owner=3), face(5, owner=3)]
+        config = policy(fill_priority="servant")
+        with patch("battle.core.decider.mfaalog.warning") as warn:
+            actual = RuleDecider(config).decide(state(cards, servants=[servant(1, "504500")])).picks
+        expected = RuleDecider(replace(config, native_strategy=replace(config.native_strategy,
+                                                                       fill_priority="chain"))).decide(state(cards)).picks
+        self.assertEqual(actual, expected)
+        self.assertIn("主输出偏好", warn.call_args.args[0])
+
+    def test_explicit_attacker_not_on_field_never_uses_automatic_attacker(self):
+        cards = [face(1, Color.QUICK, 2, "200100"), face(2, Color.QUICK, 2, "200100"),
+                 face(3, owner=3), face(4, owner=3), face(5, owner=3)]
+        selected = RuleDecider(policy(fill_priority="servant", preferred_servant_ids=("999999",))).decide(
+            state(cards, servants=[servant(2, "200100", attacker=True)])).picks
+        self.assertEqual({pick.slot for pick in selected}, {3, 4, 5})
+
+    def test_only_automatic_ordinary_cards_count_towards_servant_matching(self):
+        snapshot = state([face(1, owner=1, sid="100100"), face(2, owner=2, sid="200100")],
+                         (NpCard(1, Confidence(1), owner_servant_id="100100"),))
+        picks = (CardPick(Kind.SELECT_CARD, 1), CardPick(Kind.SELECT_NP, 1), CardPick(Kind.SELECT_CARD, 2))
+        score = _native_card_score(picks, snapshot, policy(fill_priority="servant", preferred_slots=(1,)),
+                                   automatic_face_slots=frozenset({2}))
+        self.assertEqual(score[2], 0)
+
+    def test_servant_priority_applies_with_enhanced_chains_disabled(self):
+        cards = [face(1, Color.QUICK, 2), face(2, Color.QUICK, 2),
+                 face(3, owner=3), face(4, owner=3), face(5, owner=3)]
+        config = policy(enabled=False, fill_priority="servant", preferred_slots=(2,),
+                        brave_chain_weight=100, mighty_chain_weight=100,
+                        color_weights=((Color.BUSTER, 100),))
+        selected = RuleDecider(config).decide(state(cards)).picks
+        self.assertTrue({1, 2}.issubset({pick.slot for pick in selected}))
+        with_np = RuleDecider(config, planned([AUTO, NP1, AUTO])).decide(
+            state(cards, (NpCard(1, Confidence(1)),))).picks
+        self.assertEqual(with_np[1], CardPick(Kind.SELECT_NP, 1))
+        self.assertEqual({pick.slot for pick in with_np if pick.kind is Kind.SELECT_CARD}, {1, 2})
+        fixed_nps = planned([{"svt": index, "isTD": True, "card": -1} for index in range(3)])
+        nps = tuple(NpCard(index, Confidence(1)) for index in range(1, 4))
+        self.assertEqual([pick.kind for pick in RuleDecider(config, fixed_nps).decide(state(cards, nps)).picks],
+                         [Kind.SELECT_NP] * 3)
+        self.assertEqual(RuleDecider(config).decide(state([])).picks, ())
+
+    def test_disabled_enhanced_chains_still_use_attacker_to_break_basic_score_ties(self):
+        cards = [face(index, owner=1 if index < 3 else 2) for index in range(1, 6)]
+        chosen = RuleDecider(policy(enabled=False, fill_priority="chain", preferred_slots=(2,),
+                                    brave_chain_weight=100)).decide(state(cards)).picks
+        self.assertEqual({pick.slot for pick in chosen}, {3, 4, 5})
+
+    def test_known_attackable_cards_remain_above_servant_preference(self):
+        cards = [face(1, Color.UNKNOWN, 1), face(2, Color.UNKNOWN, 1),
+                 face(3, Color.QUICK, 2), face(4, Color.ARTS, 2), face(5, owner=3)]
+        chosen = RuleDecider(policy(fill_priority="servant", preferred_slots=(1,))).decide(state(cards)).picks
+        self.assertEqual({pick.slot for pick in chosen}, {3, 4, 5})
+
     def test_disabled_strategy_keeps_legacy_choice_even_with_extreme_preferences(self):
         cards = (face(1, Color.QUICK, 2, "200100"), face(2, Color.ARTS, 2, "200100"),
                  face(3, Color.BUSTER, 1, "100100"), face(4, Color.BUSTER, 1, "100100"),
@@ -157,7 +311,7 @@ class NativeStrategyDecisionTests(unittest.TestCase):
         self.assertEqual(len({pick.slot for pick in result.picks}), 3)
 
     def test_identity_priority_tracks_owner_id_after_slot_move(self):
-        config = policy(preferred_servant_ids=("100100",), servant_priority_weight=100,
+        config = policy(fill_priority="servant", preferred_servant_ids=("100100",), servant_priority_weight=100,
                         prefer_brave_chain=False, mighty_chain_weight=0)
         for owner in (1, 3):
             with self.subTest(owner=owner):
@@ -170,13 +324,13 @@ class NativeStrategyDecisionTests(unittest.TestCase):
     def test_current_frontline_slot_priority_can_select_designated_attacker(self):
         cards = [face(1, Color.QUICK, 2), face(2, Color.ARTS, 2), face(3, Color.QUICK, 2),
                  face(4, owner=1), face(5, owner=3)]
-        selected = RuleDecider(policy(preferred_slots=(2,), servant_priority_weight=100)).decide(state(cards)).picks
+        selected = RuleDecider(policy(fill_priority="servant", preferred_slots=(2,), servant_priority_weight=100)).decide(state(cards)).picks
         self.assertEqual({pick.slot for pick in selected}, {1, 2, 3})
 
     def test_blocked_faces_lose_to_attackable_faces_despite_high_owner_preference(self):
         cards = [face(1, owner=1, blocked=True), face(2, owner=1, blocked=True),
                  face(3, Color.QUICK, 2), face(4, Color.ARTS, 2), face(5, Color.QUICK, 3)]
-        selected = RuleDecider(policy(preferred_slots=(1,), servant_priority_weight=100)).decide(state(cards)).picks
+        selected = RuleDecider(policy(fill_priority="servant", preferred_slots=(1,), servant_priority_weight=100)).decide(state(cards)).picks
         self.assertEqual({pick.slot for pick in selected}, {3, 4, 5})
 
     def test_unknown_owners_cannot_create_a_fake_brave_chain(self):
@@ -267,7 +421,8 @@ class NativeStrategyDecisionTests(unittest.TestCase):
         priority = _native_card_score(picks, snapshot, policy(
             prefer_brave_chain=False, preferred_servant_ids=("200100", "100100"),
             preferred_slots=(1, 2), servant_priority_weight=6))
-        self.assertEqual(priority[2] - baseline[2], 18)
+        self.assertEqual(priority[2], baseline[2])
+        self.assertEqual(priority[3] - baseline[3], 3)
 
     def test_automatic_card_before_fixed_arts_np_preserves_same_owner_arts_buff(self):
         np = {"svt": 1, "isTD": True, "card": -1}

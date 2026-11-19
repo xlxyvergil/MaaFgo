@@ -8,8 +8,10 @@ from typing import Any
 
 ADVANCED_STRATEGY_FIELD = "maaAdvancedStrategy"
 PRESET_NAMES = ("balanced", "mighty", "brave", "np", "legacy")
+FILL_PRIORITIES = ("servant", "chain")
 _DEFAULT = {
     "preset": "balanced",
+    "fillPriority": "chain",
     "preferredAttacker": "",
     "openingHand": {"enabled": False, "servantId": None, "servantSlot": None,
                     "requiredColors": ["B", "Q"], "maxWaitTurns": 2},
@@ -48,6 +50,12 @@ def validate_advanced_strategy(value: Any, path: str = ADVANCED_STRATEGY_FIELD) 
     def boolean(raw, at):
         if type(raw) is not bool:
             error(at, "需要布尔值")
+
+    def fill_priority(raw, at):
+        if type(raw) is not str or raw not in FILL_PRIORITIES:
+            error(at, "补牌优先级无法识别，无法确定先选主输出还是先组成连携。"
+                  "请在「补牌优先级」重新选择「优先从者」或「优先连携」；"
+                  "导入方案请修正对应设置后重新导入。")
 
     def identity(raw, at, nullable=True):
         if nullable and raw is None:
@@ -92,6 +100,8 @@ def validate_advanced_strategy(value: Any, path: str = ADVANCED_STRATEGY_FIELD) 
         if not isinstance(raw, dict):
             error(at, "补牌策略微调必须是 JSON 对象")
             return
+        if "fill_priority" in raw:
+            fill_priority(raw["fill_priority"], at + ".fill_priority")
         for key in ("enabled", "prefer_brave_chain", "avoid_np_color_before_np"):
             if key in raw:
                 boolean(raw[key], at + "." + key)
@@ -140,6 +150,8 @@ def validate_advanced_strategy(value: Any, path: str = ADVANCED_STRATEGY_FIELD) 
         return issues
     if "preset" in value and (type(value["preset"]) is not str or value["preset"] not in PRESET_NAMES):
         error(path + ".preset", "未知的补牌预设")
+    if "fillPriority" in value:
+        fill_priority(value["fillPriority"], path + ".fillPriority")
     if "preferredAttacker" in value:
         preferred = value["preferredAttacker"]
         if preferred == "0":
@@ -190,7 +202,7 @@ def advanced_strategy_to_param(value: dict | None = None) -> dict:
         "brave": (32, 8, 4, 4), "np": (6, 10, 12, 4),
         "legacy": (8, 12, 5, 4),
     }[preset]
-    native = {"enabled": preset != "legacy", "prefer_brave_chain": True,
+    native = {"enabled": preset != "legacy", "fill_priority": config["fillPriority"], "prefer_brave_chain": True,
               "brave_chain_weight": brave, "mighty_chain_weight": mighty,
               "same_color_chain_weight": same, "servant_priority_weight": owner,
               "preferred_servant_ids": [], "preferred_slots": [],
@@ -199,6 +211,10 @@ def advanced_strategy_to_param(value: dict | None = None) -> dict:
               "color_weights": {"B": 1, "A": 4, "Q": 2} if preset == "np"
               else {"B": 3, "A": 2, "Q": 1}}
     native = _merge(native, config["nativeStrategyOverrides"])
+    # Unset dedicated controls may inherit the JSON field; an explicit portable
+    # choice is authoritative and must survive a conflicting micro adjustment.
+    if isinstance(value, dict) and "fillPriority" in value:
+        native["fill_priority"] = config["fillPriority"]
     # A dedicated choice wins over both preference lists in imported JSON.
     # Empty means inherit, retaining ordered or mixed preferences unchanged.
     preferred = config["preferredAttacker"]

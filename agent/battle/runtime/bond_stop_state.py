@@ -160,6 +160,14 @@ class BondStopStates:
             run = self._runs.get(root)
             return bool(run and run.check_skipped)
 
+    def skip_check(self, root: int) -> None:
+        """主动跳过本场检查，结束连续漏检计数。"""
+        with self._lock:
+            self.ensure(root)
+            run = self._runs[root]
+            run.check_skipped = True
+            run.consecutive_page_misses = 0
+
     def record_incomplete_check(
         self, root: int, token: str, *, stop_message: str, image
     ) -> tuple[int, BondStop | None] | None:

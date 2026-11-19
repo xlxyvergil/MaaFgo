@@ -4,11 +4,11 @@ import {createElement} from 'react';
 import {renderToStaticMarkup} from 'react-dom/server';
 import {newBattle,assertEditable,turnsOf} from './model';
 import {GlobalAdvancedStrategy as AdvancedStrategy} from './GlobalAdvancedStrategy';
-import {advancedStrategyOf,defaultAdvancedStrategy,patchAdvancedStrategy,parseNativeStrategyOverrides,strategyInteger,advancedStrategyIssues,preferredAttackerMode} from './advancedStrategy';
+import {advancedStrategyOf,defaultAdvancedStrategy,patchAdvancedStrategy,parseNativeStrategyOverrides,strategyInteger,advancedStrategyIssues,preferredAttackerMode,STRATEGY_PRESETS} from './advancedStrategy';
 
 test('new documents carry independent unified strategy defaults',()=>{
  const first=newBattle(),second=newBattle();
- assert.deepEqual(first.maaAdvancedStrategy,{preset:'balanced',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
+ assert.deepEqual(first.maaAdvancedStrategy,{preset:'balanced',fillPriority:'chain',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
  first.maaAdvancedStrategy.openingHand.requiredColors.push('A');(first.maaAdvancedStrategy.nativeStrategyOverrides as Record<string,unknown>).preferred_slots=[2];
  assert.deepEqual(second.maaAdvancedStrategy,defaultAdvancedStrategy());
 });
@@ -18,7 +18,7 @@ test('viewing old and partial plans or focusing unchanged controls never writes 
   const before=structuredClone(data);assertEditable(data);assert.doesNotThrow(()=>turnsOf(data));
   const projected=advancedStrategyOf(data);
   assert.equal(projected.preset,'balanced');assert.equal(projected.autoServantSkills,true);
-  patchAdvancedStrategy(data,{nativeStrategyOverrides:{}});patchAdvancedStrategy(data,{openingHand:{servantSlot:null,requiredColors:['B','Q']}});patchAdvancedStrategy(data,{preferredAttacker:''});
+  patchAdvancedStrategy(data,{nativeStrategyOverrides:{}});patchAdvancedStrategy(data,{openingHand:{servantSlot:null,requiredColors:['B','Q']}});patchAdvancedStrategy(data,{preferredAttacker:''});patchAdvancedStrategy(data,{fillPriority:'chain'});
   assert.deepEqual(data,before);
   projected.openingHand.requiredColors.push('A');assert.deepEqual(data,before);
  }
@@ -32,6 +32,61 @@ test('editing writes only explicit strategy fields without inventing a team or a
  assert.deepEqual(saved.maaAdvancedStrategy,{maxTurns:65,openingHand:{enabled:true,servantSlot:2,requiredColors:['Q','Q']}});
  assert.deepEqual(advancedStrategyOf(saved),{...defaultAdvancedStrategy(),maxTurns:65,openingHand:{...defaultAdvancedStrategy().openingHand,enabled:true,servantSlot:2,requiredColors:['Q','Q']}});
  assert.deepEqual(saved.future,{keep:[null,false]});
+});
+
+test('fill priority projects legacy JSON and explicit choices without rewriting unrelated fields',()=>{
+ const data={team:{onFieldSvts:[{svtId:100200,equip1:{id:42,lv:80}}]},actions:[{type:'attack',attacks:[]}],future:{keep:null},maaAdvancedStrategy:{
+  openingHand:{enabled:true,futureOpening:{keep:true}},
+  nativeStrategyOverrides:{fill_priority:'servant',opening_hand:{servant_id:'505500',required_colors:['A','A']},futureNative:{keep:[null,false]}},futureStrategy:{keep:true},
+ }};
+ const before=structuredClone(data);
+ assert.equal(advancedStrategyOf(data).fillPriority,'servant');
+ assert.deepEqual(advancedStrategyOf(data).openingHand.requiredColors,['A','A']);
+ patchAdvancedStrategy(data,{fillPriority:'servant'});assert.deepEqual(data,before);
+ patchAdvancedStrategy(data,{maxTurns:65});
+ assert.equal(Object.hasOwn(data.maaAdvancedStrategy,'fillPriority'),false);
+ assert.equal(Object.hasOwn(data.maaAdvancedStrategy.openingHand,'requiredColors'),false);
+ patchAdvancedStrategy(data,{fillPriority:'chain'});
+ const restored=JSON.parse(JSON.stringify(data));
+ assert.equal(advancedStrategyOf(restored).fillPriority,'chain');
+ assert.deepEqual(restored.maaAdvancedStrategy.nativeStrategyOverrides,before.maaAdvancedStrategy.nativeStrategyOverrides);
+ assert.deepEqual(restored.team,before.team);assert.deepEqual(restored.actions,before.actions);assert.deepEqual(restored.future,before.future);
+ assert.deepEqual(restored.maaAdvancedStrategy.openingHand,before.maaAdvancedStrategy.openingHand);
+ assert.equal(advancedStrategyOf(before).fillPriority,'servant');
+ const old={actions:[]};patchAdvancedStrategy(old,{fillPriority:'servant'});
+ assert.deepEqual(old,{actions:[],maaAdvancedStrategy:{fillPriority:'servant'}});
+ assert.equal(advancedStrategyOf(old).preferredAttacker,'');
+});
+
+test('invalid fill priorities remain visible and can be corrected in either configuration source',()=>{
+ for(const invalid of [null,true,[],{},'','legacy','attacker']){
+  for(const data of [{maaAdvancedStrategy:{fillPriority:invalid}},{maaAdvancedStrategy:{nativeStrategyOverrides:{fill_priority:invalid}}}]){
+   const before=structuredClone(data);
+   assert.ok(advancedStrategyIssues(data).some(issue=>issue.includes('补牌优先级')));
+   assert.deepEqual(advancedStrategyOf(data).fillPriority,invalid);assert.deepEqual(data,before);
+  }
+ }
+ const invalidTop={maaAdvancedStrategy:{fillPriority:'bad',nativeStrategyOverrides:{fill_priority:'servant'}}};
+ patchAdvancedStrategy(invalidTop,{fillPriority:'chain'});
+ assert.deepEqual(advancedStrategyIssues(invalidTop),[]);assert.equal(advancedStrategyOf(invalidTop).fillPriority,'chain');
+});
+
+test('fill priority precedes unchanged chain presets and permits automatic or optional attacker selection',()=>{
+ const render=(data:Record<string,unknown>)=>renderToStaticMarkup(createElement(AdvancedStrategy,{data,onChange:()=>{},onError:()=>{}}));
+ const normal=render({actions:[]});
+ assert.ok(normal.indexOf('aria-label="补牌优先级"')<normal.indexOf('aria-label="全局连携策略"'));
+ assert.ok(normal.indexOf('aria-label="全局连携策略"')<normal.indexOf('aria-label="主输出偏好"'));
+ assert.match(normal,/<select aria-label="补牌优先级"[^>]*><option value="servant">优先从者<\/option><option value="chain" selected="">优先连携<\/option><\/select>/);
+ for(const [key,label] of STRATEGY_PRESETS){assert.match(normal,new RegExp(`value="${key}"`));assert.ok(normal.includes(label));}
+ assert.doesNotMatch(normal,/原生补牌策略/);assert.match(normal,/评分相同时再匹配主输出；可以不指定主输出/);
+ const automatic={actions:[],maaAdvancedStrategy:{fillPriority:'servant'}};
+ const before=structuredClone(automatic),servant=render(automatic);
+ assert.match(servant,/自动选择主输出（可继承微调）/);assert.match(servant,/当前前排最靠左的攻击宝具从者/);
+ assert.doesNotMatch(servant,/尚未选择主输出从者/);assert.deepEqual(automatic,before);
+ const pending=render({maaAdvancedStrategy:{fillPriority:'servant',preferredAttacker:'0'}});
+ assert.match(pending,/尚未选择主输出从者/);
+ const fromJSON=render({maaAdvancedStrategy:{nativeStrategyOverrides:{fill_priority:'servant'}}});
+ assert.match(fromJSON,/value="servant" selected=""/);
 });
 
 test('independent strategy edits retain JSON-only opening colors without materializing unrelated defaults',()=>{

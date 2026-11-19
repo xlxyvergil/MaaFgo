@@ -46,7 +46,7 @@ from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRunti
                                          trial_config_from_source)
 from battle.runtime.formation_session import context_session, session_override, sessions
 from battle.runtime.skill_confirmation_reminder import skill_confirmation_reminders
-from bond_stop_action import inspect_victory_settlement
+from bond_stop_action import inspect_victory_settlement, skip_bond_check_for_restricted_formation
 from chaldea import fetch_share_data
 
 
@@ -95,6 +95,18 @@ class RememberContinuousFormation(CustomAction):
         return CustomAction.RunResult(success=True)
 
 
+@AgentServer.custom_action("mark_native_formation_restricted")
+class MarkNativeFormationRestricted(CustomAction):
+    def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
+        if context.tasker.stopping:
+            return CustomAction.RunResult(success=False)
+        root, token = context_session(context)
+        if sessions.valid(root, token):
+            sessions.invalidate(root, token, "")
+            skip_bond_check_for_restricted_formation(context)
+        return CustomAction.RunResult(success=True)
+
+
 @AgentServer.custom_action("auto_battle")
 class AutoBattleAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
@@ -115,13 +127,12 @@ class AutoBattleAction(CustomAction):
         continued_formation_reset = (formation_reset and initial_formation is not None
                                      and getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE)
         if support_fallback or formation_reset:
-            # 锁助战可能连带改变整队配置，不能读取旧攻略或旧编队身份。
+            # 使用实际采集或确认可继承的编队，舍弃绑定原助战的方案。
             param = {}
-            if support_fallback or continued_formation_reset:
+            if continued_formation_reset:
                 initial_formation = None
-                if continued_formation_reset and token:
-                    sessions.skip_capture(root, token)
-            mfaalog.warning("[auto_battle] 编队已重置：丢弃旧方案，使用不依赖旧身份的高级策略")
+                sessions.skip_capture(root, token)
+            mfaalog.warning("[auto_battle] 本场阵容有变动，使用高级策略及当前已确认的编队记录")
         plan = _parse_plan(param)
         chaldea_roster = None
         try:
@@ -341,6 +352,8 @@ def _attached_strategy_settings(context, node_name: str) -> dict:
 def _manual_advanced_strategy_param(attach: dict) -> dict:
     """Read independent MXU fields; hidden values are only read in manual mode."""
     config = {}
+    if "native_battle_fill_priority" in attach:
+        config["fillPriority"] = attach["native_battle_fill_priority"]
     if "native_battle_max_turns" in attach:
         config["maxTurns"] = attach["native_battle_max_turns"]
     if "native_battle_auto_servant_skills" in attach:
@@ -357,15 +370,13 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
                                ("native_battle_opening_hand_max_wait_turns", "maxWaitTurns")):
         if external in attach:
             opening[internal] = attach[external]
-    # The default inherit case preserves upgraded MXU profiles. A chosen
-    # picture or explicit empty selection still supersedes the legacy ID.
-    selected_key = "native_battle_opening_hand_selected_servant"
-    if selected_key not in attach or attach[selected_key] == "inherit":
-        raw_id = attach.get("native_battle_opening_hand_servant_id")
-    else:
-        raw_id = attach[selected_key]
-        if not isinstance(raw_id, str) or (raw_id != "" and not re.fullmatch(r"[1-9][0-9]{0,11}", raw_id)):
-            raise ValueError("开局等牌的目标从者无法识别，无法确认要等待谁的牌。请在「高级策略 → 手动 → 开局等待关键牌」下重新选择「目标从者职阶」和「目标从者」。")
+    # Only picture selections provide an explicit identity. Retired inherit
+    # selections are empty too; the removed hand-entered ID is never read.
+    raw_id = attach.get("native_battle_opening_hand_selected_servant", "")
+    if raw_id == "inherit":
+        raw_id = ""
+    if not isinstance(raw_id, str) or (raw_id != "" and not re.fullmatch(r"[1-9][0-9]{0,11}", raw_id)):
+        raise ValueError("开局等牌的目标从者无法识别，无法确认要等待谁的牌。请在「高级策略 → 手动 → 开局等待关键牌」下重新选择「目标从者职阶」和「目标从者」。")
     if raw_id is not None and str(raw_id).strip():
         opening["servantId"] = str(raw_id).strip()
     raw_slot = attach.get("native_battle_opening_hand_servant_slot")
@@ -396,6 +407,8 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
         _deep_merge(advanced_strategy_to_param()["card_policy"]["native_strategy"], preset_native),
         {**copy.deepcopy(overrides), "opening_hand": result["card_policy"]["native_strategy"]["opening_hand"]},
     )
+    if "fillPriority" in config:
+        result["card_policy"]["native_strategy"]["fill_priority"] = config["fillPriority"]
     # The select cases write one scalar: an integer position or a string ID.
     # An empty selection preserves preferences from existing strategy JSON.
     preferred = attach.get("native_battle_preferred_attacker", "")

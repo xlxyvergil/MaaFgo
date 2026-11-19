@@ -31,7 +31,7 @@ class FallbackFrameworkTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
 
-    def test_fallback_crosses_nested_contexts_and_bypasses_both_formation_modes(self):
+    def test_fallback_skips_both_chaldea_modes_and_captures_actual_formation(self):
         self.addCleanup(sessions.stop_owner, "")
         source = json.loads((ROOT / "assets/resource/base/pipeline/进本流程.json").read_text("utf-8"))
         options = json.loads((ROOT / "assets/options/Chaldea导入手动输入.json").read_text("utf-8"))
@@ -62,6 +62,7 @@ class FallbackFrameworkTests(unittest.TestCase):
                                  "不应进入首个助战原有后续", "进本-点击队伍确认", "编队身份-采集",
                                  "原生战斗-校验茶壶", "原生战斗-兜底校验茶壶"):
                         nodes[name] = {"action": {"type": "Custom", "param": {"custom_action": "record"}}}
+                    nodes["编队身份-采集"]["next"] = ["进本-实际点击队伍确认"]
                     if case["name"] == "自动":
                         nodes[formation]["next"] = ["执行羁绊补齐自动编队"]
                     nodes["进本-选择助战"]["action"] = {
@@ -130,8 +131,12 @@ class FallbackFrameworkTests(unittest.TestCase):
                             else:
                                 fetch.assert_not_called()
                         self.assertEqual(controller.inputs, 0)
-                    expected = (["助战兜底-选择首个助战"] * 3 + ["进本-选择助战", "原生战斗-兜底校验茶壶", "进本-实际点击队伍确认"]
-                                if active else [formation] + (["执行羁绊补齐自动编队"] if case["name"] == "自动" else []))
+                    expected = (
+                        ["助战兜底-选择首个助战"] * 3 + [
+                            "进本-选择助战", "原生战斗-兜底校验茶壶", "编队身份-采集", "进本-实际点击队伍确认",
+                        ]
+                        if active else [formation] + (["执行羁绊补齐自动编队"] if case["name"] == "自动" else [])
+                    )
                     self.assertEqual(seen, expected)
         sessions.stop_owner("")
 

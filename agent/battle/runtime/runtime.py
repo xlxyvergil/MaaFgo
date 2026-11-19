@@ -320,7 +320,8 @@ class AutoBattleRuntime:
                 cards_text = " | ".join(
                     f"卡{card.ui_slot}:{servant_name(card.owner_servant_id)}/{card.color.value}"
                     f"(前排{card.owner_slot or '?'},归属{card.owner_confidence.value:.3f},"
-                    f"分差{card.owner_margin:.3f},{'可攻击' if card.can_attack else '封印/无法行动'})"
+                    f"分差{card.owner_margin:.3f},{'可攻击' if card.can_attack else '封印/无法行动'}"
+                    f"{f',暴击{card.crit_percent}%' if card.crit_percent is not None else ''})"
                     for card in state.cards
                 )
                 mfaalog.diagnostic(f"[英灵选卡] {cards_text}")

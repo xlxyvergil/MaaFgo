@@ -114,13 +114,13 @@ class NativeTeapotRoutingTests(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(seen, [(CHECK, False), "编队身份-采集", "进本-实际点击队伍确认"])
 
-    def test_support_fallback_checks_without_capturing_identities(self):
+    def test_support_fallback_checks_teapot_then_captures_formation(self):
         for desired in (False, True, "skip"):
             with self.subTest(desired=desired):
                 ok, seen = self.execute(mode="fallback", use_teapot=desired)
                 self.assertTrue(ok)
                 self.assertEqual(seen, ["进本-助战兜底跳过编队", (FALLBACK_CHECK, desired),
-                                        "进本-实际点击队伍确认"])
+                                        "编队身份-采集", "进本-实际点击队伍确认"])
 
     def test_failed_formation_does_not_check_teapot_or_start(self):
         for mode in ("manual", "auto"):

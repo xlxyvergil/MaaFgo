@@ -335,19 +335,34 @@ class SupportFallbackTests(unittest.TestCase):
         fresh = sessions.begin(ctx.root)
         self.assertFalse(sessions.support_fallback(ctx.root, fresh))
 
-    def test_switch_is_default_off_and_available_in_both_support_modes(self):
+    def test_switch_defaults_by_task_and_is_available_in_both_support_modes(self):
         options = json.loads((ROOT / "assets/options/原生自动战斗助战方式.json").read_text("utf-8"))["option"]
-        switch = options["多次查找失败随机选择助战"]
-        self.assertEqual(switch["default_case"], "No")
-        cases = {case["name"]: case for case in options["原生自动战斗助战方式"]["cases"]}
-        for name in ("自定义助战", "使用Chaldea配置"):
-            self.assertIn("多次查找失败随机选择助战", cases[name]["option"])
-        self.assertNotIn("多次查找失败随机选择助战", cases["首个助战"].get("option", []))
-        for case in switch["cases"]:
-            for node in ("助战action", "Chaldea助战action"):
-                self.assertEqual(case["pipeline_override"][node]["attach"]["fallback_after_refresh"],
-                                 case["name"] == "Yes")
-        self.assertIn("羁绊最大化", switch["description"])
+        task_method = "幕间与强化-助战方式"
+        tasks_with_fallback_enabled = {"自动幕间副本", "挑战强化本"}
+        self.assertEqual({
+            task["name"]
+            for path in (ROOT / "assets/tasks").glob("*.json")
+            for task in json.loads(path.read_text("utf-8"))["task"]
+            if task_method in task.get("option", [])
+        }, tasks_with_fallback_enabled)
+
+        for method, switch_name, default in (
+            ("原生自动战斗助战方式", "多次查找失败随机选择助战", "No"),
+            (task_method, "幕间与强化-多次查找失败随机选择助战", "Yes"),
+        ):
+            with self.subTest(method=method):
+                self.assertEqual(options[method]["default_case"], "首个助战")
+                switch = options[switch_name]
+                self.assertEqual(switch["default_case"], default)
+                cases = {case["name"]: case for case in options[method]["cases"]}
+                for name in ("自定义助战", "使用Chaldea配置"):
+                    self.assertIn(switch_name, cases[name]["option"])
+                self.assertNotIn(switch_name, cases["首个助战"].get("option", []))
+                for case in switch["cases"]:
+                    for node in ("助战action", "Chaldea助战action"):
+                        self.assertEqual(case["pipeline_override"][node]["attach"]["fallback_after_refresh"],
+                                         case["name"] == "Yes")
+                self.assertIn("羁绊最大化", switch["description"])
 
 
 if __name__ == "__main__":

@@ -42,11 +42,11 @@ class NativeTeapotOptionTests(unittest.TestCase):
         self.assertEqual(trial["原生自动战斗入口"]["attach"]["native_battle_trial_profile"], "hellish_202611")
         self.assertIs(trial["执行自动编队"]["attach"]["trial_grand_slot_repair"], True)
 
-    def test_default_off_changes_configuration_without_disabling_detection(self):
+    def test_task_option_defaults_to_skipping_teapot_detection(self):
         option = read(f"assets/options/{OPTION}.json")["option"][OPTION]
         self.assertEqual(option["type"], "select")
         self.assertEqual(option["label"], "是否使用茶壶")
-        self.assertEqual(option["default_case"], "No")
+        self.assertEqual(option["default_case"], "Skip")
         cases = {case["name"]: case for case in option["cases"]}
         self.assertEqual([case["label"] for case in option["cases"]], ["使用", "不使用", "不检测"])
         self.assertEqual(set(cases), {"No", "Yes", "Skip"})
@@ -98,10 +98,10 @@ class NativeTeapotOptionTests(unittest.TestCase):
         self.assertEqual(native[CHECK]["next"], ["编队身份-采集"])
         self.assertEqual(pipeline_nodes()["编队身份-采集"]["next"], ["进本-实际点击队伍确认"])
 
-    def test_support_fallback_still_checks_teapot_without_capturing_identities(self):
+    def test_support_fallback_checks_teapot_then_captures_formation(self):
         native = session_override("teapot-routing-test")
         self.assertEqual(native["进本-助战兜底跳过编队"]["next"], [FALLBACK_CHECK])
-        self.assertEqual(native[FALLBACK_CHECK]["next"], ["进本-实际点击队伍确认"])
+        self.assertEqual(native[FALLBACK_CHECK]["next"], ["编队身份-采集"])
 
     def test_shared_bbc_pipeline_keeps_its_original_direct_start_path(self):
         nodes = pipeline_nodes()

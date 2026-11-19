@@ -326,6 +326,8 @@ def _parse_native_card_strategy(value: object) -> NativeCardStrategy:
 
     return NativeCardStrategy(
         enabled=value.get("enabled") is True,
+        fill_priority=(value.get("fill_priority") if value.get("fill_priority") in ("servant", "chain")
+                       else defaults.fill_priority),
         prefer_brave_chain=value.get("prefer_brave_chain", defaults.prefer_brave_chain) is True,
         brave_chain_weight=weight("brave_chain_weight", defaults.brave_chain_weight),
         mighty_chain_weight=weight("mighty_chain_weight", defaults.mighty_chain_weight),

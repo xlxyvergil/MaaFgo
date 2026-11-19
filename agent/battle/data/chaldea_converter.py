@@ -14,7 +14,7 @@ Chaldea actions 数据结构（与 bbc_formatter.convert_actions_to_bbc_rounds �
 约束（诚实边界）：
 - attacks 按原顺序保留从者、卡色和宝具；card 是从者牌组索引，不能当作屏幕位置。
 - Maa 扩展 {"isAuto": true} 保留默认普通卡的位置，不指定从者、卡色或牌组索引。
-- 同一从者的同色面卡按当前画面从左到右选择；未指定的卡由普通选卡策略补齐。
+- 未指定的卡由普通选卡策略补齐。同一从者的同色面卡优先选暴击率较高的卡。
 - 换人：由换人礼装（mystic_code_id 在换人服集合内）的御主技能 3 触发，
   具体首发/候补槽位取 delegate.replaceMemberIndexes。
 """

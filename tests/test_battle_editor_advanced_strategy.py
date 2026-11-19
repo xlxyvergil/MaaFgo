@@ -59,6 +59,19 @@ class GlobalStrategyValidationTests(unittest.TestCase):
             self.assertFalse(report['valid'])
             self.assertIn('maaAdvancedStrategy.preferredAttacker', [i['path'] for i in report['issues']])
 
+    def test_fill_priority_validation_retains_formation_and_unknown_fields(self):
+        for priority in ('servant', 'chain'):
+            data = {'maaAdvancedStrategy': {'fillPriority': priority, 'future': [None, False]},
+                    'team': {'name': '保留', 'onFieldSvts': [{'svtId': 100100}, None, None],
+                             'backupSvts': [None, None, None]}, 'actions': []}
+            before = copy.deepcopy(data)
+            self.assertTrue(validate_battle(data)['valid'])
+            self.assertEqual(data, before)
+        for priority in (None, True, 1, 'unknown'):
+            report = validate_battle({'maaAdvancedStrategy': {'fillPriority': priority}})
+            self.assertFalse(report['valid'])
+            self.assertIn('maaAdvancedStrategy.fillPriority', [i['path'] for i in report['issues']])
+
 
 class GlobalStrategyHTTPTests(unittest.TestCase):
     def setUp(self):
@@ -89,6 +102,7 @@ class GlobalStrategyHTTPTests(unittest.TestCase):
 
     def test_save_reload_draft_and_partial_editor_document_keep_strategy_exactly(self):
         data = {'maaAdvancedStrategy': {'preset': 'brave', 'maxTurns': 52, 'autoServantSkills': False,
+                                      'fillPriority': 'servant',
                                       'preferredAttacker': '504500',
                                       'openingHand': {'enabled': False, 'maxWaitTurns': 3},
                                       'future': {'keep': [None, False]}}, 'future': '保留'}
@@ -105,6 +119,7 @@ class GlobalStrategyHTTPTests(unittest.TestCase):
         self.assertEqual(draft['data'], data)
         changed = copy.deepcopy(data)
         changed['maaAdvancedStrategy']['preset'] = 'mighty'
+        changed['maaAdvancedStrategy']['fillPriority'] = 'chain'
         changed['maaAdvancedStrategy']['preferredAttacker'] = 2
         status, updated = self.request('PUT', '/api/battles/%E4%BB%85%E5%85%A8%E5%B1%80%E7%AD%96%E7%95%A5.json', {'data': changed, 'expectedHash': loaded['hash']})
         self.assertEqual(status, 200, updated)

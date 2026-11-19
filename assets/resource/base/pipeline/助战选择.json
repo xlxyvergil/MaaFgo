@@ -1,12 +1,32 @@
 {
   "助战选择-界面标题锚点": {
-    "doc": "识别右上角助战选择标题，列表为空时仍可确认助战界面并进入自定义筛选。base 使用日服模板，国服由 cn 同名模板覆盖。",
+    "doc": "仅识别右上角助战选择标题。优先使用国日服标题模板，背景变化导致模板未命中时，用同一区域的完整标题 OCR 兜底。列表为空时仍可确认助战界面，卡片上的 NPC 助战标记不能单独确认页面。",
     "recognition": {
-      "type": "TemplateMatch",
+      "type": "Or",
       "param": {
-        "roi": [900, 0, 380, 90],
-        "template": "助战选择界面标记.png",
-        "threshold": 0.8
+        "any_of": [
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "roi": [900, 0, 380, 90],
+                "template": "助战选择界面标记.png",
+                "threshold": 0.8
+              }
+            }
+          },
+          {
+            "sub_name": "base/助战选择/助战选择-界面标题锚点/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [900, 0, 380, 90],
+                "expected": ["^助\\s*战\\s*选\\s*择$", "^サ\\s*ポ\\s*ー\\s*[ト卜]\\s*選\\s*択$"],
+                "threshold": 0.8
+              }
+            }
+          }
+        ]
       }
     }
   },

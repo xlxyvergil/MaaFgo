@@ -134,6 +134,16 @@ class InterludeRunner(StoryRunner):
     def panel(self, image):
         return self.total_list(image) or self.on_map(image)
 
+    def _check_formation_handoff(self, image):
+        # 只用当前截图确认页面。操作后若出现剧情或奖励，下一轮恢复完整检查。
+        for page in (
+            "进本-战斗主界面已出现", "进本-队伍确认",
+            "助战选择-确认按钮锚点", "助战选择-界面标题锚点",
+        ):
+            if self.reco(page, image):
+                return super().interrupt(image, forming=True, confirmed_page=page), page
+        return super()._check_formation_handoff(image)
+
     def interrupt(self, image, *, entering=False, forming=False):
         # 奖励可能透出原列表，必须先处理，再允许地图/列表作为结算出口。
         for name in ("剧情奖励-展示继续", "剧情奖励-礼装详情关闭",

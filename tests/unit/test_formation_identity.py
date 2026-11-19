@@ -11,7 +11,7 @@ import cv2
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from formation_test_support import formation as f
+from formation_test_support import ROOT, formation as f
 from battle.core.models import Confidence, FormationSlot, InitialFormation
 from chaldea.servant_aliases import build_servant_lookup
 from chaldea.support_criteria import build_support_criteria
@@ -56,6 +56,24 @@ class IdentityTests(unittest.TestCase):
     def reader(self, calibration=None):
         return f.FormationIdentityReader([self.root], calibration or self.calibration, self.catalog)
 
+    def restricted_formation(self, support_slots):
+        image = self.image.copy()
+        marker_path = ROOT / "assets/resource/base/image/battle/编队锁定空位.png"
+        lock = cv2.imdecode(np.fromfile(marker_path, np.uint8), cv2.IMREAD_COLOR)
+        image_write(self.root / "battle/编队锁定空位.png", lock)
+        marker_height, marker_width = lock.shape[:2]
+        for slot in (3, 6):
+            x, y, width, height = f.SLOT_ROIS[slot - 1]
+            image[y:y + height, x:x + width] = (45, 30, 15)
+            image[y + 17:y + 17 + marker_height, x + 9:x + 9 + marker_width] = lock
+        if 5 in support_slots:
+            x, y, width, height = f.SLOT_ROIS[4]
+            image[y:y + height, x:x + width] = (40, 60, 100)
+        for slot in support_slots:
+            x, y, _, _ = f.SLOT_ROIS[slot - 1]
+            image[y:y + 20, x:x + 35] = self.images["助战标记"]
+        return image
+
     def test_six_slots_support_empty_and_repeated_identity(self):
         x, y, w, h = f.SLOT_ROIS[2]
         self.image[y:y + 20, x:x + 35] = self.images["助战标记"]
@@ -70,6 +88,32 @@ class IdentityTests(unittest.TestCase):
         self.assertNotEqual(snapshot.member_key(1), snapshot.member_key(3))
         with self.assertRaises(FrozenInstanceError):
             snapshot.slots = ()
+
+    def test_restricted_formation_reads_each_support_and_locked_slot(self):
+        for support_slots in ((1, 4), (1, 4, 5)):
+            with self.subTest(support_slots=support_slots):
+                image = self.restricted_formation(support_slots)
+                slots = self.reader().read_frame(image)
+                self.assertEqual(tuple(s.slot for s in slots if s.is_support), support_slots)
+                for slot in (3, 6):
+                    empty = slots[slot - 1]
+                    self.assertEqual((empty.status, empty.is_support, empty.reason),
+                                     ("empty", False, "restricted_slot_locked"))
+                self.assertEqual([slots[i].servant_id for i in (0, 1, 3)], ["1000"] * 3)
+                self.assertEqual(slots[4].status, "unknown" if 5 in support_slots else "identified")
+
+    def test_multiple_supports_recover_occluded_portraits_only_in_support_slots(self):
+        for support_slots, expected_identity in (((1,), None), ((1, 4), "1000")):
+            with self.subTest(support_slots=support_slots):
+                image = self.restricted_formation(support_slots)
+                # Simulate a restriction notice covering the lower portrait.
+                for x, y, _, _ in f.SLOT_ROIS[:2]:
+                    image[y + 111:y + 140, x + 25:x + 100] = (14, 21, 33)
+                slots = self.reader().read_frame(image)
+                self.assertTrue(slots[0].is_support)
+                self.assertEqual(slots[0].servant_id, expected_identity)
+                self.assertFalse(slots[1].is_support)
+                self.assertIsNone(slots[1].servant_id)
 
     def test_variants_are_grouped_before_margin(self):
         reader = self.reader()

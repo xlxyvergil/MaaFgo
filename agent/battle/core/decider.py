@@ -10,8 +10,9 @@ V2：支持 BattlePlan（固定回合计划）。有计划时：
 无计划时退回 V1b 行为。
 
 显式启用 native_strategy 时，只枚举尚未指定的普通卡空位，对完整三张
-组合评分。既定宝具/普通卡的位置不变；宝具颜色只接受显式配置，
-暴击率与 HP 均不猜测。
+组合评分。既定宝具/普通卡的位置不变，宝具颜色只接受显式配置。
+
+RuleDecider 在确定出卡后比较同一从者同色面卡的暴击率。
 """
 from __future__ import annotations
 
@@ -30,6 +31,12 @@ _GOAL_COLOR = {
     Goal.BUILD_NP: CardColor.ARTS,
     Goal.BUILD_STARS: CardColor.QUICK,
 }
+
+
+def _uses_native_card_fill(policy: CardPolicy) -> bool:
+    native = policy.native_strategy
+    return (native.enabled or native.fill_priority == "servant"
+            or bool(native.preferred_servant_ids or native.preferred_slots))
 
 
 class Decider(Protocol):
@@ -53,10 +60,11 @@ class RuleDecider:
                 f"brave={native.brave_chain_weight if native.prefer_brave_chain else 0} "
                 f"mighty={native.mighty_chain_weight if self.card_policy.prefer_mighty_chain else 0} "
                 f"same_color={native.same_color_chain_weight} "
+                f"fill_priority={native.fill_priority} "
                 f"preferred_ids={native.preferred_servant_ids} preferred_slots={native.preferred_slots}; "
                 f"configured_np_colors={native.np_colors_by_servant_id}/{native.np_colors_by_slot}; "
                 f"np_color_preservation={native.np_color_preservation_weight if native.avoid_np_color_before_np else 0}; "
-                "使用已识别卡色/归属及显式宝具颜色，不推断HP或暴击率"
+                "组合评分使用已识别的卡色、归属及显式配置的宝具颜色"
             )
 
     @property
@@ -123,7 +131,7 @@ class RuleDecider:
         tp = self.plan.active_turn(turn_index) if self.plan is not None else None
 
         if tp is not None and tp.card_sequence:
-            picks = _resolve_planned_cards(tp, state, self.card_policy)
+            picks = _prefer_higher_crit(_resolve_planned_cards(tp, state, self.card_policy), state.cards)
             mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 攻略出卡={tp.card_sequence} 实际={picks}")
             return BattleAction(target_enemy=target, picks=picks,
                                 rationale_tag=f"v2:turn{turn_index}_cards" + (
@@ -148,7 +156,7 @@ class RuleDecider:
         # ---- 面卡补齐 ----
         need = 3 - len(np_picks)
         face_picks: List[CardPick] = []
-        if self.card_policy.native_strategy.enabled:
+        if _uses_native_card_fill(self.card_policy):
             picks = _complete_native_cards(list(np_picks), state, self.card_policy)
         elif need > 0 and state.cards:
             slots = _best_face_order(
@@ -166,9 +174,33 @@ class RuleDecider:
             tag += ":native_strategy"
         return BattleAction(
             target_enemy=target,
-            picks=picks,
+            picks=_prefer_higher_crit(picks, state.cards),
             rationale_tag=tag
         )
+
+
+def _prefer_higher_crit(
+    picks: Tuple[CardPick, ...], cards: Tuple[CommandCard, ...],
+) -> Tuple[CardPick, ...]:
+    """在既定出卡位置内，优先选同一从者、同色且可攻击的高暴击率面卡。"""
+    positions = {pick.slot: index for index, pick in enumerate(picks)
+                 if pick.kind is PrimitiveKind.SELECT_CARD}
+    groups: dict[tuple[int, str | None, CardColor], list[CommandCard]] = {}
+    for card in cards:
+        if (card.can_attack and card.color is not CardColor.UNKNOWN
+                and is_slot(card.owner_slot, 1, 3) and is_slot(card.crit_percent, 0, 100)):
+            groups.setdefault((card.owner_slot, card.owner_servant_id, card.color), []).append(card)
+
+    ordered = list(picks)
+    for group in groups.values():
+        if len(group) < 2:
+            continue
+        selected_positions = sorted(positions[card.ui_slot] for card in group if card.ui_slot in positions)
+        # 同暴击率时优先保留既定牌，未识别到暴击率的出卡位置不参与替换。
+        group.sort(key=lambda card: (-(card.crit_percent or 0), positions.get(card.ui_slot, len(picks))))
+        for index, card in zip(selected_positions, group):
+            ordered[index] = CardPick(PrimitiveKind.SELECT_CARD, card.ui_slot)
+    return tuple(ordered)
 
 
 def _resolve_planned_cards(tp: TurnPlan, state: BattleState, policy: CardPolicy) -> Tuple[CardPick, ...]:
@@ -195,7 +227,7 @@ def _resolve_planned_cards(tp: TurnPlan, state: BattleState, policy: CardPolicy)
                 used_faces.add(card.ui_slot)
         picks.append(pick)
 
-    if policy.native_strategy.enabled:
+    if _uses_native_card_fill(policy):
         return _complete_native_cards(picks, state, policy)
 
     remaining = tuple(card for card in state.cards if card.ui_slot not in used_faces)
@@ -228,21 +260,60 @@ def _complete_native_cards(
             picks[index] = CardPick(PrimitiveKind.SELECT_CARD, card.ui_slot)
         return tuple(pick for pick in picks if pick is not None)
 
-    best = max((complete(faces) for faces in permutations(remaining, need)),
-               key=lambda picks: _native_card_score(picks, state, policy))
-    mfaalog.info(f"[NativeCardStrategy] 固定位置={template} 补齐={best} "
-                 f"评分={_native_card_score(best, state, policy)}")
+    preferred = _native_preferred_owners(state, policy)
+    native = policy.native_strategy
+    if need and native.fill_priority == "servant" and not (native.preferred_servant_ids or native.preferred_slots):
+        if preferred[1]:
+            mfaalog.info(f"[NativeCardStrategy] 自动主输出=当前前排{preferred[1][0]}（最靠前的已确认攻击宝具从者）")
+        else:
+            mfaalog.warning("当前前排没有已确认的攻击宝具从者，无法自动指定主输出。本次按连携策略补牌；可在「主输出偏好」指定前排位置或从者。")
+    automatic_faces = frozenset(card.ui_slot for card in remaining)
+
+    def score(picks):
+        return _native_card_score(picks, state, policy, automatic_face_slots=automatic_faces,
+                                  preferred_owners=preferred)
+    best = max((complete(faces) for faces in permutations(remaining, need)), key=score)
+    mfaalog.info(f"[NativeCardStrategy] 优先级={native.fill_priority} 固定位置={template} 补齐={best} "
+                 f"评分={score(best)}")
     return best
+
+
+def _native_preferred_owners(state: BattleState, policy: CardPolicy) -> tuple[tuple[str, ...], tuple[int, ...]]:
+    """An automatic target is one actual frontline instance, never every equal ID."""
+    native = policy.native_strategy
+    if native.preferred_servant_ids or native.preferred_slots or native.fill_priority != "servant":
+        return native.preferred_servant_ids, native.preferred_slots
+    attackers = [servant for servant in state.servants if is_slot(servant.slot, 1, 3) and servant.has_attack_np]
+    return ((), (min(attackers, key=lambda servant: servant.slot).slot,)) if attackers else ((), ())
 
 
 def _native_card_score(
     picks: Tuple[CardPick, ...], state: BattleState, policy: CardPolicy,
-) -> tuple[int, int, float]:
-    """先保证可攻击与已知卡色数量，再比较可编辑偏好；不模拟实际收益。"""
+    *, automatic_face_slots: frozenset[int] | None = None,
+    preferred_owners: tuple[tuple[str, ...], tuple[int, ...]] | None = None,
+) -> tuple[int, int, float, float]:
+    """Safety first, then lexicographic servant/chain objectives in selected order."""
     native = policy.native_strategy
+    preferred_ids, preferred_slots = preferred_owners or _native_preferred_owners(state, policy)
+    faces = {card.ui_slot: card for card in state.cards}
+    automatic = tuple(faces[pick.slot] for pick in picks if pick.kind is PrimitiveKind.SELECT_CARD
+                      and (automatic_face_slots is None or pick.slot in automatic_face_slots))
+
+    def priority(value, ordered) -> float:
+        return (len(ordered) - ordered.index(value)) / len(ordered) if value in ordered else 0.0
+
+    owner_score = sum(max(priority(card.owner_servant_id, preferred_ids),
+                          priority(card.owner_slot if is_slot(card.owner_slot, 1, 3) else None,
+                                   preferred_slots))
+                      for card in automatic if card.can_attack)
+    if not native.enabled:
+        # Disabling enhanced chains preserves the original ordinary-card score,
+        # while an explicitly selected servant-first ordering still applies.
+        attackable, known_colors, chain_score = _face_order_score(automatic, policy)
+        return ((attackable, known_colors, owner_score, chain_score) if native.fill_priority == "servant"
+                else (attackable, known_colors, chain_score, owner_score))
     weights = {c: len(policy.color_priority) - i for i, c in enumerate(policy.color_priority)}
     weights.update(native.color_weights)
-    faces = {card.ui_slot: card for card in state.cards}
     nps = {card.servant_slot: card for card in state.np_cards if card.available}
     np_id_colors = dict(native.np_colors_by_servant_id)
     np_slot_colors = dict(native.np_colors_by_slot)
@@ -291,14 +362,6 @@ def _native_card_score(
     if n == 3 and native.prefer_brave_chain and owners[0] is not None and len(set(owners)) == 1:
         score += native.brave_chain_weight
 
-    def priority(value, ordered) -> float:
-        return (len(ordered) - ordered.index(value)) / len(ordered) if value in ordered else 0.0
-
-    for sid, slot in zip(identities, owners):
-        score += native.servant_priority_weight * max(
-            priority(sid, native.preferred_servant_ids),
-            priority(slot, native.preferred_slots),
-        )
     if native.avoid_np_color_before_np:
         for np_index, pick in enumerate(picks):
             if (pick.kind is not PrimitiveKind.SELECT_NP or colors[np_index] is None
@@ -314,7 +377,8 @@ def _native_card_score(
                         and owners[face_index] == owners[np_index]
                         and identities[face_index] == identities[np_index]):
                     score -= native.np_color_preservation_weight
-    return attackable, known_colors, score
+    return ((attackable, known_colors, owner_score, score) if native.fill_priority == "servant"
+            else (attackable, known_colors, score, owner_score))
 
 
 def _pick_target(state: BattleState):
@@ -364,57 +428,59 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     return tuple(skills[:skill_policy.max_skills_per_turn] if skill_policy.max_skills_per_turn > 0 else skills)
 
 
+def _face_order_score(seq: Tuple[CommandCard, ...], policy: CardPolicy) -> tuple[int, int, float]:
+    if not seq:
+        return 0, 0, 0.0
+    weights = {c: len(policy.color_priority) - i for i, c in enumerate(policy.color_priority)}
+    goal_color = _GOAL_COLOR.get(policy.goal)
+
+    s = 0.0
+    n = len(seq)
+    for pos, card in enumerate(seq):
+        s += weights.get(card.color, 0) * (n - pos)      # 靠前的卡权重更高
+    colors = {c.color for c in seq}
+    if len(colors) == 1 and CardColor.UNKNOWN not in colors:  # 已识别的同色链
+        s += 5.0
+    elif colors == {CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK} and policy.prefer_mighty_chain:
+        # 三色连锁（红蓝绿各一张）：全卡享受三种首卡染色加成，
+        # 顺序偏好取决于目标：
+        #   FINISH_WAVE → QAB（绿垫刀，红末位吃最高倍率）
+        #   BUILD_NP    → BQA（红首位压血线，蓝末位吃140%）
+        #   BUILD_STARS → ABQ（蓝首位，绿末位吃112%）
+        s += 8.0
+        if goal_color is not None:
+            # 目标色卡放末位（吃最高位置加成）
+            if seq[-1].color is goal_color:
+                s += 4.0
+            # 根据目标推荐首位
+            if goal_color is CardColor.BUSTER:
+                # FINISH_WAVE: 绿卡首位垫刀
+                if seq[0].color is CardColor.QUICK:
+                    s += 3.0
+            elif goal_color is CardColor.ARTS:
+                # BUILD_NP: 红卡首位压血线
+                if seq[0].color is CardColor.BUSTER:
+                    s += 3.0
+            elif goal_color is CardColor.QUICK:
+                # BUILD_STARS: 蓝卡首位
+                if seq[0].color is CardColor.ARTS:
+                    s += 3.0
+    if goal_color is not None:
+        # 通用：首卡/末卡目标色加分（同色链、三色链、杂色均适用）
+        if seq[0].color is goal_color:
+            s += 3.0
+        if seq[-1].color is goal_color:
+            s += 2.0
+    return (sum(card.can_attack for card in seq),
+            sum(card.color is not CardColor.UNKNOWN for card in seq), s)
+
 def _best_face_order(
     cards: Tuple[CommandCard, ...],
     need: int,
     policy: CardPolicy,
 ) -> List[int]:
-    weights = {c: len(policy.color_priority) - i for i, c in enumerate(policy.color_priority)}
-    goal_color = _GOAL_COLOR.get(policy.goal)
-
-    def score(seq: Tuple[CommandCard, ...]) -> tuple[int, int, float]:
-        s = 0.0
-        n = len(seq)
-        for pos, card in enumerate(seq):
-            s += weights.get(card.color, 0) * (n - pos)      # 靠前的卡权重更高
-        colors = {c.color for c in seq}
-        if len(colors) == 1 and CardColor.UNKNOWN not in colors:  # 已识别的同色链
-            s += 5.0
-        elif colors == {CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK} and policy.prefer_mighty_chain:
-            # 三色连锁（红蓝绿各一张）：全卡享受三种首卡染色加成，
-            # 顺序偏好取决于目标：
-            #   FINISH_WAVE → QAB（绿垫刀，红末位吃最高倍率）
-            #   BUILD_NP    → BQA（红首位压血线，蓝末位吃140%）
-            #   BUILD_STARS → ABQ（蓝首位，绿末位吃112%）
-            s += 8.0
-            if goal_color is not None:
-                # 目标色卡放末位（吃最高位置加成）
-                if seq[-1].color is goal_color:
-                    s += 4.0
-                # 根据目标推荐首位
-                if goal_color is CardColor.BUSTER:
-                    # FINISH_WAVE: 绿卡首位垫刀
-                    if seq[0].color is CardColor.QUICK:
-                        s += 3.0
-                elif goal_color is CardColor.ARTS:
-                    # BUILD_NP: 红卡首位压血线
-                    if seq[0].color is CardColor.BUSTER:
-                        s += 3.0
-                elif goal_color is CardColor.QUICK:
-                    # BUILD_STARS: 蓝卡首位
-                    if seq[0].color is CardColor.ARTS:
-                        s += 3.0
-        if goal_color is not None:
-            # 通用：首卡/末卡目标色加分（同色链、三色链、杂色均适用）
-            if seq[0].color is goal_color:
-                s += 3.0
-            if seq[-1].color is goal_color:
-                s += 2.0
-        return (sum(card.can_attack for card in seq),
-                sum(card.color is not CardColor.UNKNOWN for card in seq), s)
-
-    best = max(permutations(cards, need), key=score)
-    return [c.ui_slot for c in best]
+    best = max(permutations(cards, need), key=lambda seq: _face_order_score(seq, policy))
+    return [card.ui_slot for card in best]
 
 
 def _log_plan_turn(turn_index: int, tp: TurnPlan) -> None:

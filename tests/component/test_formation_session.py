@@ -10,6 +10,7 @@ from unittest.mock import Mock, patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from formation_test_support import ROOT, formation as f, battle_action as a, repeat_action as r
 from battle.core.models import FormationSlot
+from battle.runtime.bond_stop_state import bond_stops
 from battle.runtime.formation_session import FormationSessions, SESSION_NODE, session_override, sessions
 
 
@@ -234,6 +235,41 @@ class EntryTests(unittest.TestCase):
             result = a.AutoBattleAction().run(ctx, NS(custom_action_param="{}"))
             self.assertTrue(result.success)
             self.assertIs(runtime.call_args.kwargs["initial_formation"], snapshot)
+
+    def test_restricted_fallback_uses_fresh_formation_in_runtime(self):
+        ctx = FakeContext()
+        self.addCleanup(bond_stops.finish, ctx.root)
+        token = self.start(ctx)
+        verified_slots = tuple(FormationSlot(i, "identified", "100100", is_support=i == 3)
+                               for i in range(1, 7))
+        sessions.publish_verified(ctx.root, token, sessions.begin_update(ctx.root, token), verified_slots)
+        sessions.set_support_fallback(ctx.root, token, True)
+        actual_slots = (
+            FormationSlot(1, "identified", "405900", is_support=False),
+            FormationSlot(2, "unknown", is_support=True),
+            FormationSlot(3, "empty", is_support=False),
+            *SLOTS[3:],
+        )
+
+        def sample(entry, pipeline_override):
+            self.assertEqual(entry, "编队身份-采样")
+            for node in pipeline_override.values():
+                revision = node["recognition"]["param"]["custom_recognition_param"]["revision"]
+                self.assertEqual(sessions.capture_seed(ctx.root, token, revision), ())
+                sessions.append_frame(ctx.root, token, revision, actual_slots)
+            return NS(status=NS(succeeded=True))
+
+        ctx.run_task.side_effect = sample
+        self.assertTrue(f.CaptureInitialFormation().run(ctx, NS(node_name="编队身份-采集")).success)
+        snapshot, _ = sessions.read(ctx.root, token)
+        self.assertEqual([(s.status, s.servant_id, s.is_support) for s in snapshot.slots],
+                         [(s.status, s.servant_id, s.is_support) for s in actual_slots])
+        with patch.object(a, "AutoBattleRuntime") as runtime:
+            runtime.return_value.run.return_value = NS(ok=True, reason="fixture", turns=1)
+            self.assertTrue(a.AutoBattleAction().run(ctx, NS(
+                custom_action_param='{"native_battle_formation_reset":true}')).success)
+            self.assertIs(runtime.call_args.kwargs["initial_formation"], snapshot)
+            self.assertEqual(runtime.call_args.kwargs["roster_servant_ids"], ("405900",) + (None,) * 5)
 
     def test_failed_capture_discards_snapshot_and_starts_runtime_with_generic_strategy(self):
         ctx = FakeContext()
