@@ -327,13 +327,16 @@ class StoryRunner:
             self.pause()
         raise StoryStopped("确认撤退后未返回主线地图或副本列表，已停止。请回到当前章节后重试；未再次开战。")
 
-    def interrupt(self, image, *, entering=False, forming=False):
+    def interrupt(self, image, *, entering=False, forming=False, confirmed_page=None):
         """已识别事件才操作；剧情跳过分帧确认，避免切换中重复点击。"""
         if entering or forming:
             self.check_formation_restriction(image)
-            if self._handle_restricted_formation(image):
+            if self._handle_restricted_formation(
+                image, formation_confirmed=confirmed_page == "进本-队伍确认",
+            ):
                 return True
-        skip_enabled = (self.ctx.get_node_data("跳过剧情-点击跳过") or {}).get("enabled", True)
+        skip_enabled = confirmed_page is None and (
+            self.ctx.get_node_data("跳过剧情-点击跳过") or {}).get("enabled", True)
         # 强制剧情选项会使 SKIP 灰显，必须在跳过确认的等待窗口之前处理。
         for choice_node, label in (
             ("主线-剧情选择-不赞同魁札尔", "不赞同魁札尔·科亚特尔"),
@@ -385,7 +388,7 @@ class StoryRunner:
             self.task("全局-战前吃体力")
             return True
         now = self.clock()
-        if self.skip_confirm_until:
+        if confirmed_page is None and self.skip_confirm_until:
             result = self.reco("跳过剧情-确认跳过", image)
             if result:
                 self.action("跳过剧情-确认跳过", result)
@@ -395,7 +398,9 @@ class StoryRunner:
             if now < self.skip_confirm_until:
                 return False
             self.skip_confirm_until = 0
-        if now >= self.skip_settle_until and (result := self.reco("跳过剧情-点击跳过", image)):
+        if confirmed_page is None and now >= self.skip_settle_until and (
+            result := self.reco("跳过剧情-点击跳过", image)
+        ):
             self.ctx.clear_hit_count("跳过剧情-点击跳过")
             self.action("跳过剧情-点击跳过", result)
             self.skip_confirm_until = self.clock() + 4
@@ -615,6 +620,9 @@ class StoryRunner:
                 return_since = None
         raise StoryStopped("进本超时：未到达助战/战斗，或纯剧情返回尚未确认")
 
+    def _check_formation_handoff(self, image):
+        return self.interrupt(image, forming=True), None
+
     def reach_formation(self):
         """从助战交接到编队；特殊编制限制保留现场，避免通用进本反复关弹窗。"""
         entry = self.ctx.get_node_data("进本流程") or {}
@@ -628,20 +636,25 @@ class StoryRunner:
         # 限制编队确认后留出时间重新截图并确认开始按钮；普通助战仍使用原超时。
         while self.clock() < max(deadline, getattr(self, "_post_formation_decide_deadline", 0)):
             image = self.frame()
+            confirmed_page = None
             # 已保存限制编队且看到开始按钮时，只检查限制编队自身的弹窗和卡位。
             after_decide = getattr(self, "_post_formation_decide_deadline", 0)
             formation_confirmed = bool(after_decide and self.reco("进本-队伍确认", image))
             if formation_confirmed:
                 interrupted = self._handle_restricted_formation(image, formation_confirmed=True)
             else:
-                interrupted = self.interrupt(image, forming=True)
+                interrupted, confirmed_page = self._check_formation_handoff(image)
             if interrupted:
                 formation_since = None
                 self.pause()
                 continue
-            if self.reco("进本-战斗主界面已出现", image):
+            if confirmed_page == "进本-战斗主界面已出现" or (
+                confirmed_page is None and self.reco("进本-战斗主界面已出现", image)
+            ):
                 return
-            if formation_confirmed or self.reco("进本-队伍确认", image):
+            if formation_confirmed or confirmed_page == "进本-队伍确认" or (
+                confirmed_page is None and self.reco("进本-队伍确认", image)
+            ):
                 if formation_since is None:
                     formation_since = self.clock()
                 if self.clock() - formation_since >= 1:

@@ -178,6 +178,54 @@ class ForcedStoryChoiceTests(unittest.TestCase):
         self.assertEqual(context.actions, [])
 
 
+class FormationHandoffTests(unittest.TestCase):
+    def test_confirmed_pages_skip_story_and_reward_checks(self):
+        formation = "进本-队伍确认"
+        support, pick = "助战选择-界面标题锚点", "进本-选择助战"
+        support_confirm = "助战选择-确认按钮锚点"
+        battle = "进本-战斗主界面已出现"
+        for page, frames, expected_actions in (
+            (support, [{support, pick}, {battle}], [pick]),
+            (support_confirm, [{support_confirm, pick}, {battle}], [pick]),
+            (formation, [{formation}, {formation}, {formation}], []),
+            (battle, [{battle}], []),
+        ):
+            with self.subTest(page=page):
+                runtime, context = runner(frames)
+                context.nodes["进本流程"]["next"] = [pick, formation]
+                runtime.skip_confirm_until = 30
+                runtime.reach_formation()
+                self.assertIn("进本-攻略提示关闭", context.recognitions)
+                self.assertFalse(any(name.startswith((
+                    "剧情奖励-", "结算-奖励详情返回", "主线-剧情选择-", "跳过剧情-",
+                )) for name in context.recognitions))
+                self.assertEqual([name for name, _ in context.actions], expected_actions)
+
+    def test_popup_with_start_button_is_handled_before_confirming_formation(self):
+        formation = "进本-队伍确认"
+        popup = "进本-攻略提示关闭"
+        runtime, context = runner([{formation, popup}, {formation}, {formation}, {formation}])
+        runtime.reach_formation()
+        self.assertEqual([name for name, _ in context.actions], [popup])
+
+    def test_unconfirmed_frame_after_support_restores_reward_and_story_checks(self):
+        support, pick = "助战选择-界面标题锚点", "进本-选择助战"
+        reward, story = "剧情奖励-展示继续", "跳过剧情-强制选项"
+        battle = "进本-战斗主界面已出现"
+        runtime, context = runner([{support, pick}, {reward}, {story}, {battle}])
+        context.nodes["进本流程"]["next"] = [pick]
+        runtime.reach_formation()
+        self.assertEqual([name for name, _ in context.actions], [pick, reward, story])
+
+    def test_npc_marker_without_support_title_keeps_reward_check(self):
+        reward = "剧情奖励-展示继续"
+        runtime, context = runner()
+        handled, page = runtime._check_formation_handoff({"主线-助战界面", reward})
+        self.assertTrue(handled)
+        self.assertIsNone(page)
+        self.assertEqual([name for name, _ in context.actions], [reward])
+
+
 class ProgressTests(unittest.TestCase):
     def tearDown(self):
         bond_stops.finish(12345)

@@ -25,6 +25,7 @@ class FreeQuestRunner:
     on_map = StoryRunner.on_map
     failure = StoryRunner.failure
     is_defeat = StoryRunner.is_defeat
+    _check_formation_handoff = StoryRunner._check_formation_handoff
     reach_formation = StoryRunner.reach_formation
     settle = StoryRunner.settle
 
