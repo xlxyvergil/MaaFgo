@@ -75,7 +75,7 @@ class ConfigurationTests(unittest.TestCase):
         task = load("assets/tasks/自动幕间副本.json")["task"][0]
         self.assertTrue({"幕间-挑战次数上限", "吃苹果", "原生自动战斗跳过剧情",
                          "幕间-自动处理编队限制", "原生自动战斗使用Chaldea队伍",
-                         "原生自动战斗助战方式", "原生自动战斗高级策略"}.issubset(task["option"]))
+                         "幕间与强化-助战方式", "原生自动战斗高级策略"}.issubset(task["option"]))
 
     def test_interlude_options_write_only_interlude_configuration(self):
         options = load("assets/options/自动幕间副本.json")["option"]
