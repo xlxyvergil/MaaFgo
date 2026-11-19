@@ -4,7 +4,7 @@
       "type": "select",
       "label": "是否使用茶壶",
       "description": "使用：确认并开启茶壶；不使用：确认并关闭茶壶；不检测：跳过茶壶检测和设置，沿用游戏内当前状态。",
-      "default_case": "No",
+      "default_case": "Skip",
       "cases": [
         {
           "name": "Yes",
