@@ -16,9 +16,9 @@ from battle.core.policy import CardPolicy, NativeCardStrategy
 from battle.data.chaldea_converter import convert_chaldea_actions_to_battle_plan
 
 
-def face(slot, color=Color.BUSTER, owner=None, sid=None, *, blocked=False):
+def face(slot, color=Color.BUSTER, owner=None, sid=None, *, blocked=False, crit_percent=None):
     return CommandCard(slot, color, owner, Confidence(1),
-                       owner_servant_id=sid, can_attack=not blocked)
+                       owner_servant_id=sid, can_attack=not blocked, crit_percent=crit_percent)
 
 
 def state(cards, nps=(), servants=()):
@@ -117,6 +117,40 @@ class NativeStrategyParsingTests(unittest.TestCase):
 
 
 class NativeStrategyDecisionTests(unittest.TestCase):
+    def test_crit_tiebreak_keeps_planned_servants_colors_and_np_position(self):
+        cards = [face(1, owner=1, sid="100100", crit_percent=0),
+                 face(2, owner=1, sid="100100", crit_percent=80),
+                 face(3, Color.ARTS, 1, "100100", crit_percent=10),
+                 face(4, owner=2, sid="100100", crit_percent=100),
+                 face(5, Color.QUICK, 1, "100100", crit_percent=100)]
+        plan = planned([{"svt": 0, "card": 0, "cardType": 2}, NP1,
+                        {"svt": 0, "card": 1, "cardType": 1}])
+        snapshot = state(cards, (NpCard(1, Confidence(1)),))
+        for config in (CardPolicy(), policy()):
+            with self.subTest(native=config.native_strategy.enabled):
+                self.assertEqual(pairs(RuleDecider(config, plan).decide(snapshot).picks),
+                                 [(Kind.SELECT_CARD, 2), (Kind.SELECT_NP, 1), (Kind.SELECT_CARD, 3)])
+
+    def test_crit_tiebreak_uses_best_available_copies_during_automatic_fill(self):
+        cards = [face(1, owner=1, crit_percent=20), face(2, owner=1, crit_percent=80),
+                 face(3, owner=1, crit_percent=90), face(4, owner=1, crit_percent=100, blocked=True),
+                 face(5, Color.ARTS, 2, crit_percent=100)]
+        snapshot = state(cards, (NpCard(1, Confidence(1)),))
+        for config in (CardPolicy(), policy()):
+            with self.subTest(native=config.native_strategy.enabled):
+                self.assertEqual(pairs(RuleDecider(config).decide(snapshot).picks),
+                                 [(Kind.SELECT_NP, 1), (Kind.SELECT_CARD, 3), (Kind.SELECT_CARD, 2)])
+
+    def test_crit_tiebreak_preserves_equal_or_unread_chances(self):
+        nps = (NpCard(1, Confidence(1)), NpCard(2, Confidence(1)))
+        for first, second in ((None, 80), (0, None), (80, 80)):
+            with self.subTest(first=first, second=second):
+                cards = [face(1, owner=1, crit_percent=first), face(2, owner=1, crit_percent=second),
+                         face(3, owner=None, crit_percent=100), face(4, owner=2, crit_percent=100),
+                         face(5, Color.ARTS, 1, crit_percent=100)]
+                self.assertEqual(RuleDecider().decide(state(cards, nps)).picks[-1],
+                                 CardPick(Kind.SELECT_CARD, 1))
+
     def test_servant_and_chain_priority_resolve_a_conflict_in_opposite_order(self):
         cards = [face(1, Color.QUICK, 2, "200100"), face(2, Color.QUICK, 2, "200100"),
                  face(3, Color.QUICK, 2, "200100"), face(4, Color.BUSTER, 1, "100100"),

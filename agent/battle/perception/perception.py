@@ -11,7 +11,9 @@
 """
 from __future__ import annotations
 
+from collections import Counter
 from dataclasses import replace
+import re
 from typing import List, Optional, Sequence, Tuple
 
 import mfaalog
@@ -99,6 +101,7 @@ def build(
                 )
                 for card in cards
             )
+        cards = _read_crit_percents(context, img, cards)
         np_cards = tuple(c for c in (_detect_np(context, img, s, np_owners.get(s))
                                     for s in config.FRONTLINE_SLOTS) if c)
         servants = _command_servants(frontline_servant_ids or (), cards, np_cards)
@@ -224,6 +227,52 @@ def _detect_card(context, img, ui_slot: int) -> CommandCard:
     if color is None:
         return CommandCard(ui_slot, CardColor.UNKNOWN, None, Confidence(0.0, "ocr"))
     return CommandCard(ui_slot, color, owner_slot=None, confidence=Confidence(float(score), "ocr"))
+
+
+def _read_crit_percents(context, img, cards: Tuple[CommandCard, ...]) -> Tuple[CommandCard, ...]:
+    # 暴击率仅用于同一前排从者的同色面卡，省去其余卡牌的 OCR。
+    eligible = [card for card in cards if card.can_attack
+                and card.owner_slot is not None and card.color is not CardColor.UNKNOWN]
+    counts = Counter((card.owner_slot, card.owner_servant_id, card.color) for card in eligible)
+    percents = {
+        card.ui_slot: _detect_crit_percent(context, img, card.ui_slot) for card in eligible
+        if counts[card.owner_slot, card.owner_servant_id, card.color] > 1
+    }
+    return tuple(replace(card, crit_percent=percents[card.ui_slot])
+                 if card.ui_slot in percents else card for card in cards)
+
+
+def _detect_crit_percent(context, img, ui_slot: int) -> int | None:
+    star = config.FACE_CRIT_STAR_NODE
+    slot_x = config.FACE_CRIT_STAR_X[ui_slot - 1]
+    badge = context.run_recognition(star, img, {
+        star: {"recognition": {"param": {"roi": [slot_x - 30, 329, 61, 102]}}},
+    })
+    if badge is None:
+        return None
+    if not badge.hit:
+        return 0  # 0% 不显示星形徽标
+    if badge.best_result.score < .80:
+        return None
+    x, y, w, h = badge.box
+    x += w // 2 + 16
+    y += h // 2 - 28
+    width, height = 106, 47
+    strip = img[y:y + height, x:x + width]
+    low = strip.min(axis=2)
+    # 金色滚动数字即使恰好经过整十，也不能作为最终暴击率。
+    if ((low > 155) & (strip.max(axis=2) - low < 34)).sum() < 200:
+        return None
+
+    node = config.FACE_CRIT_PERCENT_NODE
+    result = context.run_recognition(node, img, {
+        node: {"recognition": {"param": {"roi": [x, y, width, height]}}},
+    })
+    if not result or not result.hit or not result.best_result:
+        return None
+    if not (match := re.fullmatch(r"([1-9]0|100)%", result.best_result.text)):
+        return None
+    return int(match[1])
 
 
 def _detect_np(context, img, servant_slot: int, owner=None) -> Optional[NpCard]:

@@ -5,6 +5,8 @@ from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import Mock
 
+import numpy as np
+
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'agent'), str(ROOT / 'agent/custom')]
 from battle.core.enums import CardColor
@@ -31,7 +33,8 @@ def harness(*, faces=None, nps=None, blocked=()):
         records[config.NP_VISUAL_NODE.format(servant_slot=slot)] = result(True, 'ET')
         records[config.NP_FRAME_NODE.format(servant_slot=slot)] = result(True)
         records[config.NP_BLOCKED_NODE.format(servant_slot=slot)] = result(slot in blocked)
-    ctx = NS(run_recognition=Mock(side_effect=lambda node, _: records.get(node, result())))
+    ctx = NS(run_recognition=Mock(
+        side_effect=lambda node, image, pipeline_override=None: records.get(node, result())))
     recognizer = NS(
         detect=Mock(return_value=tuple(faces if faces is not None else
                                       [detection(i, color=CardColor.QUICK) for i in range(1, 6)])),
@@ -75,6 +78,24 @@ class ComposedPerceptionTests(unittest.TestCase):
         self.assertTrue(all(c.confidence.source == 'composed_card' for c in state.cards))
         self.assertFalse(any(call.args[0] == config.CARD_NODE.format(ui_slot=1)
                              for call in ctx.run_recognition.call_args_list))
+
+    def test_crit_badge_distinguishes_absent_rolling_and_settled_values(self):
+        image = np.zeros((720, 1280, 3), np.uint8)
+        badge = NS(hit=True, best_result=NS(score=.99), box=(42, 373, 19, 27))
+        text = result(True, '100%')
+        ctx = NS(run_recognition=Mock(side_effect=[result(), badge, badge, text]))
+
+        self.assertEqual(perception._detect_crit_percent(ctx, image, 1), 0)
+        image[358:405, 67:173] = (25, 185, 255)
+        self.assertIsNone(perception._detect_crit_percent(ctx, image, 1))
+        self.assertEqual(ctx.run_recognition.call_count, 2)
+
+        image[358:405, 67:173] = (220, 220, 220)
+        self.assertEqual(perception._detect_crit_percent(ctx, image, 1), 100)
+        node = config.FACE_CRIT_PERCENT_NODE
+        ctx.run_recognition.assert_called_with(node, image, {
+            node: {'recognition': {'param': {'roi': [67, 358, 106, 47]}}},
+        })
 
     def test_authoritative_np_absence_cannot_be_overridden_by_target_or_border(self):
         state, ctx = harness()

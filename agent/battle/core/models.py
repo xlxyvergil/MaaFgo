@@ -112,6 +112,7 @@ class CommandCard:
     owner_reason: str = ""
     can_attack: bool = True          # 封印/无法行动的面卡仍可选作回合占位
     blocked_reason: str = ""
+    crit_percent: int | None = None  # 画面显示的暴击率，无法确认时为 None
 
 
 @dataclass(frozen=True)

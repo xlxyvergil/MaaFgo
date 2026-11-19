@@ -9,6 +9,7 @@ composed_card 的纯视觉识别器维护，可用离线截图直接回归。
   - 战斗_主界面          TemplateMatch（主界面攻击钮）
   - 战斗_胜利 / 战斗_失败   OCR / TemplateMatch
   - 战斗_卡{1..5}        合成资源缺失或身份未知时的卡色 OCR 回退
+  - 战斗_指令卡_暴击星 / 暴击率  下排面卡的暴击率定位与 OCR
   - 战斗_宝具卡{1..3}_卡面 / _封印  回退卡面证据与独立限制状态
   - 战斗_敌人{1..3} / 战斗_敌人{1..3}_选中
 战斗 HUD 头像参数定义在 自动战斗_前排身份.json 的 attach 中。
@@ -32,6 +33,10 @@ SCENE_NODES = {
 
 # 参数化节点名模板
 CARD_NODE = "战斗_卡{ui_slot}"               # OCR，识别 "力击"/"迅击"/"技击"
+FACE_CRIT_STAR_NODE = "战斗_指令卡_暴击星"
+FACE_CRIT_PERCENT_NODE = "战斗_指令卡_暴击率"
+# 各面卡在 1280x720 画面中的徽标中心横坐标，ROI 预留上下晃动空间。
+FACE_CRIT_STAR_X = (51, 307, 563, 820, 1081)
 NP_VISUAL_NODE = "战斗_宝具卡{servant_slot}_卡面" # 上排宝具名称，仅作辅助证据
 NP_FRAME_NODE = "战斗_宝具卡{servant_slot}_边框" # 未知编队时的通用卡片证据
 NP_BLOCKED_NODE = "战斗_宝具卡{servant_slot}_封印"

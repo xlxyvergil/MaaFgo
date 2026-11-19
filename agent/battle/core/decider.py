@@ -10,8 +10,9 @@ V2：支持 BattlePlan（固定回合计划）。有计划时：
 无计划时退回 V1b 行为。
 
 显式启用 native_strategy 时，只枚举尚未指定的普通卡空位，对完整三张
-组合评分。既定宝具/普通卡的位置不变；宝具颜色只接受显式配置，
-暴击率与 HP 均不猜测。
+组合评分。既定宝具/普通卡的位置不变，宝具颜色只接受显式配置。
+
+RuleDecider 在确定出卡后比较同一从者同色面卡的暴击率。
 """
 from __future__ import annotations
 
@@ -63,7 +64,7 @@ class RuleDecider:
                 f"preferred_ids={native.preferred_servant_ids} preferred_slots={native.preferred_slots}; "
                 f"configured_np_colors={native.np_colors_by_servant_id}/{native.np_colors_by_slot}; "
                 f"np_color_preservation={native.np_color_preservation_weight if native.avoid_np_color_before_np else 0}; "
-                "使用已识别卡色/归属及显式宝具颜色，不推断HP或暴击率"
+                "组合评分使用已识别的卡色、归属及显式配置的宝具颜色"
             )
 
     @property
@@ -130,7 +131,7 @@ class RuleDecider:
         tp = self.plan.active_turn(turn_index) if self.plan is not None else None
 
         if tp is not None and tp.card_sequence:
-            picks = _resolve_planned_cards(tp, state, self.card_policy)
+            picks = _prefer_higher_crit(_resolve_planned_cards(tp, state, self.card_policy), state.cards)
             mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 攻略出卡={tp.card_sequence} 实际={picks}")
             return BattleAction(target_enemy=target, picks=picks,
                                 rationale_tag=f"v2:turn{turn_index}_cards" + (
@@ -173,9 +174,33 @@ class RuleDecider:
             tag += ":native_strategy"
         return BattleAction(
             target_enemy=target,
-            picks=picks,
+            picks=_prefer_higher_crit(picks, state.cards),
             rationale_tag=tag
         )
+
+
+def _prefer_higher_crit(
+    picks: Tuple[CardPick, ...], cards: Tuple[CommandCard, ...],
+) -> Tuple[CardPick, ...]:
+    """在既定出卡位置内，优先选同一从者、同色且可攻击的高暴击率面卡。"""
+    positions = {pick.slot: index for index, pick in enumerate(picks)
+                 if pick.kind is PrimitiveKind.SELECT_CARD}
+    groups: dict[tuple[int, str | None, CardColor], list[CommandCard]] = {}
+    for card in cards:
+        if (card.can_attack and card.color is not CardColor.UNKNOWN
+                and is_slot(card.owner_slot, 1, 3) and is_slot(card.crit_percent, 0, 100)):
+            groups.setdefault((card.owner_slot, card.owner_servant_id, card.color), []).append(card)
+
+    ordered = list(picks)
+    for group in groups.values():
+        if len(group) < 2:
+            continue
+        selected_positions = sorted(positions[card.ui_slot] for card in group if card.ui_slot in positions)
+        # 同暴击率时优先保留既定牌，未识别到暴击率的出卡位置不参与替换。
+        group.sort(key=lambda card: (-(card.crit_percent or 0), positions.get(card.ui_slot, len(picks))))
+        for index, card in zip(selected_positions, group):
+            ordered[index] = CardPick(PrimitiveKind.SELECT_CARD, card.ui_slot)
+    return tuple(ordered)
 
 
 def _resolve_planned_cards(tp: TurnPlan, state: BattleState, policy: CardPolicy) -> Tuple[CardPick, ...]:
