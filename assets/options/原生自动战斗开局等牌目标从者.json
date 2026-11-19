@@ -3,19 +3,8 @@
     "原生自动战斗开局等牌目标职阶": {
       "type": "select",
       "label": "目标从者职阶",
-      "default": "inherit",
+      "default": "none",
       "cases": [
-        {
-          "name": "inherit",
-          "label": "沿用旧版目标（无旧值则使用位置或微调）",
-          "pipeline_override": {
-            "原生自动战斗-高级策略配置": {
-              "attach": {
-                "native_battle_opening_hand_selected_servant": "inherit"
-              }
-            }
-          }
-        },
         {
           "name": "none",
           "label": "未指定从者（使用前排位置或微调）",

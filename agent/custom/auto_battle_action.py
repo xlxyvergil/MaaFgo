@@ -368,15 +368,13 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
                                ("native_battle_opening_hand_max_wait_turns", "maxWaitTurns")):
         if external in attach:
             opening[internal] = attach[external]
-    # The default inherit case preserves upgraded MXU profiles. A chosen
-    # picture or explicit empty selection still supersedes the legacy ID.
-    selected_key = "native_battle_opening_hand_selected_servant"
-    if selected_key not in attach or attach[selected_key] == "inherit":
-        raw_id = attach.get("native_battle_opening_hand_servant_id")
-    else:
-        raw_id = attach[selected_key]
-        if not isinstance(raw_id, str) or (raw_id != "" and not re.fullmatch(r"[1-9][0-9]{0,11}", raw_id)):
-            raise ValueError("开局等牌的目标从者无法识别，无法确认要等待谁的牌。请在「高级策略 → 手动 → 开局等待关键牌」下重新选择「目标从者职阶」和「目标从者」。")
+    # Only picture selections provide an explicit identity. Retired inherit
+    # selections are empty too; the removed hand-entered ID is never read.
+    raw_id = attach.get("native_battle_opening_hand_selected_servant", "")
+    if raw_id == "inherit":
+        raw_id = ""
+    if not isinstance(raw_id, str) or (raw_id != "" and not re.fullmatch(r"[1-9][0-9]{0,11}", raw_id)):
+        raise ValueError("开局等牌的目标从者无法识别，无法确认要等待谁的牌。请在「高级策略 → 手动 → 开局等待关键牌」下重新选择「目标从者职阶」和「目标从者」。")
     if raw_id is not None and str(raw_id).strip():
         opening["servantId"] = str(raw_id).strip()
     raw_slot = attach.get("native_battle_opening_hand_servant_slot")

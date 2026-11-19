@@ -152,8 +152,8 @@ class StrategySourceTests(unittest.TestCase):
         self.assertEqual(policy.card.native_strategy.mighty_chain_weight, 51)
         self.assertEqual(policy.card.native_strategy.preferred_slots, (2,))
 
-    def test_manual_opening_text_fields_and_json_target_work(self):
-        for target in ({"native_battle_opening_hand_servant_id": "605300"},
+    def test_manual_opening_picture_selection_and_json_target_work(self):
+        for target in ({"native_battle_opening_hand_selected_servant": "605300"},
                        {"native_strategy_overrides": '{"opening_hand":{"servant_slot":2}}'}):
             result = self.resolve(context("manual", native_battle_opening_hand_enabled=True,
                 native_battle_opening_hand_required_colors="B,Q",
@@ -257,7 +257,7 @@ class StrategyActionHandoffTests(unittest.TestCase):
 
     def test_manual_fallback_keeps_nonidentity_strategy_but_clears_old_identity(self):
         ctx = context("manual", native_battle_max_turns=63,
-            native_battle_opening_hand_enabled=True, native_battle_opening_hand_servant_id="605300",
+            native_battle_opening_hand_enabled=True, native_battle_opening_hand_selected_servant="605300",
             native_strategy_overrides=json.dumps({"preferred_servant_ids": ["605300"],
                 "preferred_slots": [2], "mighty_chain_weight": 55,
                 "np_colors_by_servant_id": {"605300": "A"}, "np_colors_by_slot": {"2": "A"}}))
