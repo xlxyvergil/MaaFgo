@@ -25,6 +25,7 @@ _CUSTOM_SUPPORT_NODES = ("助战action", "Chaldea助战action")
 _SUPPORT_NODES = ("进本-选择助战", *_CUSTOM_SUPPORT_NODES)
 # 补点前的二次确认超过此时间即丢弃，不能把慢识别期间的旧坐标点到助战页。
 _QUEST_RETRY_FRAME_MAX_AGE = 2.0
+_POST_FORMATION_DECIDE_TIMEOUT = 60
 
 
 class StoryStopped(RuntimeError):
@@ -93,6 +94,7 @@ class StoryRunner:
         self._restriction_auto_done = False
         self._restriction_needs_decide = False
         self._restriction_action_counts = {}
+        self._post_formation_decide_deadline = 0
 
     def _mark_restricted(self, reason):
         if self.mode != "native":
@@ -112,13 +114,15 @@ class StoryRunner:
             raise StoryStopped(f"限制编队处理重复无效：{name}，已停止，请手动检查")
         counts[name] = counts.get(name, 0) + 1
         self.action(name, result)
+        if name == "主线限制-编队决定" and counts[name] == 1:
+            self._post_formation_decide_deadline = self.clock() + _POST_FORMATION_DECIDE_TIMEOUT
         if name in ("主线限制-自动编成确认", "进本-自动编队确认", "主线限制-编队决定"):
             root, token = context_session(self.ctx)
             if sessions.valid(root, token):
                 sessions.invalidate(root, token, "")
         self.pause()
 
-    def _handle_restricted_formation(self, image):
+    def _handle_restricted_formation(self, image, *, formation_confirmed=False):
         """每帧最多操作一次；叶子节点只点击，不执行其后续开战链。"""
         for name in ("主线限制-关闭提示", "主线限制-编成条件未满足", "主线限制-取消编队来源",
                      "主线限制-自动编成确认", "进本-自动编队确认"):
@@ -150,8 +154,7 @@ class StoryRunner:
             self._restriction_needs_decide = False
             return True
         # 卡位文字仅在编队确认页检查，地图/战斗背景上的类似文字不能标记本关。
-        formation = self.reco("进本-队伍确认", image)
-        if formation:
+        if formation_confirmed or self.reco("进本-队伍确认", image):
             if self.reco("主线限制-空槽", image):
                 self._mark_restricted("必填空槽")
                 if self._restriction_auto_done:
@@ -622,15 +625,23 @@ class StoryRunner:
         deadline = self.clock() + self.timeout
         support_clicks = 0
         formation_since = None
-        while self.clock() < deadline:
+        # 限制编队确认后留出时间重新截图并确认开始按钮；普通助战仍使用原超时。
+        while self.clock() < max(deadline, getattr(self, "_post_formation_decide_deadline", 0)):
             image = self.frame()
-            if self.interrupt(image, forming=True):
+            # 已保存限制编队且看到开始按钮时，只检查限制编队自身的弹窗和卡位。
+            after_decide = getattr(self, "_post_formation_decide_deadline", 0)
+            formation_confirmed = bool(after_decide and self.reco("进本-队伍确认", image))
+            if formation_confirmed:
+                interrupted = self._handle_restricted_formation(image, formation_confirmed=True)
+            else:
+                interrupted = self.interrupt(image, forming=True)
+            if interrupted:
                 formation_since = None
                 self.pause()
                 continue
             if self.reco("进本-战斗主界面已出现", image):
                 return
-            if self.reco("进本-队伍确认", image):
+            if formation_confirmed or self.reco("进本-队伍确认", image):
                 if formation_since is None:
                     formation_since = self.clock()
                 if self.clock() - formation_since >= 1:

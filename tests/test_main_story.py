@@ -298,6 +298,47 @@ class RoutingTests(unittest.TestCase):
         self.assertEqual([n for n, _ in c.actions], ["进本-自动编队确认", "主线限制-编队决定"])
         self.assertEqual(c.tasks, [])
 
+    def test_slow_recognition_after_formation_decide_can_confirm_after_original_deadline(self):
+        popup = "进本-自动编队确认"
+        decide = "主线限制-编队决定"
+        formation = "进本-队伍确认"
+        r, c = runner([{popup}, {decide}, {formation}, {formation}], {"transition_timeout": 10})
+        recognize = c.run_recognition
+
+        def slow_recognition(name, image):
+            if name == "主线限制-空槽" and formation in image:
+                r.sleep(12)
+            return recognize(name, image)
+
+        with patch.object(c, "run_recognition", side_effect=slow_recognition):
+            r.reach_formation()
+
+        self.assertEqual([name for name, _ in c.actions], [popup, decide])
+        self.assertGreater(r.clock(), r.timeout)
+        self.assertEqual(c.frames, [])
+
+    def test_formation_after_decide_skips_story_and_generic_popups(self):
+        popup = "进本-自动编队确认"
+        decide = "主线限制-编队决定"
+        formation = "进本-队伍确认"
+        r, c = runner([{popup}, {decide}, *[{formation}] * 3])
+        recognize = c.run_recognition
+        formation_checks = []
+
+        def record_recognition(name, image):
+            if formation in image:
+                formation_checks.append(name)
+            return recognize(name, image)
+
+        with patch.object(c, "run_recognition", side_effect=record_recognition):
+            r.reach_formation()
+
+        self.assertIn("主线限制-空槽", formation_checks)
+        self.assertEqual(formation_checks.count(formation), 3)
+        self.assertTrue(all(name.startswith("主线限制-") or name in (
+            formation, "主线-编制限制", "进本-自动编队确认", "进本-战斗主界面已出现",
+        ) for name in formation_checks))
+
     def test_auto_formation_decide_failure_stops_handoff(self):
         r, c = runner([{"进本-自动编队确认"}, {"主线限制-编队决定"}])
         original = c.run_action
