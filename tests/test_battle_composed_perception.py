@@ -8,7 +8,7 @@ from unittest.mock import Mock
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / 'agent'), str(ROOT / 'agent/custom')]
 from battle.core.enums import CardColor
-from battle.core.models import Confidence
+from battle.core.models import CommandCard, Confidence, NpCard
 from battle.perception import config, perception
 
 
@@ -43,6 +43,31 @@ def harness(*, faces=None, nps=None, blocked=()):
 
 
 class ComposedPerceptionTests(unittest.TestCase):
+    def test_command_phase_exposes_current_np_roles_without_reading_skills(self):
+        state, ctx = harness()
+        self.assertEqual([(s.slot, s.servant_id, s.has_attack_np) for s in state.servants],
+                         [(1, '504500', False), (2, '105900', True), (3, '505400', False)])
+        self.assertTrue(all(skill.available is None for servant in state.servants for skill in servant.skills))
+        skill_nodes = {config.SERVANT_SKILL_CD_NODE.format(servant_slot=slot, skill_index=index)
+                       for slot in (1, 2, 3) for index in (1, 2, 3)}
+        self.assertFalse(any(call.args[0] in skill_nodes for call in ctx.run_recognition.call_args_list))
+
+    def test_command_identity_metadata_follows_slots_and_rejects_current_conflicts(self):
+        cards = (CommandCard(1, CardColor.BUSTER, 2, Confidence(1),
+                             owner_confidence=Confidence(1), owner_servant_id='100100'),)
+        moved = perception._command_servants(('504500', '100100', '100100'), cards, ())
+        self.assertEqual([(s.slot, s.servant_id) for s in moved],
+                         [(1, '504500'), (2, '100100'), (3, '100100')])
+        conflicting = perception._command_servants(('504500', '800100', None), cards, ())
+        self.assertEqual([(s.slot, s.servant_id) for s in conflicting], [(1, '504500')])
+
+    def test_current_card_identity_can_supply_missing_roster_but_low_confidence_cannot(self):
+        np = NpCard(3, Confidence(1), owner_servant_id='100100', owner_confidence=Confidence(.96))
+        learned = perception._command_servants((), (), (np,))
+        self.assertEqual([(s.slot, s.servant_id, s.has_attack_np) for s in learned], [(3, '100100', True)])
+        uncertain = NpCard(3, Confidence(1), owner_servant_id='100100', owner_confidence=Confidence(.5))
+        self.assertEqual(perception._command_servants((), (), (uncertain,)), ())
+
     def test_complete_composed_match_replaces_clipped_colour_ocr_and_portrait(self):
         state, ctx = harness()
         self.assertEqual([c.color for c in state.cards], [CardColor.QUICK] * 5)

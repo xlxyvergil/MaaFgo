@@ -40,6 +40,7 @@ class NativeCardStrategy:
     same_color_chain_weight: float = 5.0
     preferred_servant_ids: Tuple[str, ...] = ()
     preferred_slots: Tuple[int, ...] = ()
+    # Accepted for old custom JSON; hard priority no longer mixes this into chains.
     servant_priority_weight: float = 6.0
     # 空配置沿用 CardPolicy.color_priority；JSON 使用 {"B":3,"A":2,"Q":1}。
     color_weights: Tuple[Tuple[CardColor, float], ...] = ()
@@ -52,6 +53,9 @@ class NativeCardStrategy:
     # It only scores fill candidates; explicit plan cards always stay fixed.
     avoid_np_color_before_np: bool = False
     np_color_preservation_weight: float = 20.0
+    # Hard ordering between the two dimensions; never simulated by one weight.
+    # Only automatic ordinary-card fills participate in servant preference.
+    fill_priority: str = "chain"
 
 
 @dataclass(frozen=True)

@@ -8,6 +8,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 KEY = "原生自动战斗高级策略"
+FILL_PRIORITY = "原生自动战斗补牌优先级"
 CONFIG = "原生自动战斗-高级策略配置"
 ATTACKER = "原生自动战斗主输出偏好"
 ATTACKER_SLOT = "原生自动战斗主输出位置"
@@ -55,13 +56,29 @@ class NativeAdvancedStrategyResourcesTests(unittest.TestCase):
                          ["默认", "使用编辑器/chaldea配置", "手动"])
         for name in ("default", "editor"):
             self.assertFalse(cases[name].get("option"))
-        self.assertEqual(len(cases["manual"]["option"]), 6)
+        self.assertEqual(len(cases["manual"]["option"]), 7)
+        self.assertEqual(cases["manual"]["option"][:3], [FILL_PRIORITY, "原生自动战斗补牌预设", ATTACKER])
         self.assertIn(ATTACKER, cases["manual"]["option"])
         for name, case in cases.items():
             self.assertEqual(case["pipeline_override"], {
                 CONFIG: {"attach": {"native_battle_strategy_source": name}},
             })
         self.reachable_options([KEY])
+
+    def test_fill_priority_choices_and_chain_strategy_keep_existing_presets(self):
+        option = self.shared[FILL_PRIORITY]
+        self.assertEqual(option['label'], '补牌优先级')
+        self.assertEqual(option['default'], 'chain')
+        self.assertEqual([(case['name'], case['label']) for case in option['cases']],
+                         [('servant', '优先从者'), ('chain', '优先连携')])
+        for case in option['cases']:
+            self.assertEqual(case['pipeline_override'], {CONFIG: {'attach': {'native_battle_fill_priority': case['name']}}})
+        presets = self.shared['原生自动战斗补牌预设']
+        self.assertEqual(presets['label'], '连携策略')
+        self.assertEqual([(case['name'], case['label']) for case in presets['cases']],
+                         [('平衡', '平衡：三色与勇猛链'), ('三色', '优先三色链'),
+                          ('勇猛', '优先同一从者勇猛链'), ('回收', '优先蓝卡与 NP 回收'),
+                          ('旧策略', '关闭增强补牌，沿用原策略')])
 
     def test_attacker_picker_exposes_only_the_selected_branch(self):
         option = self.options[ATTACKER]
@@ -236,6 +253,7 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
 
     def manual_defaults(self, preset="平衡"):
         return {
+            **self.case_attach(FILL_PRIORITY, "chain"),
             **self.case_attach("原生自动战斗补牌预设", preset),
             **self.case_attach(ATTACKER, "inherit"),
             **self.case_attach("原生自动战斗开局等待关键牌", "No"),
@@ -252,14 +270,17 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
     def test_every_manual_preset_matches_the_shared_editor_preset(self):
         for manual, persisted in (("平衡", "balanced"), ("三色", "mighty"),
                                   ("勇猛", "brave"), ("回收", "np"), ("旧策略", "legacy")):
-            with self.subTest(preset=manual):
-                actual = self.read(self.context("manual", self.manual_defaults(manual)))
-                expected = self.convert({"preset": persisted})
-                self.assertEqual(self.policy(actual), self.policy(expected))
-                self.assertEqual(self.profile(actual).max_turns, 40)
+            for priority in ('servant', 'chain'):
+                with self.subTest(preset=manual, priority=priority):
+                    attach = {**self.manual_defaults(manual), **self.case_attach(FILL_PRIORITY, priority)}
+                    actual = self.read(self.context("manual", attach))
+                    expected = self.convert({"preset": persisted, "fillPriority": priority})
+                    self.assertEqual(self.policy(actual), self.policy(expected))
+                    self.assertEqual(self.profile(actual).max_turns, 40)
 
     def test_default_and_editor_ignore_invalid_hidden_manual_values(self):
         hidden = {"native_strategy_overrides": "{broken", "native_battle_max_turns": 1000,
+                  "native_battle_fill_priority": "broken",
                   "native_battle_preferred_attacker": "504500",
                   OPENING_SELECTED: "broken-hidden-id",
                   "native_battle_opening_hand_enabled": True,
@@ -277,6 +298,19 @@ class NativeAdvancedStrategyResourceIntegrationTests(unittest.TestCase):
                 self.assertEqual(self.profile(actual).max_turns, expected["max_turns"])
                 self.assertEqual(actual["chaldea_import_source"], source["chaldea_import_source"])
                 self.assertEqual(actual["plan"], source["plan"])
+
+    def test_fill_priority_picker_is_authoritative_and_does_not_change_other_settings(self):
+        for selected, opposite in (('servant', 'chain'), ('chain', 'servant')):
+            attach = {**self.manual_defaults('勇猛'), **self.case_attach(FILL_PRIORITY, selected),
+                      **self.input_attach('原生自动战斗策略微调', {'native_strategy_overrides': json.dumps({
+                          'fill_priority': opposite, 'preferred_slots': [2], 'brave_chain_weight': 29})})}
+            original = copy.deepcopy(attach)
+            actual = self.read(self.context('manual', attach), share={'maaAdvancedStrategy': {'fillPriority': opposite}})
+            native = actual['card_policy']['native_strategy']
+            self.assertEqual(native['fill_priority'], selected)
+            self.assertEqual(native['preferred_slots'], [2])
+            self.assertEqual(native['brave_chain_weight'], 29)
+            self.assertEqual(attach, original)
 
     def test_attacker_picker_overrides_only_attacker_preferences_from_json(self):
         manual = {

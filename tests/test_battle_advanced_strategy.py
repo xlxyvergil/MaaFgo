@@ -42,6 +42,7 @@ class StrategyContractTests(unittest.TestCase):
         self.assertEqual(policy.card.native_strategy.mighty_chain_weight, 12)
         self.assertEqual(policy.card.native_strategy.preferred_servant_ids, ())
         self.assertEqual(config["preferredAttacker"], "")
+        self.assertEqual(config["fillPriority"], "chain")
         config["openingHand"]["requiredColors"].clear()
         self.assertEqual(default_advanced_strategy()["openingHand"]["requiredColors"], ["B", "Q"])
 
@@ -62,6 +63,27 @@ class StrategyContractTests(unittest.TestCase):
                 self.assertEqual((policy.card.native_strategy.brave_chain_weight,
                                   policy.card.native_strategy.mighty_chain_weight), expected)
         self.assertFalse(_parse_battle_policy(advanced_strategy_to_param({"preset": "legacy"})).card.native_strategy.enabled)
+
+    def test_fill_priority_uses_explicit_portable_choice_then_json_then_default(self):
+        for config, expected in (({}, "chain"), ({"fillPriority": "servant"}, "servant"),
+                                 ({"nativeStrategyOverrides": {"fill_priority": "servant"}}, "servant"),
+                                 ({"fillPriority": "chain", "nativeStrategyOverrides": {"fill_priority": "servant"}}, "chain"),
+                                 ({"fillPriority": "servant", "nativeStrategyOverrides": {"fill_priority": "chain"}}, "servant")):
+            with self.subTest(config=config):
+                original = copy.deepcopy(config)
+                native = advanced_strategy_to_param(config)["card_policy"]["native_strategy"]
+                self.assertEqual(native["fill_priority"], expected)
+                self.assertEqual(config, original)
+        for invalid in (None, False, 1, [], {}, "", "attacker", "chain "):
+            for config, path in (({"fillPriority": invalid}, "maaAdvancedStrategy.fillPriority"),
+                                 ({"nativeStrategyOverrides": {"fill_priority": invalid}},
+                                  "maaAdvancedStrategy.nativeStrategyOverrides.fill_priority")):
+                with self.subTest(config=config):
+                    issues = validate_advanced_strategy(config)
+                    self.assertEqual([issue["path"] for issue in issues], [path])
+                    self.assertIn("补牌优先级", issues[0]["message"])
+                    with self.assertRaises(ValueError):
+                        advanced_strategy_to_param(config)
 
     def test_invalid_types_bounds_and_incomplete_waiting_are_visible_errors(self):
         invalid = [None, [], {"preset": []}, {"maxTurns": True}, {"maxTurns": 101},
@@ -151,6 +173,23 @@ class StrategySourceTests(unittest.TestCase):
         self.assertFalse(policy.skill.auto_servant_skills)
         self.assertEqual(policy.card.native_strategy.mighty_chain_weight, 51)
         self.assertEqual(policy.card.native_strategy.preferred_slots, (2,))
+
+    def test_fill_priority_source_isolation_and_manual_precedence(self):
+        share = {"maaAdvancedStrategy": {"fillPriority": "servant", "future": {"keep": True}}}
+        before = copy.deepcopy(share)
+        manual = {"native_battle_fill_priority": "chain",
+                  "native_strategy_overrides": '{"fill_priority":"servant"}'}
+        self.assertEqual(self.resolve(context("manual", **manual), share=share)
+                         ["card_policy"]["native_strategy"]["fill_priority"], "chain")
+        self.assertEqual(self.resolve(context("manual", native_strategy_overrides='{"fill_priority":"servant"}'))
+                         ["card_policy"]["native_strategy"]["fill_priority"], "servant")
+        self.assertEqual(self.resolve(context("editor", native_battle_fill_priority="broken"), share=share)
+                         ["card_policy"]["native_strategy"]["fill_priority"], "servant")
+        self.assertEqual(self.resolve(context("default", native_battle_fill_priority="broken"), share=share)
+                         ["card_policy"]["native_strategy"]["fill_priority"], "chain")
+        self.assertEqual(share, before)
+        with self.assertRaisesRegex(ValueError, "补牌优先级"):
+            self.resolve(context("manual", native_battle_fill_priority="broken"))
 
     def test_manual_opening_picture_selection_and_json_target_work(self):
         for target in ({"native_battle_opening_hand_selected_servant": "605300"},

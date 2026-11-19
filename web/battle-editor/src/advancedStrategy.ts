@@ -6,15 +6,18 @@ export const STRATEGY_PRESETS=[
  ['np','优先蓝卡与 NP 回收'],['legacy','关闭增强补牌，沿用原策略'],
 ] as const;
 export type StrategyPreset=typeof STRATEGY_PRESETS[number][0];
+export const FILL_PRIORITIES=[['servant','优先从者'],['chain','优先连携']] as const;
+export type FillPriority=typeof FILL_PRIORITIES[number][0];
 export interface AdvancedStrategy extends Json {
  preset:StrategyPreset;
+ fillPriority:FillPriority;
  preferredAttacker:string|number;
  openingHand:{enabled:boolean;servantId:string|number|null;servantSlot:number|null;requiredColors:string[];maxWaitTurns:number;[key:string]:unknown};
  nativeStrategyOverrides:Json;
  autoServantSkills:boolean;
  maxTurns:number;
 }
-export const defaultAdvancedStrategy=():AdvancedStrategy=>({preset:'balanced',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
+export const defaultAdvancedStrategy=():AdvancedStrategy=>({preset:'balanced',fillPriority:'chain',preferredAttacker:'',openingHand:{enabled:false,servantId:null,servantSlot:null,requiredColors:['B','Q'],maxWaitTurns:2},nativeStrategyOverrides:{},autoServantSkills:true,maxTurns:40});
 export const strategyObject=(value:unknown):value is Json=>value!==null&&typeof value==='object'&&!Array.isArray(value);
 
 /** Match the manual MXU option: integers are positions, strings are identities. */
@@ -38,7 +41,9 @@ export function advancedStrategyOf(data:Json):AdvancedStrategy {
  const nativeOpening=strategyObject(raw.nativeStrategyOverrides?.opening_hand)?raw.nativeStrategyOverrides.opening_hand:{};
  // Match runtime precedence for legacy JSON-only colors, without writing them.
  if(!Object.hasOwn(explicitOpening,'requiredColors')&&Object.hasOwn(nativeOpening,'required_colors'))openingHand.requiredColors=structuredClone(nativeOpening.required_colors);
- return structuredClone({...defaults,...raw,openingHand});
+ const native=strategyObject(raw.nativeStrategyOverrides)?raw.nativeStrategyOverrides:{};
+ const fillPriority=Object.hasOwn(raw,'fillPriority')?raw.fillPriority:Object.hasOwn(native,'fill_priority')?native.fill_priority:defaults.fillPriority;
+ return structuredClone({...defaults,...raw,fillPriority,openingHand});
 }
 
 /** Apply inside the editor's ordinary undo/redo transaction; retain unknown keys. */
@@ -75,6 +80,8 @@ export function advancedStrategyIssues(data:Json):string[] {
  if(!strategyObject(raw))return ['全局高级策略必须是 JSON 对象。'];
  const issues:string[]=[];
  if(raw.preset!==undefined&&!STRATEGY_PRESETS.some(([key])=>key===raw.preset))issues.push('补牌预设无效，请重新选择。');
+ if(Object.hasOwn(raw,'fillPriority')&&!FILL_PRIORITIES.some(([key])=>key===raw.fillPriority))issues.push('补牌优先级无法识别，无法确定先选从者还是连携。请在「补牌优先级」重新选择「优先从者」或「优先连携」。');
+ if(strategyObject(raw.nativeStrategyOverrides)&&Object.hasOwn(raw.nativeStrategyOverrides,'fill_priority')&&!FILL_PRIORITIES.some(([key])=>key===raw.nativeStrategyOverrides.fill_priority))issues.push('补牌策略微调中的补牌优先级无法识别。请将 JSON 的 fill_priority 设为 "servant"（优先从者）或 "chain"（优先连携），也可删除该字段后重试。');
  if(raw.preferredAttacker!==undefined){const issue=preferredAttackerIssue(raw.preferredAttacker);if(issue)issues.push(issue);}
  if(raw.autoServantSkills!==undefined&&typeof raw.autoServantSkills!=='boolean')issues.push('自动补放从者技能必须是布尔值。');
  if(raw.maxTurns!==undefined&&(!Number.isSafeInteger(raw.maxTurns)||raw.maxTurns<1||raw.maxTurns>100))issues.push('最大战斗回合必须是 1～100 的整数。');

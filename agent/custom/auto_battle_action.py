@@ -352,6 +352,8 @@ def _attached_strategy_settings(context, node_name: str) -> dict:
 def _manual_advanced_strategy_param(attach: dict) -> dict:
     """Read independent MXU fields; hidden values are only read in manual mode."""
     config = {}
+    if "native_battle_fill_priority" in attach:
+        config["fillPriority"] = attach["native_battle_fill_priority"]
     if "native_battle_max_turns" in attach:
         config["maxTurns"] = attach["native_battle_max_turns"]
     if "native_battle_auto_servant_skills" in attach:
@@ -405,6 +407,8 @@ def _manual_advanced_strategy_param(attach: dict) -> dict:
         _deep_merge(advanced_strategy_to_param()["card_policy"]["native_strategy"], preset_native),
         {**copy.deepcopy(overrides), "opening_hand": result["card_policy"]["native_strategy"]["opening_hand"]},
     )
+    if "fillPriority" in config:
+        result["card_policy"]["native_strategy"]["fill_priority"] = config["fillPriority"]
     # The select cases write one scalar: an integer position or a string ID.
     # An empty selection preserves preferences from existing strategy JSON.
     preferred = attach.get("native_battle_preferred_attacker", "")

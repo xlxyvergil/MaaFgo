@@ -4,6 +4,7 @@
 .global-strategy-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 20px}
 .global-strategy-grid .field{margin:0;min-width:0}
 .global-strategy-grid input,.global-strategy-grid select,.global-strategy-json textarea{width:100%;min-width:0;box-sizing:border-box}
+.global-fill-priority{margin:0}.global-fill-priority select{width:100%;min-width:0;box-sizing:border-box}
 .global-attacker-settings{display:grid;gap:10px;min-width:0}
 .strategy-servant-picker-row{display:flex;align-items:center;gap:8px;min-width:0}.strategy-servant-clear{flex:none}
 .strategy-servant-picker{display:flex;align-items:center;gap:12px;width:100%;min-width:0;padding:9px 12px;border:1px solid var(--line);border-radius:4px;background:var(--surface-2);color:var(--text);text-align:left;cursor:pointer}
