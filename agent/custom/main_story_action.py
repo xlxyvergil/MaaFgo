@@ -162,6 +162,10 @@ class StoryRunner:
                 self._restriction_needs_auto = True
             elif self.reco("主线限制-固定成员", image):
                 self._mark_restricted("固定成员标记")
+            elif self.reco("主线限制-单骑出击", image):
+                # 单骑出击整队固定，游戏不提供编队配置；必须在 Chaldea 编队前接管，
+                # 否则自动编队会反复尝试打开配置并以“流程失败：进本流程”中断。
+                self._mark_restricted("单骑出击固定编队")
             elif self.mode == "native" and self.reco("主线限制-多个助战", image):
                 # 剧情可能固定多名助战，却没有既有的“编队限制”标签。
                 # 必须在进入 Chaldea 单助战校验前接管，不能仅放宽数量后继续换人。

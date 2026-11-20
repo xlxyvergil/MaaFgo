@@ -134,6 +134,19 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertFalse(runtime._restriction_needs_auto)
         self.assertEqual(context.actions, [])
 
+    def test_solo_sortie_fixed_party_keeps_game_formation(self):
+        runtime, context = runner()
+        self.assertFalse(runtime._handle_restricted_formation({
+            "进本-队伍确认", "主线限制-单骑出击", "主线限制-打开自动编队"}))
+        self.assertTrue(runtime.current_restricted)
+        self.assertFalse(runtime._restriction_needs_auto)
+        self.assertEqual(context.actions, [])
+
+    def test_solo_sortie_signal_outside_confirmation_page_does_not_mark_quest(self):
+        runtime, _ = runner()
+        self.assertFalse(runtime._handle_restricted_formation({"主线限制-单骑出击"}))
+        self.assertFalse(runtime.current_restricted)
+
     def test_empty_required_slot_opens_game_auto_formation(self):
         runtime, context = runner()
         self.assertTrue(runtime._handle_restricted_formation({
@@ -170,7 +183,7 @@ class RestrictedStateTests(unittest.TestCase):
         for signal in ("主线限制-关闭提示", "主线限制-取消编队来源",
                        "主线限制-编成条件未满足",
                        "主线限制-自动编成确认", "进本-自动编队确认",
-                       "主线限制-空槽", "主线限制-固定成员"):
+                       "主线限制-空槽", "主线限制-固定成员", "主线限制-单骑出击"):
             with self.subTest(signal=signal):
                 runtime, context = runner(config={"auto_handle_restrictions": False})
                 with self.assertRaisesRegex(StoryStopped, "手动|限制"):
@@ -232,6 +245,33 @@ class RestrictedStateTests(unittest.TestCase):
                 self.assertFalse(runtime._handle_restricted_formation({signal}))
                 self.assertFalse(runtime.current_restricted)
                 self.assertEqual(context.actions, [])
+
+
+class SoloSortiePipelineTests(unittest.TestCase):
+    """单骑出击识别必须同时覆盖顶部横幅和锁定槽，先于 Chaldea 编队接管。"""
+
+    def setUp(self):
+        self.pipeline = json.loads(
+            (ROOT / "assets/resource/base/pipeline/主线限制编队.json").read_text("utf8"))
+
+    def test_node_requires_confirmation_page_before_reading_labels(self):
+        node = self.pipeline["主线限制-单骑出击"]
+        self.assertEqual(node["action"], {"type": "DoNothing"})
+        self.assertEqual(node["next"], [])
+        self.assertEqual(node["recognition"]["param"]["all_of"][0], "进本-队伍确认")
+
+    def test_node_accepts_banner_or_locked_slot_text_with_unique_ocr_names(self):
+        node = self.pipeline["主线限制-单骑出击"]
+        any_of = node["recognition"]["param"]["all_of"][1]["recognition"]["param"]["any_of"]
+        self.assertEqual({item["recognition"]["type"] for item in any_of}, {"OCR"})
+        names = [item["sub_name"] for item in any_of]
+        self.assertEqual(len(names), len(set(names)))
+        for name in names:
+            self.assertTrue(name.startswith("base/主线限制编队/主线限制-单骑出击/OCR"))
+        expected = [pattern for item in any_of
+                    for pattern in item["recognition"]["param"]["expected"]]
+        self.assertIn("单骑出击|単騎出撃", expected)
+        self.assertIn("只有助战|サポートのみ", expected)
 
 
 class RestrictedOptionTests(unittest.TestCase):
@@ -445,6 +485,20 @@ class RestrictedContextIsolationTests(unittest.TestCase):
         second = context.executions[1][1]
         self.assertEqual(second["进本-编队处理"]["next"], ["进本-点击队伍确认"])
         self.assertEqual(context.actions, [])
+        self.assert_session_finished(context)
+
+    def test_solo_sortie_discovered_during_handoff_skips_chaldea_formation(self):
+        runtime, context = self.make_runtime(restricted=False)
+        context.frames[:] = [
+            *[{"进本-队伍确认", "主线限制-单骑出击"}] * 3,
+            {"进本-战斗主界面已出现"},
+        ]
+        runtime.fight()
+        entry, battle = (nodes for _, nodes in context.executions)
+        self.assertEqual(entry["进本-编队处理"]["next"], ["进本-点击队伍确认"])
+        self.assertTrue(runtime.current_restricted)
+        self.assertEqual(json.loads(battle["原生自动战斗入口"]["action"]["param"]["custom_action_param"]),
+                         {"native_battle_formation_reset": True})
         self.assert_session_finished(context)
 
     def test_start_retry_budget_is_three_and_failure_cleans_context(self):
