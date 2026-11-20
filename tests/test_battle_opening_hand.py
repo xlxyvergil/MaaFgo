@@ -4,7 +4,9 @@ from pathlib import Path
 import sys
 from types import SimpleNamespace as NS
 import unittest
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
+
+import cv2
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
@@ -14,6 +16,7 @@ from battle.core.models import (BattlePlan, BattleState, CommandCard, Confidence
                                 PlannedCard, ServantSkillAction, ServantState, SkillState, TurnPlan)
 from battle.core.plan_parser import _parse_battle_policy
 from battle.core.policy import BattlePolicy, CardPolicy, NativeCardStrategy, OpeningHandPolicy, SkillPolicy, StrategyProfile
+from battle.perception.opening_preview import OpeningPreviewRecognizer
 from battle.runtime.runtime import AutoBattleRuntime
 
 ROSTER = ("300500", "605300", "504500", "205500", None, None)
@@ -81,17 +84,104 @@ class OpeningHandParserTests(unittest.TestCase):
             self.assertEqual(self.parse({"enabled": True, "max_wait_turns": budget}).max_wait_turns, -1)
 
 
+class OpeningPreviewRecognitionTests(unittest.TestCase):
+    def test_preview_reads_the_observed_cn_hand_without_expanding_cards(self):
+        fixture = ROOT / "tests/fixtures/battle_preset_fallback_cn/main_after_cancel.png"
+        frame = cv2.imread(str(fixture))
+        self.assertIsNotNone(frame)
+        cards = OpeningPreviewRecognizer.default().detect(frame, ("504500", "500300", "501900"))
+
+        self.assertEqual(
+            [(card.color, card.owner_slot) for card in cards],
+            [(Color.ARTS, 1), (Color.ARTS, 1), (Color.BUSTER, 2),
+             (Color.QUICK, 1), (Color.BUSTER, 3)],
+        )
+
+
 class OpeningHandRuntimeTests(unittest.TestCase):
+    def test_preview_match_runs_skills_then_uses_fresh_card_positions(self):
+        battle_main = main()
+        first, target, last = battle_main.servants
+        waiting_skills = (replace(target.skills[0], available=False),) + target.skills[1:]
+        before = replace(battle_main, servants=(first, replace(target, skills=waiting_skills), last))
+        observed = command()
+        order = (4, 2, 0, 3, 1)
+        after = replace(observed, cards=tuple(
+            replace(observed.cards[index], ui_slot=slot)
+            for slot, index in enumerate(order, 1)
+        ))
+        runtime, events = runtime_for([before, after, victory()])
+        runtime._opening_hand_preview_matches = Mock(return_value=True)
+
+        result = runtime.run()
+
+        self.assertTrue(result.ok, result.reason)
+        self.assertEqual(result.turns, 1)
+        runtime._opening_hand_preview_matches.assert_called_once_with(before, OPENING)
+        self.assertEqual([event[0] for event in events], ["skills", "open", "cards"])
+        runtime.ctx.run_task.assert_not_called()
+        self.assertEqual(runtime._execute_skills.call_args.args[0].servant_skills, PLAN.turns[0].servant_skills)
+        self.assertIs(runtime.decider.decide.call_args.args[0], after)
+        picks = runtime._execute_selection.call_args.args[0].picks
+        self.assertEqual([(pick.kind, pick.slot) for pick in picks], [
+            (Kind.SELECT_NP, 2), (Kind.SELECT_CARD, 3), (Kind.SELECT_CARD, 5),
+        ])
+
     def test_ready_hand_returns_to_confirmed_main_before_first_skill_then_preserves_plan(self):
-        runtime, events = runtime_for([main(), command(), main(), command(), victory()])
+        before = main()
+        runtime, events = runtime_for([before, command(), main(), command(), victory()])
+        runtime._opening_hand_preview_matches = Mock(return_value=False)
         result = runtime.run()
         self.assertTrue(result.ok, result.reason)
         self.assertEqual(result.turns, 1)
+        runtime._opening_hand_preview_matches.assert_called_once_with(before, OPENING)
         self.assertEqual([event[0] for event in events], ["open", "pipeline", "skills", "open", "cards"])
         self.assertEqual(events[1], ("pipeline", "战斗_选卡返回主界面"))
         picks = runtime._execute_selection.call_args.args[0].picks
         self.assertEqual([(pick.kind, pick.slot) for pick in picks], [(Kind.SELECT_NP, 2), (Kind.SELECT_CARD, 1), (Kind.SELECT_CARD, 2)])
         self.assertEqual(runtime.decider.plan, PLAN)
+
+    def test_expanded_hand_can_confirm_target_even_when_other_owners_are_ambiguous(self):
+        base = command()
+        other_cards = tuple(replace(card, owner_slot=None, owner_servant_id=ROSTER[0])
+                            for card in base.cards[2:])
+        full_hand = replace(base, cards=base.cards[:2] + other_cards)
+        roster = ROSTER[:2] + (ROSTER[0],) + ROSTER[3:]
+        before = main()
+        before = replace(before, servants=tuple(
+            replace(member, servant_id=roster[member.slot - 1]) for member in before.servants
+        ))
+        runtime, events = runtime_for([before, full_hand, before, full_hand, victory()])
+        runtime._opening_hand_preview_matches = Mock(return_value=False)
+        runtime.roster_servant_ids = runtime._initial_servant_ids = roster
+
+        result = runtime.run()
+
+        self.assertTrue(result.ok, result.reason)
+        self.assertEqual([event[0] for event in events], ["open", "pipeline", "skills", "open", "cards"])
+        self.assertEqual(events[1], ("pipeline", "战斗_选卡返回主界面"))
+        picks = runtime._execute_selection.call_args.args[0].picks
+        self.assertEqual([(pick.kind, pick.slot) for pick in picks], [
+            (Kind.SELECT_NP, 2), (Kind.SELECT_CARD, 1), (Kind.SELECT_CARD, 2),
+        ])
+
+    def test_preview_checks_the_new_main_after_spending_a_wait_turn(self):
+        before, next_turn = main(), main()
+        runtime, events = runtime_for([before, command(ready=False), next_turn, command(), victory()])
+        runtime._opening_hand_preview_matches = Mock(side_effect=(False, True))
+
+        result = runtime.run()
+
+        self.assertTrue(result.ok, result.reason)
+        self.assertEqual(result.turns, 2)
+        preview_calls = runtime._opening_hand_preview_matches.call_args_list
+        self.assertEqual(len(preview_calls), 2)
+        self.assertIs(preview_calls[0].args[0], before)
+        self.assertIs(preview_calls[1].args[0], next_turn)
+        self.assertEqual([event[0] for event in events], ["open", "cards", "skills", "open", "cards"])
+        self.assertEqual([event[1] for event in events], [0, 0, 0, 0, 0])
+        waiting = runtime._execute_selection.call_args_list[0].args[0]
+        self.assertTrue(all(pick.kind is Kind.SELECT_CARD for pick in waiting.picks))
 
     def test_waiting_uses_no_skill_or_np_and_keeps_plan_turn_zero_until_hand_is_ready(self):
         runtime, events = runtime_for([main(), command(ready=False), main(), command(), main(), command(),
@@ -136,6 +226,7 @@ class OpeningHandRuntimeTests(unittest.TestCase):
         base = command()
         bad_cards = (replace(base.cards[0], owner_slot=None), replace(base.cards[0], color=Color.UNKNOWN),
                      replace(base.cards[0], owner_confidence=Confidence(0)),
+                     replace(base.cards[0], confidence=Confidence(0)),
                      replace(base.cards[0], owner_servant_id="504500"))
         for bad in bad_cards:
             with self.subTest(card=bad):
@@ -162,6 +253,48 @@ class OpeningHandRuntimeTests(unittest.TestCase):
         self.assertTrue(runtime._opening_hand_matches(replace(command(), cards=tuple(cards)), duplicated)[0])
         cards[1] = replace(cards[1], can_attack=False)
         self.assertFalse(runtime._opening_hand_matches(replace(command(), cards=tuple(cards)), duplicated)[0])
+
+    def test_expanded_hand_ignores_unknown_color_only_after_confirming_required_cards(self):
+        runtime, _ = runtime_for([])
+        base = command()
+        cards = list(base.cards)
+        cards[2] = replace(cards[2], owner_slot=None, owner_servant_id=None,
+                           color=Color.UNKNOWN, confidence=Confidence(0))
+        hand = replace(base, cards=tuple(cards))
+        cards[1] = replace(cards[1], can_attack=False)
+        blocked_hand = replace(base, cards=tuple(cards))
+        for opening in (OPENING, replace(OPENING, servant_id=None, servant_slot=2)):
+            with self.subTest(opening=opening):
+                self.assertEqual(runtime._opening_hand_matches(hand, opening)[:2], (True, "known_hand"))
+                self.assertEqual(runtime._opening_hand_matches(blocked_hand, opening)[:2],
+                                 (False, "hand_identity_or_color_unknown"))
+
+    def test_expanded_hand_needs_five_distinct_card_positions_for_a_match(self):
+        runtime, _ = runtime_for([])
+        base = command()
+        for cards in (base.cards[:-1], base.cards[:-1] + (replace(base.cards[-1], ui_slot=1),)):
+            with self.subTest(slots=tuple(card.ui_slot for card in cards)):
+                hand = replace(base, cards=cards)
+                self.assertEqual(runtime._opening_hand_matches(hand, OPENING)[:2], (False, "hand_identity_or_color_unknown"))
+
+    def test_preview_checks_required_card_count_and_falls_back_without_clear_status(self):
+        runtime, _ = runtime_for([])
+        runtime._observation_image = image = object()
+        state = main()
+        cards = tuple(NS(color=card.color, owner_slot=card.owner_slot, servant_id=card.owner_servant_id)
+                      for card in command().cards)
+        with patch("battle.perception.opening_preview.OpeningPreviewRecognizer.default") as recognizer, \
+             patch("battle.perception.opening_preview_availability.preview_target_has_clear_status") as clear:
+            recognizer.return_value.detect.return_value = cards
+            clear.return_value = True
+            self.assertTrue(runtime._opening_hand_preview_matches(state, OPENING))
+            clear.assert_called_once_with(image, 2, ROSTER[1])
+            clear.reset_mock()
+            duplicate = replace(OPENING, required_colors=(Color.BUSTER, Color.BUSTER))
+            self.assertFalse(runtime._opening_hand_preview_matches(state, duplicate))
+            clear.assert_not_called()
+            clear.return_value = False
+            self.assertFalse(runtime._opening_hand_preview_matches(state, OPENING))
 
     def test_intentionally_empty_initial_slots_are_distinct_from_a_member_departure(self):
         runtime, _ = runtime_for([])
@@ -209,9 +342,18 @@ class OpeningHandRuntimeTests(unittest.TestCase):
 
     def test_disabled_native_strategy_preserves_legacy_immediate_skill_behavior(self):
         runtime, events = runtime_for([main(), command(ready=False), victory()], enabled=False)
+        runtime._opening_hand_preview_matches = Mock(return_value=True)
         self.assertTrue(runtime.run().ok)
         self.assertEqual([event[0] for event in events[:2]], ["skills", "open"])
         runtime.ctx.run_task.assert_not_called()
+        runtime._opening_hand_preview_matches.assert_not_called()
+
+    def test_native_strategy_without_opening_hand_skips_the_preview(self):
+        runtime, events = runtime_for([main(), command(), victory()], opening=replace(OPENING, enabled=False))
+        runtime._opening_hand_preview_matches = Mock(return_value=True)
+        self.assertTrue(runtime.run().ok)
+        self.assertEqual([event[0] for event in events], ["skills", "open", "cards"])
+        runtime._opening_hand_preview_matches.assert_not_called()
 
     def test_missing_plan_and_invalid_enabled_constraints_stop_before_any_device_action(self):
         for plan, opening in ((None, OPENING), (PLAN, replace(OPENING, required_colors=())),

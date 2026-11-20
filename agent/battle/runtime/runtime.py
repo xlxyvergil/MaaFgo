@@ -17,7 +17,7 @@ from dataclasses import dataclass, replace
 from ..core.decider import Decider, RuleDecider
 from ..core.special_skills import SPECIAL_SKILL_GROUPS, TD, SpecialSkillChoiceError, SpecialSkillChoices
 from .special_skills import DEFAULT_NP_MENU_ROOTS, NP_IDENTITY_GUARD, SpecialSkillDispatcher
-from ..core.enums import PrimitiveKind, Scene
+from ..core.enums import CardColor, PrimitiveKind, Scene
 from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, Confidence, InitialFormation,
                            MasterSkillAction, OrderChangeAction, RetireAction,
                            ServantSkillAction, VERIFIED_FORMATION_SOURCE,
@@ -197,15 +197,21 @@ class AutoBattleRuntime:
                 if opening_used and plan_turn == 0 and not self._opening_roster_unchanged():
                     return BattleResult.fail("opening_hand_roster_changed_or_unknown", turns)
                 if self._opening_hand_pending and plan_turn == 0:
-                    # Observe the real five cards before the first skill. The
-                    # existing Executor owns Attack; the return lives in Pipeline.
-                    mfaalog.info(f"[OpeningHand] 实际回合{turns+1}，释放任何计划技能前查看手牌")
-                    if not self.executor.open_command_cards():
-                        return BattleResult.fail("opening_hand_open_failed", turns)
-                    if not self._wait_until((Scene.COMMAND_SELECTION,), _OPEN_CARDS_TIMEOUT_S):
-                        return BattleResult.fail("opening_hand_open_confirm_failed", turns)
-                    opening_preview_started = True
-                    continue
+                    if self._opening_hand_preview_matches(state, opening):
+                        mfaalog.info(f"[OpeningHand] 实际回合{turns+1}，缩略卡满足开局条件，开始执行计划")
+                        self._opening_hand_pending = False
+                        # The first observation read cooldowns for opening-hand
+                        # waiting. Apply the same plan availability as after a
+                        # successful return from the full-card page.
+                        state = self._patch_skills_available(state)
+                    else:
+                        mfaalog.info(f"[OpeningHand] 实际回合{turns+1}，打开完整选卡页确认手牌")
+                        if not self.executor.open_command_cards():
+                            return BattleResult.fail("opening_hand_open_failed", turns)
+                        if not self._wait_until((Scene.COMMAND_SELECTION,), _OPEN_CARDS_TIMEOUT_S):
+                            return BattleResult.fail("opening_hand_open_confirm_failed", turns)
+                        opening_preview_started = True
+                        continue
                 mfaalog.info("[AutoBattle] MAIN_BATTLE -> deciding skills...")
                 action = self.decider.decide(state, turn_index=plan_turn)
                 action, skipped_skills = skip_unusable_servant_skills(
@@ -409,30 +415,71 @@ class AutoBattleRuntime:
         return (any(expected) and expected == actual and not self._retired_instances
                 and self._member_order[:3] == [0, 1, 2])
 
-    def _opening_hand_matches(self, state, opening):
-        from ..core.enums import CardColor
+    @staticmethod
+    def _opening_hand_target(opening, roster):
         target_id = canonical_servant_id(opening.servant_id) if opening.servant_id else None
-        target_slot = opening.servant_slot
-        roster = tuple(canonical_servant_id(sid) for sid in self.roster_servant_ids[:3])
         if target_id:
             slots = [slot for slot, sid in enumerate(roster, 1) if sid == target_id]
-            if len(slots) != 1:
-                return False, "target_identity_unknown", target_id, target_slot
-            target_slot = slots[0]
-        elif not is_slot(target_slot, 1, 3) or roster[target_slot - 1] is None:
-            return False, "target_identity_unknown", target_id, target_slot
-        if (not state.cards_ready(self.profile.min_card_confidence)
-                or not state.card_owners_ready(.80)
-                or any(card.color not in (CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK) for card in state.cards)
-                or target_id and any(canonical_servant_id(card.owner_servant_id) != roster[card.owner_slot - 1]
-                                     for card in state.cards)):
+            return target_id, slots[0] if len(slots) == 1 else None
+        slot = opening.servant_slot
+        return None, slot if is_slot(slot, 1, 3) and roster[slot - 1] else None
+
+    def _opening_hand_preview_matches(self, state: BattleState, opening) -> bool:
+        image = getattr(self, "_observation_image", None)
+        if image is None or state.scene is not Scene.MAIN_BATTLE or not state.scene_confidence.passes(.95):
+            return False
+        roster = tuple(canonical_servant_id(sid) for sid in self.roster_servant_ids[:3])
+        _, target_slot = self._opening_hand_target(opening, roster)
+        if target_slot is None:
+            return False
+        target_id = roster[target_slot - 1]
+        if not any(servant.slot == target_slot and canonical_servant_id(servant.servant_id) == target_id
+                   for servant in state.servants):
+            return False
+
+        from ..perception.opening_preview import OpeningPreviewRecognizer
+        from ..perception.opening_preview_availability import preview_target_has_clear_status
+
+        from cv2 import error as ImageRecognitionError
+
+        try:
+            cards = OpeningPreviewRecognizer.default().detect(image, roster)
+            if len(cards) != 5 or any(card.color in (None, CardColor.UNKNOWN) for card in cards):
+                return False
+            observed = Counter(card.color for card in cards
+                               if card.owner_slot == target_slot and card.servant_id == target_id)
+            required = Counter(opening.required_colors)
+            return required <= observed and preview_target_has_clear_status(image, target_slot, target_id)
+        except (ImageRecognitionError, OSError) as exc:
+            mfaalog.diagnostic(f"[OpeningHand] 缩略卡或状态图标识别失败，改用完整选卡页：{exc}")
+            return False
+
+    def _opening_hand_matches(self, state, opening):
+        roster = tuple(canonical_servant_id(sid) for sid in self.roster_servant_ids[:3])
+        target_id, target_slot = self._opening_hand_target(opening, roster)
+        if target_slot is None:
+            return False, "target_identity_unknown", target_id, opening.servant_slot
+        if len(state.cards) != 5 or {card.ui_slot for card in state.cards} != {1, 2, 3, 4, 5}:
             return False, "hand_identity_or_color_unknown", target_id, target_slot
-        available = Counter(card.color for card in state.cards if card.owner_slot == target_slot and card.can_attack)
-        needed = Counter(opening.required_colors)
-        return all(available[color] >= count for color, count in needed.items()), "known_hand", target_id, target_slot
+        confirmed = [
+            card for card in state.cards
+            if card.color in (CardColor.BUSTER, CardColor.ARTS, CardColor.QUICK)
+            and card.confidence.passes(self.profile.min_card_confidence)
+            and card.owner_confidence.passes(.80)
+            and is_slot(card.owner_slot, 1, 3)
+            and roster[card.owner_slot - 1] is not None
+            and canonical_servant_id(card.owner_servant_id) == roster[card.owner_slot - 1]
+        ]
+        usable = Counter(card.color for card in confirmed if card.owner_slot == target_slot and card.can_attack)
+        if Counter(opening.required_colors) <= usable:
+            # Sufficient confirmed cards prove readiness independently of the
+            # remaining cards (for example two copies of the same teammate).
+            return True, "known_hand", target_id, target_slot
+        # Wait turns still require the complete hand for card choice.
+        reason = "known_hand" if len(confirmed) == 5 else "hand_identity_or_color_unknown"
+        return False, reason, target_id, target_slot
 
     def _opening_wait_action(self, state, target_id, target_slot):
-        from ..core.enums import CardColor
         policy = self.battle_policy.card
         native = policy.native_strategy
         ids = tuple(dict.fromkeys(((target_id,) if target_id else ()) + native.preferred_servant_ids))
