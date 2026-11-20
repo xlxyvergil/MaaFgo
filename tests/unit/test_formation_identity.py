@@ -278,5 +278,35 @@ class IdentityTests(unittest.TestCase):
             FormationSlot(1, "unknown", servant_id="1000")
 
 
+class SoloSortieIdentityTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        image_path = ROOT / "tests/fixtures/main_story/cn_solo_sortie_confirm.png"
+        cls.image = cv2.imdecode(np.fromfile(image_path, np.uint8), cv2.IMREAD_COLOR)
+        resource_root = ROOT / "assets/resource"
+        pipeline = json.loads((resource_root / "base/pipeline/自动编队.json").read_text("utf8"))
+        calibration = f.FormationCalibration.parse(pipeline["编队身份-采集"]["attach"]["calibration"])
+        cls.reader = f.FormationIdentityReader(
+            [resource_root / layer / "image" for layer in ("cn", "base")], calibration,
+        )
+
+    def test_fixed_support_portrait_is_identified_in_cn_solo_sortie(self):
+        support, *locked = self.reader.read_frame(self.image)
+        self.assertEqual((support.status, support.is_support, support.servant_id),
+                         ("identified", True, "2300300"))
+        self.assertEqual(support.search_scope, "solo_support_crop")
+        self.assertEqual([(slot.status, slot.reason) for slot in locked],
+                         [("empty", "restricted_slot_locked")] * 5)
+
+    def test_ordinary_empty_slot_does_not_count_as_locked(self):
+        image = self.image.copy()
+        x, y, width, height = f.SLOT_ROIS[-1]
+        image[y:y + height, x:x + width] = 70
+        slots = self.reader.read_frame(image)
+        self.assertTrue(slots[0].is_support)
+        self.assertIsNone(slots[0].servant_id)
+        self.assertEqual(slots[-1].reason, "existing_empty_slot_heuristic")
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -65,10 +65,11 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertTrue(runtime.auto_handle_restrictions)
         self.assertFalse(runtime.current_restricted)
 
-    def test_disabled_restriction_stops_before_any_click(self):
+    def test_disabled_restriction_does_not_probe_title(self):
         runtime, context = runner(config={"auto_handle_restrictions": False})
-        with self.assertRaisesRegex(StoryStopped, "手动|限制"):
-            runtime.check_formation_restriction({"主线-编制限制"})
+        runtime.check_formation_restriction({"主线-编制限制"})
+        self.assertFalse(runtime.current_restricted)
+        self.assertEqual(context.recognitions, [])
         self.assertEqual(context.actions, [])
         self.assertEqual(context.tasks, [])
 
@@ -147,6 +148,14 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertFalse(runtime._handle_restricted_formation({"主线限制-单骑出击"}))
         self.assertFalse(runtime.current_restricted)
 
+    def test_direct_start_skips_unrelated_popup_probes_on_actionable_confirmation(self):
+        runtime, context = runner()
+        self.assertFalse(runtime.interrupt({
+            "进本-队伍确认", "进本-队伍确认页可开始", "进本-灰色变更配置", "主线-编队弹窗关闭保底",
+        }, forming=True))
+        self.assertNotIn("主线-编队弹窗关闭保底", context.recognitions)
+        self.assertEqual(context.actions, [])
+
     def test_empty_required_slot_opens_game_auto_formation(self):
         runtime, context = runner()
         self.assertTrue(runtime._handle_restricted_formation({
@@ -179,15 +188,17 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertFalse(runtime._restriction_needs_decide)
         self.assertEqual([name for name, _ in context.actions], ["主线限制-自动编成确认"])
 
-    def test_disabled_setting_rejects_each_restriction_signal_before_action(self):
+    def test_disabled_setting_does_not_probe_restriction_signals(self):
         for signal in ("主线限制-关闭提示", "主线限制-取消编队来源",
                        "主线限制-编成条件未满足",
                        "主线限制-自动编成确认", "进本-自动编队确认",
-                       "主线限制-空槽", "主线限制-固定成员", "主线限制-单骑出击"):
+                       "主线限制-空槽", "主线限制-固定成员", "主线限制-单骑出击",
+                       "进本-灰色变更配置", "主线限制-多个助战"):
             with self.subTest(signal=signal):
                 runtime, context = runner(config={"auto_handle_restrictions": False})
-                with self.assertRaisesRegex(StoryStopped, "手动|限制"):
-                    runtime._handle_restricted_formation({signal, "进本-队伍确认"})
+                self.assertFalse(runtime._handle_restricted_formation({signal, "进本-队伍确认"}))
+                self.assertFalse(runtime.current_restricted)
+                self.assertEqual(context.recognitions, [])
                 self.assertEqual(context.actions, [])
                 self.assertEqual(context.tasks, [])
 
@@ -212,10 +223,11 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertEqual([name for name, _ in context.actions], [
             "主线限制-关闭职阶相性", "主线限制-编队决定"])
 
-    def test_bbc_restriction_stops_without_silently_switching_backend(self):
+    def test_bbc_does_not_probe_native_formation_restrictions(self):
         runtime, context = runner(config={"battle_mode": "bbc"})
-        with self.assertRaisesRegex(StoryStopped, "原生|手动"):
-            runtime._handle_restricted_formation({"主线限制-自动编成确认"})
+        self.assertFalse(runtime.auto_handle_restrictions)
+        self.assertFalse(runtime._handle_restricted_formation({"主线限制-自动编成确认"}))
+        self.assertEqual(context.recognitions, [])
         self.assertEqual(context.actions, [])
         self.assertEqual(context.tasks, [])
 
@@ -418,7 +430,7 @@ class RestrictedContextIsolationTests(unittest.TestCase):
         self.assertEqual([name for name, _ in context.tasks], ["进本流程"])
         self.assert_session_finished(context)
 
-    def test_start_rejection_then_auto_formation_updates_next_entry_and_battle(self):
+    def test_start_rejection_after_fallback_updates_next_entry_and_battle(self):
         runtime, context = self.make_runtime(restricted=False)
         context.frames[:] = [
             {"主线限制-编成条件未满足"},
@@ -429,7 +441,14 @@ class RestrictedContextIsolationTests(unittest.TestCase):
             {"进本-战斗主界面已出现"},
         ]
         before = copy.deepcopy(context.nodes)
-        with patch.object(runtime, "reach_formation"):
+        original = CloneContext.run_task
+
+        def recover_first_entry(ctx, name, pipeline_override=None):
+            if not ctx.tasks and name == "进本流程":
+                sessions.mark_restricted(*context_session(ctx))
+            return original(ctx, name, pipeline_override)
+
+        with patch.object(runtime, "reach_formation"), patch.object(CloneContext, "run_task", recover_first_entry):
             runtime.fight()
         self.assertEqual([name for name, _ in context.tasks], [
             "进本流程", "进本流程", "原生自动战斗入口"])
@@ -438,6 +457,7 @@ class RestrictedContextIsolationTests(unittest.TestCase):
         self.assertEqual(second["进本-编队处理"]["next"], ["进本-点击队伍确认"])
         self.assertEqual(second["进本-队伍确认"]["next"][0], "进本-助战兜底跳过编队")
         self.assertEqual(second["进本-实际点击队伍确认"]["next"], [])
+        self.assertFalse(runtime._restriction_direct_start)
         self.assertEqual(json.loads(battle["原生自动战斗入口"]["action"]["param"]["custom_action_param"]),
                          {"native_battle_formation_reset": True})
         self.assertEqual(context.nodes, before)
@@ -487,18 +507,42 @@ class RestrictedContextIsolationTests(unittest.TestCase):
         self.assertEqual(context.actions, [])
         self.assert_session_finished(context)
 
-    def test_solo_sortie_discovered_during_handoff_skips_chaldea_formation(self):
+    def test_fixed_formation_during_handoff_uses_direct_start(self):
+        for signal in ("主线限制-单骑出击", "进本-灰色变更配置"):
+            with self.subTest(signal=signal):
+                runtime, context = self.make_runtime(restricted=False)
+                context.frames[:] = [
+                    *[{"进本-队伍确认", "进本-队伍确认页可开始", signal, "主线-编队弹窗关闭保底"}] * 3,
+                    {"进本-战斗主界面已出现"},
+                ]
+                runtime.fight()
+                entry, battle = (nodes for _, nodes in context.executions)
+                self.assertEqual(entry["进本-队伍确认"]["next"], ["进本-已标记限制编队", "进本-限制编队直接开战"])
+                self.assertEqual(context.actions, [])
+                self.assertTrue(runtime.current_restricted)
+                self.assertEqual(json.loads(battle["原生自动战斗入口"]["action"]["param"]["custom_action_param"]),
+                                 {"native_battle_formation_reset": True})
+                self.assert_session_finished(context)
+
+    def test_configuration_open_fallback_uses_default_battle_for_current_quest(self):
         runtime, context = self.make_runtime(restricted=False)
-        context.frames[:] = [
-            *[{"进本-队伍确认", "主线限制-单骑出击"}] * 3,
-            {"进本-战斗主界面已出现"},
-        ]
-        runtime.fight()
+        original = CloneContext.run_task
+
+        def recover(ctx, name, pipeline_override=None):
+            if name == "进本流程":
+                sessions.mark_restricted(*context_session(ctx))
+            return original(ctx, name, pipeline_override)
+
+        with patch.object(runtime, "reach_formation"), patch.object(CloneContext, "run_task", recover):
+            runtime.fight()
         entry, battle = (nodes for _, nodes in context.executions)
-        self.assertEqual(entry["进本-编队处理"]["next"], ["进本-点击队伍确认"])
+        self.assertTrue(entry["进本-编队限制配置"]["attach"]["auto_handle_restrictions"])
         self.assertTrue(runtime.current_restricted)
         self.assertEqual(json.loads(battle["原生自动战斗入口"]["action"]["param"]["custom_action_param"]),
                          {"native_battle_formation_reset": True})
+        runtime.reset_restriction_state()
+        self.assertFalse(runtime.current_restricted)
+        self.assertFalse(runtime._restriction_direct_start)
         self.assert_session_finished(context)
 
     def test_start_retry_budget_is_three_and_failure_cleans_context(self):

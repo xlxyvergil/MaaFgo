@@ -7,7 +7,7 @@ import unittest
 from unittest.mock import patch
 
 from test_main_story import Context
-from main_story_action import StoryRunner, StoryStopped
+from main_story_action import StoryRunner
 from battle.runtime.formation_session import sessions
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,10 +66,10 @@ class MultipleSupportStateTests(unittest.TestCase):
         self.assertFalse(runtime._restriction_needs_auto)
         self.assertEqual(context.actions, [])
 
-    def test_multiple_supports_with_handling_disabled_stop_before_inputs(self):
+    def test_multiple_supports_with_handling_disabled_are_not_probed(self):
         runtime, context = runner(config={"auto_handle_restrictions": False})
-        with self.assertRaisesRegex(StoryStopped, "自动处理编队限制情况"):
-            runtime._handle_restricted_formation({"进本-队伍确认", "主线限制-多个助战"})
+        self.assertFalse(runtime._handle_restricted_formation({"进本-队伍确认", "主线限制-多个助战"}))
+        self.assertEqual(context.recognitions, [])
         self.assertFalse(runtime.current_restricted)
         self.assertEqual(context.actions, [])
         self.assertEqual(context.tasks, [])

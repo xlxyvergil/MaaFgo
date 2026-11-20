@@ -50,7 +50,7 @@ class Context:
 
     def run_recognition(self, name, image):
         self.recognitions.append(name)
-        return NS(hit=name in image, box=[700, 200, 1, 1])
+        return NS(hit=name in image or name.removesuffix("特征") in image, box=[700, 200, 1, 1])
 
     def run_action(self, name, box, pipeline_override=None):
         self.actions.append((name, pipeline_override))
@@ -191,25 +191,30 @@ class RoutingTests(unittest.TestCase):
                          ["跳过剧情-点击跳过", "跳过剧情-确认跳过",
                           "跳过剧情-点击跳过", "跳过剧情-确认跳过"])
 
-    def test_special_formation_popup_stops_before_generic_battle_flow(self):
+    def test_disabled_restrictions_keep_normal_formation_flow(self):
         r, c = runner([{"进本-选择助战"},
-                       {"主线-编制限制", "进本-队伍确认"}],
+                       *[{"主线-编制限制", "进本-队伍确认"}] * 3,
+                       {"进本-战斗主界面已出现"}],
                       {"auto_handle_restrictions": False})
-        with self.assertRaisesRegex(StoryStopped, "需要手动调整"):
-            r.fight()
+        r.fight()
+        self.assertNotIn("主线-编制限制", c.recognitions)
+        self.assertFalse(r.current_restricted)
         self.assertEqual([n for n, _ in c.actions], ["进本-选择助战"])
-        self.assertEqual(c.tasks, [])
+        self.assertEqual([n for n, _ in c.tasks], ["进本流程", "原生自动战斗入口"])
 
-    def test_restriction_stops_immediately_at_start_and_during_entry(self):
-        popup = {"主线-编制限制", "进本-队伍确认", "进本-关闭告知弹窗",
+    def test_disabled_restriction_processing_does_not_close_unknown_dialog(self):
+        popup = {"主线-编制限制", "进本-队伍确认", "进本-编成条件提示",
                  "主线-编队弹窗关闭保底"}
-        for mode in ("native", "bbc"):
+        for config in ({"auto_handle_restrictions": False}, {"battle_mode": "bbc"}):
             for method in ("run", "wait_after_quest_click", "reach_formation"):
-                with self.subTest(mode=mode, method=method):
-                    r, c = runner([popup], {"battle_mode": mode, "auto_handle_restrictions": False})
-                    with self.assertRaisesRegex(StoryStopped, "手动调整"):
+                with self.subTest(config=config, method=method):
+                    r, c = runner([popup], config)
+                    with self.assertRaisesRegex(StoryStopped, "弹窗需要确认"):
                         getattr(r, method)()
                     self.assertLess(r.clock(), 1)
+                    self.assertNotIn("主线-编制限制", c.recognitions)
+                    self.assertNotIn("进本-编成条件提示特征", c.recognitions)
+                    self.assertFalse(r.current_restricted)
                     self.assertEqual(c.actions, [])
                     self.assertEqual(c.tasks, [])
                     self.assertEqual((r.completed, r.battles), (0, 0))
@@ -336,7 +341,7 @@ class RoutingTests(unittest.TestCase):
         self.assertIn("主线限制-空槽", formation_checks)
         self.assertEqual(formation_checks.count(formation), 3)
         self.assertTrue(all(name.startswith("主线限制-") or name in (
-            formation, "主线-编制限制", "进本-自动编队确认", "进本-战斗主界面已出现",
+            formation, "主线-编制限制", "进本-自动编队确认特征", "进本-战斗主界面已出现", "进本-灰色变更配置",
         ) for name in formation_checks))
 
     def test_auto_formation_decide_failure_stops_handoff(self):
@@ -405,14 +410,13 @@ class RoutingTests(unittest.TestCase):
         self.assertTrue(r.interrupt({popup}, forming=True))
         self.assertEqual([n for n, _ in c.actions], [popup] * 2)
 
-    def test_formation_close_fallback_never_overrides_manual_restriction(self):
+    def test_disabled_restrictions_still_close_known_strategy_hint(self):
         r, c = runner(config={"auto_handle_restrictions": False})
-        popup = {"主线-编制限制", "主线-编队弹窗关闭保底"}
+        popup = {"进本-攻略提示关闭", "主线-编队弹窗关闭保底"}
         for flags in ({"entering": True}, {"forming": True}):
             with self.subTest(flags=flags):
-                with self.assertRaisesRegex(StoryStopped, "需要手动调整"):
-                    r.interrupt(popup, **flags)
-        self.assertEqual(c.actions, [])
+                self.assertTrue(r.interrupt(popup, **flags))
+        self.assertEqual([name for name, _ in c.actions], ["进本-攻略提示关闭"] * 2)
 
     def test_known_formation_hint_has_priority_over_close_fallback(self):
         hint, fallback, formation = "进本-攻略提示关闭", "主线-编队弹窗关闭保底", "进本-队伍确认"

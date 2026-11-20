@@ -81,6 +81,15 @@ class ContinuationSessionTests(unittest.TestCase):
         self.assertIsNone(self.store.support_selected(1, self.token, "100100"))
         self.assertIsNone(self.store.read(1, self.token)[0])
 
+    def test_restricted_formation_is_retained_only_for_a_continuous_sortie(self):
+        self.store.mark_restricted(1, self.token)
+        self.assertTrue(self.store.restricted(1, self.token))
+        self.store.prepare_continuation(1, self.token)
+        self.store.battle_started(1, self.token, 2)
+        self.assertTrue(self.store.restricted(1, self.token))
+        self.store.battle_started(1, self.token, 3)
+        self.assertFalse(self.store.restricted(1, self.token))
+
     def test_zero_multiple_or_uncertain_support_markers_cannot_reuse(self):
         for flags in ((False,) * 6, (True, False, True, False, False, False),
                       (None, False, True, False, False, False)):

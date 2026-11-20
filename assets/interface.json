@@ -199,6 +199,7 @@
     "options/编队与战斗编辑器.json",
     "options/BBC配置转Chaldea本地队伍.json",
     "options/原生自动战斗次数.json",
+    "options/原生自动战斗处理编队限制.json",
     "options/原生自动战斗跳过剧情.json",
     "options/原生自动战斗助战方式.json",
     "options/原生自动战斗是否使用茶壶.json",

@@ -1,0 +1,30 @@
+{
+  "option": {
+    "原生自动战斗处理编队限制": {
+      "type": "switch",
+      "label": "自动处理编队限制情况",
+      "description": "开启后按游戏要求处理编队限制。阵容已可出击时沿用当前队伍，本关使用默认战斗逻辑；下一关恢复原方案。",
+      "default_case": "No",
+      "cases": [
+        {
+          "name": "Yes",
+          "label": "开启",
+          "pipeline_override": {
+            "进本-编队限制配置": {
+              "attach": {"managed_formation_restrictions": true, "auto_handle_restrictions": true}
+            }
+          }
+        },
+        {
+          "name": "No",
+          "label": "关闭",
+          "pipeline_override": {
+            "进本-编队限制配置": {
+              "attach": {"managed_formation_restrictions": true, "auto_handle_restrictions": false}
+            }
+          }
+        }
+      ]
+    }
+  }
+}

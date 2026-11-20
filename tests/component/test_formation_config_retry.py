@@ -29,6 +29,7 @@ from formation_test_support import formation as f
 ROOT = Path(__file__).resolve().parents[2]
 OPEN = "自动编队-打开配置"
 DETECT = "自动编队-检测编辑决定"
+CAN_START = "进本-限制编队确认开始"
 
 
 class ConfigController(CustomController):
@@ -69,7 +70,8 @@ class FormationConfigRetryTests(unittest.TestCase):
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = json.loads((ROOT / "assets/resource/base/pipeline/自动编队.json").read_text("utf8"))
 
-    def run_graph(self, *, succeed_after, unknown=False, both_visible=False, runs=1):
+    def run_graph(self, *, succeed_after, unknown=False, both_visible=False, runs=1,
+                  restriction_option=None, can_start=True):
         controller = ConfigController(succeed_after, unknown, both_visible)
         nodes = {name: copy.deepcopy(self.source[name]) for name in (OPEN, DETECT)}
         for node in nodes.values():
@@ -84,12 +86,26 @@ class FormationConfigRetryTests(unittest.TestCase):
                 if argv.node_name == OPEN and (controller.scene == "confirm"
                                               or (controller.scene == "edit" and controller.both_visible)):
                     return (200, 650, 50, 40)
+                if argv.node_name == CAN_START and can_start and controller.scene == "confirm":
+                    return (1100, 650, 100, 40)
                 return None
 
         class Invoke(CustomAction):
             def run(self, context, argv):
                 action = f.AutoFormationFromChaldea.__new__(f.AutoFormationFromChaldea)
                 action.context = context
+                if restriction_option is not None:
+                    root = context.get_task_job().job_id
+                    token = f.sessions.begin(root)
+                    action._shot = controller.screencap
+                    try:
+                        if not context.override_pipeline({"编队身份-会话": {"attach": {"session_id": token}}}):
+                            return False
+                        result = action._open_initial_configuration()
+                        results.append((result, f.sessions.restricted(root, token)))
+                        return result == "restricted"
+                    finally:
+                        f.sessions.finish(root, token)
                 for _ in range(runs):
                     controller.scene = "confirm"
                     controller.round_clicks = 0
@@ -101,6 +117,9 @@ class FormationConfigRetryTests(unittest.TestCase):
 
         nodes["invoke"] = {"action": {"type": "Custom", "param": {"custom_action": "invoke"}},
                            "on_error": []}
+        nodes[CAN_START] = {"recognition": {"type": "Custom", "param": {"custom_recognition": "screen"}}}
+        nodes["编队身份-会话"] = {"attach": {"session_id": ""}}
+        nodes["进本-编队限制配置"] = {"attach": {"auto_handle_restrictions": restriction_option is True}}
         with tempfile.TemporaryDirectory() as temp:
             bundle = Path(temp)
             (bundle / "pipeline").mkdir()
@@ -166,6 +185,23 @@ class FormationConfigRetryTests(unittest.TestCase):
         self.assertTrue(ok)
         self.assertEqual(len(controller.clicks), 4)
         self.assertEqual(results, [True, True])
+
+    def test_exhausted_retries_recover_only_if_enabled_and_can_start(self):
+        for enabled, can_start in ((True, True), (False, True), (True, False)):
+            with self.subTest(enabled=enabled, can_start=can_start):
+                ok, controller, results = self.run_graph(
+                    succeed_after=None, restriction_option=enabled, can_start=can_start)
+                expected = enabled and can_start
+                self.assertEqual(ok, expected)
+                self.assertEqual(len(controller.clicks), 3)
+                self.assertEqual(results, [("restricted" if expected else "failed", expected)])
+
+    def test_unknown_page_does_not_recover_before_retry_budget_is_used(self):
+        ok, controller, results = self.run_graph(
+            succeed_after=None, unknown=True, restriction_option=True)
+        self.assertFalse(ok)
+        self.assertEqual(len(controller.clicks), 1)
+        self.assertEqual(results, [("failed", False)])
 
 
 if __name__ == "__main__":

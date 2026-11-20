@@ -44,7 +44,8 @@ from battle.runtime.runtime import AutoBattleRuntime, BattleResult
 from battle.runtime.preset_fallback import recover_for_default_battle
 from battle.runtime.hellish_trial import (HellishTrialDecider, HellishTrialRuntime,
                                          trial_config_from_source)
-from battle.runtime.formation_session import context_session, session_override, sessions
+from battle.runtime.formation_session import (context_session, restriction_settings,
+                                               session_override, sessions)
 from battle.runtime.skill_confirmation_reminder import skill_confirmation_reminders
 from bond_stop_action import inspect_victory_settlement, skip_bond_check_for_restricted_formation
 from chaldea import fetch_share_data
@@ -95,6 +96,35 @@ class RememberContinuousFormation(CustomAction):
         return CustomAction.RunResult(success=True)
 
 
+@AgentServer.custom_recognition("formation_restriction_enabled")
+class FormationRestrictionEnabled(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        if restriction_settings(context).get("auto_handle_restrictions") is True:
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="restriction_enabled")
+        return None
+
+
+@AgentServer.custom_recognition("formation_unclassified_notice_allowed")
+class FormationUnclassifiedNoticeAllowed(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        settings = restriction_settings(context)
+        if (settings.get("managed_formation_restrictions") is not True
+                or settings.get("auto_handle_restrictions") is True):
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="notice_allowed")
+        return None
+
+
+@AgentServer.custom_recognition("formation_restriction_marked")
+class FormationRestrictionMarked(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        if restriction_settings(context).get("auto_handle_restrictions") is not True:
+            return None
+        root, token = context_session(context)
+        if sessions.valid(root, token) and sessions.restricted(root, token):
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="restriction_marked")
+        return None
+
+
 @AgentServer.custom_action("mark_native_formation_restricted")
 class MarkNativeFormationRestricted(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
@@ -102,7 +132,9 @@ class MarkNativeFormationRestricted(CustomAction):
             return CustomAction.RunResult(success=False)
         root, token = context_session(context)
         if sessions.valid(root, token):
-            sessions.invalidate(root, token, "")
+            if not sessions.restricted(root, token):
+                mfaalog.warning("[编队限制] 本场将采用游戏当前阵容和默认战斗逻辑。")
+            sessions.mark_restricted(root, token)
             skip_bond_check_for_restricted_formation(context)
         return CustomAction.RunResult(success=True)
 
@@ -111,19 +143,22 @@ class MarkNativeFormationRestricted(CustomAction):
 class AutoBattleAction(CustomAction):
     def run(self, context: Context, argv: CustomAction.RunArg) -> CustomAction.RunResult:
         root, token = context_session(context)
-        initial_formation, formation_battle = None, 1
+        initial_formation, formation_battle, restricted = None, 1, False
         if token:
             try:
                 if context.tasker.stopping:
                     raise ValueError("task stopping")
                 initial_formation, formation_battle = sessions.read(root, token)
+                restricted = sessions.restricted(root, token)
             except ValueError as exc:
                 mfaalog.error(f"[auto_battle] 初始编队会话无效: {exc}")
                 return CustomAction.RunResult(success=False)
         param = _load_action_param(argv.custom_action_param)
         node_name = getattr(argv, "node_name", "")
         support_fallback = bool(token and sessions.support_fallback(root, token))
-        formation_reset = param.get("native_battle_formation_reset") is True
+        if restricted:
+            skip_bond_check_for_restricted_formation(context)
+        formation_reset = restricted or param.get("native_battle_formation_reset") is True
         continued_formation_reset = (formation_reset and initial_formation is not None
                                      and getattr(initial_formation, "source", "") == CONTINUOUS_FORMATION_SOURCE)
         if support_fallback or formation_reset:

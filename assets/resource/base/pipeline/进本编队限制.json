@@ -1,0 +1,77 @@
+{
+  "进本-编队限制配置": {
+    "attach": {"auto_handle_restrictions": false, "managed_formation_restrictions": false}
+  },
+  "进本-编队限制已开启": {
+    "recognition": {"type": "Custom", "param": {
+      "custom_recognition": "formation_restriction_enabled"
+    }}
+  },
+  "进本-可关闭未分类告知": {
+    "recognition": {"type": "Custom", "param": {
+      "custom_recognition": "formation_unclassified_notice_allowed"
+    }}
+  },
+  "进本-变更配置按钮": {
+    "recognition": {"type": "TemplateMatch", "param": {
+      "template": "battle/配置变更.png", "roi": [176, 638, 92, 76], "threshold": 0.8
+    }}
+  },
+  "进本-队伍确认页可开始": {
+    "doc": "队伍确认页的开始按钮必须亮起，同时识别同一页左下的变更配置。全屏弹窗压暗后的底层按钮不能用于开战兜底。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认",
+      "进本-变更配置按钮",
+      {"recognition": {"type": "Custom", "param": {
+        "custom_recognition": "formation_confirmation_lighting", "custom_recognition_param": "start"
+      }}}
+    ], "box_index": 0}}
+  },
+  "进本-灰色变更配置": {
+    "doc": "同屏确认可用的开始按钮与灰显的变更配置。配置模板只定位，亮度阈值区分按钮状态。当前正例为国服单骑出击实拍，日服用正常日服编队作反例。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认页可开始",
+      {"recognition": {"type": "Custom", "param": {
+        "custom_recognition": "formation_confirmation_lighting", "custom_recognition_param": "disabled_config"
+      }}}
+    ], "box_index": 1}}
+  },
+  "进本-限制编队需补齐": {
+    "doc": "必填限制空槽优先于固定成员、灰色配置和受限标记。调用游戏自动编队后再识别可开战状态。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-编队限制已开启", "进本-变更配置按钮", "主线限制-空槽"
+    ], "box_index": 2}},
+    "action": {"type": "Custom", "param": {"custom_action": "mark_native_formation_restricted"}},
+    "max_hit": 3,
+    "next": ["特殊编队-打开自动编队", "特殊编队-自动编成确认"],
+    "on_error": []
+  },
+  "进本-限制编队直接开战": {
+    "doc": "复用进本-限制编队确认开始，确认开始按钮可用且没有必填空槽。2026-11-20 国服库·丘林〔Alter〕强化本 MaaMCP 实测，普通队伍的开始按钮可用，灰色配置和直接开战均未命中，原 Chaldea 方案三回合完成。同帧关闭态只执行开关识别。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-编队限制已开启", "进本-限制编队确认开始",
+      {"recognition": {"type": "Or", "param": {"any_of": [
+        "进本-灰色变更配置", "主线限制-单骑出击", "主线限制-固定成员", "主线限制-多个助战"
+      ]}}}
+    ], "box_index": 1}},
+    "action": {"type": "Custom", "param": {"custom_action": "mark_native_formation_restricted"}},
+    "next": ["编队身份-采集"],
+    "on_error": []
+  },
+  "进本-已标记限制编队": {
+    "doc": "受限提示或打开配置重试已确认本场采用游戏阵容，重新确认确实可开始，再采集。此门控命中后不能回退到 Chaldea 编队或羁绊补齐。",
+    "recognition": {"type": "Custom", "param": {"custom_recognition": "formation_restriction_marked"}},
+    "next": ["进本-限制编队需补齐", "进本-限制编队确认开始"],
+    "on_error": []
+  },
+  "进本-限制编队确认开始": {
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认页可开始",
+      {"recognition": {"type": "Custom", "param": {
+        "custom_recognition": "formation_required_slots_filled"
+      }}}
+    ], "box_index": 0}},
+    "next": ["编队身份-采集"],
+    "on_error": []
+  }
+}

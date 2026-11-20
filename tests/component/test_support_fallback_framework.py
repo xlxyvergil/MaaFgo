@@ -49,6 +49,9 @@ class FallbackFrameworkTests(unittest.TestCase):
                         "进本-队伍确认", "进本-编队处理", "进本-助战兜底跳过编队",
                         "助战兜底-选择首个助战", "进本-选择助战",
                     )}
+                    # 专项编队分支由限制开关的组件测试覆盖。这里隔离普通助战路由。
+                    for name in ("进本-限制编队需补齐", "进本-限制编队直接开战", "进本-已标记限制编队"):
+                        nodes[name] = {"enabled": False}
                     formation = case["pipeline_override"]["进本-编队处理"]["next"][0]
                     nodes["进本-编队处理"].update(case["pipeline_override"]["进本-编队处理"])
                     for name in ("进本-队伍确认", "进本-选择助战"):
