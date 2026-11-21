@@ -100,6 +100,25 @@ class StrengtheningFrameworkTests(FrameworkResources, unittest.TestCase):
             self.assertEqual(detail["entries"][0]["box"][0], 950)
         self.probe(self.fixture(), check)
 
+    def test_cn_list_title_with_ocr_noise_still_requires_visible_header_and_close(self):
+        # 2026-11-21 打包版误停截图，仅保留两处识别区域，OCR 会读成「.强化任务」。
+        header = self.fixture("cn_list_title_ocr_noise.png")
+        image = np.zeros((720, 1280, 3), np.uint8)
+        image[:header.shape[0]] = header
+        dimmed = (image * .55).astype(np.uint8)
+        no_close = image.copy()
+        no_close[:90, :175] = 0
+
+        def check(ctx):
+            runner = StrengtheningRunner(ctx)
+            self.assertTrue(runner.panel(image))
+            self.assertFalse(runner.panel(dimmed))
+            self.assertFalse(runner.panel(no_close))
+            self.assertFalse(runner.reco("幕间-列表界面", image))
+            self.assertFalse(runner.reco("结算-已返回幕间列表", image))
+
+        self.probe(image, check)
+
     def test_wrong_page_preserves_screen_and_stops(self):
         def check(ctx):
             with self.assertRaisesRegex(StoryStopped, "强化任务"):
