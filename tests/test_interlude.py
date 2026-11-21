@@ -554,10 +554,11 @@ class NavigationSafetyTests(unittest.TestCase):
         with patch("interlude_action.same_list", return_value=True):
             self.assertIsNone(runtime.scan_entries(MAP, map_mode=True))
 
-    def test_disabled_restriction_stops_without_clicking_or_starting_battle(self):
+    def test_disabled_restriction_does_not_probe_restriction_or_start_battle(self):
         runtime, context = runner(config={"auto_handle_restrictions": False})
-        with self.assertRaises(StoryStopped):
-            runtime.check_formation_restriction({"主线-编制限制"})
+        runtime.check_formation_restriction({"主线-编制限制"})
+        self.assertEqual(context.recognitions, [])
+        self.assertFalse(runtime.current_restricted)
         self.assertEqual(context.actions, [])
         self.assertEqual(context.tasks, [])
 

@@ -41,10 +41,11 @@ class EntryRoutingTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = {}
-        for name in ("原生自动战斗", "日常战斗", "进本流程", "跳过剧情", "剧情通用选项", "自动编队"):
+        for name in ("原生自动战斗", "日常战斗", "进本流程", "特殊编队", "跳过剧情", "剧情通用选项", "自动编队"):
             cls.source.update(json.loads((ROOT / f"assets/resource/base/pipeline/{name}.json").read_text("utf-8")))
 
-    def run_graph(self, nodes, entry, screens=(), *, succeeds=True, runs=1):
+    def run_graph(self, nodes, entry, screens=(), *, succeeds=True, runs=1,
+                  preserve_recognition=()):
         nodes = copy.deepcopy(nodes)
         state = {"index": 0, "seen": []}
 
@@ -70,7 +71,8 @@ class EntryRoutingTests(unittest.TestCase):
             node.pop("focus", None)
             node.pop("post_wait_freezes", None)
             node.update(pre_delay=0, post_delay=0, timeout=20, rate_limit=1)
-            if node.get("recognition", {}).get("type", "DirectHit") != "DirectHit":
+            if (name not in preserve_recognition
+                    and node.get("recognition", {}).get("type", "DirectHit") != "DirectHit"):
                 node["recognition"] = {"type": "Custom", "param": {"custom_recognition": "screen"}}
                 node.pop("inverse", None)
             node["action"] = {"type": "Custom", "param": {"custom_action": "record"}}
@@ -117,7 +119,7 @@ class EntryRoutingTests(unittest.TestCase):
                  "进本-关闭告知弹窗", "进本-选择助战", "助战action", "Chaldea助战action",
                  "进本-自动编队确认", "进本-限制编队决定", "自动编队-编队决定",
                  "进本-编成条件提示", "进本-记录编队限制",
-                 "进本-攻略提示关闭",
+                 "进本-攻略提示关闭", "进本-战斗教程前进",
                  "进本-队伍确认", MAIN, RECONNECT, GUARD, BLIND, CHOICE, CONTINUE,
                  "跳过剧情-确认跳过", "跳过剧情-无确认弹窗", "跳过剧情-点击跳过",
                  "跳过剧情-确认跳过-已消失", "跳过-可能在主界面", "完成跳过剧情")
@@ -174,6 +176,44 @@ class EntryRoutingTests(unittest.TestCase):
                 self.assertNotIn("进本-自动编队确认", seen)
                 self.assertNotIn("自动编队-编队决定", seen)
                 self.assertNotIn(BLIND, seen)
+
+    def test_restriction_recognition_precedes_normal_formation(self):
+        self.assertEqual(self.source["进本-队伍确认"]["next"], [
+            "进本-限制编队需补齐", "进本-限制编队直接开战", "进本-已标记限制编队",
+            "进本-助战兜底跳过编队", "进本-编队处理",
+        ])
+        for name in ("进本-特殊编队处理", "进本-自动编队确认", "进本-编成条件提示",
+                     "特殊编队-编成条件未满足", "特殊编队-取消编队来源"):
+            with self.subTest(node=name):
+                recognition = self.source[name]["recognition"]
+                self.assertEqual(recognition["type"], "And")
+                self.assertEqual(recognition["param"]["all_of"][0], "进本-编队限制已开启")
+
+    def test_unclassified_popup_closing_requires_permission(self):
+        for name in ("进本-普通告知弹窗关闭", "进本-开始后弹窗检查"):
+            with self.subTest(node=name):
+                recognition = self.source[name]["recognition"]
+                self.assertEqual(recognition["type"], "And")
+                self.assertEqual(recognition["param"]["all_of"][0], "进本-可关闭未分类告知")
+                self.assertEqual(recognition["param"]["box_index"], 1)
+
+    def test_disabled_restriction_does_not_preempt_an_explicit_ordinary_notice(self):
+        gate = "进本-编队限制已开启"
+        restriction = "进本-编成条件提示"
+        feature = "进本-编成条件提示特征"
+        ordinary = "进本-攻略提示关闭"
+        mark = "进本-记录编队限制"
+        nodes = {name: copy.deepcopy(self.source[name]) for name in (restriction, feature, ordinary, mark)}
+        nodes[gate] = {"recognition": {"type": "Custom"}}
+        nodes["测试弹窗分发"] = {"next": [restriction, ordinary]}
+        for enabled in (False, True):
+            with self.subTest(enabled=enabled):
+                screen = {feature, ordinary}
+                if enabled:
+                    screen.add(gate)
+                seen = self.run_graph(nodes, "测试弹窗分发", [screen],
+                                      preserve_recognition=(restriction,))
+                self.assertEqual(seen[1:], [restriction, mark] if enabled else [ordinary])
 
     def test_auto_formation_missing_decide_never_starts_battle(self):
         seen = self.run_graph(self.entry_graph(), "进本-自动编队确认",

@@ -23,6 +23,11 @@ _BATTLE_RESET = (
 )
 _CUSTOM_SUPPORT_NODES = ("助战action", "Chaldea助战action")
 _SUPPORT_NODES = ("进本-选择助战", *_CUSTOM_SUPPORT_NODES)
+_FORMATION_POPUP_FEATURES = {
+    "进本-编成条件提示": "进本-编成条件提示特征",
+    "进本-自动编队确认": "进本-自动编队确认特征",
+}
+_GENERIC_FORMATION_POPUPS = ("主线-编队弹窗关闭保底", "进本-普通告知弹窗关闭")
 # 补点前的二次确认超过此时间即丢弃，不能把慢识别期间的旧坐标点到助战页。
 _QUEST_RETRY_FRAME_MAX_AGE = 2.0
 _POST_FORMATION_DECIDE_TIMEOUT = 60
@@ -75,7 +80,9 @@ class StoryRunner:
             raise ValueError("主线参数无效")
         self.completed = self.battles = 0
         self.skip_confirm_until = self.skip_settle_until = 0
-        self.auto_handle_restrictions = self.config.get("auto_handle_restrictions", True) is True
+        self.auto_handle_restrictions = (
+            self.mode == "native" and self.config.get("auto_handle_restrictions", True) is True
+        )
         self.use_spirit_stone = self.config.get("use_spirit_stone", False) is True
         self.retry_without_spirit_stone = self.config.get("retry_without_spirit_stone", False) is True
         self.defeat_retry_limit = self.config.get("defeat_retry_limit", 3)
@@ -90,6 +97,7 @@ class StoryRunner:
     def reset_restriction_state(self):
         """定位阶段也可能遇到限制；只在开始下一关时清空，不在进入战斗时清空。"""
         self.current_restricted = False
+        self._restriction_direct_start = False
         self._restriction_needs_auto = False
         self._restriction_auto_done = False
         self._restriction_needs_decide = False
@@ -97,10 +105,6 @@ class StoryRunner:
         self._post_formation_decide_deadline = 0
 
     def _mark_restricted(self, reason):
-        if self.mode != "native":
-            raise StoryStopped("限制编队自动处理仅支持原生自动战斗，请改用原生或手动调整编队")
-        if not self.auto_handle_restrictions:
-            raise StoryStopped("关卡存在编成限制，需要手动调整；或开启“自动处理编队限制情况”后重试")
         if not self.current_restricted:
             mfaalog.warning(
                 f"[自动推主线] 检测到限制编队（{reason}）；本关以游戏编队为准，"
@@ -124,16 +128,20 @@ class StoryRunner:
 
     def _handle_restricted_formation(self, image, *, formation_confirmed=False):
         """每帧最多操作一次；叶子节点只点击，不执行其后续开战链。"""
+        if not self.auto_handle_restrictions:
+            return False
         for name in ("主线限制-关闭提示", "主线限制-编成条件未满足", "主线限制-取消编队来源",
                      "主线限制-自动编成确认", "进本-自动编队确认"):
-            result = self.reco(name, image)
+            result = self.reco(_FORMATION_POPUP_FEATURES.get(name, name), image)
             if not result:
                 continue
             self._mark_restricted(name)
             if name in ("主线限制-取消编队来源", "主线限制-编成条件未满足"):
+                self._restriction_direct_start = False
                 self._restriction_needs_auto = True
             self._restriction_action(name, result)
             if name in ("主线限制-自动编成确认", "进本-自动编队确认"):
+                self._restriction_direct_start = False
                 self._restriction_auto_done = True
                 self._restriction_needs_auto = False
                 self._restriction_needs_decide = True
@@ -157,12 +165,19 @@ class StoryRunner:
         if formation_confirmed or self.reco("进本-队伍确认", image):
             if self.reco("主线限制-空槽", image):
                 self._mark_restricted("必填空槽")
+                self._restriction_direct_start = False
                 if self._restriction_auto_done:
                     raise StoryStopped("游戏自动编队后仍有必填的限制空槽，停止任务，请手动完成编队")
                 self._restriction_needs_auto = True
+            elif self.reco("主线限制-单骑出击", image):
+                self._mark_restricted("单骑出击固定编队")
+                self._restriction_direct_start = bool(self.reco("进本-队伍确认页可开始", image))
+            elif self.reco("进本-灰色变更配置", image):
+                self._mark_restricted("变更配置按钮不可用")
+                self._restriction_direct_start = True
             elif self.reco("主线限制-固定成员", image):
                 self._mark_restricted("固定成员标记")
-            elif self.mode == "native" and self.reco("主线限制-多个助战", image):
+            elif self.reco("主线限制-多个助战", image):
                 # 剧情可能固定多名助战，却没有既有的“编队限制”标签。
                 # 必须在进入 Chaldea 单助战校验前接管，不能仅放宽数量后继续换人。
                 self._mark_restricted("多个助战标记")
@@ -239,11 +254,14 @@ class StoryRunner:
 
     def battle_ready(self, image):
         self.check_formation_restriction(image)
-        return any(self.reco(n, image) for n in
-                   ("主线-助战界面", "进本-队伍确认", "进本-战斗主界面已出现"))
+        ready = any(self.reco(n, image) for n in
+                    ("主线-助战界面", "进本-队伍确认", "进本-战斗主界面已出现"))
+        return ready and (self.auto_handle_restrictions or not any(
+            self.reco(name, image) for name in _GENERIC_FORMATION_POPUPS
+        ))
 
     def check_formation_restriction(self, image):
-        if self.reco("主线-编制限制", image):
+        if self.auto_handle_restrictions and self.reco("主线-编制限制", image):
             self._mark_restricted("编成限制提示")
 
     def failure(self, image):
@@ -329,12 +347,14 @@ class StoryRunner:
 
     def interrupt(self, image, *, entering=False, forming=False, confirmed_page=None):
         """已识别事件才操作；剧情跳过分帧确认，避免切换中重复点击。"""
-        if entering or forming:
-            self.check_formation_restriction(image)
-            if self._handle_restricted_formation(
-                image, formation_confirmed=confirmed_page == "进本-队伍确认",
-            ):
-                return True
+        formation_stage = entering or forming
+        if formation_stage and self._handle_restricted_formation(
+            image, formation_confirmed=confirmed_page == "进本-队伍确认",
+        ):
+            return True
+        if (forming and not entering and self._restriction_direct_start
+            and self.reco("进本-队伍确认页可开始", image)):
+            return False
         skip_enabled = confirmed_page is None and (
             self.ctx.get_node_data("跳过剧情-点击跳过") or {}).get("enabled", True)
         # 强制剧情选项会使 SKIP 灰显，必须在跳过确认的等待窗口之前处理。
@@ -407,17 +427,21 @@ class StoryRunner:
             return True
         # run_action 不执行 next；必须调用实际关闭叶子，不能调用仅分发的父节点。
         names = ["主线-右上公告关闭", "进本-普通告知弹窗关闭"]
-        if entering or forming:
-            names[:0] = ["进本-编成条件提示", "进本-攻略提示关闭",
-                         "主线-编队弹窗关闭保底"]
+        if formation_stage:
+            names[:0] = ["进本-攻略提示关闭", "进本-战斗教程前进", "主线-编队弹窗关闭保底"]
+            if self.auto_handle_restrictions:
+                names.insert(0, "进本-编成条件提示")
         if entering:
-            names = ["主线-纯剧情任务开始", "进本-编队提示-点击开始",
-                     "进本-点击任务开始"] + names
+            quest_starts = ["主线-纯剧情任务开始", "进本-编队提示-点击开始", "进本-点击任务开始"]
+            names = quest_starts + names if self.auto_handle_restrictions else names + quest_starts
         for name in names:
-            result = self.reco(name, image)
+            result = self.reco(_FORMATION_POPUP_FEATURES.get(name, name), image)
             if result:
-                if self.mode == "native" and name == "进本-编成条件提示":
+                if name == "进本-编成条件提示":
                     self._mark_restricted(name)
+                if (formation_stage and not self.auto_handle_restrictions
+                    and name in _GENERIC_FORMATION_POPUPS):
+                    raise StoryStopped("进本时有弹窗需要确认，无法继续。请按游戏提示处理后重新启动任务。")
                 self.action(name, result)
                 self.pause()
                 return True
@@ -694,11 +718,19 @@ class StoryRunner:
         for _ in range(3):
             override = {
                 "进本流程": {"next": ["进本-战斗主界面已出现", "进本-队伍确认"], "on_error": []},
+                "进本-队伍确认": {"next": ["进本-助战兜底跳过编队", "进本-编队处理"]},
                 "进本-实际点击队伍确认": {"next": [], "on_error": []},
             }
-            if self.current_restricted:
+            if self._restriction_direct_start:
+                override["进本-队伍确认"]["next"] = ["进本-已标记限制编队", "进本-限制编队直接开战"]
+            elif self.current_restricted:
                 override["进本-编队处理"] = {"next": ["进本-点击队伍确认"]}
             self.task("进本流程", override)
+            if self.auto_handle_restrictions and not self.current_restricted:
+                root, token = context_session(self.ctx)
+                if sessions.valid(root, token) and sessions.restricted(root, token):
+                    self._mark_restricted("无法打开变更配置")
+                    self._restriction_direct_start = True
             deadline = self.clock() + self.timeout
             formation_since = None
             while self.clock() < deadline:
@@ -719,8 +751,8 @@ class StoryRunner:
                     formation_since = None
                 self.pause()
             else:
-                raise StoryStopped("进本结束但未确认战斗画面：限制处理或加载超时")
-        raise StoryStopped("限制编队处理后仍无法开始战斗，已重试3次，请手动检查")
+                raise StoryStopped("等待超时，未确认进入战斗。请检查游戏画面，处理当前提示后重新启动任务。")
+        raise StoryStopped("已重试3次，仍停在队伍确认页。请检查当前队伍是否能点击“开始任务”或“战斗开始”，处理后重新启动任务。")
 
     def _fight_current(self):
         # 不复用上一场的编队快照。仅当前单场持有会话，finally 负责清理。
@@ -730,7 +762,11 @@ class StoryRunner:
         root = self.ctx.get_task_job().job_id
         token = sessions.begin(root)
         try:
-            if not self.ctx.override_pipeline(session_override(token)):
+            override = session_override(token)
+            override["进本-编队限制配置"] = {
+                "attach": {"auto_handle_restrictions": self.auto_handle_restrictions},
+            }
+            if not self.ctx.override_pipeline(override):
                 raise StoryStopped("无法初始化本场编队会话")
             self.reach_formation()
             for name in _BATTLE_RESET:

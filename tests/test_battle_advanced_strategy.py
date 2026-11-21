@@ -233,10 +233,13 @@ class StrategySourceTests(unittest.TestCase):
 
 
 class StrategyActionHandoffTests(unittest.TestCase):
-    def run_action(self, ctx, param, *, fallback=False):
-        with patch.object(action, "context_session", return_value=(11, "token" if fallback else None)), \
+    def run_action(self, ctx, param, *, fallback=False, restricted=False):
+        token = "token" if fallback or restricted else None
+        with patch.object(action, "context_session", return_value=(11, token)), \
              patch.object(action.sessions, "read", return_value=(None, 1)), \
              patch.object(action.sessions, "support_fallback", return_value=fallback), \
+             patch.object(action.sessions, "restricted", return_value=restricted), \
+             patch.object(action, "skip_bond_check_for_restricted_formation"), \
              patch.object(action, "AutoBattleRuntime") as runtime:
             runtime.return_value.run.return_value = NS(ok=True, reason="victory", turns=1)
             result = action.AutoBattleAction().run(ctx, NS(node_name="battle", custom_action_param=json.dumps(param)))
@@ -308,6 +311,15 @@ class StrategyActionHandoffTests(unittest.TestCase):
         self.assertEqual((native.preferred_servant_ids, native.preferred_slots,
                           native.np_colors_by_servant_id, native.np_colors_by_slot), ((), (), (), ()))
         self.assertFalse(native.opening_hand.enabled)
+
+    def test_restricted_round_drops_the_original_plan_and_editor_source(self):
+        with patch.object(action, "fetch_share_data") as fetch:
+            result, runtime = self.run_action(context("editor"), {
+                "chaldea_import_source": "stale.json", "plan": {"turns": [{"np_order": [2]}]},
+            }, restricted=True)
+        self.assertTrue(result.success)
+        self.assertIsNone(runtime.call_args.args[2].plan)
+        fetch.assert_not_called()
 
     def test_invalid_configuration_never_starts_runtime(self):
         result, runtime = self.run_action(context("editor"), {"chaldea_share": {"maaAdvancedStrategy": None}})

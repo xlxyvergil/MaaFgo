@@ -397,7 +397,8 @@ class EntryTests(unittest.TestCase):
             self.assertEqual(effective[endpoint]["next"], ["进本-点击队伍确认"])
             self.assertEqual(effective["进本-点击队伍确认"]["next"], ["原生战斗-校验茶壶"])
             self.assertEqual(effective["原生战斗-校验茶壶"]["next"], ["编队身份-采集"])
-        self.assertEqual(nodes["执行自动编队"]["next"], ["执行羁绊补齐自动编队"])
+        self.assertEqual(nodes["执行自动编队"]["next"], ["进本-已标记限制编队", "执行羁绊补齐自动编队"])
+        self.assertEqual(nodes["执行手动编队检查"]["next"], ["进本-已标记限制编队", "手动编队检查完成"])
         for name in ("编队身份-采集", "编队身份-采样", *f.IDENTITY_FRAME_NODES):
             self.assertEqual(nodes[name]["on_error"], [])
 

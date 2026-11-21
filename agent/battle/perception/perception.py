@@ -202,6 +202,11 @@ def _detect_scene(context, img, *, check_order_change: bool = True) -> Tuple[Sce
         if r and r.hit:
             score = getattr(getattr(r, "best_result", None), "score", 1.0) or 1.0
             return Scene(scene_key), float(score)
+    # 完成最后一战后可能直接给出整屏“任务完成／获得报酬”，没有“下一步”按钮。
+    # 不识别会让战斗循环在未知画面空转到超时；按胜利交回调度，由各任务结算节点推进。
+    r = _reco(context, "战斗_任务完成", img)
+    if r and r.hit:
+        return Scene.VICTORY, 1.0
     return Scene.UNKNOWN, 0.0
 
 

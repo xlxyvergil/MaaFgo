@@ -43,10 +43,42 @@ from chaldea.servant_aliases import build_servant_lookup, canonical_servants, se
 import mfaalog
 from battle.core.models import Confidence, FormationSlot
 from battle.perception.formation_candidates import FormationCandidateIndex
-from battle.runtime.formation_session import context_session, sessions
+from battle.runtime.formation_session import context_session, restriction_settings, sessions
 
 
 BASE_W, BASE_H = 1280, 720
+
+
+@AgentServer.custom_recognition("formation_confirmation_lighting")
+class FormationConfirmationLighting(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        image = argv.image
+        if image is None or image.shape[:2] != (BASE_H, BASE_W):
+            return None
+        button = json.loads(argv.custom_recognition_param)
+        if button == "start":
+            box = (1079, 630, 168, 77)
+        elif button == "disabled_config":
+            box = (188, 653, 66, 53)
+        else:
+            return None
+        x, y, width, height = box
+        gray = cv2.cvtColor(image[y:y + height, x:x + width], cv2.COLOR_BGR2GRAY)
+        brightness = float(np.percentile(gray, 90))
+        # 单骑样本灰显配置为 108，日服正常配置为 184；亮起的开始按钮约 239。
+        visible = brightness >= 200 if button == "start" else brightness <= 140
+        if visible:
+            return CustomRecognition.AnalyzeResult(box=box, detail={"brightness": brightness})
+        return None
+
+
+@AgentServer.custom_recognition("formation_required_slots_filled")
+class FormationRequiredSlotsFilled(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        result = context.run_recognition("主线限制-空槽", argv.image)
+        if result is not None and not result.hit:
+            return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="required_slots_filled")
+        return None
 
 
 @lru_cache(maxsize=4)
@@ -435,19 +467,13 @@ class AutoFormationFromChaldea(CustomAction):
                     if clear_result == "skipped" and not self._confirmed_now(
                         self._in_formation_edit
                     ):
-                        if not self._run_pipeline("自动编队-打开配置"):
-                            self._fail("not_on_formation_page: 跳过解散后未找到配置变更按钮")
-                            return CustomAction.RunResult(success=False)
-                        if not self._wait_for(self._in_formation_edit, 5.0):
-                            self._fail("not_on_formation_page: 跳过解散后未进入配置变更页")
-                            return CustomAction.RunResult(success=False)
+                        opened = self._open_initial_configuration()
+                        if opened != "edit":
+                            return CustomAction.RunResult(success=opened == "restricted")
             elif not already_editing:
-                if not self._run_pipeline("自动编队-打开配置"):
-                    self._fail("not_on_formation_page: 未找到配置变更按钮")
-                    return CustomAction.RunResult(success=False)
-                if not self._wait_for(self._in_formation_edit, 5.0):
-                    self._fail("not_on_formation_page: 点击配置变更后未进入编辑状态")
-                    return CustomAction.RunResult(success=False)
+                opened = self._open_initial_configuration()
+                if opened != "edit":
+                    return CustomAction.RunResult(success=opened == "restricted")
             else:
                 mfaalog.info("[自动编队] 已处于编队编辑页，跳过配置变更点击")
 
@@ -2314,6 +2340,27 @@ class AutoFormationFromChaldea(CustomAction):
             "[自动编队] 目标：" + ", ".join(describe(item) for item in self.expected)
         )
 
+    def _open_initial_configuration(self):
+        name = "自动编队-打开配置"
+        recover = restriction_settings(self.context).get("auto_handle_restrictions") is True
+        if self._run_pipeline(name):
+            if self._wait_for(self._in_formation_edit, 5.0):
+                return "edit"
+        elif recover and not self.context.tasker.stopping:
+            root, token = context_session(self.context)
+            if sessions.valid(root, token) and self.context.get_hit_count(name) >= 3:
+                image = self._shot()
+                if image is not None:
+                    can_start = self.context.run_recognition("进本-限制编队确认开始", image)
+                    decision = self.context.run_recognition("自动编队-检测编辑决定", image)
+                    if can_start and can_start.hit and not (decision and decision.hit):
+                        sessions.mark_restricted(root, token)
+                        mfaalog.warning("[编队限制] 点击“变更配置”3次仍未打开编辑页，将采集当前队伍并尝试开始战斗。")
+                        return "restricted"
+        if not self.context.tasker.stopping:
+            self._fail("未能打开编队编辑页，无法修改队伍。请在游戏中点击“变更配置”，确认能进入显示“决定”的编辑页后重试。")
+        return "failed"
+
     def _run_pipeline(self, name):
         try:
             if name == "自动编队-打开配置":
@@ -2326,7 +2373,9 @@ class AutoFormationFromChaldea(CustomAction):
         if self.context.tasker.stopping:
             return False
         if detail is None or detail.status.failed or not detail.status.succeeded:
-            mfaalog.error(f"[自动编队] pipeline {name} 失败")
+            if (name != "自动编队-打开配置"
+                    or restriction_settings(self.context).get("auto_handle_restrictions") is not True):
+                mfaalog.error(f"[自动编队] pipeline {name} 失败")
             return False
         return True
 
@@ -2447,12 +2496,9 @@ class ValidateFormationFromChaldea(AutoFormationFromChaldea):
                 "开始换位"
             )
             if page_state != "edit":
-                if not self._run_pipeline("自动编队-打开配置"):
-                    self._fail("not_on_formation_page: 未找到配置变更按钮")
-                    return CustomAction.RunResult(success=False)
-                if not self._wait_for(self._in_formation_edit, 5.0):
-                    self._fail("not_on_formation_page: 点击配置变更后未稳定进入编辑状态")
-                    return CustomAction.RunResult(success=False)
+                opened = self._open_initial_configuration()
+                if opened != "edit":
+                    return CustomAction.RunResult(success=opened == "restricted")
 
             # 进入编辑页会触发一次界面刷新，必须重新稳定识别并再次确认身份，
             # 避免拿确认页的旧截图执行拖动。
@@ -2864,6 +2910,9 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                 support = self._match_template(image, self.support_marker, roi)
                 support_flags[i] = None if support is None else support[0] >= SUPPORT_THRESHOLD
         multiple_supports = sum(flag is True for flag in support_flags.values()) >= 2
+        # 单骑出击只留一位助战，其他槽全部有锁定标记；普通空槽不计入。
+        locked_slots = sum(reason == "restricted_slot_locked" for reason in empty_slots.values())
+        use_support_portrait_crop = multiple_supports or locked_slots == len(SLOT_ROIS) - 1
         pending = [(i, roi) for i, roi in enumerate(SLOT_ROIS) if i not in known and i not in empty_slots]
         pools = None
         if (pending and not full_audit and (c.verified or diagnostics)
@@ -2928,15 +2977,17 @@ class FormationIdentityReader(AutoFormationFromChaldea):
                         local = self._rank(image, roi, self.templates, cropped=True)
                         if self._accepted(local):
                             ranked, scope = local, "all_crop"
-            if multiple_supports and is_support is True and c.verified and not self._accepted(ranked):
+            if use_support_portrait_crop and is_support is True and c.verified and not self._accepted(ranked):
                 # 全库比较同一裁剪范围，并继续使用已有的分数和不同身份分差门槛。
                 upper = self._rank(image, roi, self.templates, multi_support_crop=True)
                 if self._accepted(upper):
-                    ranked, scope = upper, "multi_support_crop"
+                    ranked = upper
+                    scope = "multi_support_crop" if multiple_supports else "solo_support_crop"
             self.last_match_stats["slots"].append({
                 "slot": index + 1, "scope": scope,
                 "candidates": (len(pool.ids) if pool is not None and not pool.fallback
-                               and scope != "multi_support_crop" else len(self.templates)),
+                               and scope not in {"multi_support_crop", "solo_support_crop"}
+                               else len(self.templates)),
                 "ms": (time.perf_counter() - slot_started) * 1000,
             })
             identified = self._accepted(ranked)

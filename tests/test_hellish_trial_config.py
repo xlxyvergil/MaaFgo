@@ -19,7 +19,8 @@ CONFIG_NODE = "原生自动战斗-高级策略配置"
 class HellishTrialConfigTests(unittest.TestCase):
     def test_trial_retains_source_and_formation_options_then_shared_strategy(self):
         self.assertEqual(TASK["option"], [
-            "地狱的试炼-队伍方案", "地狱的试炼-挑战次数", "Chaldea编队方式", "原生自动战斗是否使用茶壶", "原生自动战斗助战方式",
+            "地狱的试炼-队伍方案", "地狱的试炼-挑战次数", "Chaldea编队方式", "原生自动战斗处理编队限制",
+            "原生自动战斗是否使用茶壶", "原生自动战斗助战方式",
             "原生自动战斗羁绊满停止", "原生自动战斗高级策略",
         ])
         self.assertEqual(TASK["resource"], ["日服"])
@@ -116,8 +117,27 @@ class HellishTrialConfigTests(unittest.TestCase):
     def test_trial_and_shared_options_are_imported_once(self):
         imports = load("assets/interface.json")["import"]
         for item in ("tasks/地狱的试炼.json", "options/地狱的试炼.json",
-                     "options/原生自动战斗高级策略.json"):
+                     "options/原生自动战斗高级策略.json", "options/原生自动战斗处理编队限制.json"):
             self.assertEqual(imports.count(item), 1)
+
+    def test_trial_and_continuous_battle_share_default_off_restriction_switch(self):
+        name = "原生自动战斗处理编队限制"
+        continuous = load("assets/tasks/原生自动战斗.json")["task"][0]
+        for task in (TASK, continuous):
+            self.assertEqual(task["option"].count(name), 1)
+        option = load(f"assets/options/{name}.json")["option"][name]
+        self.assertEqual(option["type"], "switch")
+        self.assertEqual(option["label"], "自动处理编队限制情况")
+        self.assertEqual(option["default_case"], "No")
+        cases = {case["name"]: case["pipeline_override"] for case in option["cases"]}
+        self.assertEqual(cases, {
+            "Yes": {"进本-编队限制配置": {"attach": {
+                "managed_formation_restrictions": True, "auto_handle_restrictions": True,
+            }}},
+            "No": {"进本-编队限制配置": {"attach": {
+                "managed_formation_restrictions": True, "auto_handle_restrictions": False,
+            }}},
+        })
 
 
 if __name__ == "__main__":

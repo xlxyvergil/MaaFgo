@@ -98,6 +98,7 @@
             "use_support_substitution": false
         },
         "next": [
+            "进本-已标记限制编队",
             "执行羁绊补齐自动编队"
         ],
         "on_error": []
@@ -114,6 +115,7 @@
             "chaldea_import_source": ""
         },
         "next": [
+            "进本-已标记限制编队",
             "手动编队检查完成"
         ],
         "on_error": []

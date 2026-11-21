@@ -17,6 +17,7 @@ from .bond_stop_state import bond_stops
 
 
 SESSION_NODE = "编队身份-会话"
+RESTRICTION_CONFIG_NODE = "进本-编队限制配置"
 GATE_NODE = "进本-点击队伍确认"
 CAPTURE_NODE = "编队身份-采集"
 TEAPOT_NODE = "原生战斗-校验茶壶"
@@ -36,6 +37,8 @@ class _Session:
     frames: list[tuple[FormationSlot, ...]] = field(default_factory=list)
     error: str = ""
     support_fallback: bool = False
+    restricted: bool = False
+    restricted_continuation_battle: int = 0
     capture_seed: tuple[FormationSlot, ...] = ()
     continuation: InitialFormation | None = None
     continuation_battle: int = 0
@@ -123,6 +126,9 @@ class FormationSessions:
                 self._invalidate(session, "unfinished_formation_update")
             if session.continuation is not None and battle != session.continuation_battle:
                 self._invalidate(session, "")
+            if battle != session.battle:
+                session.restricted = battle == session.restricted_continuation_battle
+                session.restricted_continuation_battle = 0
             session.battle = battle
 
     @staticmethod
@@ -157,6 +163,8 @@ class FormationSessions:
             if eligible:
                 session.continuation = snapshot
                 session.continuation_battle = session.battle + 1
+            if session.repeat and session.restricted:
+                session.restricted_continuation_battle = session.battle + 1
             return bool(eligible)
 
     def awaiting_continuous_support(self, task_id: int, token: str) -> bool:
@@ -229,6 +237,17 @@ class FormationSessions:
     def support_fallback(self, task_id: int, token: str) -> bool:
         with self._lock:
             return self._get(task_id, token).support_fallback
+
+    def mark_restricted(self, task_id: int, token: str) -> None:
+        with self._lock:
+            session = self._get(task_id, token)
+            self._invalidate(session, "")
+            session.restricted = True
+            bond_stops.clear_formation(task_id)
+
+    def restricted(self, task_id: int, token: str) -> bool:
+        with self._lock:
+            return self._get(task_id, token).restricted
 
     def begin_update(self, task_id: int, token: str) -> int:
         """编队修改前撤销旧结果，返回只允许本次成功结果发布的代次。"""
@@ -366,6 +385,10 @@ def context_session(context) -> tuple[int, str]:
     node = context.get_node_data(SESSION_NODE) or {}
     token = (node.get("attach") or {}).get("session_id", "")
     return root, token if isinstance(token, str) else ""
+
+
+def restriction_settings(context) -> dict:
+    return (context.get_node_data(RESTRICTION_CONFIG_NODE) or {}).get("attach") or {}
 
 
 def session_override(token: str, context=None) -> dict:

@@ -67,6 +67,21 @@
     ], "box_index": 1}},
     "action": {"type": "DoNothing"}, "next": [], "on_error": []
   },
+  "主线限制-单骑出击": {
+    "doc": "整队由游戏固定的单骑出击关卡。2026-11-20国服幕间样本：队伍确认页顶部横幅OCR为“→单骑出击”0.878881，五个锁定槽分别读出“只有助战”0.999935与“可以出击”，卡片另有“出击成员固定”；旧“编队限制”未命中，Chaldea自动编队反复点击“自动编队/变更配置”都无法打开编队配置，任务以“流程失败：进本流程”中断。本节点只在队伍确认页命中，要求顶部横幅或锁定槽文字之一成立；横幅与“只有助战”是整队固定的直接依据，不把普通固定助战当成整队固定。命中后按受限编队处理，保留游戏阵容并跳过Chaldea编队。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      "进本-队伍确认",
+      {"recognition": {"type": "Or", "param": {"any_of": [
+        {"sub_name": "base/主线限制编队/主线限制-单骑出击/OCR1", "recognition": {"type": "OCR", "param": {
+          "roi": [480, 5, 330, 80], "expected": ["单骑出击|単騎出撃"], "threshold": 0.8
+        }}},
+        {"sub_name": "base/主线限制编队/主线限制-单骑出击/OCR2", "recognition": {"type": "OCR", "param": {
+          "roi": [220, 330, 1060, 100], "expected": ["只有助战|サポートのみ"], "threshold": 0.8
+        }}}
+      ]}}}
+    ], "box_index": 1}},
+    "action": {"type": "DoNothing"}, "next": [], "on_error": []
+  },
   "主线限制-多个助战": {
     "doc": "仅由主线在编队确认页检查。复用当前资源层的助战标记与编队识别阈值，index=1要求至少两个独立匹配；兼容剧情多助战没有编队限制标签的情况。命中后按本关限制编队处理，不执行Chaldea单助战核对或换人。",
     "recognition": {"type": "TemplateMatch", "param": {
