@@ -1,7 +1,0 @@
-{
-    "更新settings": {
-        "action": "Command",
-        "recognition": "DirectHit",
-        "exec": "{RESOURCE_DIR}/../../restart_mfa.exe"
-    }
-}
