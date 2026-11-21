@@ -50,6 +50,7 @@ import strengthening_recognition
 import strengthening_action
 import free_quest_recognition
 import free_quest_action
+import ordeal_call_action
 
 
 def main():

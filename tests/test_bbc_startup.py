@@ -188,6 +188,7 @@ class AgentStartTests(unittest.TestCase):
         self.ns = load_classes(ROOT / "agent/custom/bbc_action.py", {"ExecuteBbcTask", "BattleType"}, {
             "CustomAction": CustomAction, "IntEnum": IntEnum, "threading": threading,
             "mfaalog": self.log, "time": NS(sleep=Mock()), "get_manager": lambda: self.manager,
+            "map_battle_attempt": Mock(return_value=None),
         })
         self.action = self.ns["ExecuteBbcTask"]()
         self.context = NS(tasker=NS(stopping=False), override_pipeline=Mock(), get_node_data=lambda _: {
@@ -296,6 +297,16 @@ class AgentStartTests(unittest.TestCase):
         self.assertTrue(self.action.run(self.context, None).success)
         self.action._restart_bbc.assert_called_once()
         self.assertTrue(any("startup timeout" in str(c) for c in self.log.warning.call_args_list))
+
+    def test_mixed_map_failure_is_reported_without_restarting_bbc(self):
+        self.ns["map_battle_attempt"].return_value = NS(started=False, bbc_idle=True)
+        self.action._execute_single_battle = Mock(return_value={
+            "success": False, "error": "startup timeout", "need_restart": True,
+        })
+        self.action._restart_bbc = Mock()
+        self.assertFalse(self.action.run(self.context, None).success)
+        self.action._execute_single_battle.assert_called_once()
+        self.action._restart_bbc.assert_not_called()
 
     def test_game_exception_keeps_restart_reason_in_failure_result(self):
         self.action._ensure_bbc_connected = Mock(return_value=True)

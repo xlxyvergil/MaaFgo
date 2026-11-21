@@ -10,6 +10,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "残留的神话"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "残留的神话",
+                                "item": 6536,
+                                "item_name": "极光之钢（オーロラ鋼）",
+                                "titles": [
+                                    "残された神話",
+                                    "残留的神话"
+                                ]
+                            }
                         }
                     }
                 },
@@ -19,6 +30,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "噩梦的南瓜"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "噩梦的南瓜",
+                                "item": 7005,
+                                "item_name": "术阶银棋（キャスターピース）",
+                                "titles": [
+                                    "悪夢のカボチャ",
+                                    "恶梦的南瓜"
+                                ]
+                            }
                         }
                     }
                 },
@@ -28,6 +50,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "冻土的试炼"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "冻土的试炼",
+                                "item": 6534,
+                                "item_name": "振荡火药（励振火薬）",
+                                "titles": [
+                                    "凍土の試練",
+                                    "冻土的试炼"
+                                ]
+                            }
                         }
                     }
                 },
@@ -37,6 +70,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "光之丝线引导的迷宫"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "光之丝线引导的迷宫",
+                                "item": 6543,
+                                "item_name": "光银之冠（光銀の冠）",
+                                "titles": [
+                                    "光糸導く迷宮",
+                                    "光之丝线引导的迷宫"
+                                ]
+                            }
                         }
                     }
                 },
@@ -46,6 +90,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "久远的微笑"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "久远的微笑",
+                                "item": 6546,
+                                "item_name": "悠久果实（悠久の実）",
+                                "titles": [
+                                    "久遠の微笑",
+                                    "久远的微笑"
+                                ]
+                            }
                         }
                     }
                 },
@@ -55,6 +110,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "复活的黄金都市"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "复活的黄金都市",
+                                "item": 7002,
+                                "item_name": "弓阶银棋（アーチャーピース）",
+                                "titles": [
+                                    "復活の黄金都市",
+                                    "复活的黄金都市"
+                                ]
+                            }
                         }
                     }
                 },
@@ -64,6 +130,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "赏金猎人数光年"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "赏金猎人数光年",
+                                "item": 6559,
+                                "item_name": "宇宙立方形（ユニバーサルキューブ）",
+                                "titles": [
+                                    "賞金稼ぎに幾光年",
+                                    "赏金猎人数光年"
+                                ]
+                            }
                         }
                     }
                 },
@@ -73,6 +150,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "月光矿区"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "月光矿区",
+                                "item": 6560,
+                                "item_name": "月光核（月光核）",
+                                "titles": [
+                                    "月光採掘場",
+                                    "月光矿区"
+                                ]
+                            }
                         }
                     }
                 },
@@ -82,6 +170,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "神秘主义者与魂之故乡"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "神秘主义者与魂之故乡",
+                                "item": 6522,
+                                "item_name": "愚者之锁（愚者の鎖）",
+                                "titles": [
+                                    "神秘主義者と魂の故郷",
+                                    "神秘主义者与魂之故乡"
+                                ]
+                            }
                         }
                     }
                 },
@@ -91,6 +190,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "于荒野萌芽的王之花"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "于荒野萌芽的王之花",
+                                "item": 6502,
+                                "item_name": "世界树之种（世界樹の種）",
+                                "titles": [
+                                    "荒野に芽吹く王の花",
+                                    "于荒野萌芽的王之花"
+                                ]
+                            }
                         }
                     }
                 },
@@ -100,6 +210,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "举世之飞将军"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "举世之飞将军",
+                                "item": 6538,
+                                "item_name": "闲古铃（閑古鈴）",
+                                "titles": [
+                                    "天下の飛将軍",
+                                    "举世之飞将军"
+                                ]
+                            }
                         }
                     }
                 },
@@ -109,6 +230,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "寻求女神像"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "寻求女神像",
+                                "item": 7007,
+                                "item_name": "狂阶银棋（バーサーカーピース）",
+                                "titles": [
+                                    "女神像を求めて",
+                                    "寻求女神像"
+                                ]
+                            }
                         }
                     }
                 },
@@ -118,6 +250,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "高贵的海盗"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "高贵的海盗",
+                                "item": 7004,
+                                "item_name": "骑阶银棋（ライダーピース）",
+                                "titles": [
+                                    "高貴なる海賊",
+                                    "高贵的海盗"
+                                ]
+                            }
                         }
                     }
                 },
@@ -127,6 +270,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "复苏的远古浪漫"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "复苏的远古浪漫",
+                                "item": 6003,
+                                "item_name": "枪之辉石（槍の輝石）",
+                                "titles": [
+                                    "蘇る太古のロマン",
+                                    "复苏的远古浪漫"
+                                ]
+                            }
                         }
                     }
                 },
@@ -136,6 +290,18 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "荒野的欢乐"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "荒野的欢乐",
+                                "item": 50,
+                                "item_name": "星光之砂（星光の砂）",
+                                "titles": [
+                                    "白紙化地球上のクエストクリアで獲得",
+                                    "白纸化地球上的关卡"
+                                ],
+                                "source_opens_map": true
+                            }
                         }
                     }
                 },
@@ -145,6 +311,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "常夏的休假"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "常夏的休假",
+                                "item": 6526,
+                                "item_name": "追忆的贝壳（追憶の貝殻）",
+                                "titles": [
+                                    "常夏の休暇",
+                                    "常夏的休假"
+                                ]
+                            }
                         }
                     }
                 },
@@ -154,6 +331,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "常夏展销会场"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "常夏展销会场",
+                                "item": 6503,
+                                "item_name": "英雄之证（英雄の証）",
+                                "titles": [
+                                    "常夏即売会場",
+                                    "常夏展销会场"
+                                ]
+                            }
                         }
                     }
                 },
@@ -163,6 +351,17 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "大堡礁之卵"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "大堡礁之卵",
+                                "item": 6004,
+                                "item_name": "骑之辉石（騎の輝石）",
+                                "titles": [
+                                    "大堡礁の卵",
+                                    "大堡礁之卵"
+                                ]
+                            }
                         }
                     }
                 },
@@ -172,6 +371,61 @@
                     "pipeline_override": {
                         "OrdealCall关卡导航": {
                             "next": "蛇龙的恶作剧"
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "quest": "蛇龙的恶作剧",
+                                "item": 6509,
+                                "item_name": "蛇之宝玉（蛇の宝玉）",
+                                "titles": [
+                                    "蛇竜のいたずら",
+                                    "蛇龙的恶作剧"
+                                ]
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "OrdealCall进图方式": {
+            "type": "select",
+            "label": "进图方式",
+            "description": "混合方式先从地图进本。开战前失败时，回主界面后从图鉴重试一次。",
+            "default_case": "mixed",
+            "cases": [
+                {
+                    "name": "map",
+                    "label": "从地图进本"
+                },
+                {
+                    "name": "catalog",
+                    "label": "从图鉴进本",
+                    "pipeline_override": {
+                        "日常战斗": {
+                            "next": [
+                                "OrdealCall-替代方式调度"
+                            ]
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "mode": "catalog"
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "mixed",
+                    "label": "混合方式",
+                    "pipeline_override": {
+                        "日常战斗": {
+                            "next": [
+                                "OrdealCall-替代方式调度"
+                            ]
+                        },
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "mode": "mixed"
+                            }
                         }
                     }
                 }

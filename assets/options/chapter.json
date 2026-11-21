@@ -634,7 +634,8 @@
                     "name": "OrdealCall",
                     "label": "OrdealCall",
                     "option": [
-                        "OrdealCall"
+                        "OrdealCall",
+                        "OrdealCall进图方式"
                     ],
                     "pipeline_override": {
                         "章节导航": {
