@@ -68,7 +68,6 @@ build-*
 *.exe
 *.out
 *.app
-!tools/restart_mfa.exe
 
 Debug
 Release
@@ -338,7 +337,6 @@ Generated_Code/
 # because we have git ;-)
 _UpgradeReport_Files/
 Backup*/
-!tools/backup/
 UpgradeLog*.XML
 UpgradeLog*.htm
 ServiceFabricBackup/
