@@ -173,7 +173,7 @@
             "OrdealCall-图鉴-点关卡"
         ],
         "timeout": 10000,
-        "on_error": ["OrdealCall-风暴罐不足"]
+        "on_error": []
     },
     "OrdealCall-风暴罐不足": {
         "recognition": {"type": "Or", "param": {"any_of": [
