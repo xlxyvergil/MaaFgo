@@ -1,0 +1,201 @@
+{
+    "OrdealCall-替代方式调度": {
+        "next": ["[JumpBack]执行回主界面", "[JumpBack]执行队伍选择", "OrdealCall-替代方式"],
+        "on_error": []
+    },
+    "OrdealCall-替代方式": {
+        "action": {"type": "Custom", "param": {"custom_action": "ordeal_call_entry"}},
+        "attach": {"mode": "catalog", "engine": "native"},
+        "next": ["战斗完成信息"],
+        "on_error": []
+    },
+    "OrdealCall-用户提示": {
+        "next": [],
+        "on_error": []
+    },
+    "OrdealCall-图鉴-打开道具列表": {
+        "next": ["OrdealCall-图鉴-打开菜单"],
+        "timeout": 5000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-打开菜单": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "菜单.png", "roi": [1080, 597, 200, 111], "green_mask": true, "threshold": 0.75
+        }},
+        "action": {"type": "Click"},
+        "post_delay": 450,
+        "next": ["OrdealCall-图鉴-打开个人空间"],
+        "timeout": 5000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-打开个人空间": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "ordealcall/catalog/my-room.png", "roi": [1090, 505, 146, 150], "threshold": 0.85
+        }},
+        "action": {"type": "Click"},
+        "post_delay": 650,
+        "next": ["OrdealCall-图鉴-进入所持道具"],
+        "timeout": 5000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-进入所持道具": {
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"recognition": {"type": "TemplateMatch", "param": {
+                "template": "ordealcall/catalog/items-button.png", "roi": [700, 114, 390, 555], "threshold": 0.88
+            }}},
+            {"sub_name": "base/OrdealCall图鉴进本/OrdealCall-图鉴-进入所持道具/OCR1",
+             "recognition": {"type": "OCR", "param": {
+                "expected": "所持(?:道具|物品)(?:一览|列表)?", "roi": [700, 114, 390, 555]
+            }}}
+        ]}},
+        "action": {"type": "Click"},
+        "post_delay": 650,
+        "next": ["OrdealCall-图鉴-所持道具列表"],
+        "timeout": 6000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-所持道具列表": {
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"recognition": {"type": "TemplateMatch", "param": {
+                "template": "ordealcall/catalog/items-title.png", "roi": [822, 0, 458, 86], "threshold": 0.85
+            }}},
+            {"sub_name": "base/OrdealCall图鉴进本/OrdealCall-图鉴-所持道具列表/OCR1",
+             "recognition": {"type": "OCR", "param": {
+                "expected": "所持(?:道具|物品)(?:一览|列表)?", "roi": [822, 0, 458, 86]
+            }}}
+        ]}},
+        "next": [],
+        "on_error": []
+    },
+    "OrdealCall-图鉴-找道具": {
+        "next": ["OrdealCall-图鉴-点道具", "[JumpBack]OrdealCall-图鉴-滑动道具"],
+        "timeout": 1200,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-点道具": {
+        "doc": "先确认仍在所持道具列表，再匹配对应道具内侧小图。列表每次滑动保留相邻画面的重叠，识别后串行点击。",
+        "recognition": {"type": "And", "param": {"all_of": [
+            "OrdealCall-图鉴-所持道具列表",
+            "OrdealCall-图鉴-道具图标"
+        ], "box_index": 1}},
+        "action": {"type": "Click"},
+        "post_delay": 550,
+        "next": ["OrdealCall-图鉴-道具详情"],
+        "timeout": 5000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-道具图标": {
+        "doc": "使用所持道具列表中实际渲染的图标内侧裁图。日服实测振荡火药的解包小图在库存中最高仅0.70，保留0.88阈值并改用库存实拍模板。ROI覆盖两列，模板不包含名称或数量。",
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "ordealcall/catalog/6536.png",
+            "roi": [186, 106, 554, 589],
+            "green_mask": true, "threshold": 0.88
+        }},
+        "on_error": []
+    },
+    "OrdealCall-图鉴-滑动道具": {
+        "doc": "日服实测从道具卡片与滚动条之间的右侧空白处滑动可正常翻动列表。",
+        "recognition": {"type": "Or", "param": {"any_of": ["OrdealCall-图鉴-所持道具列表"]}},
+        "action": {"type": "Swipe", "param": {
+            "begin": [1140, 652, 1, 1], "end": [[1140, 218, 1, 1]], "duration": 540
+        }},
+        "post_delay": 480,
+        "max_hit": 34,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-道具详情": {
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"recognition": {"type": "TemplateMatch", "param": {
+                "template": "ordealcall/catalog/item-dialog-close.png", "roi": [506, 565, 274, 88], "threshold": 0.88
+            }}},
+            {"sub_name": "base/OrdealCall图鉴进本/OrdealCall-图鉴-道具详情/OCR1",
+             "recognition": {"type": "OCR", "param": {"expected": "^关闭$", "roi": [570, 587, 142, 47]}}}
+        ]}},
+        "next": [],
+        "on_error": []
+    },
+    "OrdealCall-图鉴-找获取途径": {
+        "next": ["OrdealCall-图鉴-点获取途径", "[JumpBack]OrdealCall-图鉴-滑动获取途径"],
+        "timeout": 1200,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-白纸化地球图标": {
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "ordealcall/catalog/ordeal-source.png",
+            "roi": [343, 163, 105, 398], "threshold": 0.88
+        }},
+        "on_error": []
+    },
+    "OrdealCall-图鉴-读取关卡标题": {
+        "recognition": {"type": "OCR", "param": {"expected": ".", "threshold": 0.55}},
+        "on_error": []
+    },
+    "OrdealCall-图鉴-点获取途径": {
+        "doc": "仅在道具详情中识别白纸化地球标记和同一条目的完整关卡名，避免点击其他自由本、未解锁条目或商店。点获取途径会定位地图上的关卡卡片。",
+        "recognition": {"type": "Custom", "param": {"custom_recognition": "ordeal_call_source"}},
+        "action": {"type": "Click"},
+        "post_delay": 950,
+        "next": [],
+        "on_error": []
+    },
+    "OrdealCall-图鉴-滑动获取途径": {
+        "recognition": {"type": "Or", "param": {"any_of": ["OrdealCall-图鉴-道具详情"]}},
+        "action": {"type": "Swipe", "param": {
+            "begin": [945, 532, 1, 1], "end": [[945, 284, 1, 1]], "duration": 520
+        }},
+        "post_delay": 400,
+        "max_hit": 12,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-进关卡": {
+        "next": ["OrdealCall-图鉴-点关卡"],
+        "timeout": 18000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-星光之砂进关卡": {
+        "doc": "荒野的欢乐只掉落QP，游戏没有该关卡的道具直达链接。星光之砂的获取途径将终端定位到OrdealCall入口，复用 ordeal call.json 的入口和地图选关。",
+        "next": ["OrdealCall-识别"],
+        "timeout": 18000,
+        "on_error": []
+    },
+    "OrdealCall-图鉴-点关卡": {
+        "doc": "图鉴只定位地图，不直接进本。再匹配目标卡片，复用 ordeal call.json 的「任务开始」和「OrdealCall-已到助战」。",
+        "recognition": {"type": "TemplateMatch", "param": {
+            "template": "ordealcall/残留的神话.png", "roi": [606, 90, 609, 525], "threshold": 0.82
+        }},
+        "action": {"type": "Click"},
+        "post_delay": 700,
+        "max_hit": 3,
+        "next": [
+            "OrdealCall-风暴罐不足",
+            "任务开始",
+            "[JumpBack]风暴罐副本-体力不足",
+            "OrdealCall-图鉴-点关卡"
+        ],
+        "timeout": 10000,
+        "on_error": ["OrdealCall-风暴罐不足"]
+    },
+    "OrdealCall-风暴罐不足": {
+        "recognition": {"type": "Or", "param": {"any_of": [
+            {"recognition": {"type": "TemplateMatch", "param": {
+                "template": "ordealcall/catalog/storm-pod-empty.png", "roi": [425, 244, 440, 139], "threshold": 0.88
+            }}},
+            "风暴罐不足",
+            {"sub_name": "base/OrdealCall图鉴进本/OrdealCall-风暴罐不足/OCR1",
+             "recognition": {"type": "OCR", "param": {
+                "expected": "风暴罐.*不足|不足.*风暴罐", "roi": [365, 237, 550, 171]
+            }}}
+        ]}},
+        "action": {"type": "Click", "param": {"target": [577, 544, 125, 34]}},
+        "post_delay": 500,
+        "next": [],
+        "on_error": []
+    },
+    "OrdealCall-战前界面": {
+        "doc": "引擎出错后只允许从确认过的战前界面返回。已识别实际战斗、画面仍在加载或状态不明时保留现场。",
+        "recognition": {"type": "Or", "param": {"any_of": [
+            "OrdealCall-已到助战", "进本-队伍确认", "任务开始"
+        ]}},
+        "on_error": []
+    }
+}

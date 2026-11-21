@@ -13,6 +13,7 @@ if _custom_dir not in sys.path:
     sys.path.insert(0, _custom_dir)
 
 from bbc_connection_manager import get_manager
+from ordeal_call_action import BATTLE_SCREEN, map_battle_attempt
 import mfaalog
 
 
@@ -41,7 +42,9 @@ class ExecuteBbcTask(CustomAction):
         3. 如果检测到游戏异常（need_restart=True），进入下一次循环
         4. 成功或达到最大重试次数后返回结果
         """
-        max_retries = 2  # 最多重试2次
+        map_attempt = map_battle_attempt(context)
+        # 混合进本由外层处理失败，避免 BBC 重启后丢失首次失败的界面。
+        max_retries = 1 if map_attempt is not None else 2
         last_error = None
         
         for attempt in range(max_retries):
@@ -52,7 +55,7 @@ class ExecuteBbcTask(CustomAction):
                     return CustomAction.RunResult(success=False)
             
             # 执行单次战斗流程（不含重启逻辑）
-            result = self._execute_single_battle(context)
+            result = self._execute_single_battle(context, map_attempt)
             last_error = result.get('error', '')
             
             # 检查是否需要重启：游戏异常时标记为 need_restart=True
@@ -77,7 +80,11 @@ class ExecuteBbcTask(CustomAction):
                     return CustomAction.RunResult(success=False)
         
         # 达到最大重试次数，输出最终错误信息
-        error_msg = f"战斗失败（已重试{max_retries-1}次）" + (f": {last_error}" if last_error else "")
+        error_msg = "战斗失败"
+        if max_retries > 1:
+            error_msg += f"（已重试{max_retries-1}次）"
+        if last_error:
+            error_msg += f": {last_error}"
         mfaalog.error(f"[ExecuteBbcTask] {error_msg}")
         context.override_pipeline({
             "bbc弹窗信息输出": {
@@ -88,7 +95,7 @@ class ExecuteBbcTask(CustomAction):
         })
         return CustomAction.RunResult(success=False)
     
-    def _execute_single_battle(self, context: Context) -> dict:
+    def _execute_single_battle(self, context: Context, map_attempt=None) -> dict:
         """执行单次战斗流程（不含重启逻辑）
         
         执行步骤：
@@ -145,7 +152,9 @@ class ExecuteBbcTask(CustomAction):
                 'finished': False,  # 战斗是否结束
                 'popup_title': '',  # 弹窗标题
                 'popup_message': '',  # 弹窗内容
-                'popup_event': popup_event
+                'popup_event': popup_event,
+                'ordeal_map_attempt': map_attempt,
+                'ordeal_route': attach_data.get('ordeal_route', False),
             }
             
             # 启动弹窗监听线程（在 action 开头启动，确保能捕获所有弹窗）
@@ -234,6 +243,8 @@ class ExecuteBbcTask(CustomAction):
                     'error': f"{popup_title}: {popup_message}".replace('\r', '').replace('\n', '；'),
                     'need_restart': True  # 错误状态需要重启
                 }
+            if state['ordeal_route'] and (popup_title or popup_message):
+                return {'success': False, 'error': display_text}
             
             return {
                 'success': True,
@@ -249,7 +260,13 @@ class ExecuteBbcTask(CustomAction):
                 state['finished'] = True
                 state['popup_event'].set()
             if manager is not None:
-                if state is not None and state.get('start_requested') and not state.get('battle_confirmed'):
+                if map_attempt is not None and not map_attempt.bbc_idle and not state.get('bbc_task_in_use'):
+                    # BBC 线程可能还在操作设备，确认空闲后才把控制权交回 Maa。
+                    cancelled = manager.send_command('stop_battle', {}, timeout=5)
+                    if cancelled.get('success'):
+                        ui = manager.send_command('get_ui_status', {}, timeout=5)
+                        map_attempt.bbc_idle = ui.get('success', False) and ui.get('device_running') is False
+                elif state is not None and state.get('start_requested') and not state.get('battle_confirmed'):
                     cancelled = manager.send_command('stop_battle', {}, timeout=5)
                     if not cancelled.get('success'):
                         mfaalog.warning(f"[ExecuteBbcTask] 取消未完成的BBC启动失败: {cancelled.get('error', '')}")
@@ -472,7 +489,8 @@ class ExecuteBbcTask(CustomAction):
             return state
         
         mfaalog.info("[ExecuteBbcTask] 启动BBC战斗，等待实际运行状态确认...")
-        max_retries = 3
+        map_attempt = state.get('ordeal_map_attempt')
+        max_retries = 1 if map_attempt is not None else 3
         last_error = 'BBC未进入战斗运行状态'
 
         for retry in range(max_retries):
@@ -485,7 +503,13 @@ class ExecuteBbcTask(CustomAction):
                 return state
 
             mfaalog.info(f"[ExecuteBbcTask] 发送启动请求 ({retry + 1}/{max_retries})")
+            if map_attempt is not None:
+                # 即使请求超时，BBC 也可能已收到命令，必须在 finally 确认停止。
+                map_attempt.bbc_idle = False
             result = manager.send_command('start_battle', {}, timeout=10)
+            if map_attempt is not None and (result.get('device_running') or result.get('start_method') == 'already_running'):
+                state['bbc_task_in_use'] = True
+                return {'success': False, 'error': 'BBC 已在执行任务，无法接管。请先在 BBC 停止现有任务后重试。'}
             if not result.get('success'):
                 last_error = result.get('error', '启动命令无响应')
                 mfaalog.warning(f"[ExecuteBbcTask] BBC拒绝启动: {last_error}")
@@ -694,6 +718,7 @@ class ExecuteBbcTask(CustomAction):
         miss_count = 0           # 连续识别到助战错误的次数
         miss_threshold = 1       # 阈值，达到则停止BBC脚本并正常结束任务
         last_heartbeat = time.time()
+        map_attempt = state.get('ordeal_map_attempt')
 
         while not state['finished']:
             # 短间隔轮询停止信号：MXU post_stop 后 stopping() 立即为 True
@@ -703,6 +728,15 @@ class ExecuteBbcTask(CustomAction):
                 state['popup_title'] = '脚本停止'
                 state['popup_message'] = '任务已停止'
                 break
+
+            if map_attempt is not None and not map_attempt.started:
+                try:
+                    image = context.tasker.controller.post_screencap().wait().get()
+                    if image is not None:
+                        result = context.run_recognition(BATTLE_SCREEN, image)
+                        map_attempt.started = result is not None and result.hit
+                except Exception as exc:
+                    mfaalog.warning(f"[ExecuteBbcTask] 无法确认 OrdealCall 开战状态: {exc}")
 
             # 达到心跳间隔才执行心跳检查（避免高频截图/识别）
             if time.time() - last_heartbeat < heartbeat_interval:
@@ -766,7 +800,9 @@ class ExecuteBbcTask(CustomAction):
                             mfaalog.warning(f"[ExecuteBbcTask] 停止BBC脚本失败: {stop_result.get('error', '')}")
                         # 等待BBC脚本完全停止，避免干扰后续任务
                         time.sleep(3)
-                        # 正常结束不设置弹窗信息，避免被误判为异常
+                        if state.get('ordeal_route'):
+                            state['popup_title'] = '错误'
+                            state['popup_message'] = 'BBC 未能完成助战选择'
                         state['finished'] = True
                         break
                 else:

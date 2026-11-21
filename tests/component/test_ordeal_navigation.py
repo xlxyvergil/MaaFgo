@@ -3,9 +3,11 @@ import copy
 import json
 import os
 from pathlib import Path
+import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 
 import maa
 import numpy as np
@@ -288,6 +290,127 @@ class OrdealNavigationTests(unittest.TestCase):
                 self.assertEqual(controller.quest_clicks, [])
                 self.assertEqual(controller.start_clicks, [])
                 self.assertEqual(seen, ["next-task"])
+
+
+class OrdealMixedEntryTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        Library.open(Path(os.environ.get("MAAFW_BINARY_PATH", Path(maa.__file__).parent / "bin")))
+        Tasker.set_stdout_level(LoggingLevelEnum.Off)
+        # Run the production Custom Actions in-process with the same framework
+        # used by the device. The AgentServer decorator can be bypassed here.
+        from maa.agent.agent_server import AgentServer
+        sys.path.insert(0, str(ROOT / "agent/custom"))
+        try:
+            with patch.object(AgentServer, "register_custom_action"), patch.object(
+                AgentServer, "register_custom_recognition"
+            ):
+                import ordeal_call_action
+        finally:
+            sys.path.pop(0)
+            Library._is_agent_server = False
+        cls.logic = ordeal_call_action
+        cls.catalog = json.loads((ROOT / "assets/resource/base/pipeline/OrdealCall图鉴进本.json").read_text("utf8"))
+
+    def run_mixed(self, *, map_lands, map_battle_starts=False, gallery_lands=True):
+        seen = []
+        controller = QuestController(None)
+
+        class Record(CustomAction):
+            def run(self, context, argv):
+                seen.append(argv.node_name)
+                return True
+
+        action = {"type": "Custom", "param": {"custom_action": "record"}}
+        entry = self.logic.CONFIG
+        nodes = {
+            entry: {
+                **self.catalog[entry],
+                "attach": {"quest": "残留的神话", "item": 6536, "item_name": "极光之钢",
+                           "mode": "mixed", "engine": "native"},
+            },
+            "OrdealCall": {"action": action, "next": [SUPPORT] if map_lands else ["blocked"]},
+            "回主界面": {"action": action, "next": ["无弹窗"]},
+            "无弹窗": {},
+            SUPPORT: {},
+            self.logic.BATTLE_SCREEN: {"next": ["blocked"], "enabled": map_battle_starts},
+            "OrdealCall-战前界面": {},
+            "blocked": {"enabled": False},
+            "OrdealCall-用户提示": {},
+            "战斗完成信息": {"action": action},
+            "OrdealCall-图鉴-进关卡": {"action": action, "next": [SUPPORT] if gallery_lands else ["blocked"]},
+        }
+        for name in ("OrdealCall-图鉴-打开道具列表", "OrdealCall-图鉴-找道具", "OrdealCall-图鉴-找获取途径"):
+            nodes[name] = {"action": action}
+        for name in ("Global_Null", self.logic.STORM_POD_EMPTY, "全局-战前吃体力"):
+            nodes[name] = {"enabled": False}
+        if map_lands:
+            map_battle_attempt = self.logic.map_battle_attempt
+
+            class Battle(CustomAction):
+                def run(self, context, argv):
+                    seen.append(argv.node_name)
+                    return map_battle_attempt(context) is None or map_battle_starts
+
+            nodes[self.logic.NATIVE_ENGINE] = {
+                "action": {"type": "Custom", "param": {"custom_action": "battle"}},
+                "next": [self.logic.BATTLE_SCREEN] if map_battle_starts else [],
+            }
+        else:
+            nodes[self.logic.NATIVE_ENGINE] = {"action": action}
+        for node in nodes.values():
+            node.update(timeout=40, rate_limit=1, pre_delay=0, post_delay=0, on_error=[])
+
+        with tempfile.TemporaryDirectory() as directory:
+            bundle = Path(directory)
+            (bundle / "pipeline").mkdir()
+            (bundle / "pipeline/ordeal.json").write_text(json.dumps(nodes, ensure_ascii=False), "utf8")
+            resource = Resource()
+            resource.use_cpu()
+            self.assertTrue(resource.post_bundle(bundle).wait().succeeded)
+            runner = self.logic.OrdealCallEntry()
+            runner._at_prebattle = lambda context: True
+            resource.register_custom_action("ordeal_call_entry", runner)
+            resource.register_custom_action("ordeal_call_mark_battle", self.logic.MarkOrdealCallBattle())
+            resource.register_custom_action("record", Record())
+            if map_lands:
+                resource.register_custom_action("battle", Battle())
+            self.assertTrue(controller.post_connection().wait().succeeded)
+            tasker = Tasker()
+            self.assertTrue(tasker.bind(resource, controller))
+            try:
+                succeeded = tasker.post_task(entry).wait().succeeded
+            finally:
+                tasker.post_stop().wait()
+        self.assertFalse(self.logic._map_attempts)
+        return succeeded, seen
+
+    def test_navigation_failure_falls_back_once_and_stops_on_gallery_failure(self):
+        succeeded, seen = self.run_mixed(map_lands=False, gallery_lands=False)
+        self.assertFalse(succeeded)
+        self.assertEqual(seen.count("回主界面"), 1)
+        self.assertEqual(seen.count("OrdealCall-图鉴-进关卡"), 1)
+        self.assertNotIn(self.logic.NATIVE_ENGINE, seen)
+        self.assertNotIn("战斗完成信息", seen)
+
+    def test_source_title_recognition_tolerates_observed_japanese_ocr_variants(self):
+        for expected, read in (("悪夢のカボチャ", "悪夢の力ボチャ"), ("残された神話", "残されだ神話")):
+            with self.subTest(expected=expected):
+                label = f"白紙化地球上のフリークエスト「{read}」で獲得"
+                self.assertIn(self.logic._normalized(expected), self.logic._normalized(label))
+        self.assertNotIn(self.logic._normalized("悪夢のカボチャ"), self.logic._normalized("荒野の歓楽"))
+
+    def test_engine_failure_before_start_restarts_from_catalog(self):
+        succeeded, seen = self.run_mixed(map_lands=True)
+        self.assertTrue(succeeded)
+        self.assertEqual(seen.count(self.logic.NATIVE_ENGINE), 2)
+        self.assertEqual(seen.count("回主界面"), 1)
+        self.assertEqual(seen.count("战斗完成信息"), 1)
+
+    def test_engine_failure_after_confirmed_start_does_not_retry(self):
+        succeeded, seen = self.run_mixed(map_lands=True, map_battle_starts=True)
+        self.assertFalse(succeeded)
+        self.assertEqual(seen, ["OrdealCall", self.logic.NATIVE_ENGINE])
 
 
 if __name__ == "__main__":

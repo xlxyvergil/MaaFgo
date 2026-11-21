@@ -19,6 +19,11 @@
                         "team_config_error"
                     ],
                     "pipeline_override": {
+                        "OrdealCall-替代方式": {
+                            "attach": {
+                                "engine": "bbc"
+                            }
+                        },
                         "通用战斗调度": {
                             "next": [
                                 "[JumpBack]执行回主界面",
