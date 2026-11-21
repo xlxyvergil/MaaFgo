@@ -172,8 +172,7 @@
             "[JumpBack]风暴罐副本-体力不足",
             "OrdealCall-图鉴-点关卡"
         ],
-        "timeout": 10000,
-        "on_error": []
+        "timeout": 10000
     },
     "OrdealCall-风暴罐不足": {
         "recognition": {"type": "Or", "param": {"any_of": [
