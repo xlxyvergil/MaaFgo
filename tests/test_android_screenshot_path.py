@@ -17,22 +17,26 @@ class AndroidScreenshotPathTests(unittest.TestCase):
         source = android.load_interface(ROOT / "assets")
         original = copy.deepcopy(source)
         converted = android.adapt_interface(source, ROOT / "assets")
-        source_task = next(task for task in source["task"] if task["name"] == "截图")
-        android_task = next(task for task in converted["task"] if task["name"] == "截图")
-        self.assertIn("debug/screencap/", source_task["description"])
-        self.assertIn("log/screencap/", android_task["description"])
-        self.assertNotIn("debug/screencap/", android_task["description"])
+        source_descriptions = {task["name"]: task.get("description") for task in source["task"]}
+        android_descriptions = {task["name"]: task.get("description") for task in converted["task"]}
+        for name in ("截图", "自动抽护符", "每日1石", "常驻每日1抽"):
+            with self.subTest(task=name):
+                self.assertIn("debug/screencap/", source_descriptions[name])
+                self.assertIn("log/screencap/", android_descriptions[name])
+                self.assertNotIn("debug/screencap/", android_descriptions[name])
         self.assertEqual(converted["version"], source["version"])
         self.assertEqual(source, original)
 
-    def test_prepare_converts_pipeline_focus_and_keeps_desktop_files(self):
+    def test_prepare_converts_screenshot_messages_and_keeps_desktop_files(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             screenshot_task = android.read_json(ROOT / "assets/tasks/截图.json")["task"][0]
+            summon_task = android.read_json(ROOT / "assets/tasks/自动抽护符.json")["task"][0]
+            summon_options = android.read_json(ROOT / "assets/options/自动抽护符.json")["option"]
             source = {
                 "version": "v9.8.7",
-                "task": [screenshot_task],
-                "option": {name: {"cases": [{"name": "native"}]} for name in ("battle_mode", "主线-战斗方式")},
+                "task": [screenshot_task, summon_task],
+                "option": summon_options,
             }
             android.write_json(root / "assets/interface.json", source)
             android.write_json(root / "assets/resource/base/pipeline/日常战斗.json", {"通用战斗调度": {}})
@@ -57,7 +61,19 @@ class AndroidScreenshotPathTests(unittest.TestCase):
             self.assertEqual(message, "截图已保存至 log/screencap/")
             self.assertEqual(converted["截图"]["action"], pipeline["截图"]["action"])
             interface = android.read_json(output / "interface.json")
-            self.assertIn("log/screencap/", interface["task"][0]["description"])
+            task_descriptions = {task["name"]: task["description"] for task in interface["task"]}
+            option_name = "自动抽护符-抽卡完后是否保存截图"
+            summon_screenshot = interface["option"][option_name]
+            for description in (
+                task_descriptions["截图"],
+                task_descriptions["自动抽护符"],
+                summon_screenshot["description"],
+            ):
+                with self.subTest(description=description):
+                    self.assertIn("log/screencap/", description)
+                    self.assertNotIn("debug/screencap/", description)
+            self.assertEqual(summon_screenshot["default_case"], "no")
+            self.assertEqual(summon_screenshot["cases"], summon_options[option_name]["cases"])
             self.assertEqual(interface["version"], source["version"])
             for path, content in originals.items():
                 self.assertEqual(path.read_bytes(), content, str(path.relative_to(root)))
