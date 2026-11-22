@@ -155,7 +155,10 @@ class AutoBattleAction(CustomAction):
                 return CustomAction.RunResult(success=False)
         param = _load_action_param(argv.custom_action_param)
         node_name = getattr(argv, "node_name", "")
+        battle_node = (context.get_node_data(node_name) or {}) if node_name else {}
+        battle_attach = battle_node.get("attach") or {}
         support_fallback = bool(token and sessions.support_fallback(root, token))
+        restricted = restricted or battle_attach.get("native_battle_formation_restricted") is True
         if restricted:
             skip_bond_check_for_restricted_formation(context)
         formation_reset = restricted or param.get("native_battle_formation_reset") is True
@@ -173,12 +176,11 @@ class AutoBattleAction(CustomAction):
         try:
             strategy_attach = _attached_strategy_settings(context, node_name)
             source_mode = strategy_attach.get("native_battle_strategy_source")
-            trial_node = (context.get_node_data(node_name) or {}) if node_name else {}
-            trial_requested = ((trial_node.get("attach") or {}).get("native_battle_trial_profile")
+            trial_requested = (battle_attach.get("native_battle_trial_profile")
                                == "hellish_202611" and not (support_fallback or formation_reset))
             share = (_share_data_from_param(param) if plan is None or source_mode == "editor" or trial_requested
                      else None)
-            trial_config = trial_config_from_source(trial_node, share) if trial_requested else None
+            trial_config = trial_config_from_source(battle_node, share) if trial_requested else None
             if share is not None:
                 if plan is None:
                     plan = _build_plan_from_share(share)
@@ -207,7 +209,14 @@ class AutoBattleAction(CustomAction):
                 sessions.invalidate(root, token, "chaldea_plan_failed")
             return CustomAction.RunResult(success=False)
         roster_servant_ids = _merge_rosters(initial_formation, chaldea_roster)
-        decider = RuleDecider(battle_policy, plan=plan)
+        preferred = strategy_attach.get("native_battle_preferred_attacker")
+        frontline_preferred_servant_id = (
+            canonical_servant_id(preferred)
+            if restricted and source_mode == "manual" and isinstance(preferred, str)
+            else None
+        )
+        decider = RuleDecider(battle_policy, plan=plan,
+                              frontline_preferred_servant_id=frontline_preferred_servant_id)
         runtime_class = AutoBattleRuntime
         if trial_config is not None:
             decider = HellishTrialDecider(decider, trial_config)
@@ -242,7 +251,7 @@ class AutoBattleAction(CustomAction):
                 isinstance(plan, BattlePlan) and bool(plan.turns) and runtime._has_active_plan()))
             result = _continue_without_preset(
                 context, controller, runtime, result, profile,
-                enabled=(trial_node.get("attach") or {}).get("native_battle_preset_fallback") is True,
+                enabled=battle_attach.get("native_battle_preset_fallback") is True,
                 preset_active=preset_active,
                 trial_mode=trial_config is not None,
             )

@@ -779,6 +779,8 @@ class StoryRunner:
             while True:
                 # 仅本关原生入口允许预设执行失败后改用默认战斗，不污染其他任务。
                 battle_node = {"attach": {"native_battle_preset_fallback": True}}
+                if self.current_restricted:
+                    battle_node["attach"]["native_battle_formation_restricted"] = True
                 if use_default:
                     battle_node["action"] = {"param": {
                         "custom_action_param": '{"native_battle_formation_reset":true}'

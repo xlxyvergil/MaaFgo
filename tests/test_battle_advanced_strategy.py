@@ -15,8 +15,9 @@ sys.path[:0] = [str(ROOT / "tests"), str(ROOT / "agent"), str(ROOT / "agent/cust
 from formation_test_support import battle_action as action
 from battle.core.advanced_strategy import (advanced_strategy_to_param,
     default_advanced_strategy, normalize_advanced_strategy, validate_advanced_strategy)
-from battle.core.enums import CardColor, Scene
-from battle.core.models import BattleState, Confidence
+from battle.core.enums import CardColor, PrimitiveKind, Scene
+from battle.core.models import (BattleState, CardPick, CommandCard, Confidence, NpCard,
+                                ServantState, SkillState)
 from battle.core.plan_parser import _parse_battle_policy, _parse_strategy_profile
 import chaldea
 
@@ -320,6 +321,44 @@ class StrategyActionHandoffTests(unittest.TestCase):
         self.assertTrue(result.success)
         self.assertIsNone(runtime.call_args.args[2].plan)
         fetch.assert_not_called()
+
+    def test_restricted_manual_attacker_follows_observed_frontline_for_cards_and_skills(self):
+        preferred = "505600"
+        confidence = Confidence(1)
+        skills = (SkillState(True, confidence),) * 3
+        other_attacker = ServantState(1, skills, confidence, "100100", has_attack_np=True)
+        other_faces = tuple(CommandCard(slot, CardColor.BUSTER, 1, confidence,
+                                        owner_servant_id="100100") for slot in (1, 2, 3))
+        np_cards = (NpCard(1, confidence),)
+        for marked_by_session in (True, False):
+            with self.subTest(marked_by_session=marked_by_session):
+                ctx = context("manual", native_battle_fill_priority="servant",
+                              native_battle_preferred_attacker="505700")
+                if not marked_by_session:
+                    ctx.get_node_data("battle")["attach"]["native_battle_formation_restricted"] = True
+                result, runtime = self.run_action(ctx, {"plan": {"turns": [{"np_order": [2]}]}},
+                                                  restricted=marked_by_session)
+                self.assertTrue(result.success)
+                decider = runtime.call_args.args[2]
+                self.assertIsNone(decider.plan)
+
+                for slot, observed_id in ((2, preferred), (3, preferred), (2, None), (2, "504500")):
+                    with self.subTest(slot=slot, observed_id=observed_id):
+                        frontline = (other_attacker, ServantState(slot, skills, confidence, observed_id))
+                        main = BattleState(Scene.MAIN_BATTLE, confidence, (), (), (), frontline)
+                        action = decider.decide(main)
+                        present = observed_id == preferred
+                        self.assertEqual({skill.target_ally for skill in action.servant_skills},
+                                         {slot if present else 1})
+
+                        # A preferred ID in card evidence alone must not override the current lineup.
+                        preferred_faces = tuple(CommandCard(index, CardColor.QUICK, slot, confidence,
+                                                            owner_servant_id=preferred) for index in (4, 5))
+                        command = BattleState(Scene.COMMAND_SELECTION, confidence,
+                                              other_faces + preferred_faces, np_cards, (), frontline)
+                        picks = decider.decide(command).picks
+                        self.assertEqual(picks[0], CardPick(PrimitiveKind.SELECT_NP, 1))
+                        self.assertEqual({pick.slot for pick in picks[1:]} & {4, 5}, {4, 5} if present else set())
 
     def test_invalid_configuration_never_starts_runtime(self):
         result, runtime = self.run_action(context("editor"), {"chaldea_share": {"maaAdvancedStrategy": None}})
