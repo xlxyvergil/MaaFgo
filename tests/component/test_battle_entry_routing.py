@@ -96,7 +96,8 @@ class EntryRoutingTests(unittest.TestCase):
             self.assertTrue(resource.post_bundle(temp).wait().succeeded)
             resource.register_custom_recognition("screen", Screen())
             resource.register_custom_action("record", Record())
-            pipeline_override = make_override(resource) if make_override else None
+            # MaaFramework 5.10.4 serializes the override as-is and expects a JSON object.
+            pipeline_override = make_override(resource) if make_override else {}
             controller = MemoryController(np.zeros((720, 1280, 3), dtype=np.uint8))
             self.assertTrue(controller.post_connection().wait().succeeded)
             tasker = Tasker()
