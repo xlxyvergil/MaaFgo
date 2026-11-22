@@ -34,7 +34,7 @@ from ..perception import perception
 from ..perception.frontline import FrontlineIdentity
 from ..perception.status_catalog import StatusCatalogRecognizer
 import mfaalog
-from platform_waits import is_android, platform_timeout
+from platform_waits import platform_timeout
 
 # 选完卡后等攻击动画结束（部分长演出可能超过 60s，留足余量）
 _ANIMATION_TIMEOUT_S = 120.0
@@ -42,8 +42,8 @@ _ANIMATION_TIMEOUT_S = 120.0
 _UNKNOWN_TIMEOUT_S = 30.0
 # 每次轮询之间等画面静止的窗口（ms）
 _POLL_FREEZE_MS = 2000
-# 安卓包在两次选卡之间等待卡牌选中态渲染。
-_ANDROID_PICK_DELAY_S = 0.3
+# 两次选卡之间留出卡牌选中态的渲染时间。
+_PICK_DELAY_S = 0.3
 # 主战斗界面首次出现后，等待技能 CD 数字渲染完成再重新截图感知。
 _MAIN_BATTLE_SETTLE_S = 1.0
 _NP_GLARE_MAX_FRAMES = 3
@@ -725,8 +725,8 @@ class AutoBattleRuntime:
             mfaalog.info(f"[AutoBattle] pick result: ok={ok}")
             if not ok:
                 return False
-            if index < len(picks) - 1 and is_android():
-                time.sleep(_ANDROID_PICK_DELAY_S)
+            if index < len(picks) - 1:
+                time.sleep(_PICK_DELAY_S)
         return True
 
     def _normalize_picks_for_execution(self, picks, *, blocked_face_slots=()) -> tuple[CardPick, ...]:

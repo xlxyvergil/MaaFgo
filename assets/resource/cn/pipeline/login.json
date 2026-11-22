@@ -158,6 +158,7 @@
         ]
     },
     "更新": {
+        "timeout": 60000,
         "recognition": {
             "type": "TemplateMatch",
             "param": {
@@ -255,6 +256,7 @@
         "post_wait_freezes": 5000
     },
     "阶段判断循环": {
+        "timeout": 60000,
         "post_wait_freezes": 2000,
         "next": [
             "4399-关闭弹窗-前往游戏盒领取-小",
