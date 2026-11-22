@@ -22,7 +22,7 @@ from typing import List, Protocol, Tuple
 from .enums import CardColor, PrimitiveKind, Scene
 from .models import (BattleAction, BattlePlan, BattleState, CardPick,
                      CommandCard, ServantSkillAction, TurnPlan, is_slot)
-from .policy import BattlePolicy, CardPolicy, Goal, SkillPolicy
+from .policy import BattlePolicy, CardPolicy, Goal, NativeCardStrategy, SkillPolicy
 
 import mfaalog
 
@@ -100,7 +100,9 @@ class RuleDecider:
         tp = self.plan.active_turn(turn_index) if self.plan is not None else None
         if tp is None:
             # 无计划或计划已结束：按 SkillPolicy 自动决策可用的从者技能
-            servant_skills = _auto_servant_skills(state, self.skill_policy)
+            servant_skills = _auto_servant_skills(
+                state, self.skill_policy, self.card_policy.native_strategy,
+            )
             return BattleAction(
                 target_enemy=target,
                 picks=(),
@@ -388,7 +390,9 @@ def _pick_target(state: BattleState):
     return tgt
 
 
-def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple[ServantSkillAction, ...]:
+def _auto_servant_skills(
+    state: BattleState, skill_policy: SkillPolicy, native: NativeCardStrategy,
+) -> Tuple[ServantSkillAction, ...]:
     """无计划时按 SkillPolicy 自动决策可用的从者技能。
 
     规则：
@@ -397,7 +401,7 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     - skip_skill_indexes → 跳过指定技能索引
     - max_skills_per_turn > 0 → 每回合最多放 N 个技能
     - available is True → 加入技能序列；False（CD）或 None（未知）→ 跳过
-    - 需要选择队友时优先选攻击宝具从者，同类按前排位置从左到右
+    - 需要选择队友时优先匹配当前前排的主输出，未匹配时优先选最靠左的攻击宝具从者，再选最靠左的前排从者
     技能可用性过滤由 Runtime 的统一安全门（skip_unusable_servant_skills）兜底。
     """
     if not skill_policy.auto_servant_skills:
@@ -406,7 +410,15 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     frontline = tuple(servant for servant in state.servants if is_slot(servant.slot, 1, 3))
     if not frontline:
         return ()
-    target_ally = min(frontline, key=lambda servant: (not servant.has_attack_np, servant.slot)).slot
+    # 微调同时列出从者和位置时，先匹配从者身份，再匹配位置。
+    preferred_ids = {sid: rank for rank, sid in enumerate(native.preferred_servant_ids)}
+    preferred_slots = {slot: rank for rank, slot in enumerate(native.preferred_slots)}
+    target_ally = min(frontline, key=lambda servant: (
+        preferred_ids.get(servant.servant_id, len(preferred_ids)),
+        preferred_slots.get(servant.slot, len(preferred_slots)),
+        not servant.has_attack_np,
+        servant.slot,
+    )).slot
     slots = set(skill_policy.servant_slots) if skill_policy.servant_slots else None
     skip = set(skill_policy.skip_skill_indexes)
 
