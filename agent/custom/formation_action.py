@@ -39,6 +39,7 @@ from chaldea import fetch_share_data
 from mystic_code import extract_mystic_code_id, ensure_mystic_code
 from platform_waits import platform_timeout
 from resource_package import resolve_resource_package
+from support_ce import resolve_external_image
 from chaldea.servant_aliases import build_servant_lookup, canonical_servants, servant_aliases
 import mfaalog
 from battle.core.models import Confidence, FormationSlot
@@ -660,6 +661,7 @@ class AutoFormationFromChaldea(CustomAction):
 
     def _init_paths(self):
         layer = resolve_resource_package(self.context, caller="编队")
+        self.resource_install_root = Path(_PROJECT_DIR)
         roots = []
         for root in (_PROJECT_DIR, os.path.dirname(_PROJECT_DIR)):
             for current_layer in (layer, "base"):
@@ -768,11 +770,20 @@ class AutoFormationFromChaldea(CustomAction):
                     seen.add(name)
         return result
 
-    def _load_equip_template(self, equip_id, directories):
+    def _load_external_equip_template(self, equip_id, kind):
+        root = getattr(self, "resource_install_root", _PROJECT_DIR)
+        path = resolve_external_image(root, equip_id, kind)
+        return _read_image(str(path)) if path is not None else None
+
+    def _load_equip_template(self, equip_id, directories, kind=None):
         filename = f"f_{equip_id}0.png"
         for directory in directories:
             path = os.path.join(directory, filename)
             template = _read_image(path)
+            if template is not None:
+                return filename, template
+        if kind in {"list", "team"}:
+            template = self._load_external_equip_template(equip_id, kind)
             if template is not None:
                 return filename, template
         return None
@@ -824,8 +835,8 @@ class AutoFormationFromChaldea(CustomAction):
                     f"[自动编队] 槽位{item['slot'] + 1}礼装 ceId={equip_id} 不在礼装数据库，跳过"
                 )
                 continue
-            team_template = self._load_equip_template(equip_id, self.equip_team_dirs)
-            list_template = self._load_equip_template(equip_id, self.equip_list_dirs)
+            team_template = self._load_equip_template(equip_id, self.equip_team_dirs, "team")
+            list_template = self._load_equip_template(equip_id, self.equip_list_dirs, "list")
             if team_template is None or list_template is None:
                 item["equip_status"] = "resource_missing"
                 mfaalog.warning(

@@ -22895,6 +22895,195 @@
         "atlas_effects": []
       },
       "bondOwner": 2501700
+    },
+    {
+      "id": "9408540",
+      "collection_no": 2232,
+      "name": "立于剑士之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94085400.png"
+      ],
+      "name_jp": "剣士の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408600",
+      "collection_no": 2239,
+      "name": "立于狂战士之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94086000.png"
+      ],
+      "name_jp": "狂戦士の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408650",
+      "collection_no": 2264,
+      "name": "立于枪兵之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94086500.png"
+      ],
+      "name_jp": "槍兵の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408700",
+      "collection_no": 2403,
+      "name": "自此方登临于巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94087000.png"
+      ],
+      "name_jp": "此方より頂に至るもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408710",
+      "collection_no": 2404,
+      "name": "自彼方登临于巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94087100.png"
+      ],
+      "name_jp": "彼方より頂に至るもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408840",
+      "collection_no": 2442,
+      "name": "立于骑兵之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94088400.png"
+      ],
+      "name_jp": "騎兵の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408920",
+      "collection_no": 2472,
+      "name": "立于暗杀者之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94089200.png"
+      ],
+      "name_jp": "暗殺者の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408970",
+      "collection_no": 2494,
+      "name": "立于弓兵之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94089700.png"
+      ],
+      "name_jp": "弓兵の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
+    },
+    {
+      "id": "9408980",
+      "collection_no": 2510,
+      "name": "立于魔术师之巅者",
+      "rarity": 5,
+      "important": 0,
+      "images": [
+        "f_94089800.png"
+      ],
+      "name_jp": "魔術師の頂に立つもの",
+      "acquisition_category_jp": "マナプリズム交換",
+      "filter_tag": "达芬奇工坊",
+      "bond": {
+        "bonus_type": "none",
+        "bonus": 0,
+        "target": "",
+        "effect_desc": ""
+      },
+      "resource": "dlc",
+      "reward_source": "冠位認定戦"
     }
   ]
 }

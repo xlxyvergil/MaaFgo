@@ -646,6 +646,8 @@ class BuildPlayerInventory(AutoFormationFromChaldea):
             ])
             for name in names:
                 template = self._read_first_template(self.equip_list_dirs, name)
+                if template is None and name == f"f_{item['id']}0.png":
+                    template = self._load_external_equip_template(item["id"], "list")
                 if template is None:
                     continue
                 if template.shape[:2] != (EQUIP_TEMPLATE_SIZE[1], EQUIP_TEMPLATE_SIZE[0]):

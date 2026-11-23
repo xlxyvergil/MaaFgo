@@ -58,7 +58,7 @@ def build(source: Path, destination: Path, *, categories_path: Path | None = Non
         if not filter_tag:
             unknown_categories.add(category_jp)
             continue
-        equips.append({
+        entry = {
             "id": equip_id,
             "collection_no": to_int(row.get("collectionNo", ""), "collectionNo", equip_id),
             "name": row.get("name_cn", ""),
@@ -68,7 +68,10 @@ def build(source: Path, destination: Path, *, categories_path: Path | None = Non
             "name_jp": row.get("name_jp", ""),
             "acquisition_category_jp": category_jp,
             "filter_tag": filter_tag,
-        })
+        }
+        if row.get("resource", "").strip():
+            entry["resource"] = row["resource"].strip()
+        equips.append(entry)
     if unknown_categories:
         raise ValueError(f"未映射的礼装入手分类: {sorted(unknown_categories)!r}")
 

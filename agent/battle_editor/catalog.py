@@ -17,9 +17,9 @@ from urllib.parse import quote
 from .special_choices import special_skill_catalog
 from .equip_filters import catalog_filter_metadata, equip_filter_facts, read_equip_filters
 try:
-    from support_ce import extension_snapshot, resolve_external_templates
+    from support_ce import extension_snapshot, resolve_external_image, resolve_external_templates
 except ModuleNotFoundError:
-    from ..support_ce import extension_snapshot, resolve_external_templates
+    from ..support_ce import extension_snapshot, resolve_external_image, resolve_external_templates
 
 
 _MODULE_DIR = Path(__file__).resolve().parent
@@ -149,6 +149,10 @@ def resolve_media(project_root: Path | str, kind: str, filename: str) -> Path | 
             continue
         if candidate.is_relative_to(resolved_dir) and candidate.is_file():
             return candidate
+    if kind == "equip":
+        match = re.fullmatch(r"f_([1-9][0-9]{0,9})0\.png", filename)
+        if match:
+            return resolve_external_image(root, int(match[1]), "team")
     return None
 
 

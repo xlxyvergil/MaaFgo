@@ -840,7 +840,7 @@ class BundledCatalogTests(unittest.TestCase):
         self.assertEqual(sum(equip["common"] and equip["recognizable"]
                              for equip in catalog["equips"]), 48)
         recognized = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
-        self.assertEqual(len(recognized), 1166)
+        self.assertEqual(len(recognized), 1175)
         expected_equip_ids = {int(row["id"]) for row in recognized
                               if any(resolve_media(ROOT, "equip", image) for image in row.get("images", []))}
         self.assertEqual({equip["id"] for equip in catalog["equips"] if equip["recognizable"]}, expected_equip_ids)

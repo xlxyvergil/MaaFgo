@@ -918,5 +918,23 @@
       ],
       "method": "incremental; existing facts preserved except explicitly appended costume assets"
     }
+  ],
+  "incrementalSources": [
+    {
+      "scope": "grand-certification-reward-dlc",
+      "ids": [
+        9408540,
+        9408600,
+        9408650,
+        9408700,
+        9408710,
+        9408840,
+        9408920,
+        9408970,
+        9408980
+      ],
+      "source": "equip_list.xlsx:name_cn",
+      "reason": "补齐已有日文条目的中文名称；不改其他轻量事实"
+    }
   ]
 }
