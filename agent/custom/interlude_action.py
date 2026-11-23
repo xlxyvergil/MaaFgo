@@ -343,8 +343,9 @@ class InterludeRunner(StoryRunner):
             if kind == "map":
                 continue
             if kind == "battle":
+                # 未到小关上限时允许下场复核，结算后由选关流程确认是否还有可打关卡。
                 bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
-                    another_battle_planned=False if self.completed + 1 == self.limit else None)
+                    another_battle_planned=self.completed + 1 < self.limit)
                 self.fight()
                 self.settle()
                 self.battles += 1
