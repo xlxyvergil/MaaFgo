@@ -25,7 +25,7 @@ import formation_action as f, bond_completion_action as b, inventory_scan_action
 from battle.runtime import runtime as r
 print('BUDGETS='+json.dumps([f.SLOT_LAYOUT_VERIFY_TIMEOUT_SECONDS,b.SERVANT_BOND_OCR_TIMEOUT_SECONDS,b.COST_VERIFY_TIMEOUT_SECONDS,i.ICON_LAYOUT_TRANSITION_TIMEOUT_SECONDS,box.LJBH_NAV_TIMEOUT,r._SKILL_ANIM_TIMEOUT_S,r.AutoBattleRuntime._wait_until_enemy_targeted.__defaults__[0]]))
 """
-        for platform, expected in [("desktop", [5,5,5,2,10,15,3]), ("android", [30,30,20,8,20,30,20])]:
+        for platform, expected in [("desktop", [5,5,5,2,10,60,3]), ("android", [30,30,20,8,20,60,20])]:
             with self.subTest(platform=platform):
                 env = dict(os.environ, MAAFGO_PLATFORM=platform, PYTHONUTF8="1")
                 output = subprocess.check_output([sys.executable, "-X", "utf8", "-c", script], cwd=ROOT, env=env, text=True)

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
 from battle.core.enums import Scene
 from battle.perception import config, perception
-from battle.runtime.runtime import AutoBattleRuntime
+from battle.runtime.runtime import AutoBattleRuntime, _SKILL_ANIM_TIMEOUT_S
 
 
 class PerceptionCostTests(unittest.TestCase):
@@ -69,6 +69,34 @@ class PerceptionCostTests(unittest.TestCase):
                     detect.assert_called_once_with(runtime.ctx, frame)
                 else:
                     detect.assert_called_once_with(runtime.ctx, frame, check_order_change=False)
+
+    def test_skill_return_can_observe_a_fresh_frame_after_slow_recognition(self):
+        runtime = AutoBattleRuntime.__new__(AutoBattleRuntime)
+        runtime.ctx = NS(tasker=NS(stopping=False))
+        runtime.controller = Mock()
+        runtime.executor = Mock()
+        animation_frame, main_frame = object(), object()
+        capture = runtime.controller.post_screencap.return_value.wait.return_value.get
+        capture.side_effect = [animation_frame, main_frame]
+        elapsed = 0.0
+
+        def advance(seconds):
+            nonlocal elapsed
+            elapsed += seconds
+
+        def detect_scene(context, frame, *, check_order_change):
+            if frame is animation_frame:
+                advance(32.0)
+                return Scene.UNKNOWN
+            self.assertIs(frame, main_frame)
+            return Scene.MAIN_BATTLE
+
+        with patch("battle.runtime.runtime.time.monotonic", lambda: elapsed), \
+                patch("battle.runtime.runtime.time.sleep", side_effect=advance), \
+                patch.object(perception, "detect_scene", side_effect=detect_scene):
+            self.assertTrue(runtime._wait_until((Scene.MAIN_BATTLE,), _SKILL_ANIM_TIMEOUT_S, tap_close=True))
+        self.assertEqual(capture.call_count, 2)
+        self.assertEqual(elapsed, 32.5)
 
 
 if __name__ == "__main__":
