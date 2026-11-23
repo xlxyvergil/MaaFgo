@@ -12,7 +12,7 @@ from battle.core.decider import RuleDecider
 from battle.core.enums import CardColor, PrimitiveKind, Scene
 from battle.core.models import (ActorBinding, BattleAction, BattlePlan, Confidence,
                                 PlannedCard, ServantSkillAction, TurnPlan)
-from battle.core.policy import BattlePolicy, SkillPolicy, StrategyProfile
+from battle.core.policy import BattlePolicy, CardPolicy, NativeCardStrategy, SkillPolicy, StrategyProfile
 from battle.core.validator import skip_unusable_servant_skills, validate_main_action
 from battle.execution import coords
 from battle.perception import config, perception
@@ -37,11 +37,11 @@ def context():
         )))
 
 
-def runtime(*, plan=None, roster=None):
+def runtime(*, plan=None, roster=None, policy=None):
     controller = Mock()
     controller.post_screencap.return_value.wait.return_value.get.return_value = object()
-    result = AutoBattleRuntime(context(), controller, RuleDecider(plan=plan),
-                               StrategyProfile(), roster_servant_ids=roster)
+    result = AutoBattleRuntime(context(), controller, RuleDecider(policy, plan=plan),
+                               StrategyProfile(), policy, roster_servant_ids=roster)
     result._run_special_skill_pipeline = Mock(return_value=result._SKILL_NO_OVERLAY_BRANCH)
     result._wait_until = Mock(return_value=True)
     return result
@@ -303,13 +303,35 @@ class WithoutFormationTests(unittest.TestCase):
                         for slot in (1, 2, 3)
                     })
 
+    def test_auto_skill_follows_preferred_servant_then_falls_back_when_absent(self):
+        native = NativeCardStrategy(preferred_servant_ids=("304800",))
+        policy = BattlePolicy(card=CardPolicy(native_strategy=native))
+        rt = runtime(roster=("100100", "304800", "504500", None, None, None), policy=policy)
+        rt.servant_recognizer = NS(detect=Mock())
+
+        for frontline, expected in (
+            (("100100", "304800", "504500"), 2),
+            (("100100", "504500", "304800"), 3),
+            (("100100", "504500", None), 1),
+        ):
+            with self.subTest(frontline=frontline):
+                rt.servant_recognizer.detect.return_value = tuple(
+                    NS(slot=slot, servant_id=sid, confidence=Confidence(.98),
+                       margin=.2, matched_template="portrait")
+                    for slot, sid in enumerate(frontline, 1)
+                )
+                action = rt.decider.decide(rt._observe())
+                self.assertEqual({skill.target_ally for skill in action.servant_skills}, {expected})
+
     def test_fixed_target_is_kept_until_the_plan_ends(self):
         planned_skill = ServantSkillAction(2, 2, target_ally=3)
-        rt = runtime(plan=BattlePlan((TurnPlan(servant_skills=(planned_skill,)),)))
+        native = NativeCardStrategy(preferred_slots=(2,))
+        policy = BattlePolicy(card=CardPolicy(native_strategy=native))
+        rt = runtime(plan=BattlePlan((TurnPlan(servant_skills=(planned_skill,)),)), policy=policy)
         self.assertEqual(rt.decider.decide(rt._observe()).servant_skills, (planned_skill,))
         rt._turn_index = 1
         action = rt.decider.decide(rt._observe(), turn_index=1)
-        self.assertEqual({skill.target_ally for skill in action.servant_skills}, {1})
+        self.assertEqual({skill.target_ally for skill in action.servant_skills}, {2})
 
     def test_auto_skill_switch_still_disables_position_only_casts(self):
         rt = runtime()

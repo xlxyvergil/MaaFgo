@@ -5,11 +5,11 @@
 
 流程：
   第 1 场: 执行进本 → auto_battle → 结束战斗 → 作战成功(点下一步)
-           → 连续出击_继续(点继续按钮) → auto_battle (第 2 场)
-  第 2 场: auto_battle → 结束战斗 → 作战成功(点下一步)
-           → 连续出击_继续(点继续按钮) → auto_battle (第 3 场)
+           → 连续出击_继续(点继续按钮) → 下一场进本轮询
+  第 2 场: 进本轮询 → auto_battle → 结束战斗 → 作战成功(点下一步)
+           → 连续出击_继续(点继续按钮) → 下一场进本轮询
   ...
- 最后 1 场: auto_battle → 结束战斗 → 作战成功(点下一步)
+ 最后 1 场: 进本轮询 → auto_battle → 结束战斗 → 作战成功(点下一步)
            → 战斗结束关闭_不回主界面 → 战斗完成-回主界面
 
 节点参数（custom_action_param，JSON）示例：
@@ -48,6 +48,8 @@ from bond_stop_action import save_bond_stop
 _NODE_FIRST_BATTLE = "原生自动战斗_多次_第一场"
 _NODE_NEXT_BATTLE = "原生自动战斗_多次_下一场"
 _NODE_LAST_BATTLE = "原生自动战斗_多次_最后一场"
+_NODE_CONTINUOUS_ENTRY = "连续出击-进本轮询"
+_SUPPORT_NODES = {"进本-选择助战", "助战action", "Chaldea助战action"}
 
 # 安全上限
 _MAX_BATTLE_COUNT = 999
@@ -180,6 +182,8 @@ class AutoBattleRepeatAction(CustomAction):
                 },
             }
             try:
+                if entry in (_NODE_NEXT_BATTLE, _NODE_LAST_BATTLE):
+                    round_override.update(_continuous_entry_override(context))
                 detail = context.run_task(entry, pipeline_override=round_override)
             except Exception as e:
                 last_error = f"异常: {e}"
@@ -253,6 +257,36 @@ class AutoBattleRepeatAction(CustomAction):
             })
 
         return CustomAction.RunResult(success=ok)
+
+
+def _continuous_entry_override(context: Context) -> dict:
+    """仅在后续场次调整共享关卡节点，沿用当前任务选定的助战方式。"""
+    entry = context.get_node_data("进本流程") or {}
+    names = (edge if isinstance(edge, str) else edge["name"] for edge in entry.get("next", []))
+    support = next((name for name in names if name in _SUPPORT_NODES), None)
+    after_quest = ["连续出击-关卡后查弹窗"]
+    override = {
+        "执行进本": {"next": [_NODE_CONTINUOUS_ENTRY], "pre_delay": 0, "post_delay": 0},
+        "进本-点击任务开始": {"next": after_quest},
+        "进本-编队提示-点击开始": {"next": after_quest},
+        "进本-点击关卡-等待界面切换": {"next": after_quest},
+    }
+    if support:
+        override[_NODE_CONTINUOUS_ENTRY] = {"anchor": {"连续出击助战": support}}
+    for name in ("进本-点击上一次关卡", "进本-点击关卡", "进本-识别幕间强化界面"):
+        override[name] = {
+            "post_wait_freezes": 0,
+            "timeout": 30000,
+            "next": [
+                "[JumpBack]全局-战前吃体力",
+                "进本-编队提示-点击开始",
+                "进本-点击任务开始",
+                "进本-关闭告知弹窗",
+                "进本-点击关卡-等待界面切换",
+            ],
+            "on_error": [],
+        }
+    return override
 
 
 def _load_param(raw_param: object) -> dict:

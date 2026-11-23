@@ -258,6 +258,22 @@ class ProgressTests(unittest.TestCase):
         self.assertEqual(events, ["fight", "settle", "locate", "locate"])
         self.assertEqual((runtime.completed, runtime.battles), (2, 1))
 
+    def test_can_defer_bond_upgrade_before_list_scan_finds_no_more_quests(self):
+        runtime, context = runner(config={"quest_limit": 2})
+        root = context.get_task_job().job_id
+
+        def settle():
+            deferred = bond_stops.defer(root, bond_stops.ensure(root), message="待下场复核")
+            self.assertIsNotNone(deferred)
+            self.assertEqual(deferred.reason, "bond_upgrade_deferred")
+
+        with patch.object(runtime, "locate", side_effect=(TARGET, None)), \
+             patch.object(runtime, "enter", return_value="battle"), \
+             patch.object(runtime, "fight") as fight, patch.object(runtime, "settle", side_effect=settle):
+            self.assertIn("没有可挑战的已开启幕间", runtime.run())
+        fight.assert_called_once()
+        self.assertEqual((runtime.completed, runtime.battles), (1, 1))
+
     def test_resumed_quest_failed_settlement_does_not_count_or_select_next(self):
         runtime, _ = runner([{"进本-队伍确认"}], {"quest_limit": 2})
         with patch.object(runtime, "fight"), \

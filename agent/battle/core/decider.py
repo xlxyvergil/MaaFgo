@@ -16,13 +16,14 @@ RuleDecider 在确定出卡后比较同一从者同色面卡的暴击率。
 """
 from __future__ import annotations
 
+from dataclasses import replace
 from itertools import permutations
 from typing import List, Protocol, Tuple
 
 from .enums import CardColor, PrimitiveKind, Scene
 from .models import (BattleAction, BattlePlan, BattleState, CardPick,
                      CommandCard, ServantSkillAction, TurnPlan, is_slot)
-from .policy import BattlePolicy, CardPolicy, Goal, SkillPolicy
+from .policy import BattlePolicy, CardPolicy, Goal, NativeCardStrategy, SkillPolicy
 
 import mfaalog
 
@@ -45,7 +46,8 @@ class Decider(Protocol):
 
 class RuleDecider:
     def __init__(self, policy: BattlePolicy | CardPolicy | None = None,
-                 plan: BattlePlan | None = None) -> None:
+                 plan: BattlePlan | None = None, *,
+                 frontline_preferred_servant_id: str | None = None) -> None:
         if isinstance(policy, BattlePolicy):
             self.policy = policy
         elif isinstance(policy, CardPolicy):
@@ -53,6 +55,7 @@ class RuleDecider:
         else:
             self.policy = BattlePolicy()
         self.plan = plan
+        self.frontline_preferred_servant_id = frontline_preferred_servant_id
         native = self.card_policy.native_strategy
         if native.enabled:
             mfaalog.info(
@@ -77,12 +80,22 @@ class RuleDecider:
 
     def decide(self, state: BattleState, turn_index: int = 0) -> BattleAction:
         target = self._pick_enemy_target(state, turn_index)
+        card_policy = self._card_policy_for(state)
 
         if state.scene is Scene.MAIN_BATTLE:
-            return self._decide_main_battle(state, turn_index, target)
+            return self._decide_main_battle(state, turn_index, target, card_policy)
 
         # 选卡阶段
-        return self._decide_command_selection(state, turn_index, target)
+        return self._decide_command_selection(state, turn_index, target, card_policy)
+
+    def _card_policy_for(self, state: BattleState) -> CardPolicy:
+        policy = self.card_policy
+        preferred = self.frontline_preferred_servant_id
+        if preferred and any(servant.servant_id == preferred and is_slot(servant.slot, 1, 3)
+                             for servant in state.servants):
+            return replace(policy, native_strategy=replace(policy.native_strategy,
+                                                           preferred_servant_ids=(preferred,)))
+        return policy
 
     def _pick_enemy_target(self, state: BattleState, turn_index: int) -> int | None:
         # 目标取自攻略；未指定或目标已不在场时沿用既有选怪行为。
@@ -96,11 +109,13 @@ class RuleDecider:
         return _pick_target(state)
 
     def _decide_main_battle(self, state: BattleState, turn_index: int,
-                            target) -> BattleAction:
+                            target, card_policy: CardPolicy) -> BattleAction:
         tp = self.plan.active_turn(turn_index) if self.plan is not None else None
         if tp is None:
             # 无计划或计划已结束：按 SkillPolicy 自动决策可用的从者技能
-            servant_skills = _auto_servant_skills(state, self.skill_policy)
+            servant_skills = _auto_servant_skills(
+                state, self.skill_policy, card_policy.native_strategy,
+            )
             return BattleAction(
                 target_enemy=target,
                 picks=(),
@@ -127,15 +142,15 @@ class RuleDecider:
 
 
     def _decide_command_selection(self, state: BattleState, turn_index: int,
-                                  target) -> BattleAction:
+                                  target, card_policy: CardPolicy) -> BattleAction:
         tp = self.plan.active_turn(turn_index) if self.plan is not None else None
 
         if tp is not None and tp.card_sequence:
-            picks = _prefer_higher_crit(_resolve_planned_cards(tp, state, self.card_policy), state.cards)
+            picks = _prefer_higher_crit(_resolve_planned_cards(tp, state, card_policy), state.cards)
             mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 攻略出卡={tp.card_sequence} 实际={picks}")
             return BattleAction(target_enemy=target, picks=picks,
                                 rationale_tag=f"v2:turn{turn_index}_cards" + (
-                                    ":native_strategy" if self.card_policy.native_strategy.enabled else ""))
+                                    ":native_strategy" if card_policy.native_strategy.enabled else ""))
 
         # ---- 宝具卡选择 ----
         np_picks: List[CardPick] = []
@@ -148,7 +163,7 @@ class RuleDecider:
                 if slot not in {pick.slot for pick in np_picks} and len(np_picks) < 3:
                     np_picks.append(CardPick(PrimitiveKind.SELECT_NP, slot))
             mfaalog.info(f"[ChaldeaPlan] 选卡阶段 回合{turn_index}: 计划宝具顺序={tp.np_order} 实际np_picks={[p.slot for p in np_picks]}")
-        elif tp is None and self.card_policy.np_first:
+        elif tp is None and card_policy.np_first:
             # 无计划：有宝具就优先出
             np_picks = [CardPick(PrimitiveKind.SELECT_NP, c.servant_slot)
                         for c in state.np_cards if c.available][:3]
@@ -156,21 +171,21 @@ class RuleDecider:
         # ---- 面卡补齐 ----
         need = 3 - len(np_picks)
         face_picks: List[CardPick] = []
-        if _uses_native_card_fill(self.card_policy):
-            picks = _complete_native_cards(list(np_picks), state, self.card_policy)
+        if _uses_native_card_fill(card_policy):
+            picks = _complete_native_cards(list(np_picks), state, card_policy)
         elif need > 0 and state.cards:
             slots = _best_face_order(
                 state.cards,
                 min(need, len(state.cards)),
-                self.card_policy,
+                card_policy,
             )
             face_picks = [CardPick(PrimitiveKind.SELECT_CARD, s) for s in slots]
             picks = tuple((np_picks + face_picks)[:3])
         else:
             picks = tuple(np_picks[:3])
 
-        tag = f"v2:turn{turn_index}" if tp is not None else f"v2:{self.card_policy.goal.value}"
-        if self.card_policy.native_strategy.enabled:
+        tag = f"v2:turn{turn_index}" if tp is not None else f"v2:{card_policy.goal.value}"
+        if card_policy.native_strategy.enabled:
             tag += ":native_strategy"
         return BattleAction(
             target_enemy=target,
@@ -388,7 +403,9 @@ def _pick_target(state: BattleState):
     return tgt
 
 
-def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple[ServantSkillAction, ...]:
+def _auto_servant_skills(
+    state: BattleState, skill_policy: SkillPolicy, native: NativeCardStrategy,
+) -> Tuple[ServantSkillAction, ...]:
     """无计划时按 SkillPolicy 自动决策可用的从者技能。
 
     规则：
@@ -397,7 +414,7 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     - skip_skill_indexes → 跳过指定技能索引
     - max_skills_per_turn > 0 → 每回合最多放 N 个技能
     - available is True → 加入技能序列；False（CD）或 None（未知）→ 跳过
-    - 需要选择队友时优先选攻击宝具从者，同类按前排位置从左到右
+    - 需要选择队友时优先匹配当前前排的主输出，未匹配时优先选最靠左的攻击宝具从者，再选最靠左的前排从者
     技能可用性过滤由 Runtime 的统一安全门（skip_unusable_servant_skills）兜底。
     """
     if not skill_policy.auto_servant_skills:
@@ -406,7 +423,15 @@ def _auto_servant_skills(state: BattleState, skill_policy: SkillPolicy) -> Tuple
     frontline = tuple(servant for servant in state.servants if is_slot(servant.slot, 1, 3))
     if not frontline:
         return ()
-    target_ally = min(frontline, key=lambda servant: (not servant.has_attack_np, servant.slot)).slot
+    # 微调同时列出从者和位置时，先匹配从者身份，再匹配位置。
+    preferred_ids = {sid: rank for rank, sid in enumerate(native.preferred_servant_ids)}
+    preferred_slots = {slot: rank for rank, slot in enumerate(native.preferred_slots)}
+    target_ally = min(frontline, key=lambda servant: (
+        preferred_ids.get(servant.servant_id, len(preferred_ids)),
+        preferred_slots.get(servant.slot, len(preferred_slots)),
+        not servant.has_attack_np,
+        servant.slot,
+    )).slot
     slots = set(skill_policy.servant_slots) if skill_policy.servant_slots else None
     skip = set(skill_policy.skip_skill_indexes)
 

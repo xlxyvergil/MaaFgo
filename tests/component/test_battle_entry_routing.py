@@ -22,7 +22,7 @@ from test_formation_framework import MemoryController
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "agent/custom"))
-from auto_battle_repeat_action import _DEFAULT_RESET_HIT_NODES
+from auto_battle_repeat_action import _DEFAULT_RESET_HIT_NODES, _continuous_entry_override
 from main_story_action import _BATTLE_RESET
 
 GUARD = "进本-盲点跳过剧情"
@@ -32,6 +32,12 @@ CONTINUE = "跳过剧情-灰色继续"
 REPEAT = "原生自动战斗_多次入口"
 MAIN = "进本-战斗主界面已出现"
 RECONNECT = "进本-断网重连"
+NEXT_BATTLE = "原生自动战斗_多次_下一场"
+LAST_BATTLE = "原生自动战斗_多次_最后一场"
+CONTINUOUS_ENTRY = "连续出击-进本轮询"
+AFTER_QUEST = "连续出击-关卡后查弹窗"
+POPUP = "进本-关闭告知弹窗"
+STRATEGY_HINT = "进本-攻略提示关闭"
 
 
 class EntryRoutingTests(unittest.TestCase):
@@ -41,16 +47,21 @@ class EntryRoutingTests(unittest.TestCase):
         Tasker.set_log_dir("")
         Tasker.set_stdout_level(LoggingLevelEnum.Off)
         cls.source = {}
-        for name in ("原生自动战斗", "日常战斗", "进本流程", "特殊编队", "跳过剧情", "剧情通用选项", "自动编队"):
+        for name in ("原生自动战斗", "日常战斗", "进本流程", "特殊编队", "跳过剧情",
+                     "剧情通用选项", "自动编队", "原生自动战斗调度", "Dummy"):
             cls.source.update(json.loads((ROOT / f"assets/resource/base/pipeline/{name}.json").read_text("utf-8")))
 
     def run_graph(self, nodes, entry, screens=(), *, succeeds=True, runs=1,
-                  preserve_recognition=()):
+                  preserve_recognition=(), make_override=None, loading_frames=0):
         nodes = copy.deepcopy(nodes)
         state = {"index": 0, "seen": []}
 
         class Screen(CustomRecognition):
             def analyze(self, context, argv):
+                if loading_frames:
+                    first_frame = state.setdefault("first_frame", controller.frames)
+                    if controller.frames - first_frame < loading_frames:
+                        return None
                 index = state["index"]
                 current = screens[index] if index < len(screens) else set()
                 hit = argv.node_name in current
@@ -85,13 +96,15 @@ class EntryRoutingTests(unittest.TestCase):
             self.assertTrue(resource.post_bundle(temp).wait().succeeded)
             resource.register_custom_recognition("screen", Screen())
             resource.register_custom_action("record", Record())
+            # MaaFramework 5.10.4 serializes the override as-is and expects a JSON object.
+            pipeline_override = make_override(resource) if make_override else {}
             controller = MemoryController(np.zeros((720, 1280, 3), dtype=np.uint8))
             self.assertTrue(controller.post_connection().wait().succeeded)
             tasker = Tasker()
             self.assertTrue(tasker.bind(resource, controller))
             try:
                 for _ in range(runs):
-                    job = tasker.post_task(entry)
+                    job = tasker.post_task(entry, pipeline_override=pipeline_override)
                     deadline = time.monotonic() + 5
                     while not job.status.done and time.monotonic() < deadline:
                         time.sleep(.01)
@@ -132,6 +145,65 @@ class EntryRoutingTests(unittest.TestCase):
                     if case["pipeline_override"]["进本流程"]["next"][1] == support)
         nodes["进本流程"].update(case["pipeline_override"]["进本流程"])
         return nodes
+
+    def continuous_graph(self, support):
+        nodes = self.entry_graph(support)
+        names = (NEXT_BATTLE, LAST_BATTLE, CONTINUOUS_ENTRY, AFTER_QUEST, "执行进本",
+                 "进本-点击上一次关卡", "进本-点击关卡", "进本-识别幕间强化界面",
+                 "进本-点击任务开始", "进本-编队提示-点击开始", "进本-点击关卡-等待界面切换",
+                 "进本-点击关卡-重试",
+                 "进本-弹窗分发", "进本-普通告知弹窗关闭", "进本-特殊编队处理",
+                 "全局-战前吃体力", "全局空节点")
+        nodes.update({name: copy.deepcopy(self.source[name]) for name in names})
+        for name in ("进本-特殊编队处理", "全局-战前吃体力"):
+            nodes[name].update(next=[], on_error=[])
+        for name in ("执行原生自动战斗", "执行战斗结束_连续出击继续", "执行战斗结束_不回主界面"):
+            nodes[name] = {"max_hit": 1}
+        return nodes
+
+    def run_continuous(self, entry, support, screens=(), **kwargs):
+        return self.run_graph(self.continuous_graph(support), entry, screens,
+                              preserve_recognition=(POPUP,),
+                              make_override=_continuous_entry_override, **kwargs)
+
+    def test_continuous_entry_prioritizes_the_configured_support_on_the_same_frame(self):
+        for entry, settlement in ((NEXT_BATTLE, "执行战斗结束_连续出击继续"),
+                                  (LAST_BATTLE, "执行战斗结束_不回主界面")):
+            self.assertEqual(self.source[entry]["pre_delay"], 0)
+            for support in ("进本-选择助战", "助战action", "Chaldea助战action"):
+                with self.subTest(entry=entry, support=support):
+                    competing = {support, "进本-点击上一次关卡", STRATEGY_HINT}
+                    seen = self.run_continuous(entry, support, [competing, {MAIN}])
+                    self.assertEqual(seen, [entry, "执行进本", CONTINUOUS_ENTRY, support, MAIN,
+                                            "执行原生自动战斗", settlement])
+
+    def test_continuous_quest_and_popup_return_to_support(self):
+        support = "Chaldea助战action"
+        quest = "进本-点击任务开始"
+        last_quest = "进本-点击上一次关卡"
+        wait_transition = "进本-点击关卡-等待界面切换"
+        popup = [POPUP, "进本-弹窗分发", STRATEGY_HINT]
+        prefix = [NEXT_BATTLE, "执行进本", CONTINUOUS_ENTRY]
+        tail = [{support, quest}, {MAIN}]
+        for frames, actions in (
+            ([{quest}, {STRATEGY_HINT, support}], [quest, AFTER_QUEST, *popup]),
+            ([{quest}], [quest, AFTER_QUEST, "全局空节点"]),
+            ([{last_quest}, {wait_transition}, {STRATEGY_HINT}], [last_quest, wait_transition, AFTER_QUEST, *popup]),
+            ([{STRATEGY_HINT}], popup),
+        ):
+            with self.subTest(actions=actions):
+                seen = self.run_continuous(NEXT_BATTLE, support, frames + tail)
+                expected = prefix + actions + [support, MAIN]
+                self.assertEqual(seen[:len(expected)], expected)
+
+    def test_continuous_empty_frames_retry_from_support_until_timeout(self):
+        support = "Chaldea助战action"
+        self.assertEqual(self.source[CONTINUOUS_ENTRY]["timeout"], 30000)
+        prefix = [LAST_BATTLE, "执行进本", CONTINUOUS_ENTRY]
+        seen = self.run_continuous(LAST_BATTLE, support, [{support}, {MAIN}], loading_frames=2)
+        self.assertEqual(seen[:5], prefix + [support, MAIN])
+        seen = self.run_continuous(LAST_BATTLE, support, succeeds=False)
+        self.assertEqual(seen, prefix)
 
     def test_top_level_reaches_completion_once(self):
         seen = self.run_graph(self.outer_graph(), "通用战斗调度")

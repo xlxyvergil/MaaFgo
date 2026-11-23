@@ -11,6 +11,8 @@ from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "Android" / "assets"
+DESKTOP_SCREENCAP_DIR = "debug/screencap/"
+ANDROID_SCREENCAP_DIR = "log/screencap/"
 ANDROID_OPTION_TYPES = {"select", "switch", "checkbox", "input"}
 IMAGE_SUFFIXES = {".png", ".jpg", ".jpeg", ".webp", ".gif", ".bmp"}
 # MXU 内置任务由桌面客户端执行，安卓端没有对应的 CustomAction。
@@ -121,11 +123,11 @@ def adapt_screencap_focus(value):
     if isinstance(value, dict):
         focus = value.get("focus")
         if isinstance(focus, str):
-            value["focus"] = focus.replace("debug/screencap/", "log/screencap/")
+            value["focus"] = focus.replace(DESKTOP_SCREENCAP_DIR, ANDROID_SCREENCAP_DIR)
         elif isinstance(focus, dict):
             for event, message in focus.items():
                 if isinstance(message, str):
-                    focus[event] = message.replace("debug/screencap/", "log/screencap/")
+                    focus[event] = message.replace(DESKTOP_SCREENCAP_DIR, ANDROID_SCREENCAP_DIR)
         for child in value.values():
             adapt_screencap_focus(child)
     elif isinstance(value, list):
@@ -294,8 +296,6 @@ def adapt_interface(data: dict, assets: Path) -> dict:
             if not doc.is_relative_to(assets.parent.resolve()):
                 raise ValueError(f"任务说明越出工程目录: {doc}")
             task["description"] = task.get("description", "") + "\n\n" + doc.read_text(encoding="utf-8-sig")
-        if task["name"] == "截图" and isinstance(task.get("description"), str):
-            task["description"] = task["description"].replace("debug/screencap/", "log/screencap/")
     for preset in data.get("preset", []):
         preset["task"] = [t for t in preset["task"] if t["name"] not in REMOVED_TASKS]
 
@@ -342,6 +342,11 @@ def adapt_interface(data: dict, assets: Path) -> dict:
     for option in data["option"].values():
         if option.get("type", "select") in ("select", "switch", "checkbox") and "default" in option:
             option.setdefault("default_case", option.pop("default"))
+    # 截图均由安卓外壳写入全局日志目录，包括抽卡结果等任务截图。
+    for item in [*data["task"], *data["option"].values()]:
+        description = item.get("description")
+        if isinstance(description, str):
+            item["description"] = description.replace(DESKTOP_SCREENCAP_DIR, ANDROID_SCREENCAP_DIR)
     return data
 
 
