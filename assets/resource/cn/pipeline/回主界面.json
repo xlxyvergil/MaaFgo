@@ -4,6 +4,7 @@
         "recognition": {
             "type": "TemplateMatch",
             "param": {
+                "template": "main_ui.png",
                 "threshold": 0.9
             }
         }
