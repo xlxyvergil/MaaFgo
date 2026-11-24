@@ -815,8 +815,8 @@ class CompleteBondFormation(AutoFormationFromChaldea):
             if not equip_is_permanent_bond(equip) or "cost" not in equip:
                 continue
             eid = int(equip["id"])
-            team = self._load_equip_template(eid, self.equip_team_dirs)
-            listing = self._load_equip_template(eid, self.equip_list_dirs)
+            team = self._load_equip_template(eid, self.equip_team_dirs, "team")
+            listing = self._load_equip_template(eid, self.equip_list_dirs, "list")
             if team is None or listing is None:
                 skipped.append(str(eid))
                 continue

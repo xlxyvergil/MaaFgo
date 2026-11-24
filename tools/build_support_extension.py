@@ -17,6 +17,8 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 INPUTS = ROOT / "extras/support-ce"
 DEFAULT_SOURCES = INPUTS / "sources"
+DEFAULT_FACES = INPUTS / "faces"
+DEFAULT_TEAM_SOURCES = INPUTS / "team-sources"
 DEFAULT_STAR = INPUTS / "limit-star.png"
 STATUSES = ("满破", "非满破")
 TYPE = "maafgo-support-ce"
@@ -35,7 +37,8 @@ def _image(path, size):
         return image.copy()
 
 
-def plan(catalog, source_dir, builtin_manifest=None, *, ids=None, include_builtin=False):
+def plan(catalog, source_dir, builtin_manifest=None, *, ids=None, include_builtin=False,
+         faces_dir=DEFAULT_FACES, team_source_dir=DEFAULT_TEAM_SOURCES):
     """Select by stable ID; alternate existing source names never come from a name guess."""
     source_dir = Path(source_dir)
     if not source_dir.is_dir():
@@ -69,13 +72,41 @@ def plan(catalog, source_dir, builtin_manifest=None, *, ids=None, include_builti
                          if isinstance(name, str) and re.fullmatch(r"f_[1-9][0-9]*\.png", name)
                          and (source_dir / name).is_file()), None)
         if filename is None:
+            if row.get("resource") == "dlc":
+                raise ValueError(f"DLC礼装「{row['name']}」缺少真实助战源图，无法生成完整资源。请补齐 {source_dir / f'f_{eid}0.png'} 后重试。")
             missing.append({"id": eid, "name": row["name"], "expected": f"f_{eid}0.png"})
             continue
         path = source_dir / filename
         if not path.resolve().is_relative_to(source_dir.resolve()):
             raise ValueError(f"礼装源图路径越过解包目录：{filename}。请移除指向目录外的链接后重试。")
         _image(path, (150, 68))
-        selected.append({"id": eid, "name": row["name"], "source": filename})
+        item = {"id": eid, "name": row["name"], "source": filename}
+        extra_sources = {}
+        for kind, directory in (("list", faces_dir), ("team", team_source_dir)):
+            if directory is None:
+                if row.get("resource") == "dlc":
+                    raise ValueError(f"DLC礼装「{row['name']}」没有配置{kind}源图目录。请指定对应源目录后重试。")
+                continue
+            directory = Path(directory)
+            source_name = next((candidate for candidate in candidates
+                                if isinstance(candidate, str)
+                                and re.fullmatch(r"f_[1-9][0-9]*\.png", candidate)
+                                and (directory / candidate).is_file()), None)
+            if source_name is None:
+                if row.get("resource") == "dlc":
+                    raise ValueError(f"DLC礼装「{row['name']}」缺少{kind}源图，无法生成完整资源。请补齐 {directory / f'f_{eid}0.png'} 后重试。")
+                continue
+            source = directory / source_name
+            if not source.resolve().is_relative_to(directory.resolve()):
+                raise ValueError(f"礼装源图路径越过解包目录：{source_name}。请移除指向目录外的链接后重试。")
+            if kind == "list":
+                _image(source, (128, 128))
+            else:
+                _team_image(source)
+            extra_sources[kind] = str(source.resolve())
+        if extra_sources:
+            item["images"] = extra_sources
+        selected.append(item)
     if requested is not None and requested - known:
         raise ValueError(f"运行清单中没有礼装 ID：{', '.join(map(str, sorted(requested - known)))}。请先补齐运行时资料。")
     return {"selected": sorted(selected, key=lambda item: item["id"]),
@@ -111,6 +142,30 @@ def build_images(source, star):
     return {"非满破": _png_bytes(normal), "满破": _png_bytes(maximum)}
 
 
+def _team_image(path):
+    with Image.open(path) as image:
+        image.load()
+        if image.format != "PNG" or image.mode != "RGBA" or image.width != 188 or image.height < 86:
+            raise ValueError(f"编队源图格式不符：{path}；需要宽188、高至少86的 RGBA PNG。请重新准备正确的 EquipFaces_188 源图。")
+        return image.copy()
+
+
+def build_catalog_image(source, kind):
+    """Use exactly the same crop/quantization order as built-in list/team."""
+    if kind == "list":
+        image = _image(source, (128, 128)).resize((158, 158), Image.Resampling.BILINEAR)
+        image = image.quantize(colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+        image = image.crop((11, 27, 158, 83))
+    elif kind == "team":
+        image = _team_image(source)
+        top = (image.height - 86) // 2
+        image = image.crop((18, top, 170, top + 86)).quantize(
+            colors=256, method=Image.Quantize.FASTOCTREE, dither=Image.Dither.NONE)
+    else:
+        raise ValueError(f"未知礼装图片用途：{kind}")
+    return _png_bytes(image)
+
+
 def _zip_info(path):
     info = zipfile.ZipInfo(path, date_time=(1980, 1, 1, 0, 0, 0))
     info.compress_type = zipfile.ZIP_DEFLATED
@@ -140,14 +195,21 @@ def build_archive(output, selected, source_dir, star_path, *, name="MaaFGO 助�
                     templates[status] = path
                     manifest["sha256"][path] = hashlib.sha256(payload).hexdigest()
                     archive.writestr(_zip_info(path), payload)
-                manifest["equips"].append({"id": item["id"], "name": item["name"], "templates": templates})
+                entry = {"id": item["id"], "name": item["name"], "templates": templates}
+                for kind, source in item.get("images", {}).items():
+                    path = f"{kind}/f_{item['id']}0.png"
+                    payload = build_catalog_image(source, kind)
+                    entry.setdefault("images", {})[kind] = path
+                    manifest["sha256"][path] = hashlib.sha256(payload).hexdigest()
+                    archive.writestr(_zip_info(path), payload)
+                manifest["equips"].append(entry)
             content = json.dumps(manifest, ensure_ascii=False, sort_keys=True, indent=2).encode("utf-8") + b"\n"
             archive.writestr(_zip_info("manifest.json"), content)
         verify_archive(temporary_path)
         temporary_path.replace(output)
     finally:
         temporary_path.unlink(missing_ok=True)
-    return {"output": str(output.resolve()), "equips": len(selected), "images": len(selected) * 2,
+    return {"output": str(output.resolve()), "equips": len(selected), "images": len(manifest["sha256"]),
             "bytes": output.stat().st_size, "sha256": hashlib.sha256(output.read_bytes()).hexdigest()}
 
 
@@ -170,7 +232,10 @@ def verify_archive(path):
             ids.add(row["id"])
             if set(row["templates"]) != set(STATUSES):
                 raise ValueError("压缩包中的礼装缺少满破或非满破模板。请重新生成。")
-            for status, filename in row["templates"].items():
+            images = row.get("images", {})
+            if not isinstance(images, dict) or set(images) - {"list", "team"}:
+                raise ValueError("压缩包中的编队或仓库图片用途无法识别。请重新生成。")
+            for status, filename in {**row["templates"], **images}.items():
                 parsed = PurePosixPath(filename)
                 if (parsed.is_absolute() or ".." in parsed.parts or len(parsed.parts) != 2
                         or parsed.parts[0] != status or "\\" in filename or ":" in filename):
@@ -181,8 +246,9 @@ def verify_archive(path):
                     raise ValueError(f"压缩包图片哈希不一致：{filename}。请重新生成。")
                 with Image.open(io.BytesIO(payload)) as image:
                     image.load()
-                    expected_mode = "P" if status == "非满破" else "RGBA"
-                    if image.format != "PNG" or image.size != (158, 44) or image.mode != expected_mode:
+                    expected_mode = "RGBA" if status == "满破" else "P"
+                    expected_size = {"list": (147, 56), "team": (152, 86)}.get(status, (158, 44))
+                    if image.format != "PNG" or image.size != expected_size or image.mode != expected_mode:
                         raise ValueError(f"压缩包图片规格不符：{filename}。请重新生成。")
         if set(names) != expected or set(manifest["sha256"]) != expected - {"manifest.json"}:
             raise ValueError("压缩包清单与文件集合不一致。请重新生成。")
@@ -193,6 +259,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--catalog", type=Path, default=ROOT / "agent/custom/equip_list.json")
     parser.add_argument("--source-dir", type=Path, default=DEFAULT_SOURCES)
+    parser.add_argument("--faces-dir", type=Path, default=DEFAULT_FACES, help="可选128×128 Faces源图；存在时额外生成仓库图片")
+    parser.add_argument("--team-source-dir", type=Path, default=DEFAULT_TEAM_SOURCES, help="可选188宽编队源图；存在时额外生成编队图片")
     parser.add_argument("--star", type=Path, default=DEFAULT_STAR)
     parser.add_argument("--builtin-manifest", type=Path, default=INPUTS / "builtin.json")
     parser.add_argument("--output", type=Path, default=ROOT / "build/support-ce/MaaFGO-SupportCE-DLC.zip")
@@ -210,7 +278,8 @@ def main():
             print(json.dumps(verify_archive(args.verify), ensure_ascii=False))
             return 0
         selection = plan(args.catalog, args.source_dir, args.builtin_manifest,
-                         ids=args.ids, include_builtin=args.include_builtin)
+                         ids=args.ids, include_builtin=args.include_builtin,
+                         faces_dir=args.faces_dir, team_source_dir=args.team_source_dir)
         _image(args.star, (20, 20))
         summary = {"selected": len(selection["selected"]), "excluded_builtin": len(selection["excluded_builtin"]),
                    "missing": selection["missing"], "dry_run": args.dry_run}

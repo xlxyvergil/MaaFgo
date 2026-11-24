@@ -6,6 +6,7 @@ from maa.agent.agent_server import AgentServer
 from maa.custom_action import CustomAction
 
 import mfaalog
+from battle.runtime import BATTLE_ENTRY_TIMEOUT_S
 from battle.runtime.formation_session import context_session, session_override, sessions
 from battle.runtime.bond_stop_state import bond_stops
 from bond_stop_action import (BondStopReached, check_settlement_bond_stop,
@@ -162,7 +163,8 @@ class StoryRunner:
             self._restriction_needs_decide = False
             return True
         # 卡位文字仅在编队确认页检查，地图/战斗背景上的类似文字不能标记本关。
-        if formation_confirmed or self.reco("进本-队伍确认", image):
+        formation_confirmed = formation_confirmed or bool(self.reco("进本-队伍确认", image))
+        if formation_confirmed:
             if self.reco("主线限制-空槽", image):
                 self._mark_restricted("必填空槽")
                 self._restriction_direct_start = False
@@ -184,13 +186,19 @@ class StoryRunner:
             if self._restriction_needs_decide:
                 # 部分自动编成直接回确认页，不显示决定；仍须检查空槽再放行。
                 self._restriction_needs_decide = False
-        if self._restriction_needs_auto:
+        if self._restriction_needs_auto or (
+            formation_confirmed and self.current_restricted
+            and not self._restriction_auto_done
+            and not self._restriction_action_counts.get("主线限制-打开自动编队")
+            and self.reco("主线限制-可见空槽", image)
+        ):
             result = self.reco("主线限制-打开自动编队", image)
             if result:
                 self._restriction_action("主线限制-打开自动编队", result)
-            else:
+                return True
+            if self._restriction_needs_auto:
                 self.pause()
-            return True
+                return True
         if self._restriction_needs_decide:
             self.pause()
             return True
@@ -731,7 +739,7 @@ class StoryRunner:
                 if sessions.valid(root, token) and sessions.restricted(root, token):
                     self._mark_restricted("无法打开变更配置")
                     self._restriction_direct_start = True
-            deadline = self.clock() + self.timeout
+            deadline = self.clock() + BATTLE_ENTRY_TIMEOUT_S
             formation_since = None
             while self.clock() < deadline:
                 image = self.frame()

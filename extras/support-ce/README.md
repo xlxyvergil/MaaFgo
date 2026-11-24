@@ -29,6 +29,8 @@ python -m unittest discover -s tests -p test_support_extension_generator.py -v
   `https://static.atlasacademy.io/JP/EquipFaces/f_93126500.png`；该新增项不再属于缺图，
   原有8项已审阅缺图保持。原始下载SHA-256及验证见本轮资源更新回执。
 - `limit-star.png`：真实 20×20 RGBA 满破星标。
+- `faces/`、`team-sources/`：DLC 专属礼装的真实 128×128 Faces 和 188×86 编队源图。九张冠位认定战奖励礼装的运行记录标记 `resource=dlc`，构建时必须同时有这两类源图及 `sources/` 助战源图，生成 `list/`、`team/` 和两态助战图片。图片只进入独立 ZIP，不复制进主包；本地缺少对应图片时，运行时才查 `config/SupportCE`。
+- `grand-rewards.json`：上述九张礼装的准确 ID、Atlas 资料及图片地址、全部三类源图的 SHA-256，供后续核对来源与内容。
 - `builtin.json`：47 种现有内置助战礼装的中文文件名到源图文件名映射，沿用本地
   礼装流水线已核验的映射，用于排除内置礼装。新增内置模板时须同步该映射。
 - `missing.json`：本次 8 张缺少真实助战源图的礼装，保留准确 ID、名称和预期文件名。

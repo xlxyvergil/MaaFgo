@@ -28,7 +28,7 @@ export function SupportCEInstallDialog({busy,disabled=false,common=false,onInsta
  };
  return <Modal title="安装礼装扩展" onClose={onClose} closeDisabled={blocked}>
   <div className="modal-content support-ce-dialog">
-   <p className="support-ce-dialog-intro">安装后可识别更多助战礼装。请先下载礼装扩展包 ZIP，再选择文件安装，无需自行解压。</p>
+   <p className="support-ce-dialog-intro">安装后可识别更多礼装；扩展包提供编队、仓库图片时，也可用于自动编队和仓库识别。请先下载礼装扩展包 ZIP，再选择文件安装，无需自行解压。</p>
    <section className="support-ce-download" aria-label="获取礼装扩展包">
     <div className="support-ce-download-info">
      <h3><CloudDownload size={22} aria-hidden="true"/>获取礼装扩展包</h3>

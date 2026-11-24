@@ -39,6 +39,7 @@ from chaldea import fetch_share_data
 from mystic_code import extract_mystic_code_id, ensure_mystic_code
 from platform_waits import platform_timeout
 from resource_package import resolve_resource_package
+from support_ce import resolve_external_image
 from chaldea.servant_aliases import build_servant_lookup, canonical_servants, servant_aliases
 import mfaalog
 from battle.core.models import Confidence, FormationSlot
@@ -60,6 +61,15 @@ class FormationConfirmationLighting(CustomRecognition):
             box = (1079, 630, 168, 77)
         elif button == "disabled_config":
             box = (188, 653, 66, 53)
+        elif button == "auto_formation":
+            box = (267, 652, 64, 52)
+            x, y, width, height = box
+            blue, _, red = cv2.split(image[y:y + height, x:x + width].astype(np.int16))
+            # 国日服可用按钮的底色为亮蓝色。单骑灰显和弹窗压暗时仍可能读到文字。
+            blue_fraction = float(np.mean((blue >= 140) & (blue - red >= 30)))
+            if blue_fraction >= 0.4:
+                return CustomRecognition.AnalyzeResult(box=box, detail={"blue_fraction": blue_fraction})
+            return None
         else:
             return None
         x, y, width, height = box
@@ -78,6 +88,18 @@ class FormationRequiredSlotsFilled(CustomRecognition):
         result = context.run_recognition("主线限制-空槽", argv.image)
         if result is not None and not result.hit:
             return CustomRecognition.AnalyzeResult(box=(0, 0, 1, 1), detail="required_slots_filled")
+        return None
+
+
+@AgentServer.custom_recognition("formation_visible_empty_slot")
+class FormationVisibleEmptySlot(CustomRecognition):
+    def analyze(self, context: Context, argv: CustomRecognition.AnalyzeArg):
+        image = argv.image
+        if image is None or image.shape[:2] != (BASE_H, BASE_W):
+            return None
+        for index, roi in enumerate(SLOT_ROIS, start=1):
+            if _is_gray_formation_slot(image, roi):
+                return CustomRecognition.AnalyzeResult(box=roi, detail={"slot": index})
         return None
 
 
@@ -225,6 +247,32 @@ CLASS_TEMPLATE = {
     "beast": "兽",
     "unBeast": "兽",
 }
+
+
+def _is_gray_formation_slot(image, roi):
+    """识别灰色的 SELECT 空槽，兼容卡片下方覆盖的限制文字。"""
+    x, y, width, height = roi
+    region = image[y:y + height, x:x + width]
+
+    def is_gray_panel(candidate):
+        if candidate.size == 0:
+            return False
+        channel_means = np.mean(candidate, axis=(0, 1))
+        channel_std = float(np.mean(np.std(candidate, axis=(0, 1))))
+        channel_delta = float(np.max(channel_means) - np.min(channel_means))
+        return (
+            channel_std <= EMPTY_SLOT_STD_THRESHOLD
+            and channel_delta <= EMPTY_SLOT_CHANNEL_DELTA_THRESHOLD
+        )
+
+    if is_gray_panel(region):
+        return True
+
+    core_x1 = int(round(width * EMPTY_SLOT_CORE_X_START_RATIO))
+    core_x2 = int(round(width * EMPTY_SLOT_CORE_X_END_RATIO))
+    core_y1 = int(round(height * EMPTY_SLOT_CORE_Y_START_RATIO))
+    core_y2 = int(round(height * EMPTY_SLOT_CORE_Y_END_RATIO))
+    return is_gray_panel(region[core_y1:core_y2, core_x1:core_x2])
 
 
 def _norm_img(image):
@@ -660,6 +708,7 @@ class AutoFormationFromChaldea(CustomAction):
 
     def _init_paths(self):
         layer = resolve_resource_package(self.context, caller="编队")
+        self.resource_install_root = Path(_PROJECT_DIR)
         roots = []
         for root in (_PROJECT_DIR, os.path.dirname(_PROJECT_DIR)):
             for current_layer in (layer, "base"):
@@ -768,11 +817,20 @@ class AutoFormationFromChaldea(CustomAction):
                     seen.add(name)
         return result
 
-    def _load_equip_template(self, equip_id, directories):
+    def _load_external_equip_template(self, equip_id, kind):
+        root = getattr(self, "resource_install_root", _PROJECT_DIR)
+        path = resolve_external_image(root, equip_id, kind)
+        return _read_image(str(path)) if path is not None else None
+
+    def _load_equip_template(self, equip_id, directories, kind=None):
         filename = f"f_{equip_id}0.png"
         for directory in directories:
             path = os.path.join(directory, filename)
             template = _read_image(path)
+            if template is not None:
+                return filename, template
+        if kind in {"list", "team"}:
+            template = self._load_external_equip_template(equip_id, kind)
             if template is not None:
                 return filename, template
         return None
@@ -824,8 +882,8 @@ class AutoFormationFromChaldea(CustomAction):
                     f"[自动编队] 槽位{item['slot'] + 1}礼装 ceId={equip_id} 不在礼装数据库，跳过"
                 )
                 continue
-            team_template = self._load_equip_template(equip_id, self.equip_team_dirs)
-            list_template = self._load_equip_template(equip_id, self.equip_list_dirs)
+            team_template = self._load_equip_template(equip_id, self.equip_team_dirs, "team")
+            list_template = self._load_equip_template(equip_id, self.equip_list_dirs, "list")
             if team_template is None or list_template is None:
                 item["equip_status"] = "resource_missing"
                 mfaalog.warning(
@@ -1067,32 +1125,7 @@ class AutoFormationFromChaldea(CustomAction):
         return best
 
     def _is_empty_slot(self, image, roi):
-        """识别编队中灰色的 SELECT 空槽；兼容戴冠战职阶限制文字。"""
-        x, y, width, height = self._scale_roi(roi)
-        region = image[y:y + height, x:x + width]
-        if region.size == 0:
-            return False
-
-        def is_gray_panel(candidate):
-            if candidate.size == 0:
-                return False
-            channel_means = np.mean(candidate, axis=(0, 1))
-            channel_std = float(np.mean(np.std(candidate, axis=(0, 1))))
-            channel_delta = float(np.max(channel_means) - np.min(channel_means))
-            return (
-                channel_std <= EMPTY_SLOT_STD_THRESHOLD
-                and channel_delta <= EMPTY_SLOT_CHANNEL_DELTA_THRESHOLD
-            )
-
-        if is_gray_panel(region):
-            return True
-
-        core_x1 = int(round(width * EMPTY_SLOT_CORE_X_START_RATIO))
-        core_x2 = int(round(width * EMPTY_SLOT_CORE_X_END_RATIO))
-        core_y1 = int(round(height * EMPTY_SLOT_CORE_Y_START_RATIO))
-        core_y2 = int(round(height * EMPTY_SLOT_CORE_Y_END_RATIO))
-        core = region[core_y1:core_y2, core_x1:core_x2]
-        return is_gray_panel(core)
+        return _is_gray_formation_slot(image, self._scale_roi(roi))
 
     def _matches(self, expected, current):
         if expected["kind"] == "LOCAL":

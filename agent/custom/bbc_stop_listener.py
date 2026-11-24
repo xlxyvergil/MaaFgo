@@ -13,6 +13,7 @@ import sys
 
 import psutil
 from maa.agent.agent_server import AgentServer
+from maa.event_sink import NotificationType
 from maa.tasker import TaskerEventSink
 
 import mfaalog
@@ -31,11 +32,10 @@ STOP_ENTRY = "MaaTaskerPostStop"
 def _kill_bbc_processes() -> int:
     """强杀所有 BBchannel 进程，返回被杀数量"""
     killed = 0
-    for proc in psutil.process_iter(['pid', 'name', 'cmdline']):
+    # 停止事件回调需要尽快返回，避免读取所有进程的命令行。
+    for proc in psutil.process_iter(['name']):
         try:
-            name = proc.info.get('name') or ''
-            cmdline = proc.info.get('cmdline') or []
-            if is_bbc_process(name, cmdline):
+            if is_bbc_process(proc.info['name']):
                 mfaalog.info(f"[BbcStopListener] 强制杀死 BBC 进程 PID: {proc.pid}")
                 proc.kill()
                 killed += 1
@@ -49,11 +49,13 @@ class BbcStopOnTaskStop(TaskerEventSink):
     """任务被停止时关闭 BBC"""
 
     def on_tasker_task(self, tasker, noti_type, detail):
-        # MXU 停止任务 → post_stop → entry 为 MaaTaskerPostStop 的内部任务
-        if getattr(detail, 'entry', '') == STOP_ENTRY:
-            mfaalog.info("[BbcStopListener] 检测到任务停止信号，关闭 BBC...")
-            try:
-                killed = _kill_bbc_processes()
-                mfaalog.info(f"[BbcStopListener] 已关闭 {killed} 个 BBC 进程")
-            except Exception as e:
-                mfaalog.warning(f"[BbcStopListener] 关闭 BBC 失败: {e}")
+        # 停止任务还有完成事件，只在开始时清理一次。
+        if noti_type != NotificationType.Starting or getattr(detail, 'entry', '') != STOP_ENTRY:
+            return
+
+        mfaalog.info("[BbcStopListener] 检测到任务停止信号，关闭 BBC...")
+        try:
+            killed = _kill_bbc_processes()
+            mfaalog.info(f"[BbcStopListener] 已关闭 {killed} 个 BBC 进程")
+        except Exception as e:
+            mfaalog.warning(f"[BbcStopListener] 关闭 BBC 失败: {e}")

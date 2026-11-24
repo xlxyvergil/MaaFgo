@@ -149,6 +149,90 @@ class SupportExtensionGeneratorTests(unittest.TestCase):
         self.assertEqual(manifest["equips"][0]["name"], "礼装102")
         self.assertEqual(len(resolve_external_templates(installation, "support-ce:102", "任意")), 2)
 
+    def catalog_sources(self):
+        faces, team = self.root / "faces", self.root / "team"
+        faces.mkdir()
+        team.mkdir()
+        for size, target in (((128, 128), faces), ((188, 86), team)):
+            image = Image.new("RGBA", size)
+            image.putdata([(x % 256, (x * 3 + y * 2) % 256, y * 3 % 256, 255)
+                           for y in range(size[1]) for x in range(size[0])])
+            image.save(target / "f_1020.png")
+        catalog = json.loads(self.catalog.read_text("utf8"))
+        catalog["equips"][1]["resource"] = "dlc"
+        self.catalog.write_text(json.dumps(catalog), encoding="utf8")
+        return faces, team
+
+    def test_catalog_dlc_roundtrip_includes_all_four_images_and_reproduces(self):
+        from agent.support_ce import install_extension, resolve_external_image
+
+        faces, team = self.catalog_sources()
+        selected = self.plan(faces_dir=faces, team_source_dir=team)["selected"]
+        first, second = self.root / "catalog-one.zip", self.root / "catalog-two.zip"
+        for output in (first, second):
+            report = generator.build_archive(output, selected, self.sources, self.star)
+            self.assertEqual(report["images"], 4)
+        self.assertEqual(first.read_bytes(), second.read_bytes())
+        self.assertEqual(generator.verify_archive(first), {"equips": 1, "images": 4})
+        installation = self.root / "installation"
+        self.assertEqual(install_extension(installation, first.read_bytes())["images"], 4)
+        for kind, size in (("list", (147, 56)), ("team", (152, 86))):
+            with Image.open(resolve_external_image(installation, 102, kind)) as image:
+                self.assertEqual((image.size, image.mode), (size, "P"))
+
+    @unittest.skipUnless(formal, "未安装本地正式模板生成 skill")
+    def test_catalog_images_match_formal_list_and_team_builders(self):
+        faces, team = self.catalog_sources()
+        for kind, directory, builder in (("list", faces, formal.build_list_icon),
+                                         ("team", team, formal.build_team_icon)):
+            target = self.root / f"formal-{kind}.png"
+            source = directory / "f_1020.png"
+            builder(source, target)
+            generated = generator.build_catalog_image(source, kind)
+            with Image.open(target) as expected, Image.open(io.BytesIO(generated)) as actual:
+                self.assertEqual((actual.size, actual.mode), (expected.size, expected.mode))
+                self.assertEqual(actual.convert("RGBA").tobytes(), expected.convert("RGBA").tobytes())
+
+    def test_catalog_dlc_missing_any_required_source_stops(self):
+        faces, team = self.catalog_sources()
+        for source in (faces / "f_1020.png", team / "f_1020.png", self.sources / "f_1020.png"):
+            original = source.read_bytes()
+            source.unlink()
+            try:
+                with self.assertRaisesRegex(ValueError, "DLC礼装.*缺少"):
+                    self.plan(faces_dir=faces, team_source_dir=team)
+            finally:
+                source.write_bytes(original)
+
+    def test_catalog_dlc_rejects_wrong_source_dimensions(self):
+        faces, team = self.catalog_sources()
+        Image.new("RGBA", (150, 68)).save(team / "f_1020.png")
+        with self.assertRaisesRegex(ValueError, "188"):
+            self.plan(faces_dir=faces, team_source_dir=team)
+
+    @unittest.skipUnless(formal, "未安装本地正式模板生成 skill")
+    def test_formal_selection_excludes_dlc_from_excel_and_runtime_but_keeps_variants(self):
+        from openpyxl import Workbook
+
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.append(["equipId", "非高价值礼装", "resource", "important"])
+        sheet.append([101, 0, None, 1])
+        sheet.append([102, 0, "dlc", 0])
+        sheet.append([103, 0, None, 0])
+        sheet.append([104, 1, None, 0])
+        source = self.root / "equip_list.xlsx"
+        workbook.save(source)
+        runtime = self.root / "runtime.json"
+        runtime.write_text(json.dumps({"equips": [
+            {"id": "101", "important": 1, "images": ["f_1010.png", "f_1011.png"]},
+            {"id": "102", "images": ["f_1020.png", "f_1021.png"]},
+            {"id": "103", "resource": "dlc", "images": ["f_1030.png", "f_1031.png"]},
+            {"id": "104", "images": ["f_1040.png", "f_1041.png"]},
+        ]}), encoding="utf8")
+        self.assertEqual(formal.selected_filenames(source, runtime), {
+            "f_1010.png", "f_1011.png", "f_1040.png", "f_1041.png"})
+
 
 class CheckedInReleaseInputsTests(unittest.TestCase):
     def test_catalog_has_no_unreviewed_missing_source(self):

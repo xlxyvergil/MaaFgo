@@ -78,6 +78,17 @@ class SoloSortieRestrictionFrameworkTests(FrameworkResources, unittest.TestCase)
         for name in ("主线限制-单骑出击", "进本-灰色变更配置", "进本-限制编队直接开战"):
             self.assertFalse(outcomes[name].hit, (name, outcomes[name].raw_detail))
 
+    def test_game_auto_formation_button_requires_lit_button(self):
+        node = "主线限制-打开自动编队"
+        for folder, name, server, dimmed, expected in (
+            ("strengthening", "jp_formation_start.png", "jp", False, True),
+            ("strengthening", "jp_formation_start.png", "jp", True, False),
+            ("main_story", "cn_solo_sortie_confirm.png", "cn", False, False),
+        ):
+            with self.subTest(server=server, dimmed=dimmed):
+                result = self.recognize(folder, name, server, (node,), dimmed=dimmed)[node]
+                self.assertEqual(result.hit, expected, result.raw_detail)
+
     def test_dimmed_formation_does_not_start_battle_through_popup(self):
         outcomes = self.recognize("main_story", "cn_solo_sortie_confirm.png", "cn", (
             "进本-队伍确认", "进本-灰色变更配置", "进本-限制编队直接开战",

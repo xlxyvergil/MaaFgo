@@ -4,7 +4,7 @@ import sys
 import tempfile
 from types import SimpleNamespace as NS
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 import cv2
 import numpy as np
@@ -85,6 +85,41 @@ class ServantFaceResourceOverrideTests(unittest.TestCase):
         self.write("cn", self.names[2], self.image((65, 119)))
         action = self.strengthening("cn")
         self.assertEqual(action._tpl("servant_face/f_9999999.png"), "servant_face/f_9999999.png")
+
+    def test_exp_bonus_portrait_ignores_multiplier_and_accepts_unlit_frame(self):
+        action = servant_up.ExecuteServantUp()
+        action.sx = action.sy = 1.0
+        badge = ROOT / "assets/resource/cn/image/强化从者/经验加成字样.png"
+        badge_image = cv2.imdecode(np.fromfile(badge, dtype=np.uint8), cv2.IMREAD_UNCHANGED)
+        plain, boosted, mask = servant_up._compose_exp_portraits(self.image(), badge_image, 1.0, 1.0)
+        templates = [("普通", plain, None), ("加成", boosted, mask)]
+        changed_multiplier = boosted.copy()
+        changed_multiplier[mask == 0] = self.rng.integers(
+            0, 256, (np.count_nonzero(mask == 0), 3), dtype=np.uint8
+        )
+        x, y = 101, 213
+        h, w = plain.shape[:2]
+        screen = self.image((720, 1280))
+        for label, portrait in (("加成", changed_multiplier), ("普通", plain)):
+            with self.subTest(label=label):
+                screen[y:y + h, x:x + w] = portrait
+                score, cx, cy, template = action._best_exp_portrait(screen, templates)
+                self.assertGreaterEqual(score, servant_up.EXP_BONUS_THRESHOLD)
+                self.assertEqual((cx, cy, template), (x + w // 2, y + h // 2, label))
+
+    def test_exp_bonus_waits_for_second_match_at_same_slot_across_blink(self):
+        action = servant_up.ExecuteServantUp()
+        action.sx = action.sy = 1.0
+        action._context = NS(tasker=NS(stopping=False))
+        action._shot = Mock(return_value=self.image())
+        target = (0.94, 140, 239, "加成")
+        different_slot = (0.95, 273, 239, "加成")
+        action._best_exp_portrait = Mock(side_effect=[target, None, different_slot, target])
+        with patch.object(servant_up.time, "sleep") as sleep:
+            self.assertEqual(action._sample_exp_portrait({"name": "目标"}, [], 1), target)
+        self.assertEqual(action._shot.call_count, 4)
+        self.assertEqual([call.args[0] for call in sleep.call_args_list],
+                         list(servant_up.EXP_BONUS_SAMPLE_DELAYS[1:4]))
 
     def test_formation_partial_cn_face_falls_back_to_same_complete_base_stage(self):
         full = self.image()

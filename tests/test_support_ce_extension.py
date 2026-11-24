@@ -15,7 +15,8 @@ import zipfile
 from PIL import Image
 
 from agent.support_ce import (MAX_PACK_BYTES, SupportCEError, extension_entries,
-                              extension_snapshot, install_extension, read_manifest, resolve_external_templates)
+                              extension_snapshot, extension_image_snapshot, install_extension,
+                              read_manifest, resolve_external_image, resolve_external_templates)
 from agent.battle_editor.server import create_server
 
 
@@ -64,6 +65,53 @@ class SupportCEPackTests(unittest.TestCase):
             self.assertTrue(all(path.is_relative_to(self.root / "config/SupportCE") for path in paths))
         self.assertEqual(untouched.read_text(), "keep")
         self.assertEqual(builtin.read_bytes(), b"keep")
+
+    def catalog_pack(self, *, mutate=None, wrong_mode=False, wrong_size=False):
+        images = {"满破/f_94000100.png": png(), "非满破/f_94000100.png": png()}
+        for kind, size in (("list", (147, 56)), ("team", (152, 86))):
+            stream = io.BytesIO()
+            if wrong_size and kind == "team":
+                size = (147, 56)
+            Image.new("RGB" if wrong_mode else "P", size).save(stream, "PNG")
+            images[f"{kind}/f_94000100.png"] = stream.getvalue()
+
+        def with_images(manifest):
+            manifest["equips"][0]["images"] = {
+                kind: f"{kind}/f_94000100.png" for kind in ("list", "team")}
+            if mutate:
+                mutate(manifest)
+        return pack(images=images, mutate=with_images)
+
+    def test_catalog_images_install_by_exact_id_and_refresh_on_removal(self):
+        result = install_extension(self.root, self.catalog_pack())
+        self.assertEqual(result["images"], 4)
+        for kind in ("list", "team"):
+            path = resolve_external_image(self.root, "9400010", kind)
+            self.assertEqual(path, self.root / "config/SupportCE" / kind / "f_94000100.png")
+            self.assertEqual(extension_image_snapshot(self.root)[9400010][kind], path)
+            self.assertIsNone(resolve_external_image(self.root, 9400020, kind))
+            path.unlink()
+            self.assertIsNone(resolve_external_image(self.root, 9400010, kind))
+            self.assertNotIn(kind, extension_image_snapshot(self.root)[9400010])
+        self.assertIsNone(resolve_external_image(self.root, 9400010, "unknown"))
+        self.assertEqual(len(resolve_external_templates(self.root, "support-ce:9400010", "任意")), 2)
+
+    def test_catalog_images_require_correct_size_mode_path_and_complete_hashes(self):
+        install_extension(self.root, pack(version="old"))
+        for payload in (
+                self.catalog_pack(wrong_mode=True), self.catalog_pack(wrong_size=True),
+                self.catalog_pack(mutate=lambda m: m["equips"][0]["images"].update(team="list/f_94000100.png")),
+                self.catalog_pack(mutate=lambda m: m["equips"][0]["images"].update(team="../outside.png")),
+                self.catalog_pack(mutate=lambda m: m["sha256"].pop("team/f_94000100.png")),
+                self.catalog_pack(mutate=lambda m: m["sha256"].update({"list/f_94000100.png": "0" * 64}))):
+            with self.subTest(size=len(payload)), self.assertRaises(SupportCEError):
+                install_extension(self.root, payload)
+            self.assertEqual(read_manifest(self.root)["version"], "old")
+
+    def test_old_support_only_pack_has_no_catalog_image(self):
+        install_extension(self.root, pack())
+        self.assertEqual(extension_image_snapshot(self.root), {9400010: {}})
+        self.assertIsNone(resolve_external_image(self.root, 9400010, "team"))
 
     def test_replacement_keeps_previous_pack_and_reloads_cached_manifest(self):
         install_extension(self.root, pack(version="1"))
@@ -289,6 +337,29 @@ class SupportCEHTTPTests(unittest.TestCase):
             with self.subTest(kwargs=kwargs):
                 self.assertEqual(self.request(**kwargs)[0], expected)
         self.assertFalse((self.root / "config/SupportCE").exists())
+
+    def test_catalog_refreshes_when_team_or_list_files_arrive_after_manifest(self):
+        custom = self.root / "agent/custom"
+        custom.mkdir(parents=True)
+        (custom / "equip_list.json").write_text(json.dumps({"equips": [{
+            "id": "9400010", "name": "测试礼装", "important": 0,
+            "images": ["f_94000100.png"], "resource": "dlc"}]}), encoding="utf-8")
+        install_extension(self.root, SupportCEPackTests().catalog_pack())
+        from agent.battle_editor.catalog import build_catalog
+        with patch("agent.battle_editor.catalog.build_catalog", wraps=build_catalog) as build:
+            self.assertTrue(self.server.catalog()["equips"][0]["recognizable"])
+            for kind in ("team", "list"):
+                path = self.root / "config/SupportCE" / kind / "f_94000100.png"
+                raw = path.read_bytes()
+                previous = build.call_count
+                path.unlink()
+                absent = self.server.catalog()["equips"][0]
+                self.assertEqual(build.call_count, previous + 1)
+                self.assertEqual(absent["recognizable"], kind != "team")
+                self.assertTrue(all(absent["supportRecognition"].values()))
+                path.write_bytes(raw)
+                self.assertTrue(self.server.catalog()["equips"][0]["recognizable"])
+                self.assertEqual(build.call_count, previous + 2)
 
     def test_rejected_large_upload_returns_actionable_error_without_tcp_reset(self):
         # Real packs exceed JSON's 4 MiB limit. Sending the entire body exposes

@@ -1725,7 +1725,7 @@ class ExpballRuntimeTests(unittest.TestCase):
                         elif stage == "face_scan":
                             action._find_servant(servant)
                         else:
-                            action._levelup_loop(servant, 90)
+                            action._levelup_loop(90)
                 action._tap.assert_not_called()
                 action._match.assert_not_called()
                 action._read_level.assert_not_called()
@@ -2196,7 +2196,7 @@ class ExpballRuntimeTests(unittest.TestCase):
                         if stage == "after_face_click":
                             action._find_servant(servant)
                         else:
-                            action._levelup_loop(servant, 90)
+                            action._levelup_loop(90)
                 action._in_levelup.assert_not_called()
                 action._controller.post_swipe.assert_not_called()
                 if stage == "after_face_click":

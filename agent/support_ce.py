@@ -23,6 +23,8 @@ MAX_FILES = 10000
 MAX_MANIFEST_BYTES = 4 * 1024 * 1024
 MAX_IMAGE_BYTES = 512 * 1024
 STATES = ("满破", "非满破")
+IMAGE_SIZES = {"list": (147, 56), "team": (152, 86)}
+IMAGE_DIRECTORIES = (*STATES, *IMAGE_SIZES)
 _INSTALL_LOCK = threading.Lock()
 _ALNUM = str.maketrans({c: c - 0xFEE0 for start, end in
                         ((0xFF10, 0xFF19), (0xFF21, 0xFF3A), (0xFF41, 0xFF5A))
@@ -94,19 +96,23 @@ def _parse_manifest(raw):
         ids.add(eid)
         if not isinstance(name, str) or not name.strip() or len(name) > 160:
             raise _invalid(f"礼装 {eid} 缺少名称")
-        if not isinstance(templates, dict) or not templates or set(templates) - set(STATES):
-            raise _invalid(f"礼装「{name}」没有可用的满破或非满破图片")
-        for state_name, relative in templates.items():
+        images = entry.get("images", {})
+        if (not isinstance(templates, dict) or set(templates) - set(STATES)
+                or not isinstance(images, dict) or set(images) - set(IMAGE_SIZES)
+                or not (templates or images)):
+            raise _invalid(f"礼装「{name}」的图片用途为空或无法识别")
+        for state_name, relative in {**templates, **images}.items():
             path = _safe_relative(relative)
             if len(path.parts) != 2 or path.parts[0] != state_name or path.suffix.lower() != ".png":
-                raise _invalid(f"礼装「{name}」图片没有放在对应满破状态目录")
+                raise _invalid(f"礼装「{name}」图片没有放在对应用途目录")
             key = relative.casefold()
             if key in paths:
                 raise _invalid("多张礼装引用了同一图片路径")
             paths.add(key)
     hashes = document.get("sha256")
     if hashes is not None:
-        expected = {path for entry in entries for path in entry["templates"].values()}
+        expected = {path for entry in entries
+                    for path in (*entry["templates"].values(), *entry.get("images", {}).values())}
         if (not isinstance(hashes, dict) or set(hashes) != expected
                 or any(not isinstance(v, str) or re.fullmatch(r"[a-fA-F0-9]{64}", v) is None
                        for v in hashes.values())):
@@ -167,6 +173,28 @@ def extension_snapshot(root):
     return entries, templates
 
 
+def extension_image_snapshot(root):
+    """Index installed inventory/formation images by stable equip ID."""
+    return {
+        entry["id"]: {
+            kind: path for kind, relative in entry.get("images", {}).items()
+            if (path := _installed_path(root, relative)) is not None
+        }
+        for entry in extension_entries(root)
+    }
+
+
+def resolve_external_image(root, equip_id, kind):
+    """Return only a manifest-declared list/team image for the exact ID."""
+    if kind not in IMAGE_SIZES:
+        return None
+    for entry in extension_entries(root):
+        if str(entry["id"]) == str(equip_id):
+            relative = entry.get("images", {}).get(kind)
+            return _installed_path(root, relative) if relative else None
+    return None
+
+
 def resolve_external_templates(root, ce_name, status, equip_id=None):
     states = STATES if status == "任意" else (status,)
     if equip_id is None and isinstance(ce_name, str) and re.fullmatch(r"support-ce:[1-9][0-9]{0,9}", ce_name):
@@ -193,9 +221,13 @@ def _validate_image(raw, name):
     if not raw or len(raw) > MAX_IMAGE_BYTES:
         raise _invalid(f"图片「{name}」为空或超过 512 KiB")
     try:
+        kind = PurePosixPath(name).parts[0]
+        size = IMAGE_SIZES.get(kind, (158, 44))
         with Image.open(io.BytesIO(raw)) as image:
-            if image.format != "PNG" or image.size != (158, 44) or getattr(image, "n_frames", 1) != 1:
-                raise _invalid(f"图片「{name}」不是 158×44 的静态 PNG")
+            if image.format != "PNG" or image.size != size or getattr(image, "n_frames", 1) != 1:
+                raise _invalid(f"图片「{name}」不是 {size[0]}×{size[1]} 的静态 PNG")
+            if kind in IMAGE_SIZES and image.mode != "P":
+                raise _invalid(f"图片「{name}」不是 256 色索引 PNG")
             image.verify()
         with Image.open(io.BytesIO(raw)) as image:
             image.load()
@@ -228,7 +260,7 @@ def _validated_files(payload):
                 if info.flag_bits & 1:
                     raise _invalid("ZIP 已加密")
                 if info.is_dir():
-                    if trimmed not in STATES:
+                    if trimmed not in IMAGE_DIRECTORIES:
                         raise _invalid("ZIP 包含礼装目录之外的文件夹")
                     continue
                 total += info.file_size
@@ -236,13 +268,14 @@ def _validated_files(payload):
                 if info.file_size > limit or total > MAX_PACK_BYTES:
                     raise _invalid("ZIP 解压后的体积超过限制")
                 if name != "manifest.json" and (len(PurePosixPath(name).parts) != 2
-                    or PurePosixPath(name).parts[0] not in STATES or not name.lower().endswith(".png")):
+                    or PurePosixPath(name).parts[0] not in IMAGE_DIRECTORIES or not name.lower().endswith(".png")):
                     raise _invalid("ZIP 包含礼装清单和图片之外的文件")
                 files[name] = archive.read(info)
             if "manifest.json" not in files:
                 raise _invalid("ZIP 根目录缺少 manifest.json")
             manifest = _parse_manifest(files["manifest.json"])
-            expected = {p for item in manifest["equips"] for p in item["templates"].values()}
+            expected = {p for item in manifest["equips"]
+                        for p in (*item["templates"].values(), *item.get("images", {}).values())}
             if set(files) != expected | {"manifest.json"}:
                 raise _invalid("礼装清单与 ZIP 内的图片不一致")
             for name in expected:

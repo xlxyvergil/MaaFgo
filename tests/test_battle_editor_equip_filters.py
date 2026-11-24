@@ -171,14 +171,44 @@ class EquipFilterCompilerTests(unittest.TestCase):
             # The recorded source hash must survive Git's LF normalization on CI.
             self.assertNotIn(b"\r\n", target.read_bytes())
 
+    def test_csv_builder_preserves_optional_dlc_storage(self):
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            source, target = folder / "equips.csv", folder / "equips.json"
+            columns = ["equipId", "collectionNo", "name_cn", "name_jp", "rarity", "important", "非高价值礼装", "入手分类(日文)", "resource"]
+            with source.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(handle, fieldnames=columns)
+                writer.writeheader()
+                for identity, storage in (("9408540", "dlc"), ("9400180", "")):
+                    writer.writerow(dict(zip(columns, [identity, "1", "test", "test", "5", "0", "0", "マナプリズム交換", storage])))
+            list_builder.build(source, target)
+            rows = json.loads(target.read_text(encoding="utf-8"))["equips"]
+            self.assertEqual(rows[0]["resource"], "dlc")
+            self.assertNotIn("resource", rows[1])
+
 
 class BundledEquipFilterTests(unittest.TestCase):
+    def test_grand_rewards_are_dlc_without_expanding_important_equips(self):
+        ids = {9408540, 9408600, 9408650, 9408700, 9408710, 9408840, 9408920, 9408970, 9408980}
+        runtime = json.loads((ROOT / "agent/custom/equip_list.json").read_text(encoding="utf-8"))["equips"]
+        selected = {int(row["id"]): row for row in runtime if int(row["id"]) in ids}
+        self.assertEqual(set(selected), ids)
+        costs = json.loads((ROOT / "agent/custom/bond_completion_costs.json").read_text(encoding="utf-8"))["equips"]
+        index = read_equip_filters(ROOT)["equips"]
+        for eid, row in selected.items():
+            self.assertEqual((row["resource"], row["important"], costs[str(eid)]), ("dlc", 0, 12))
+            self.assertEqual(row["reward_source"], "冠位認定戦")
+            for state in ("base", "mlb"):
+                effects = index[str(eid)][state]["effects"]
+                self.assertTrue(any("masterExp" in effect["tags"] and effect["value"] == 20
+                                    and effect["conditional"] for effect in effects))
+
     def test_complete_curated_scope_sources_hash_and_known_real_effects(self):
         index = read_equip_filters(ROOT)
         curated_path = ROOT / "agent/custom/equip_list.json"
         curated = json.loads(curated_path.read_text(encoding="utf-8"))["equips"]
         self.assertEqual(set(index["equips"]), {row["id"] for row in curated})
-        self.assertEqual(len(index["equips"]), 1166)
+        self.assertEqual(len(index["equips"]), 1175)
         self.assertEqual(
             index["version"]["curatedSha256"], hashlib.sha256(curated_path.read_bytes()).hexdigest(),
             "礼装清单已变更，筛选索引仍记录旧的来源。请运行 "

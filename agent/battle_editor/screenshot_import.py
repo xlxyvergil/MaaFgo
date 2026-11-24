@@ -19,6 +19,17 @@ MAX_IMAGE_SIDE = 30_000
 IMAGE_TYPES = ('image/png', 'image/jpeg', 'image/webp')
 
 
+def _equip_extension_signature(root):
+    signature = []
+    for relative in ('manifest.json', 'team'):
+        try:
+            info = (Path(root) / 'config/SupportCE' / relative).stat()
+            signature.append((info.st_mtime_ns, info.st_ctime_ns, info.st_size, info.st_ino))
+        except OSError:
+            signature.append(None)
+    return tuple(signature)
+
+
 def decode_image(raw):
     from PIL import Image, ImageOps, UnidentifiedImageError
     import numpy as np
@@ -80,8 +91,9 @@ class ScreenshotIndex:
         import sys
         import cv2
         import numpy as np
-        from .catalog import _ALIASES
+        from .catalog import _ALIASES, resolve_media
         self.root = Path(root)
+        self._equip_extension_signature = _equip_extension_signature(self.root)
         image_root = self.root / 'assets/resource/base/image'
         if not image_root.is_dir():
             image_root = self.root / 'resource/base/image'
@@ -123,8 +135,8 @@ class ScreenshotIndex:
         self.equips, self.equip_meta = {}, {}
         records = json.loads((self.root / 'agent/custom/equip_list.json').read_text(encoding='utf-8-sig'))['equips']
         for row in records:
-            sid = str(row['id']);path = image_root / 'EquipFaces/team' / f'f_{sid}0.png'
-            if not path.is_file(): continue
+            sid = str(row['id']);path = resolve_media(self.root, 'equip', f'f_{sid}0.png')
+            if path is None: continue
             image = read(path)
             if image is not None:
                 self.equips[sid] = [(path.name, image)];self.equip_meta[sid] = row
@@ -299,7 +311,8 @@ def recognize_image(raw, root, index=None):
     if result is None:
         result = recognize_chaldea_image(original, root)
     if result is None:
-        if index is None:
+        signature = _equip_extension_signature(root)
+        if index is None or index.__dict__.get('_equip_extension_signature', signature) != signature:
             index = ScreenshotIndex(root)
         result = index.recognize(raw, decoded=original)
     return result | {'elapsedMs': round((time.perf_counter() - started) * 1000)}, index

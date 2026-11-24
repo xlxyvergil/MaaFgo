@@ -583,6 +583,28 @@
         ]
     },
     "强化从者-筛选完成": {},
+    "强化从者-经验加成列表下滑": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "强化从者-已在强化列表",
+                    "强化从者-图标大小检测"
+                ]
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [600, 560, 1, 1],
+                "end": [600, 200, 1, 1],
+                "duration": 400
+            }
+        },
+        "post_delay": 800,
+        "timeout": 3000,
+        "doc": "识别到从者强化小图标列表才下滑。动作完成后先等列表停稳，业务层再留出多个取样时点，让头像中央闪烁的经验加成字样有机会进入匹配。复用「强化从者-图标大小检测」检查列表布局。"
+    },
     "强化从者-筛选星级": {
         "recognition": {
             "type": "TemplateMatch",
@@ -772,7 +794,8 @@
         "attach": {
             "servant_id": "",
             "servant_name": "",
-            "target_level": 0
+            "target_level": 0,
+            "exp_bonus": false
         },
         "next": [
             "强化从者完成"

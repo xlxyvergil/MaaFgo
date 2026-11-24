@@ -61,7 +61,7 @@
             }
         },
         "post_delay": 1500,
-        "timeout": 60000,
+        "timeout": 300000,
         "next": [
             "[JumpBack]进本-关闭告知弹窗",
             "进本-选择助战",
@@ -109,7 +109,7 @@
             }
         },
         "post_delay": 0,
-        "timeout": 60000,
+        "timeout": 300000,
         "attach": {
             "ce": "",
             "ce_1": "",
@@ -165,7 +165,7 @@
                 }
             }
         },
-        "timeout": 60000,
+        "timeout": 300000,
         "attach": {
             "chaldea_enabled": false,
             "chaldea_import_source": "",
@@ -446,7 +446,7 @@
             "[JumpBack]跳过剧情-灰色继续",
             "[JumpBack]进本-盲点跳过剧情"
         ],
-        "timeout": 60000,
+        "timeout": 300000,
         "on_error": []
     },
     "进本-战斗教程前进": {

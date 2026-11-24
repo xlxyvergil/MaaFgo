@@ -12,6 +12,10 @@ from pathlib import Path
 import sys
 
 from .storage import EditorError, within
+try:
+    from support_ce import resolve_external_image
+except ModuleNotFoundError:
+    from ..support_ce import resolve_external_image
 
 _name = '_maafgo_editor_bond_matcher'
 if _name not in sys.modules:
@@ -122,9 +126,20 @@ class BondPlanner:
         images = [name for name in item.get('images') or [] if isinstance(name, str) and Path(name).name == name]
         roots = [self.root / 'assets/resource/base/image', self.root / 'resource/base/image']
         folders = [('servant_face', 'ServantFaces')] if kind == 'servant' else [('EquipFaces/list',), ('EquipFaces/team',)]
-        return bool(images) and all(any(within(base / folder / name, self.root).is_file()
-                                        for base in roots for folder in alternatives for name in images)
-                                   for alternatives in folders)
+        if not images:
+            return False
+        for alternatives in folders:
+            if any(within(base / folder / name, self.root).is_file()
+                   for base in roots for folder in alternatives for name in images):
+                continue
+            # Only the declared canonical appearance can use a manifest's ID
+            # mapping; a custom variant must not silently become another image.
+            canonical = f"f_{item.get('id')}0.png"
+            purpose = alternatives[0].rsplit('/', 1)[-1]
+            if (kind != 'equip' or canonical not in images
+                    or resolve_external_image(self.root, item.get('id'), purpose) is None):
+                return False
+        return True
 
     def _mash_form(self, sid, member=None, *, slot=None, default=False, allow_unknown=False):
         """Project retained COST facts only; the exported member remains untouched."""

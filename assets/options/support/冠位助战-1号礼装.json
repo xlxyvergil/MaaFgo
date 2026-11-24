@@ -11361,6 +11361,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408540",
+                    "label": "立于剑士之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408540": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408590",
                     "label": "献给幸福的新娘",
                     "pipeline_override": {
@@ -11416,6 +11427,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408600",
+                    "label": "立于狂战士之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408600": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408610",
                     "label": "睡莲丛中",
                     "pipeline_override": {
@@ -11460,6 +11482,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408650",
+                    "label": "立于枪兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408650": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408660",
                     "label": "属于你的王国",
                     "pipeline_override": {
@@ -11499,6 +11532,28 @@
                         "助战action": {
                             "attach": {
                                 "冠位助战-1号礼装-满破-扩展候选:support-ce:9310440": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408700",
+                    "label": "自此方登临于巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408700": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408710",
+                    "label": "自彼方登临于巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408710": true
                             }
                         }
                     }
@@ -11691,6 +11746,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408840",
+                    "label": "立于骑兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408840": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408850",
                     "label": "京乱怒涛",
                     "pipeline_override": {
@@ -11790,6 +11856,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408920",
+                    "label": "立于暗杀者之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408920": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408930",
                     "label": "太空女主人",
                     "pipeline_override": {
@@ -11845,12 +11922,34 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408970",
+                    "label": "立于弓兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408970": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408990",
                     "label": "迦勒底之人",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
                                 "冠位助战-1号礼装-满破-扩展候选:support-ce:9408990": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408980",
+                    "label": "立于魔术师之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-满破-扩展候选:support-ce:9408980": true
                             }
                         }
                     }
@@ -24835,6 +24934,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408540",
+                    "label": "立于剑士之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408540": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408590",
                     "label": "献给幸福的新娘",
                     "pipeline_override": {
@@ -24890,6 +25000,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408600",
+                    "label": "立于狂战士之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408600": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408610",
                     "label": "睡莲丛中",
                     "pipeline_override": {
@@ -24934,6 +25055,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408650",
+                    "label": "立于枪兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408650": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408660",
                     "label": "属于你的王国",
                     "pipeline_override": {
@@ -24973,6 +25105,28 @@
                         "助战action": {
                             "attach": {
                                 "冠位助战-1号礼装-非满破-扩展候选:support-ce:9310440": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408700",
+                    "label": "自此方登临于巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408700": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408710",
+                    "label": "自彼方登临于巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408710": true
                             }
                         }
                     }
@@ -25165,6 +25319,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408840",
+                    "label": "立于骑兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408840": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408850",
                     "label": "京乱怒涛",
                     "pipeline_override": {
@@ -25264,6 +25429,17 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408920",
+                    "label": "立于暗杀者之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408920": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408930",
                     "label": "太空女主人",
                     "pipeline_override": {
@@ -25319,12 +25495,34 @@
                     }
                 },
                 {
+                    "name": "support-ce:9408970",
+                    "label": "立于弓兵之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408970": true
+                            }
+                        }
+                    }
+                },
+                {
                     "name": "support-ce:9408990",
                     "label": "迦勒底之人",
                     "pipeline_override": {
                         "助战action": {
                             "attach": {
                                 "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408990": true
+                            }
+                        }
+                    }
+                },
+                {
+                    "name": "support-ce:9408980",
+                    "label": "立于魔术师之巅者",
+                    "pipeline_override": {
+                        "助战action": {
+                            "attach": {
+                                "冠位助战-1号礼装-非满破-扩展候选:support-ce:9408980": true
                             }
                         }
                     }

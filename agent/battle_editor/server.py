@@ -97,7 +97,7 @@ class EditorHTTPServer(ThreadingHTTPServer):
         # A manual extraction can write its manifest before its PNG files.
         # Directory metadata catches referenced images added or removed later,
         # without scanning the image collection on every catalog request.
-        for relative in ("manifest.json", "满破", "非满破"):
+        for relative in ("manifest.json", "满破", "非满破", "list", "team"):
             try:
                 info = (directory / relative).stat()
                 signature.append((info.st_mtime_ns, info.st_ctime_ns, info.st_size, info.st_ino))

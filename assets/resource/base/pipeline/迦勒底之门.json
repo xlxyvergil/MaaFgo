@@ -92,34 +92,9 @@
             "迦门-QP本划到最下面"
         ]
     },
-    "迦门-种火-识别等级": {
-        "max_hit": 3,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    1113,
-                    453,
-                    68,
-                    150
-                ],
-                "expected": [
-                    "60"
-                ]
-            }
-        },
-        "action": {
-            "type": "Click"
-        },
-        "post_delay": 3000,
-        "next": [
-            "迦门-副本选择完毕",
-            "[JumpBack]全局-战前吃体力",
-            "迦门-种火-识别等级"
-        ]
-    },
     "迦勒底之门-开始": {
         "next": [
+            "迦门-前往顶部",
             "迦勒底之门进入",
             "[JumpBack]迦门-不匹配下滑"
         ]
@@ -159,34 +134,23 @@
             "迦门-前往顶部"
         ]
     },
-    "迦门-种火-选择职介和等级": {
-        "recognition": {
-            "type": "TemplateMatch",
-            "param": {
-                "template": [
-                    "chaldea_gate/种火-剑骑副本.png"
-                ],
-                "threshold": [
-                    0.8
-                ]
-            }
-        },
-        "next": [
-            "迦门-种火-识别等级",
-            "[JumpBack]迦门-不匹配下滑"
-        ]
-    },
     "迦门-副本选择完毕": {
         "recognition": {
             "type": "TemplateMatch",
             "param": {
                 "template": [
                     "助战选择界面标记.png"
+                ],
+                "roi": [
+                    920,
+                    0,
+                    360,
+                    88
                 ]
             }
         },
         "focus": {
-            "Node.Recognition.Starting": "已选择副本"
+            "Node.Recognition.Succeeded": "已进入助战选择"
         }
     },
     "迦门-不匹配下滑": {
@@ -216,73 +180,42 @@
         "post_delay": 1000
     },
     "迦门-先上滑到最上面": {
-        "action": {
-            "type": "Swipe",
+        "doc": "先通过「迦门-前往顶部」点击滚动条顶端。国服实机从底部一次点击可归位，用滑块位置确认；尚未归位时才执行「迦门-副本列表归位上滑」。滑块长度随条目数量变化，只识别顶部尖端。",
+        "recognition": {
+            "type": "TemplateMatch",
             "param": {
-                "begin": [
-                    929,
-                    100,
-                    1,
-                    1
+                "template": "chaldea_gate/每日任务-顶部滑块.png",
+                "roi": [
+                    1237,
+                    90,
+                    43,
+                    33
                 ],
-                "end": [
-                    [
-                        929,
-                        600,
-                        1,
-                        1
-                    ]
-                ]
+                "threshold": 0.8
             }
         },
-        "repeat": 4,
-        "repeat_delay": 500,
-        "post_delay": 3000,
         "next": [
             "迦门-种火副本选择"
         ]
     },
     "迦门-种火副本选择": {
         "next": [
-            "迦门-种火-选择职介和等级",
-            "[JumpBack]迦门-不匹配下滑",
+            "迦门-选择种火副本",
+            "迦门-列表触底",
+            "[JumpBack]迦门-副本列表查找下滑"
+        ],
+        "timeout": 2500,
+        "on_error": [
             "迦门-副本未找到"
         ]
     },
     "迦门-副本未找到": {
-        "max_hit": 1,
         "focus": {
-            "Node.Recognition.Starting": "未找到副本，重新查找"
-        },
-        "next": [
-            "迦门-先上滑到最上面"
-        ]
-    },
-    "迦门-修炼场选择": {
-        "max_hit": 3,
-        "recognition": {
-            "type": "OCR",
-            "param": {
-                "roi": [
-                    1113,
-                    453,
-                    68,
-                    150
-                ],
-                "expected": [
-                    "80"
-                ]
-            }
+            "Node.Recognition.Succeeded": "每日任务列表中未能确认所选副本，已停止选关。请查看游戏中今天开放的职阶，在「迦勒底之门」任务的「种火副本选项」或「修炼场副本选项」中选择对应关卡，再重试。"
         },
         "action": {
-            "type": "Click"
-        },
-        "post_delay": 3000,
-        "next": [
-            "迦门-副本选择完毕",
-            "[JumpBack]全局-战前吃体力",
-            "迦门-修炼场选择"
-        ]
+            "type": "StopTask"
+        }
     },
     "迦门-QP本选择": {
         "next": [
@@ -327,7 +260,339 @@
             }
         },
         "next": [
-            "迦门-先上滑到最上面"
+            "迦门-先上滑到最上面",
+            "[JumpBack]迦门-副本列表归位上滑"
+        ],
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表"
+                ],
+                "box_index": 0
+            }
+        },
+        "timeout": 3000,
+        "on_error": [
+            "迦门-列表未确认"
+        ],
+        "post_delay": 600
+    },
+    "迦门-列表未确认": {
+        "focus": {
+            "Node.Recognition.Succeeded": "无法确认每日任务列表已回到顶部，已停止选关。请关闭当前弹窗，打开迦勒底之门的每日任务列表，从列表顶部重试。"
+        },
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "迦门-选关结果未确认": {
+        "focus": {
+            "Node.Recognition.Succeeded": "点击副本后未能确认进入助战选择，已停止选关。请查看游戏是否弹出了体力或其他提示，处理后从每日任务列表重试。"
+        },
+        "action": {
+            "type": "StopTask"
+        }
+    },
+    "迦门-每日任务列表": {
+        "doc": "仅在国服「每日任务」或日服「曜日クエスト」标题命中时选关或滑动。日服模板裁掉标题左部，避开可能延伸到标题附近的角色立绘。绿幕遮住会随活动及角色变化的底图，保留标题笔画。日服蓝色和红色背景的历史截图均已回放。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": [
+                    "chaldea_gate/每日任务-国服标题.png",
+                    "chaldea_gate/每日任务-日服标题.png"
+                ],
+                "roi": [
+                    1045,
+                    0,
+                    235,
+                    65
+                ],
+                "threshold": 0.85,
+                "green_mask": true
+            }
+        }
+    },
+    "迦门-副本列表归位上滑": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    930,
+                    140,
+                    1,
+                    1
+                ],
+                "end": [
+                    930,
+                    565,
+                    1,
+                    1
+                ],
+                "duration": 500
+            }
+        },
+        "max_hit": 4,
+        "post_delay": 650
+    },
+    "迦门-列表触底": {
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表",
+                    "迦门-底部滑块"
+                ],
+                "box_index": 0
+            }
+        },
+        "next": [
+            "迦门-副本未找到"
+        ],
+        "doc": "国服从「迦门-日常副本」进入后测试未开放的问号60：命中底部滑块后停在每日任务列表，未点击任何副本。"
+    },
+    "迦门-底部滑块": {
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "chaldea_gate/每日任务-底部滑块.png",
+                "roi": [
+                    1237,
+                    559,
+                    43,
+                    38
+                ],
+                "threshold": 0.8
+            }
+        },
+        "doc": "只在滚动条底端匹配滑块的下尖端，避免假设国日服或活动期间有相同的列表长度。"
+    },
+    "迦门-副本列表查找下滑": {
+        "doc": "与入口查找用的「迦门-不匹配下滑」分开计数。每次翻页保留相邻画面的识别区域重叠，避免带菜单遮挡的底部条目和顶部裁切条目被跨过；到达「迦门-列表触底」后停止。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表"
+                ],
+                "box_index": 0
+            }
+        },
+        "action": {
+            "type": "Swipe",
+            "param": {
+                "begin": [
+                    930,
+                    525,
+                    1,
+                    1
+                ],
+                "end": [
+                    930,
+                    205,
+                    1,
+                    1
+                ],
+                "duration": 700
+            }
+        },
+        "max_hit": 40,
+        "post_delay": 650
+    },
+    "迦门-目标职阶": {
+        "doc": "使用条目右侧的推荐等级与职阶小徽章定位候选行。左侧图案在各等级及正反职阶组合之间复用，不能单独定位。实际选关还要在此候选行核对等级和副本类型。",
+        "recognition": {
+            "type": "TemplateMatch",
+            "param": {
+                "template": "chaldea_gate/剑骑60.png",
+                "roi": [
+                    1109,
+                    96,
+                    125,
+                    524
+                ],
+                "threshold": 0.72,
+                "green_mask": true,
+                "order_by": "Score"
+            }
+        }
+    },
+    "迦门-选择种火副本": {
+        "doc": "用「迦门-目标职阶」定位候选，依次核对同一行的等级和底色。动作以通过底色复核的框定位，避免点到另一条得分更高的副本。右下角菜单遮挡的条目由「迦门-副本列表查找下滑」移入识别区。国服每日任务实机：弓术60从列表顶部下滑后进入助战选择。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表",
+                    "迦门-目标职阶",
+                    {
+                        "sub_name": "base/迦勒底之门/迦门-选择种火副本/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": "迦门-目标职阶",
+                                "roi_offset": [
+                                    20,
+                                    0,
+                                    -64,
+                                    -40
+                                ],
+                                "expected": "^[^\\d]*60$"
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "ColorMatch",
+                            "param": {
+                                "roi": "base/迦勒底之门/迦门-选择种火副本/OCR1",
+                                "roi_offset": [
+                                    -42,
+                                    4,
+                                    0,
+                                    -5
+                                ],
+                                "method": 40,
+                                "lower": [
+                                    [
+                                        0,
+                                        55,
+                                        54
+                                    ],
+                                    [
+                                        164,
+                                        55,
+                                        54
+                                    ]
+                                ],
+                                "upper": [
+                                    [
+                                        16,
+                                        255,
+                                        255
+                                    ],
+                                    [
+                                        180,
+                                        255,
+                                        255
+                                    ]
+                                ],
+                                "count": 45
+                            }
+                        }
+                    }
+                ],
+                "box_index": 3
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -210,
+                    12,
+                    0,
+                    6
+                ]
+            }
+        },
+        "max_hit": 3,
+        "post_delay": 1700,
+        "timeout": 8500,
+        "next": [
+            "迦门-副本选择完毕",
+            "[JumpBack]全局-战前吃体力",
+            "迦门-选择种火副本"
+        ],
+        "on_error": [
+            "迦门-选关结果未确认"
+        ]
+    },
+    "迦门-选择修炼场副本": {
+        "doc": "用「迦门-目标职阶」定位候选，依次核对同一行的等级和底色。动作以通过底色复核的框定位，避免点到另一条得分更高的副本。右下角菜单遮挡的条目由「迦门-副本列表查找下滑」移入识别区。国服每日任务实机：术80与术60相邻，确认80后进入助战选择。",
+        "recognition": {
+            "type": "And",
+            "param": {
+                "all_of": [
+                    "迦门-每日任务列表",
+                    "迦门-目标职阶",
+                    {
+                        "sub_name": "base/迦勒底之门/迦门-选择修炼场副本/OCR1",
+                        "recognition": {
+                            "type": "OCR",
+                            "param": {
+                                "roi": "迦门-目标职阶",
+                                "roi_offset": [
+                                    20,
+                                    0,
+                                    -64,
+                                    -40
+                                ],
+                                "expected": "^[^\\d]*80$"
+                            }
+                        }
+                    },
+                    {
+                        "recognition": {
+                            "type": "ColorMatch",
+                            "param": {
+                                "roi": "base/迦勒底之门/迦门-选择修炼场副本/OCR1",
+                                "roi_offset": [
+                                    -42,
+                                    4,
+                                    0,
+                                    -5
+                                ],
+                                "method": 40,
+                                "lower": [
+                                    25,
+                                    55,
+                                    54
+                                ],
+                                "upper": [
+                                    56,
+                                    255,
+                                    255
+                                ],
+                                "count": 45
+                            }
+                        }
+                    }
+                ],
+                "box_index": 3
+            }
+        },
+        "action": {
+            "type": "Click",
+            "param": {
+                "target_offset": [
+                    -210,
+                    12,
+                    0,
+                    6
+                ]
+            }
+        },
+        "max_hit": 3,
+        "post_delay": 1700,
+        "timeout": 8500,
+        "next": [
+            "迦门-副本选择完毕",
+            "[JumpBack]全局-战前吃体力",
+            "迦门-选择修炼场副本"
+        ],
+        "on_error": [
+            "迦门-选关结果未确认"
         ]
     }
 }

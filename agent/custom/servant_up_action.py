@@ -10,6 +10,8 @@
 attach 参数（pipeline 节点「执行强化从者」定义默认值，option 覆盖）：
     servant_id    str  从者 id（联动选择 / 职介列表选择时由 option 覆盖）
     target_level  int  目标等级（>= 该等级则停止）
+    use_current_servant  bool  直接强化游戏界面里已选中的从者
+    exp_bonus     bool  在列表中识别带闪烁经验加成字样的头像
 """
 import os
 import re
@@ -60,6 +62,9 @@ LEVEL_ROI = (396, 450, 200, 47)
 
 TH_TEMPLATE = 0.65
 FACE_THRESHOLD = 0.55         # 从者头像匹配阈值（列表头像缩放/变形，比通用模板更宽松）
+EXP_BONUS_THRESHOLD = 0.90
+EXP_BONUS_LIST_ROI = (60, 171, 935, 549)  # 小图标列表，不含两侧按钮、滚动条或材料统计
+EXP_BONUS_SAMPLE_DELAYS = (0.0, 0.42, 0.57, 0.43, 0.58)
 MAX_FIND_SERVANT_ROUND = 80   # 头像定位最大滚动轮数
 MAX_LEVELUP_ROUND = 120       # 强化最大循环轮数
 
@@ -103,6 +108,24 @@ def _read_tpl(path):
     return cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_COLOR)
 
 
+def _compose_exp_portraits(face, badge, sx, sy):
+    """按小图标布局合成活动头像，同时保留字样熄灭时的普通版本。"""
+    # 使用 BBC 的区服字样及 1920×1080 小图标拼图布局，国服列表实图已核对。
+    face = cv2.resize(face, (170, 170), interpolation=cv2.INTER_LANCZOS4)
+    boosted = face.copy()
+    h, w = badge.shape[:2]
+    dst = boosted[60:60 + h, 30:30 + w]
+    alpha = badge[:, :, 3:4].astype(np.float32) / 255
+    dst[:] = np.rint(dst * (1 - alpha) + badge[:, :, :3] * alpha).astype(np.uint8)
+    size = (max(1, round(125 * BASE_W / 1920 * sx)), max(1, round(80 * BASE_H / 1080 * sy)))
+    plain, combined = (cv2.resize(img[30:110, 35:160], size, interpolation=cv2.INTER_AREA)
+                       for img in (face, boosted))
+    # 两行字样的上半行相同。只排除下半行的倍率区，2 倍、3 倍等共用模板。
+    mask = np.full((80, 125), 255, dtype=np.uint8)
+    mask[55:, 16:87] = 0
+    return plain, combined, cv2.resize(mask, size, interpolation=cv2.INTER_NEAREST)
+
+
 @AgentServer.custom_action("execute_servant_up")
 class ExecuteServantUp(CustomAction):
     """强化从者：选从者 -> 喂狗粮升级到目标等级"""
@@ -117,16 +140,28 @@ class ExecuteServantUp(CustomAction):
             servant_id = str(attach.get("servant_id") or "").strip()
             target_level = int(attach.get("target_level", 0))
             tidy_giftbox = bool(attach.get("tidy_giftbox", False))
+            self._exp_bonus = bool(attach.get("exp_bonus", False))
 
             if target_level <= 0:
                 mfaalog.error("[强化从者] 未设置目标等级")
                 return CustomAction.RunResult(success=False)
 
+            use_current_servant = bool(attach.get("use_current_servant", False))
             # 资源包区分服务器 -> 模板目录
             self._init_dirs()
 
             # 坐标自适应
             self._init_scale()
+
+            if use_current_servant:
+                if tidy_giftbox:
+                    mfaalog.error("[强化从者] 从礼物盒返回后需要重新定位从者。要自动领取经验，请将"
+                                 "「从者选择方式」改为「星级/职介/从者名联动选择」或「搜索全从者」。")
+                    return CustomAction.RunResult(success=False)
+                result = self._levelup_current_servant(target_level)
+                return CustomAction.RunResult(
+                    success=result in ("target_reached", "dogfood_empty", "no_material")
+                )
 
             # 解析从者（联动选择 / 职介列表选择都传 servant_id，按 id 查表）
             servant = self._resolve_servant(servant_id)
@@ -156,6 +191,26 @@ class ExecuteServantUp(CustomAction):
         except Exception as e:
             mfaalog.error(f"[强化从者] 异常: {e}\n{traceback.format_exc()}")
             return CustomAction.RunResult(success=False)
+
+    def _levelup_current_servant(self, target_level):
+        image = self._shot()
+        if self._context.tasker.stopping:
+            return "stopped"
+        if image is None:
+            mfaalog.error("[强化从者] 未能读取游戏画面。请确认模拟器仍在运行，再重试。")
+            return "failed"
+        page = self._context.run_recognition("搓丸子-从者强化已选页面", image)
+        if page is None or not page.hit:
+            mfaalog.error("[强化从者] 未识别到已选从者的强化页面，无法确定要强化的对象。"
+                         "请在游戏中打开「从者强化」，选中要升级的从者后重试。")
+            return "failed"
+        empty_slots = self._context.run_recognition("搓丸子-测试从者素材已清空", image)
+        if empty_slots is None or not empty_slots.hit:
+            mfaalog.error("[强化从者] 未能确认素材槽全部为空。为避免消耗当前选中的卡牌，"
+                         "请在游戏中点「清除」，确认素材槽已清空后重试。")
+            return "failed"
+        mfaalog.info(f"[强化从者] 从当前已选从者的强化页面开始，目标等级 {target_level}")
+        return self._levelup_loop(target_level)
 
     def _tidy_and_levelup_loop(self, servant, target_level):
         """循环执行「整理礼物盒 -> 强化从者」，页面衔接由 pipeline 负责。"""
@@ -218,10 +273,11 @@ class ExecuteServantUp(CustomAction):
 
         # 筛选星级职介 + 头像定位
         if not self._select_servant(servant):
-            mfaalog.error("[强化从者] 定位从者失败")
+            if not self._context.tasker.stopping and not getattr(self, "_exp_bonus", False):
+                mfaalog.error("[强化从者] 定位从者失败")
             return "failed"
 
-        return self._levelup_loop(servant, target_level)
+        return self._levelup_loop(target_level)
 
     def _return_to_main(self):
         """每轮强化用完狗粮后回主界面，确保下一轮能重新导航。"""
@@ -398,6 +454,137 @@ class ExecuteServantUp(CustomAction):
         if callback is not None:
             callback()
 
+    def _exp_portrait_templates(self, faces):
+        path = self._tpl("经验加成字样.png")
+        badge = cv2.imdecode(np.fromfile(path, dtype=np.uint8), cv2.IMREAD_UNCHANGED) if os.path.isfile(path) else None
+        if badge is None or badge.shape != (60, 110, 4):
+            return []
+        templates = []
+        for name in faces:
+            face = _read_tpl(self._tpl(name))
+            if face is None or face.shape[0] != face.shape[1]:
+                # 国服可能覆盖成仓库专用局部图，拼图需要完整方形头像。
+                face = _read_tpl(os.path.join(self.face_base_dir, os.path.basename(name)))
+            if face is None or face.shape[0] != face.shape[1]:
+                continue
+            plain, combined, mask = _compose_exp_portraits(face, badge, self.sx, self.sy)
+            templates.extend(((name, plain, None), (f"{name}（EXP加成）", combined, mask)))
+        return templates
+
+    def _best_exp_portrait(self, image, templates):
+        x, y, w, h = EXP_BONUS_LIST_ROI
+        x, y, w, h = self._px(x), self._py(y), self._px(w), self._py(h)
+        region = image[y:y + h, x:x + w]
+        best = None
+        for name, template, mask in templates:
+            th, tw = template.shape[:2]
+            if region.shape[0] < th or region.shape[1] < tw:
+                continue
+            scores = cv2.matchTemplate(region, template, cv2.TM_CCOEFF_NORMED, mask=mask)
+            scores[~np.isfinite(scores)] = -1
+            _, score, _, (left, top) = cv2.minMaxLoc(scores)
+            if best is None or score > best[0]:
+                best = (score, x + left + tw // 2, y + top + th // 2, name)
+        return best
+
+    def _sample_exp_portrait(self, servant, templates, round_index):
+        # 单页在不同的闪烁相位取样，仅使用当前帧仍然命中的位置。
+        hits = []
+        for frame, delay in enumerate(EXP_BONUS_SAMPLE_DELAYS, 1):
+            if delay:
+                time.sleep(delay)
+            if self._context.tasker.stopping:
+                return None
+            image = self._shot()
+            best = self._best_exp_portrait(image, templates) if image is not None else None
+            if best is None:
+                continue
+            score, x, y, template = best
+            mfaalog.info(f"[强化从者] {servant['name']} 第{round_index}轮第{frame}帧 "
+                         f"经验加成头像最高分 {score:.3f}/{EXP_BONUS_THRESHOLD:.2f} @ ({x},{y}) {template}")
+            if score < EXP_BONUS_THRESHOLD:
+                continue
+            if any(abs(x - px) <= self._px(8) and abs(y - py) <= self._py(8) for px, py in hits):
+                return best
+            hits.append((x, y))
+        return None
+
+    def _run_exp_selection_step(self, node, terminal, reset=(), override=None):
+        for name in reset:
+            self._context.clear_hit_count(name)
+        detail = self._context.run_task(node, pipeline_override=override or {})
+        return (not self._context.tasker.stopping and detail is not None and detail.status.succeeded
+                and any(step.name == terminal and step.completed for step in detail.nodes))
+
+    def _select_exp_candidate(self, servant, candidate):
+        _, x, y, _ = candidate
+        image = self._shot()
+        if self._context.tasker.stopping:
+            return False
+        if image is None:
+            mfaalog.error("[强化从者] 未能读取当前从者列表，已停止选人。请确认模拟器仍在运行，再重试。")
+            return False
+        current = "搓丸子-候选已是当前从者"
+        # 已选卡片在列表中显示「卸除」，应关闭列表，避免重复点击反而解除选择。
+        label_left = max(self._px(60), x - self._px(100))
+        label_top = min(self._py(610), y + self._py(30))
+        reco = self._context.run_recognition(current, image, pipeline_override={
+            current: {"recognition": {"param": {
+                "roi": [label_left, label_top, self._px(200), min(self._py(110), image.shape[0] - label_top)]
+            }}}
+        })
+        if reco and reco.hit:
+            node = "搓丸子-关闭从者选择"
+            terminal = "搓丸子-关闭从者选择执行"
+            selected = self._run_exp_selection_step(node, terminal, (terminal,))
+        else:
+            node = "搓丸子-点击升级从者候选"
+            terminal = "搓丸子-点击升级从者候选执行"
+            target = {terminal: {"action": {"param": {"target": [x, y, 1, 1]}}}}
+            selected = self._run_exp_selection_step(node, terminal, (terminal,), target)
+        if selected and self._verify_exp_servant(servant):
+            mfaalog.info(f"[强化从者] 已核对经验加成从者 {servant['name']}")
+            return True
+        if not self._context.tasker.stopping:
+            mfaalog.error(f"[强化从者] 未能确认当前选中的是{servant['name']}，已停止强化。"
+                         "请在游戏中选中目标并清空素材槽，再将「从者选择方式」改为「当前界面已选从者」重试。")
+        return False
+
+    def _verify_exp_servant(self, servant):
+        expected = [f"^{re.escape(name)}$" for name in (servant.get("name"), servant.get("name_jp")) if name]
+        if not expected:
+            return False
+
+        def name_matches(node, image):
+            result = self._context.run_recognition(node, image, pipeline_override={
+                node: {"recognition": {"param": {"expected": expected}}}
+            })
+            return result is not None and result.hit
+
+        for _ in range(12):
+            if self._context.tasker.stopping:
+                return False
+            image = self._shot()
+            if image is not None:
+                page = self._context.run_recognition("搓丸子-从者强化已选页面", image)
+                if page and page.hit:
+                    break
+            time.sleep(0.5)
+        else:
+            return False
+        if name_matches("搓丸子-已选从者名称", image):
+            return True
+
+        # 卡面小字不可读时用现有资料页流程读大字，确认姓名后才关闭。
+        if not self._run_exp_selection_step("搓丸子-打开当前从者资料", "搓丸子-从者资料就绪",
+                                            ("搓丸子-长按当前从者资料",)):
+            return False
+        image = self._shot()
+        if image is None or not name_matches("搓丸子-资料从者名称", image):
+            return False
+        return self._run_exp_selection_step("搓丸子-关闭当前从者资料", "搓丸子-从者资料已关闭",
+                                            ("搓丸子-执行关闭从者资料",))
+
     def _find_servant(self, servant):
         """头像多阶段匹配 + 滚动查找，找到点击进入"""
         sid = servant["id"]
@@ -427,10 +614,34 @@ class ExecuteServantUp(CustomAction):
         if not faces:
             mfaalog.error(f"[强化从者] 无头像资源: {sid}")
             return False
-        for _round in range(getattr(self, "_max_find_rounds", MAX_FIND_SERVANT_ROUND)):
+        exp_bonus = getattr(self, "_exp_bonus", False)
+        exp_templates = self._exp_portrait_templates(faces) if exp_bonus else []
+        if exp_bonus and not exp_templates:
+            mfaalog.error("[强化从者] 经验加成识别图片缺失或无法读取。请更新 MaaFGO 后重试，"
+                         "也可在游戏中选好目标和清空素材槽后使用「当前界面已选从者」。")
+            return False
+        if exp_bonus:
+            for name in ("搓丸子网络-重试", "搓丸子网络-重试耗尽"):
+                self._context.clear_hit_count(name)
+        max_rounds = getattr(self, "_max_find_rounds", MAX_FIND_SERVANT_ROUND)
+        for _round in range(max_rounds):
             self._check_network_if_configured()
             if self._context.tasker.stopping:
                 return False
+            if exp_bonus:
+                candidate = self._sample_exp_portrait(servant, exp_templates, _round + 1)
+                if candidate is not None:
+                    return self._select_exp_candidate(servant, candidate)
+                if self._context.tasker.stopping:
+                    return False
+                if _round + 1 < max_rounds:
+                    swipe = "强化从者-经验加成列表下滑"
+                    if not self._run_exp_selection_step(swipe, swipe):
+                        if not self._context.tasker.stopping:
+                            mfaalog.error("[强化从者] 未确认小图标从者列表，无法继续查找。"
+                                         "请在游戏的「从者强化」列表切换到小图标后重试。")
+                        return False
+                continue
             # 先拿到本轮所有头像的最高匹配分（threshold=0 不过滤），输出日志方便排查
             best = None  # (score, cx, cy, face)
             locator = getattr(self, "_candidate_locator", None)
@@ -470,12 +681,16 @@ class ExecuteServantUp(CustomAction):
             self._controller.post_swipe(self._px(SWIPE_LIST_BEGIN[0]), self._py(SWIPE_LIST_BEGIN[1]),
                                         self._px(SWIPE_LIST_END[0]), self._py(SWIPE_LIST_END[1]), 400).wait()
             time.sleep(0.8)
-        mfaalog.warning("[强化从者] 头像定位达到最大轮数，未找到从者")
+        if exp_bonus:
+            mfaalog.error(f"[强化从者] 未能在列表中确认{servant['name']}的头像。请核对该从者是否在列表中，"
+                         "以及头像上是否显示「获得EXP」加成。也可选好目标并清空素材槽，使用「当前界面已选从者」。")
+        else:
+            mfaalog.warning("[强化从者] 头像定位达到最大轮数，未找到从者")
         return False
 
     # ---------- 强化循环 ----------
 
-    def _levelup_loop(self, servant, target_level):
+    def _levelup_loop(self, target_level):
         for _round in range(MAX_LEVELUP_ROUND):
             self._check_network_if_configured()
             if self._context.tasker.stopping:

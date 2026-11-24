@@ -1,0 +1,212 @@
+{
+  "rewardSource": "冠位認定戦",
+  "equips": [
+    {
+      "id": 9408540,
+      "collectionNo": 2232,
+      "nameJp": "剣士の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408540",
+      "sources": [
+        {
+          "file": "faces/f_94085400.png",
+          "sha256": "ccdb26314ae4cc0799b0ef67ec378d02897bf4d6ecbbe170e4c9ae5bda0b4d5e",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94085400.png"
+        },
+        {
+          "file": "sources/f_94085400.png",
+          "sha256": "8144d0c95cf6498c0df08fadd2dac8ae1da842ccc5235f3e4e5437c53a8dbb6c",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94085400.png"
+        },
+        {
+          "file": "team-sources/f_94085400.png",
+          "sha256": "fdac81b5ab2827bcec989cee59c61f1e2e47f790f4b2faa21b18ca9eb5205895",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408600,
+      "collectionNo": 2239,
+      "nameJp": "狂戦士の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408600",
+      "sources": [
+        {
+          "file": "faces/f_94086000.png",
+          "sha256": "5c35abfd4e9ca4f47d669e707c866f827a3fa9986b7049494940b449f0c838e0",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94086000.png"
+        },
+        {
+          "file": "sources/f_94086000.png",
+          "sha256": "499fc0b7ce0b227e43b60e73b6703aaa1415825d1da47ac2bdebe648d204e33a",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94086000.png"
+        },
+        {
+          "file": "team-sources/f_94086000.png",
+          "sha256": "092d82d45dc418e9fbeae020678345efd80af01cd7b9a2e4aa08af192e7e149a",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408650,
+      "collectionNo": 2264,
+      "nameJp": "槍兵の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408650",
+      "sources": [
+        {
+          "file": "faces/f_94086500.png",
+          "sha256": "a7678a3eabea809642fb7cedfe81fb5e39f1f5a0186d04b5625c6e91cfca9fdc",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94086500.png"
+        },
+        {
+          "file": "sources/f_94086500.png",
+          "sha256": "34a968a7228598d7416108fc1a59af3727bd71d41b457cde7a4a95dde8ed419d",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94086500.png"
+        },
+        {
+          "file": "team-sources/f_94086500.png",
+          "sha256": "83c77c5309a92d9f0d6cb0c6f2326bfd29ee7c34fa7459b4a267fe2887bc2f6f",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408700,
+      "collectionNo": 2403,
+      "nameJp": "此方より頂に至るもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408700",
+      "sources": [
+        {
+          "file": "faces/f_94087000.png",
+          "sha256": "172921a353edfcc6d188cc474440c4ddaba6586148784d3488722a3162e3e15b",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94087000.png"
+        },
+        {
+          "file": "sources/f_94087000.png",
+          "sha256": "a7c3c6824d1c1a7ae7b460fe88d76adc570435766df095b836858f4a42aa1d99",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94087000.png"
+        },
+        {
+          "file": "team-sources/f_94087000.png",
+          "sha256": "77477e8a17956d894a226473505159f106d9629a94c7fcae53be703c8d618f89",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408710,
+      "collectionNo": 2404,
+      "nameJp": "彼方より頂に至るもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408710",
+      "sources": [
+        {
+          "file": "faces/f_94087100.png",
+          "sha256": "00c5b3286aafc5deeaf6125966f001fd4995e4b7ca1ed50409aaec8c7cf4bfc6",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94087100.png"
+        },
+        {
+          "file": "sources/f_94087100.png",
+          "sha256": "bab2dff820524931f15d259c4fd8c0acf0fef57fb65f7d2ebc6a2c9342e93a84",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94087100.png"
+        },
+        {
+          "file": "team-sources/f_94087100.png",
+          "sha256": "9da21d42f73b5ebb97b875e1a3572d50fee0b0a1fbce5cd9a0bc25805534922e",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408840,
+      "collectionNo": 2442,
+      "nameJp": "騎兵の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408840",
+      "sources": [
+        {
+          "file": "faces/f_94088400.png",
+          "sha256": "48f61c863493c1ce59969fae7e8715b150c15d27a856461e510387f41b820c0d",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94088400.png"
+        },
+        {
+          "file": "sources/f_94088400.png",
+          "sha256": "a0e4ef94955cdb0ab2880f216cdfb51f06e1a7f7066d556b2a433de68f336d91",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94088400.png"
+        },
+        {
+          "file": "team-sources/f_94088400.png",
+          "sha256": "9b1dc749bc32b521262abb3db273d1224017960ef4a7899c57ee0f313c8c4c07",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408920,
+      "collectionNo": 2472,
+      "nameJp": "暗殺者の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408920",
+      "sources": [
+        {
+          "file": "faces/f_94089200.png",
+          "sha256": "4ab7a16e259fbc30300ff289f1cb1a62280d887890494ea93405e4ed6fed0e50",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94089200.png"
+        },
+        {
+          "file": "sources/f_94089200.png",
+          "sha256": "e697f11d1ef7f8dafbfdcb34c49bab0b27e04340044753f997ed00b5707a9f9f",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94089200.png"
+        },
+        {
+          "file": "team-sources/f_94089200.png",
+          "sha256": "fa67165da1b383744e0be046f0f51848e10eb3e1c84bf0576c91c70ab0e35725",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408970,
+      "collectionNo": 2494,
+      "nameJp": "弓兵の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408970",
+      "sources": [
+        {
+          "file": "faces/f_94089700.png",
+          "sha256": "0c08b0973d28fed0b3b1c16133d2cf02e5b093b509628822e6ce98a1767c2686",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94089700.png"
+        },
+        {
+          "file": "sources/f_94089700.png",
+          "sha256": "29b8333f9939d70145f24509a5930765bf14a3e14da840afbd91c14920872579",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94089700.png"
+        },
+        {
+          "file": "team-sources/f_94089700.png",
+          "sha256": "15d5b96a82057716b48ae276f9790e9913fcfd8fa0b03fc748a8483da294370c",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    },
+    {
+      "id": 9408980,
+      "collectionNo": 2510,
+      "nameJp": "魔術師の頂に立つもの",
+      "metadataUrl": "https://api.atlasacademy.io/nice/JP/equip/9408980",
+      "sources": [
+        {
+          "file": "faces/f_94089800.png",
+          "sha256": "a8a9b473a711800a84b645820c21a099e29f3dabe99ef6dc0c1b1056aae1f706",
+          "url": "https://static.atlasacademy.io/JP/Faces/f_94089800.png"
+        },
+        {
+          "file": "sources/f_94089800.png",
+          "sha256": "59c0948d0a922513dacbacc0e77da2a25764bbc600f385865c4b4a5bfb8b995c",
+          "url": "https://static.atlasacademy.io/JP/EquipFaces/f_94089800.png"
+        },
+        {
+          "file": "team-sources/f_94089800.png",
+          "sha256": "85c6ecaec90cc15b24129abf73419e866a1329750974504033328886ef02e73a",
+          "source": "本地游戏解包 EquipFaces_188，与相同ID的EquipFaces外观对应"
+        }
+      ]
+    }
+  ]
+}
