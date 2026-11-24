@@ -127,7 +127,7 @@ class StoryRunner:
                 sessions.invalidate(root, token, "")
         self.pause()
 
-    def _handle_restricted_formation(self, image, *, formation_confirmed=False):
+    def _handle_restricted_formation(self, image, *, formation_confirmed=False, allow_auto_open=True):
         """每帧最多操作一次；叶子节点只点击，不执行其后续开战链。"""
         if not self.auto_handle_restrictions:
             return False
@@ -186,12 +186,12 @@ class StoryRunner:
             if self._restriction_needs_decide:
                 # 部分自动编成直接回确认页，不显示决定；仍须检查空槽再放行。
                 self._restriction_needs_decide = False
-        if self._restriction_needs_auto or (
+        if allow_auto_open and (self._restriction_needs_auto or (
             formation_confirmed and self.current_restricted
             and not self._restriction_auto_done
             and not self._restriction_action_counts.get("主线限制-打开自动编队")
             and self.reco("主线限制-可见空槽", image)
-        ):
+        )):
             result = self.reco("主线限制-打开自动编队", image)
             if result:
                 self._restriction_action("主线限制-打开自动编队", result)
