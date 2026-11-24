@@ -57,6 +57,12 @@
     ], "box_index": 1}},
     "action": {"type": "DoNothing"}, "next": [], "on_error": []
   },
+  "主线限制-可见空槽": {
+    "doc": "主线已确认本关受限且当前在队伍确认页时，复用阵容采集的灰色空槽判断。仅用于尝试游戏自动编队，不判定空槽必填。",
+    "recognition": {"type": "Custom", "param": {
+      "custom_recognition": "formation_visible_empty_slot"
+    }}
+  },
   "主线限制-固定成员": {
     "doc": "仅识别编队确认页已有人物卡片中部的编队限制标签；该行与必填空槽限制标题错开。用户样本标签在首槽，但ROI覆盖六槽，不绑定特定从者。只读取标记，由主线在本关跳过Chaldea并保留现有阵容；若同时有空槽标记仍须先自动编队。",
     "recognition": {"type": "And", "param": {"all_of": [
@@ -91,11 +97,14 @@
     "action": {"type": "DoNothing"}, "next": [], "on_error": []
   },
   "主线限制-打开自动编队": {
-    "doc": "仅受限且仍需游戏编队时调用。先确认队伍开始按钮，再识别左下自动编队文字；参考特殊编队-打开自动编队，不把该叶子的next带入主线。",
+    "doc": "仅受限且仍需游戏编队时调用。队伍确认页、左下按钮亮蓝底色与自动编队文字同时命中才点击。",
     "recognition": {"type": "And", "param": {"all_of": [
       "进本-队伍确认",
+      {"recognition": {"type": "Custom", "param": {
+        "custom_recognition": "formation_confirmation_lighting", "custom_recognition_param": "auto_formation"
+      }}},
       {"sub_name": "base/主线限制编队/主线限制-打开自动编队/OCR1", "recognition": {"type": "OCR", "param": {
-        "roi": [260, 640, 85, 75], "expected": ["^自动$", "自動編成|^自動$"], "threshold": 0.8
+        "roi": [260, 640, 85, 75], "expected": ["^自$", "^自动(?:编队|编成)?$", "自動編成|^自動$"], "threshold": 0.8
       }}}
     ], "box_index": 1}},
     "action": {"type": "Click"}, "post_delay": 700, "next": [], "on_error": []

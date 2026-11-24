@@ -163,6 +163,30 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertTrue(runtime.current_restricted)
         self.assertEqual([name for name, _ in context.actions], ["主线限制-打开自动编队"])
 
+    def test_multiple_supports_with_visible_empty_slots_try_game_auto_formation_once(self):
+        runtime, context = runner()
+        frame = {"进本-队伍确认", "主线限制-多个助战", "主线限制-可见空槽", "主线限制-打开自动编队"}
+        self.assertTrue(runtime._handle_restricted_formation(frame))
+        self.assertTrue(runtime.current_restricted)
+        self.assertFalse(runtime._handle_restricted_formation(frame))
+        self.assertTrue(runtime._handle_restricted_formation({"主线限制-自动编成确认"}))
+        self.assertTrue(runtime._handle_restricted_formation({"主线限制-编队决定"}))
+        self.assertFalse(runtime._handle_restricted_formation(frame))
+        self.assertEqual([name for name, _ in context.actions], [
+            "主线限制-打开自动编队", "主线限制-自动编成确认", "主线限制-编队决定",
+        ])
+        runtime.reset_restriction_state()
+        self.assertTrue(runtime._handle_restricted_formation(frame))
+        self.assertEqual(context.actions[-1][0], "主线限制-打开自动编队")
+
+    def test_visible_empty_slots_require_restriction_and_available_auto_formation(self):
+        for signals in ({"主线限制-打开自动编队"}, {"主线限制-多个助战"}):
+            with self.subTest(signals=signals):
+                runtime, context = runner()
+                self.assertFalse(runtime._handle_restricted_formation(
+                    {"进本-队伍确认", "主线限制-可见空槽"} | signals))
+                self.assertEqual(context.actions, [])
+
     def test_remaining_required_slot_after_auto_formation_stops(self):
         runtime, context = runner()
         runtime._handle_restricted_formation({"主线限制-自动编成确认"})
