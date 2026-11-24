@@ -16,6 +16,7 @@ from dataclasses import dataclass, replace
 
 from ..core.decider import Decider, RuleDecider
 from ..core.special_skills import SPECIAL_SKILL_GROUPS, TD, SpecialSkillChoiceError, SpecialSkillChoices
+from . import BATTLE_ENTRY_TIMEOUT_S
 from .special_skills import DEFAULT_NP_MENU_ROOTS, NP_IDENTITY_GUARD, SpecialSkillDispatcher
 from ..core.enums import CardColor, PrimitiveKind, Scene
 from ..core.models import (ActorBinding, BattlePlan, BattleState, CardPick, Confidence, InitialFormation,
@@ -38,7 +39,7 @@ from platform_waits import platform_timeout
 
 # 选完卡后等攻击动画结束（部分长演出可能超过 60s，留足余量）
 _ANIMATION_TIMEOUT_S = 120.0
-# 意外 UNKNOWN（加载等）的最大等待
+# 已进入战斗后，意外 UNKNOWN 的最大等待。
 _UNKNOWN_TIMEOUT_S = 30.0
 # 每次轮询之间等画面静止的窗口（ms）
 _POLL_FREEZE_MS = 2000
@@ -157,6 +158,7 @@ class AutoBattleRuntime:
         )
         mfaalog.info(f"[AutoBattle] run() start, max_turns={self.profile.max_turns}")
         turns = 0
+        battle_entered = False
         plan_turn = 0
         opening_waits = 0
         native = self.battle_policy.card.native_strategy
@@ -177,6 +179,7 @@ class AutoBattleRuntime:
             plan_turn = self._plan_turn_after_observation(plan_turn, state)
             self._turn_index = plan_turn
             scene = state.scene
+            battle_entered = battle_entered or scene in _KNOWN_SCENES
             mfaalog.info(f"[AutoBattle] Turn {turns+1} | scene={scene.name} | unknown={state.unknown_fields}")
 
             if scene is Scene.VICTORY:
@@ -389,7 +392,17 @@ class AutoBattleRuntime:
                     plan_turn = self._plan_turn_after_settlement(plan_turn)
                 continue
 
-            # UNKNOWN / ANIMATION（非攻击后语境，如加载）：有界等待
+            # 直接战斗可在加载时启动，首次确认战斗界面前使用进本等待上限。
+            if not battle_entered:
+                if not self._wait_until(_KNOWN_SCENES, BATTLE_ENTRY_TIMEOUT_S):
+                    if not self.ctx.tasker.stopping:
+                        mfaalog.error("[AutoBattle] 未能确认进入战斗。请检查游戏是否仍在加载或有弹窗，"
+                                      "等战斗画面出现后再启动“直接战斗”。")
+                    return BattleResult.fail("battle_entry_not_confirmed", turns)
+                battle_entered = True
+                continue
+
+            # 战斗已经开始，保留战斗中未知画面的短等待。
             mfaalog.info(f"[AutoBattle] Unknown scene, waiting up to {_UNKNOWN_TIMEOUT_S}s for known scene...")
             if not self._wait_until(_KNOWN_SCENES, _UNKNOWN_TIMEOUT_S):
                 mfaalog.info(f"[AutoBattle] Stuck in unknown scene for {_UNKNOWN_TIMEOUT_S}s. turns={turns}")
