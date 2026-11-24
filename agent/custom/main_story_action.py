@@ -31,6 +31,7 @@ _GENERIC_FORMATION_POPUPS = ("主线-编队弹窗关闭保底", "进本-普通�
 # 补点前的二次确认超过此时间即丢弃，不能把慢识别期间的旧坐标点到助战页。
 _QUEST_RETRY_FRAME_MAX_AGE = 2.0
 _POST_FORMATION_DECIDE_TIMEOUT = 60
+_BATTLE_ENTRY_TIMEOUT = 300
 
 
 class StoryStopped(RuntimeError):
@@ -738,7 +739,7 @@ class StoryRunner:
                 if sessions.valid(root, token) and sessions.restricted(root, token):
                     self._mark_restricted("无法打开变更配置")
                     self._restriction_direct_start = True
-            deadline = self.clock() + self.timeout
+            deadline = self.clock() + _BATTLE_ENTRY_TIMEOUT
             formation_since = None
             while self.clock() < deadline:
                 image = self.frame()
