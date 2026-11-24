@@ -290,6 +290,17 @@ class FrontlineShortageTests(unittest.TestCase):
             runtime._start_formation_battle()
         self.assertEqual(context.actions, [])
 
+    def test_pending_auto_formation_does_not_reopen_on_old_empty_slot_frames(self):
+        not_ready = {"进本-队伍确认", self.open_auto, "主线限制-空槽"}
+        runtime, context = runner([
+            self.popup, *[not_ready] * 6, {self.confirm_auto}, {self.save_team},
+            *[self.formation] * 4, {"进本-战斗主界面已出现"},
+        ])
+        runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions],
+                         [self.shortage, self.open_auto, self.confirm_auto, self.save_team])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程", "进本流程"])
+
 
 class ProgressTests(unittest.TestCase):
     def tearDown(self):

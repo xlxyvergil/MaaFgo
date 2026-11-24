@@ -66,10 +66,12 @@ class InterludeRunner(StoryRunner):
         self._skip_next_reset = False
         self._reentered_at = None
 
-    def _handle_restricted_formation(self, image, *, formation_confirmed=False):
+    def _handle_restricted_formation(self, image, *, formation_confirmed=False, allow_auto_open=True):
         shortage = self.reco(_FRONTLINE_SHORTAGE, image)
         if not shortage:
-            return super()._handle_restricted_formation(image, formation_confirmed=formation_confirmed)
+            return super()._handle_restricted_formation(
+                image, formation_confirmed=formation_confirmed, allow_auto_open=allow_auto_open,
+            )
         if not self.auto_handle_restrictions:
             raise StoryStopped(f"游戏提示“先发成员不足”，当前已关闭“自动处理编队限制情况”。{_FILL_THIRD_FRONTLINE}")
         if self._restriction_auto_done:
@@ -91,8 +93,9 @@ class InterludeRunner(StoryRunner):
                     raise StoryStopped(f"游戏自动编队后仍提示“先发成员不足”。{_FILL_THIRD_FRONTLINE}")
             elif auto_opened and self.reco("主线限制-编成条件未满足", image):
                 raise StoryStopped(f"游戏未能按关卡条件完成自动编队。{_FILL_THIRD_FRONTLINE}")
-            elif auto_opened and super()._handle_restricted_formation(image):
+            elif auto_opened and super()._handle_restricted_formation(image, allow_auto_open=False):
                 # 自动编成弹窗后方的“开始任务”仍可命中，先处理确认和编队决定。
+                # 只消费本次编队的弹窗，旧画面上的空槽不能再次打开自动编队。
                 continue
             elif self.reco("进本-队伍确认页可开始", image):
                 if self._restriction_auto_done:
