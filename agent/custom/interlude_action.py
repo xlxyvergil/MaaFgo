@@ -104,6 +104,7 @@ class InterludeRunner(StoryRunner):
                     auto_opened = True
                     continue
             elif not auto_opened and super()._handle_restricted_formation(image):
+                auto_opened = bool(self._restriction_action_counts.get("主线限制-打开自动编队"))
                 continue
             self.pause()
         raise StoryStopped(f"未能确认游戏自动编队的结果，幕间无法继续。{_FILL_THIRD_FRONTLINE}")

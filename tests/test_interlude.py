@@ -274,6 +274,16 @@ class FrontlineShortageTests(unittest.TestCase):
         self.assertEqual([name for name, _ in context.actions], [self.shortage, self.open_auto])
         self.assertEqual([name for name, _ in context.tasks], ["进本流程"])
 
+    def test_parent_opened_auto_formation_rejection_stops_without_retrying(self):
+        not_ready = {"进本-队伍确认", self.open_auto, "主线限制-可见空槽"}
+        runtime, context = runner([
+            self.popup, not_ready, {"主线限制-编成条件未满足"}, self.formation,
+        ])
+        with self.assertRaisesRegex(StoryStopped, "未能按关卡条件完成自动编队.*第三个先发位"):
+            runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions], [self.shortage, self.open_auto])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程"])
+
     def test_disabled_option_stops_with_manual_instructions(self):
         runtime, context = runner([self.popup], {"auto_handle_restrictions": False})
         with self.assertRaisesRegex(StoryStopped, "已关闭“自动处理编队限制情况”.*第三个先发位"):
