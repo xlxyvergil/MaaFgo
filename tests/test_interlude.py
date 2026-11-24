@@ -226,6 +226,61 @@ class FormationHandoffTests(unittest.TestCase):
         self.assertEqual([name for name, _ in context.actions], [reward])
 
 
+class FrontlineShortageTests(unittest.TestCase):
+    shortage = "幕间-先发成员不足"
+    open_auto = "主线限制-打开自动编队"
+    confirm_auto = "主线限制-自动编成确认"
+    save_team = "主线限制-编队决定"
+    formation = {"进本-队伍确认", "进本-队伍确认页可开始", open_auto}
+    popup = {"进本-队伍确认", "主线-编队弹窗关闭保底", shortage}
+
+    def test_game_formation_repairs_shortage_before_retrying_start(self):
+        runtime, context = runner([
+            self.popup, self.popup, self.formation, self.formation,
+            self.formation | {self.confirm_auto}, self.formation | {self.save_team},
+            *[self.formation] * 4, {"进本-战斗主界面已出现"},
+        ])
+        runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions],
+                         [self.shortage, self.open_auto, self.confirm_auto, self.save_team])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程", "进本流程"])
+        self.assertEqual(context.executions[-1][1]["进本-编队处理"]["next"], ["进本-点击队伍确认"])
+
+    def test_empty_third_slot_after_auto_formation_stops_before_retrying_start(self):
+        runtime, context = runner([
+            self.popup, self.formation, {self.confirm_auto},
+            self.formation | {"幕间-第三个先发位空缺"},
+        ])
+        with self.assertRaisesRegex(StoryStopped, "第三个先发位仍为空.*第三个先发位的“选择”"):
+            runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions],
+                         [self.shortage, self.open_auto, self.confirm_auto])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程"])
+
+    def test_second_shortage_leaves_the_notice_for_manual_formation(self):
+        runtime, context = runner([
+            self.popup, self.formation, {self.confirm_auto}, *[self.formation] * 4, self.popup,
+        ])
+        with self.assertRaisesRegex(StoryStopped, "自动编队后仍提示.*第三个先发位"):
+            runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions],
+                         [self.shortage, self.open_auto, self.confirm_auto])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程", "进本流程"])
+
+    def test_no_auto_formation_confirmation_is_bounded(self):
+        runtime, context = runner([self.popup, self.formation], {"transition_timeout": 10})
+        with self.assertRaisesRegex(StoryStopped, "未能确认游戏自动编队的结果.*第三个先发位"):
+            runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.actions], [self.shortage, self.open_auto])
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程"])
+
+    def test_disabled_option_stops_with_manual_instructions(self):
+        runtime, context = runner([self.popup], {"auto_handle_restrictions": False})
+        with self.assertRaisesRegex(StoryStopped, "已关闭“自动处理编队限制情况”.*第三个先发位"):
+            runtime._start_formation_battle()
+        self.assertEqual(context.actions, [])
+
+
 class ProgressTests(unittest.TestCase):
     def tearDown(self):
         bond_stops.finish(12345)

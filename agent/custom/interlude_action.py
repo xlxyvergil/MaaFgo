@@ -14,6 +14,13 @@ from bond_stop_action import BondStopReached
 from main_story_action import StoryRunner, StoryStopped
 
 
+_FRONTLINE_SHORTAGE = "幕间-先发成员不足"
+_FILL_THIRD_FRONTLINE = (
+    "请回到“队伍确认”页，点第三个先发位的“选择”，补上一名符合关卡限制的从者后，"
+    "重新启动“自动幕间副本”。"
+)
+
+
 def recognition_detail(result):
     best = getattr(result, "best_result", None)
     detail = getattr(best, "detail", getattr(result, "detail", {}))
@@ -58,6 +65,48 @@ class InterludeRunner(StoryRunner):
         self._map_opened_at = None
         self._skip_next_reset = False
         self._reentered_at = None
+
+    def _handle_restricted_formation(self, image, *, formation_confirmed=False):
+        shortage = self.reco(_FRONTLINE_SHORTAGE, image)
+        if not shortage:
+            return super()._handle_restricted_formation(image, formation_confirmed=formation_confirmed)
+        if not self.auto_handle_restrictions:
+            raise StoryStopped(f"游戏提示“先发成员不足”，当前已关闭“自动处理编队限制情况”。{_FILL_THIRD_FRONTLINE}")
+        if self._restriction_auto_done:
+            raise StoryStopped(f"游戏自动编队后仍提示“先发成员不足”。{_FILL_THIRD_FRONTLINE}")
+
+        self._mark_restricted("先发成员不足")
+        self._restriction_direct_start = False
+        self._restriction_action(_FRONTLINE_SHORTAGE, shortage)
+        self._recover_frontline_formation()
+        return True
+
+    def _recover_frontline_formation(self):
+        deadline = self.clock() + min(self.timeout, 30)
+        auto_opened = False
+        while self.clock() < deadline:
+            image = self.frame()
+            if self.reco(_FRONTLINE_SHORTAGE, image):
+                if self._restriction_auto_done:
+                    raise StoryStopped(f"游戏自动编队后仍提示“先发成员不足”。{_FILL_THIRD_FRONTLINE}")
+            elif auto_opened and self.reco("主线限制-编成条件未满足", image):
+                raise StoryStopped(f"游戏未能按关卡条件完成自动编队。{_FILL_THIRD_FRONTLINE}")
+            elif auto_opened and super()._handle_restricted_formation(image):
+                # 自动编成弹窗后方的“开始任务”仍可命中，先处理确认和编队决定。
+                continue
+            elif self.reco("进本-队伍确认页可开始", image):
+                if self._restriction_auto_done:
+                    if self.reco("幕间-第三个先发位空缺", image):
+                        raise StoryStopped(f"游戏自动编队后，第三个先发位仍为空。{_FILL_THIRD_FRONTLINE}")
+                    return
+                if not auto_opened and (button := self.reco("主线限制-打开自动编队", image)):
+                    self._restriction_action("主线限制-打开自动编队", button)
+                    auto_opened = True
+                    continue
+            elif not auto_opened and super()._handle_restricted_formation(image):
+                continue
+            self.pause()
+        raise StoryStopped(f"未能确认游戏自动编队的结果，幕间无法继续。{_FILL_THIRD_FRONTLINE}")
 
     def _returned_to_list(self):
         self._map_opened_at = None

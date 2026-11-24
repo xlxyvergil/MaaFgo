@@ -8,6 +8,22 @@
     "attach": {"quest_limit": 999, "transition_timeout": 120, "battle_mode": "native", "auto_handle_restrictions": true}
   },
   "幕间-结果提示": {},
+  "幕间-先发成员不足": {
+    "doc": "国服幕间进本时，标题与同一弹窗内的关闭按钮同时命中。关闭后复用主线限制-打开自动编队和主线限制-自动编成确认。国服「歼灭女神应如是」实机的自动编成弹窗仍露出右下开始任务按钮，须先处理弹窗，再以进本-队伍确认页可开始复核队伍。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/自动幕间副本/幕间-先发成员不足/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [360, 55, 620, 110], "expected": ["^先发成员不足$"], "threshold": 0.8
+      }}},
+      "主线-编队弹窗关闭保底"
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "幕间-第三个先发位空缺": {
+    "doc": "只在幕间因先发不足完成游戏自动编队后复核。队伍确认页亮起时，第三个先发卡槽的“选择”表示仍可补人；不读取候补槽。",
+    "recognition": {"type": "OCR", "param": {
+      "roi": [440, 263, 187, 77], "expected": ["^选择$"], "threshold": 0.8
+    }}
+  },
   "幕间-主界面确认": {
     "doc": "只复核，不执行共享节点的next；回主界面任务成功后还须确认主界面标记与无弹窗标记，再进入迦门。",
     "recognition": {"type": "And", "param": {"all_of": ["主界面判断-main-ui", "无弹窗"]}},
