@@ -41,17 +41,54 @@
                     "name": "link",
                     "label": "星级/职介/从者名联动选择",
                     "option": [
-                        "强化从者-星级"
+                        "强化从者-星级",
+                        "强化从者-整理礼物盒循环"
                     ]
                 },
                 {
                     "name": "all",
                     "label": "搜索全从者",
                     "option": [
-                        "强化从者-全从者列表"
+                        "强化从者-全从者列表",
+                        "强化从者-整理礼物盒循环"
                     ]
+                },
+                {
+                    "name": "current",
+                    "label": "当前界面已选从者",
+                    "option": [
+                        "强化从者-当前从者目标等级"
+                    ],
+                    "pipeline_override": {
+                        "执行强化从者": {
+                            "attach": {
+                                "use_current_servant": true
+                            }
+                        }
+                    }
                 }
             ]
+        },
+        "强化从者-当前从者目标等级": {
+            "type": "input",
+            "label": "目标等级",
+            "description": "在游戏中打开「从者强化」，选中要升级的从者并清空素材槽。",
+            "inputs": [
+                {
+                    "name": "current_target_level",
+                    "label": "目标等级（1-120）",
+                    "default": "90",
+                    "pipeline_type": "int",
+                    "verify": "^(?:[1-9][0-9]?|1[01][0-9]|120)$"
+                }
+            ],
+            "pipeline_override": {
+                "执行强化从者": {
+                    "attach": {
+                        "target_level": "{current_target_level}"
+                    }
+                }
+            }
         },
         "强化从者-全从者列表": {
             "type": "select",

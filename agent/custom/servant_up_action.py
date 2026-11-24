@@ -10,6 +10,7 @@
 attach 参数（pipeline 节点「执行强化从者」定义默认值，option 覆盖）：
     servant_id    str  从者 id（联动选择 / 职介列表选择时由 option 覆盖）
     target_level  int  目标等级（>= 该等级则停止）
+    use_current_servant  bool  直接强化游戏界面里已选中的从者
 """
 import os
 import re
@@ -122,11 +123,22 @@ class ExecuteServantUp(CustomAction):
                 mfaalog.error("[强化从者] 未设置目标等级")
                 return CustomAction.RunResult(success=False)
 
+            use_current_servant = bool(attach.get("use_current_servant", False))
             # 资源包区分服务器 -> 模板目录
             self._init_dirs()
 
             # 坐标自适应
             self._init_scale()
+
+            if use_current_servant:
+                if tidy_giftbox:
+                    mfaalog.error("[强化从者] 从礼物盒返回后需要重新定位从者。要自动领取经验，请将"
+                                 "「从者选择方式」改为「星级/职介/从者名联动选择」或「搜索全从者」。")
+                    return CustomAction.RunResult(success=False)
+                result = self._levelup_current_servant(target_level)
+                return CustomAction.RunResult(
+                    success=result in ("target_reached", "dogfood_empty", "no_material")
+                )
 
             # 解析从者（联动选择 / 职介列表选择都传 servant_id，按 id 查表）
             servant = self._resolve_servant(servant_id)
@@ -156,6 +168,26 @@ class ExecuteServantUp(CustomAction):
         except Exception as e:
             mfaalog.error(f"[强化从者] 异常: {e}\n{traceback.format_exc()}")
             return CustomAction.RunResult(success=False)
+
+    def _levelup_current_servant(self, target_level):
+        image = self._shot()
+        if self._context.tasker.stopping:
+            return "stopped"
+        if image is None:
+            mfaalog.error("[强化从者] 未能读取游戏画面。请确认模拟器仍在运行，再重试。")
+            return "failed"
+        page = self._context.run_recognition("搓丸子-从者强化已选页面", image)
+        if page is None or not page.hit:
+            mfaalog.error("[强化从者] 未识别到已选从者的强化页面，无法确定要强化的对象。"
+                         "请在游戏中打开「从者强化」，选中要升级的从者后重试。")
+            return "failed"
+        empty_slots = self._context.run_recognition("搓丸子-测试从者素材已清空", image)
+        if empty_slots is None or not empty_slots.hit:
+            mfaalog.error("[强化从者] 未能确认素材槽全部为空。为避免消耗当前选中的卡牌，"
+                         "请在游戏中点「清除」，确认素材槽已清空后重试。")
+            return "failed"
+        mfaalog.info(f"[强化从者] 从当前已选从者的强化页面开始，目标等级 {target_level}")
+        return self._levelup_loop(target_level)
 
     def _tidy_and_levelup_loop(self, servant, target_level):
         """循环执行「整理礼物盒 -> 强化从者」，页面衔接由 pipeline 负责。"""
@@ -221,7 +253,7 @@ class ExecuteServantUp(CustomAction):
             mfaalog.error("[强化从者] 定位从者失败")
             return "failed"
 
-        return self._levelup_loop(servant, target_level)
+        return self._levelup_loop(target_level)
 
     def _return_to_main(self):
         """每轮强化用完狗粮后回主界面，确保下一轮能重新导航。"""
@@ -475,7 +507,7 @@ class ExecuteServantUp(CustomAction):
 
     # ---------- 强化循环 ----------
 
-    def _levelup_loop(self, servant, target_level):
+    def _levelup_loop(self, target_level):
         for _round in range(MAX_LEVELUP_ROUND):
             self._check_network_if_configured()
             if self._context.tasker.stopping:
