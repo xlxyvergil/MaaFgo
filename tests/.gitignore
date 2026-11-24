@@ -47,3 +47,9 @@
 !fixtures/main_story/cn_solo_sortie_confirm.png
 !fixtures/main_story/cn_battle_tutorial_forward.png
 !fixtures/main_story/cn_quest_complete_reward.png
+# Cropped daily-quest lists with account details excluded.
+!fixtures/chaldea_gate/
+!fixtures/chaldea_gate/cn_ember_60.png
+!fixtures/chaldea_gate/cn_reversed_60.png
+!fixtures/chaldea_gate/cn_training_60_and_80.png
+!fixtures/chaldea_gate/jp_ember_60.png

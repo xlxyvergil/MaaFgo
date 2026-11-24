@@ -46,16 +46,10 @@
           "name": "弓术60",
           "label": "弓术60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-弓术副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/弓术60.png"
                 }
               }
             }
@@ -65,16 +59,10 @@
           "name": "剑骑60",
           "label": "剑骑60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-剑骑副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/剑骑60.png"
                 }
               }
             }
@@ -82,18 +70,12 @@
         },
         {
           "name": "骑剑60",
-          "label": "骑剑60（可能不准）",
+          "label": "骑剑60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-剑骑副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/骑剑60.png"
                 }
               }
             }
@@ -103,16 +85,10 @@
           "name": "枪杀60",
           "label": "枪杀60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-枪杀副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/枪杀60.png"
                 }
               }
             }
@@ -120,18 +96,12 @@
         },
         {
           "name": "杀枪60",
-          "label": "杀枪60(可能不准)",
+          "label": "杀枪60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-枪杀副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/杀枪60.png"
                 }
               }
             }
@@ -139,18 +109,12 @@
         },
         {
           "name": "术弓60",
-          "label": "术弓60（可能不准）",
+          "label": "术弓60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-弓术副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/术弓60.png"
                 }
               }
             }
@@ -160,16 +124,10 @@
           "name": "问号60",
           "label": "问号60",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/种火-问号副本.png"
-                  ],
-                  "threshold": [
-                    0.8
-                  ]
+                  "template": "chaldea_gate/问号60.png"
                 }
               }
             }
@@ -186,22 +144,18 @@
           "name": "剑80",
           "label": "剑80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/剑80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/剑80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -210,22 +164,18 @@
           "name": "弓80",
           "label": "弓80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/弓80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/弓80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -234,22 +184,18 @@
           "name": "枪80",
           "label": "枪80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/枪80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/枪80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -258,22 +204,18 @@
           "name": "骑80",
           "label": "骑80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/骑80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/骑80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -282,22 +224,18 @@
           "name": "术80",
           "label": "术80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/术80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/术80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -306,22 +244,18 @@
           "name": "杀80",
           "label": "杀80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/杀80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/杀80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
@@ -330,22 +264,18 @@
           "name": "狂80",
           "label": "狂80",
           "pipeline_override": {
-            "迦门-种火-选择职介和等级": {
+            "迦门-目标职阶": {
               "recognition": {
-                "type": "TemplateMatch",
                 "param": {
-                  "template": [
-                    "chaldea_gate/狂80.png"
-                  ],
-                  "threshold": [
-                    0.72
-                  ],
-                  "green_mask": true
+                  "template": "chaldea_gate/狂80.png"
                 }
-              },
+              }
+            },
+            "迦门-种火副本选择": {
               "next": [
-                "迦门-修炼场选择",
-                "[JumpBack]迦门-不匹配下滑"
+                "迦门-选择修炼场副本",
+                "迦门-列表触底",
+                "[JumpBack]迦门-副本列表查找下滑"
               ]
             }
           }
