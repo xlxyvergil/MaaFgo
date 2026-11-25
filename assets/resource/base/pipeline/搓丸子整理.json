@@ -75,6 +75,101 @@
       "整理礼物盒-筛卖准备"
     ]
   },
+  "搓丸子整理-贩卖列表标题": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [1015, 0, 265, 88],
+        "expected": ["^[灵霊]基[变変][还還]$"],
+        "threshold": 0.85
+      }
+    },
+    "timeout": 0,
+    "on_error": []
+  },
+  "搓丸子整理-贩卖从者页签": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          "搓丸子整理-贩卖列表标题",
+          "搓丸子整理-贩卖已选数量",
+          {
+            "recognition": {
+              "type": "ColorMatch",
+              "param": {
+                "roi": [24, 105, 39, 44],
+                "lower": [170, 45, 0],
+                "upper": [255, 195, 130],
+                "count": 300,
+                "method": 4
+              }
+            }
+          }
+        ]
+      }
+    },
+    "timeout": 0,
+    "on_error": [],
+    "doc": "灵基变还页第一个页签为橙色时正在处理从者。标题、已选数量与页签颜色同时成立。"
+  },
+  "搓丸子整理-切到贩卖从者": {
+    "next": ["搓丸子整理-贩卖从者页签", "搓丸子整理-点击贩卖从者页签"],
+    "on_error": []
+  },
+  "搓丸子整理-贩卖选择为空": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [795, 95, 125, 65],
+        "expected": ["^0\\s*/\\s*[1-9][0-9,]*$"],
+        "threshold": 0.85
+      }
+    },
+    "timeout": 0,
+    "on_error": []
+  },
+  "搓丸子整理-贩卖只选一张": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [795, 95, 125, 65],
+        "expected": ["^1\\s*/\\s*[1-9][0-9,]*$"],
+        "threshold": 0.85
+      }
+    },
+    "timeout": 0,
+    "on_error": []
+  },
+  "搓丸子整理-点击贩卖从者页签": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": ["搓丸子整理-贩卖列表标题", "搓丸子整理-贩卖选择为空"]
+      }
+    },
+    "action": {
+      "type": "Click",
+      "param": {"target": [95, 126, 1, 1]}
+    },
+    "next": ["搓丸子整理-贩卖从者页签"],
+    "on_error": [],
+    "post_delay": 450,
+    "max_hit": 1
+  },
+  "搓丸子整理-贩卖从者持有数量": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [34, 125, 132, 34],
+        "expected": ["^[0-9][0-9,]*\\s*/\\s*[1-9][0-9,]*$"],
+        "threshold": 0.85
+      }
+    },
+    "timeout": 0,
+    "on_error": [],
+    "doc": "贩卖列表左上从者页签下方的当前持有数与上限。不是右边贩卖已选数量。"
+  },
   "搓丸子整理-预览候选": {
     "timeout": 10000,
     "on_error": [],
@@ -548,21 +643,9 @@
       ],
       "aqf_override": {
         "搓丸子整理-QP已满": {
-          "action": {
-            "type": "Click",
-            "param": {
-              "target": [
-                920,
-                560,
-                1,
-                1
-              ]
-            }
-          },
-          "next": [
-            "搓丸子整理-等待贩卖结果"
-          ]
-        }
+          "next": ["搓丸子整理-授权继续贩卖"]
+        },
+        "搓丸子整理-授权继续贩卖": {"enabled": true}
       }
     },
     "timeout": 30000,
@@ -573,17 +656,75 @@
       "搓丸子整理-执行提交贩卖"
     ]
   },
+  "搓丸子整理-贩卖确认框": {
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": [
+          {
+            "sub_name": "base/搓丸子整理/搓丸子整理-贩卖确认框/OCR1",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [542, 18, 220, 59],
+                "threshold": 0.85,
+                "expected": ["^[灵霊]基[变変][还還]$"]
+              }
+            }
+          },
+          {
+            "sub_name": "base/搓丸子整理/搓丸子整理-贩卖确认框/OCR2",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [325, 421, 630, 45],
+                "threshold": 0.85,
+                "expected": ["^即将变还选中从者[，,。]?$|サーヴァント.*(?:くべ|[変变]還)"]
+              }
+            }
+          },
+          {
+            "sub_name": "base/搓丸子整理/搓丸子整理-贩卖确认框/OCR3",
+            "recognition": {
+              "type": "OCR",
+              "param": {
+                "roi": [384, 543, 512, 44],
+                "threshold": 0.85,
+                "expected": ["^是否确认执行[？?]?$|よろしいですか|実行しますか"]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "timeout": 0,
+    "on_error": [],
+    "doc": "确认弹窗中央标题加从者正文。国服实际正文「即将变还选中从者」，礼装、纹章及背景同名标题不能授权。"
+  },
   "搓丸子整理-确认贩卖": {
+    "enabled": false,
     "timeout": 10000,
     "on_error": [],
     "attach": {
       "reused_action_from": "整理礼物盒-贩点贩卖"
     },
     "recognition": {
-      "type": "TemplateMatch",
+      "type": "And",
       "param": {
-        "template": "整理礼物盒/销毁按钮.png",
-        "threshold": 0.8
+        "all_of": [
+          "搓丸子整理-贩卖确认框",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "整理礼物盒/销毁按钮.png",
+                "threshold": 0.88,
+                "roi": [698, 584, 282, 88]
+              }
+            }
+          }
+        ],
+        "box_index": 1
       }
     },
     "action": {
@@ -606,19 +747,73 @@
       "搓丸子整理-关闭贩卖结果"
     ]
   },
+  "搓丸子整理-QP上限警告": {
+    "timeout": 0,
+    "on_error": [],
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [280, 155, 725, 425],
+        "expected": [
+          "(?:QP|量子).*(?:已满|已滿|(?:达到|达到持有|超过|超出|将超出).*上限|上限.*(?:达到|超过))",
+          "(?:QP|クォンタム).*(?:上限|最大).*(?:超|達|達する)"
+        ],
+        "threshold": 0.85
+      }
+    }
+  },
   "搓丸子整理-QP已满": {
     "timeout": 10000,
     "on_error": [],
-    "focus": {
-      "Node.Recognition.Succeeded": "QP已满，按设置停止。"
-    },
+    "max_hit": 1,
     "recognition": {
-      "type": "TemplateMatch",
+      "type": "And",
+      "param": {"all_of": ["搓丸子整理-QP上限警告"]}
+    },
+    "doc": "默认停止。整理礼物盒的QP提示模板仅包含通用确定字样，单独命中不能用于判定QP已满。"
+  },
+  "搓丸子整理-授权继续贩卖": {
+    "enabled": false,
+    "timeout": 10000,
+    "on_error": [],
+    "max_hit": 1,
+    "recognition": {
+      "type": "And",
       "param": {
-        "template": "整理礼物盒/QP已满提示.png",
-        "threshold": 0.7
+        "all_of": [
+          "搓丸子整理-QP上限警告",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "整理礼物盒/QP已满提示.png",
+                "threshold": 0.9,
+                "roi": [705, 475, 312, 165]
+              }
+            }
+          }
+        ],
+        "box_index": 1
       }
-    }
+    },
+    "action": {"type": "Click"},
+    "next": ["搓丸子整理-等待贩卖结果"],
+    "post_delay": 500
+  },
+  "搓丸子整理-贩卖结果弹窗": {
+    "recognition": {
+      "type": "OCR",
+      "param": {
+        "roi": [303, 35, 675, 238],
+        "expected": [
+          "灵基变还.*(?:完成|结果|成功)|变还(?:完成|结果|成功)|获得(?:的)?道具",
+          "霊基[変变]還.*(?:完了|結果)|[変变]還(?:完了|結果)|獲得(?:した)?アイテム"
+        ],
+        "threshold": 0.85
+      }
+    },
+    "timeout": 0,
+    "on_error": []
   },
   "搓丸子整理-关闭贩卖结果": {
     "timeout": 10000,
@@ -627,10 +822,22 @@
       "reused_action_from": "整理礼物盒-贩关奖励"
     },
     "recognition": {
-      "type": "TemplateMatch",
+      "type": "And",
       "param": {
-        "template": "整理礼物盒/变还关闭按钮.png",
-        "threshold": 0.8
+        "all_of": [
+          "搓丸子整理-贩卖结果弹窗",
+          {
+            "recognition": {
+              "type": "TemplateMatch",
+              "param": {
+                "template": "整理礼物盒/变还关闭按钮.png",
+                "threshold": 0.9,
+                "roi": [442, 470, 390, 240]
+              }
+            }
+          }
+        ],
+        "box_index": 1
       }
     },
     "action": {
@@ -647,19 +854,12 @@
     "timeout": 10000,
     "on_error": [],
     "focus": {
-      "Node.Recognition.Succeeded": "本轮变还完成。"
+      "Node.Recognition.Succeeded": "已回到灵基变还列表，正在核对从者持有数量。"
     },
     "recognition": {
-      "type": "TemplateMatch",
+      "type": "And",
       "param": {
-        "template": "整理礼物盒/灵基变还界面标志.png",
-        "threshold": 0.7,
-        "roi": [
-          0,
-          0,
-          1280,
-          200
-        ]
+        "all_of": ["搓丸子整理-贩卖从者页签", "搓丸子整理-贩卖选择为空"]
       }
     }
   },
@@ -1119,6 +1319,12 @@
   "搓丸子整理-执行提交贩卖": {
     "timeout": 10000,
     "on_error": [],
+    "recognition": {
+      "type": "And",
+      "param": {
+        "all_of": ["搓丸子整理-贩卖从者页签", "搓丸子整理-贩卖只选一张"]
+      }
+    },
     "action": {
       "type": "Click",
       "param": {
@@ -1142,6 +1348,7 @@
     "next": [
       "[JumpBack]搓丸子网络-重试",
       "搓丸子网络-重试耗尽",
+      "搓丸子整理-QP已满",
       "搓丸子整理-确认贩卖"
     ]
   },

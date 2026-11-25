@@ -1,10 +1,13 @@
 """Pure policy boundaries: configuration, quotas and material eligibility."""
 from dataclasses import replace
+import json
 from pathlib import Path
+import re
 import sys
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "agent/custom"))
+ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "agent/custom"))
 from expball_policy import (CardObservation, ExpballConfig, ExpballConfigError,
                             TargetQuota, boolean, material_allowed, parse_targets,
                             read_level, read_number)
@@ -36,6 +39,42 @@ class ExpballPolicyTests(unittest.TestCase):
                       {"make_ball": False}):
             with self.subTest(patch=patch), self.assertRaises(ExpballConfigError):
                 ExpballConfig.parse(patch)
+
+    def test_ce_budgets_default_independently_of_other_limits(self):
+        config = ExpballConfig.parse({"max_cycles": 1, "max_draw_batches": 2, "friend_points_reserve": 3})
+        self.assertEqual(config.max_material_batches, 10)
+        self.assertEqual(config.max_ce_qp, 100000)
+        config = ExpballConfig.parse({"max_material_batches": "0", "max_ce_qp": "0"})
+        self.assertEqual(config.max_material_batches, 0)
+        self.assertEqual(config.max_ce_qp, 0)
+
+    def test_ce_budget_options_match_entry_and_parser_boundaries(self):
+        options = json.loads((ROOT / "assets/options/搓丸子.json").read_text("utf-8"))["option"]
+        entry = json.loads((ROOT / "assets/resource/base/pipeline/搓丸子入口.json").read_text("utf-8"))
+        auto_ce = options["搓丸子-自动搓丸子"]
+        active = next(case for case in auto_ce["cases"] if case["name"] == "on")
+        inactive = next(case for case in auto_ce["cases"] if case["name"] == "off")
+        for option, field, limit in (
+            ("搓丸子-礼装强化批次上限", "max_material_batches", 9999),
+            ("搓丸子-礼装强化QP上限", "max_ce_qp", 999999999),
+        ):
+            with self.subTest(field=field):
+                self.assertIn(option, active["option"])
+                self.assertNotIn(option, inactive.get("option", []))
+                config_input, = options[option]["inputs"]
+                self.assertEqual(config_input["name"], field)
+                self.assertEqual(config_input["pipeline_type"], "int")
+                attach = options[option]["pipeline_override"]["执行搓丸子"]["attach"]
+                self.assertEqual(attach, {field: "{" + field + "}"})
+                self.assertEqual(int(config_input["default"]), getattr(ExpballConfig.parse({}), field))
+                self.assertEqual(int(config_input["default"]), entry["执行搓丸子"]["attach"][field])
+                for value in ("0", str(limit)):
+                    self.assertIsNotNone(re.fullmatch(config_input["verify"], value))
+                    self.assertEqual(getattr(ExpballConfig.parse({field: value}), field), int(value))
+                for value in ("-1", str(limit + 1), "1.5", "", True):
+                    self.assertIsNone(re.fullmatch(config_input["verify"], str(value)))
+                    with self.assertRaisesRegex(ExpballConfigError, config_input["label"]):
+                        ExpballConfig.parse({field: value})
 
     def test_same_identity_finite_targets_merge_but_types_stay_separate(self):
         entries = parse_targets({**target(1, count=2), **target(2, count=3),

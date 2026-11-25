@@ -484,14 +484,17 @@ class FriendSummonPipelineTests(unittest.TestCase):
                     self.assertEqual(seen, [P + "识别失败"])
                     self.assertEqual(c.confirmations, 0)
 
-    def test_free_reset_prompt_accepts_observed_ocr_missing_only_leading_symbol(self):
-        text = "AM0：00过后，将可以再次免费召唤。"
-        seen, c, _ = self.run_scenario("free_pool", free_authorized=True, confirm_kind="free_cn",
-                                     free_texts={"免费重置提示": text})
-        self.assertEqual(seen, [P + "结果就绪"])
-        self.assertEqual(c.confirmations, 1)
+    def test_free_reset_prompt_accepts_observed_ocr_variants(self):
+        for hour in ("0", "O"):
+            with self.subTest(hour=hour):
+                text = f"AM{hour}：00过后，将可以再次免费召唤。"
+                seen, c, _ = self.run_scenario("free_pool", free_authorized=True, confirm_kind="free_cn",
+                                             free_texts={"免费重置提示": text})
+                self.assertEqual(seen, [P + "结果就绪"])
+                self.assertEqual(c.confirmations, 1)
         param = self.production[P + "免费重置提示"]["recognition"]["param"]
         for invalid in ("AM1：00过后，将可以再次免费召唤。", "AM0：00过后，将可以再次召唤。",
+                        "AMO：01过后，将可以再次免费召唤。", "AM0：0O过后，将可以再次免费召唤。",
                         "※※AM0：00过后，将可以再次免费召唤。"):
             self.assertFalse(any(re.search(pattern, invalid) for pattern in param["expected"]), invalid)
 

@@ -15,6 +15,8 @@
             "ball_star": 1,
             "eat3": false,
             "eat4": false,
+            "max_material_batches": 10,
+            "max_ce_qp": 100000,
             "draw_fp": false,
             "draw_batch": 10,
             "direction": "left",
