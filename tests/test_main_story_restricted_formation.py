@@ -2,6 +2,7 @@
 import copy
 import json
 from pathlib import Path
+import re
 from types import SimpleNamespace as NS
 import unittest
 from unittest.mock import patch
@@ -281,6 +282,23 @@ class RestrictedStateTests(unittest.TestCase):
                 self.assertFalse(runtime._handle_restricted_formation({signal}))
                 self.assertFalse(runtime.current_restricted)
                 self.assertEqual(context.actions, [])
+
+
+class RestrictionNoticePipelineTests(unittest.TestCase):
+    def test_both_cn_condition_titles_are_recognized_before_background_slots(self):
+        pipeline_dir = ROOT / "assets/resource/base/pipeline"
+        close = json.loads((pipeline_dir / "主线限制编队.json").read_text("utf8"))["主线限制-关闭提示"]
+        recognition = close["recognition"]["param"]
+        title, button = [clause["recognition"]["param"] for clause in recognition["all_of"]]
+        main = json.loads((pipeline_dir / "自动推主线.json").read_text("utf8"))["主线-编制限制"]
+        fallback = main["recognition"]["param"]["expected"]
+        for text in ("编制条件", "编成条件"):
+            with self.subTest(text=text):
+                self.assertTrue(any(re.fullmatch(pattern, text) for pattern in title["expected"]))
+                self.assertTrue(any(re.fullmatch(pattern, text) for pattern in fallback))
+        self.assertTrue(any(re.fullmatch(pattern, "关闭") for pattern in button["expected"]))
+        self.assertEqual(recognition["box_index"], 1)
+        self.assertEqual(close["next"], [])
 
 
 class SoloSortiePipelineTests(unittest.TestCase):
