@@ -82,6 +82,8 @@
           "option": [
             "搓丸子-丸子星级",
             "搓丸子-额外材料",
+            "搓丸子-礼装强化批次上限",
+            "搓丸子-礼装强化QP上限",
             "搓丸子-成品入库"
           ]
         }
@@ -172,6 +174,48 @@
         }
       ],
       "description": "作为强化素材的礼装会被消耗；3星和4星互不连带。锁定、标记及保留目标不作为素材。"
+    },
+    "搓丸子-礼装强化批次上限": {
+      "type": "input",
+      "label": "最多礼装强化批次",
+      "inputs": [
+        {
+          "name": "max_material_batches",
+          "label": "最多礼装强化批次",
+          "default": "10",
+          "pipeline_type": "int",
+          "verify": "^(0|[1-9][0-9]{0,3})$"
+        }
+      ],
+      "pipeline_override": {
+        "执行搓丸子": {
+          "attach": {
+            "max_material_batches": "{max_material_batches}"
+          }
+        }
+      },
+      "description": "累计本次搓丸子任务的实际礼装强化批次，换底卡和仓满恢复时继续累计。填0时不提交礼装强化。"
+    },
+    "搓丸子-礼装强化QP上限": {
+      "type": "input",
+      "label": "礼装强化总QP上限",
+      "inputs": [
+        {
+          "name": "max_ce_qp",
+          "label": "礼装强化总QP上限",
+          "default": "100000",
+          "pipeline_type": "int",
+          "verify": "^(0|[1-9][0-9]{0,8})$"
+        }
+      ],
+      "pipeline_override": {
+        "执行搓丸子": {
+          "attach": {
+            "max_ce_qp": "{max_ce_qp}"
+          }
+        }
+      },
+      "description": "累计本次搓丸子任务中礼装强化消耗的QP。预计下一批将超过上限时，在扣费前停止礼装强化。填0时不提交礼装强化。"
     },
     "搓丸子-成品入库": {
       "type": "select",
@@ -721,7 +765,8 @@
             "max_cycles": "{max_cycles}"
           }
         }
-      }
+      },
+      "description": "限制外层循环和各类整理的处理轮数。礼装强化批次和QP上限在「自动搓丸子」下单独设置。"
     }
   }
 }

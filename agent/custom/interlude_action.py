@@ -46,7 +46,9 @@ def same_list(first, second):
 
 
 class InterludeRunner(StoryRunner):
-    def __init__(self, context, *, clock=time.monotonic, sleep=time.sleep):
+    task_name = "自动幕间副本"
+
+    def __init__(self, context, *, config=None, clock=time.monotonic, sleep=time.sleep):
         # 只复用主线执行器的单场行为，不继承另一任务的运行时选项。
         isolated = context.clone()
         isolated.override_pipeline({"主线-配置": {"attach": {
@@ -54,7 +56,7 @@ class InterludeRunner(StoryRunner):
             "use_spirit_stone": False, "retry_without_spirit_stone": False,
         }}})
         super().__init__(isolated, clock=clock, sleep=sleep)
-        self.config = (context.get_node_data("幕间-配置") or {}).get("attach", {})
+        self.config = config if config is not None else (context.get_node_data("幕间-配置") or {}).get("attach", {})
         self.limit = self.config.get("quest_limit", 999)
         self.timeout = self.config.get("transition_timeout", 120)
         if type(self.limit) is not int or not 1 <= self.limit <= 999:
@@ -225,11 +227,19 @@ class InterludeRunner(StoryRunner):
         return bool(detail["uncertain_count"]) or (
             not detail["row_count"] and not detail.get("empty_confirmed", False))
 
-    def scan_entries(self, image, map_mode=False):
+    def scan_entries(self, image, map_mode=False, *, find_target=None):
         """首次复位、完成小关后直接扫描；确认触底且无未知条目才报告清空。"""
         up = "幕间-地图列表复位" if map_mode else "幕间-列表复位"
         down = "幕间-地图列表向下滑动" if map_mode else "幕间-列表向下滑动"
         node = "幕间-地图关卡" if map_mode else "幕间-可挑战条目"
+
+        def find_interlude(frame):
+            result = self.reco(node, frame)
+            return (node, result) if result else None
+
+        # 混合地图详情上的主线等其他卡片可以留在原处，只选择调用方明确识别的目标。
+        check_uncertain = find_target is None
+        find_target = find_target or find_interlude
         # 总列表还含大量未开启条目；不能用当前可见的少数幕间推定列表长度。
         bound = 12 if map_mode else 400
         self._ensure_list(image, map_mode)
@@ -256,10 +266,11 @@ class InterludeRunner(StoryRunner):
                 raise StoryStopped("幕间列表复位超过上限，无法确认已回到顶部。请手动将列表拉到顶部后重试。")
         uncertain = False
         for _ in range(bound):
-            result = self.reco(node, image)
-            if result:
-                return node, result
-            uncertain |= self._scan_uncertain(image, map_mode)
+            target = find_target(image)
+            if target:
+                return target
+            if check_uncertain:
+                uncertain |= self._scan_uncertain(image, map_mode)
             previous = image
             self.action(down)
             self.pause(.6)
@@ -271,10 +282,11 @@ class InterludeRunner(StoryRunner):
                 self._ensure_list(stable, map_mode)
                 if same_list(image, stable):
                     # 最后稳定帧再复核一次，不能用滑动前的候选/空结果。
-                    result = self.reco(node, stable)
-                    if result:
-                        return node, result
-                    uncertain |= self._scan_uncertain(stable, map_mode)
+                    target = find_target(stable)
+                    if target:
+                        return target
+                    if check_uncertain:
+                        uncertain |= self._scan_uncertain(stable, map_mode)
                     if uncertain:
                         raise StoryStopped("列表中有无法确认是否开启的幕间，无法确定已全部完成。请检查当前条目及开启条件后重试。")
                     return None
@@ -341,7 +353,7 @@ class InterludeRunner(StoryRunner):
         node, result = target
         detail = recognition_detail(result)
         label = "前往故事舞台" if detail.get("kind") == "stage" else "挑战幕间小关"
-        mfaalog.info(f"[自动幕间副本] {label}：{detail.get('title') or '已识别的幕间'}")
+        mfaalog.info(f"[{self.task_name}] {label}：{detail.get('title') or '已识别的幕间'}")
         self.action(node, result)
         deadline = self.clock() + self.timeout
         story_seen, return_since = False, None
@@ -355,11 +367,10 @@ class InterludeRunner(StoryRunner):
                 continue
             if self.battle_ready(image):
                 return "battle"
-            total, stage = self.total_list(image), self.on_map(image)
-            if node == "幕间-可挑战条目" and stage and not story_seen:
+            if node == "幕间-可挑战条目" and not story_seen and self.on_map(image):
                 self._map_opened_at = self.completed
                 return "map"
-            if story_seen and (total or stage):
+            if story_seen and self.panel(image):
                 if return_since is None:
                     return_since = self.clock()
                 if self.clock() - return_since >= 3 and self.clock() >= self.skip_settle_until:

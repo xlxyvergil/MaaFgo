@@ -92,7 +92,9 @@ class CeGameModel:
     def __init__(self, runner, *, bases=(), materials=(), after=None, material_changes=None,
                  finished=(), no_base_terminal=False, unverified_lock=False, unknown_finished_level=False,
                  base_pages=None, material_pages=None, finished_pages=None, bottom_known=True,
-                 storage_selected=0, storage_selection_delta=1):
+                 storage_selected=0, storage_selection_delta=1, parent_prefill=0,
+                 unexpected_material_count=0, material_click_delta=1, remaining_exp=1000,
+                 after_exp=None, ce_cost=60, submit_result="搓丸子-强化一批完成"):
         self.runner = runner
         self.bases = {tuple(self.BOXES[i]): card for i, card in enumerate(bases)}
         self.materials = {tuple(self.BOXES[i]): card for i, card in enumerate(materials)}
@@ -116,6 +118,13 @@ class CeGameModel:
         self.chosen_base_page = None
         self.selected_materials = []
         self.selected_material_pages = []
+        self.parent_prefill = parent_prefill
+        self.cleared_prefills = []
+        self.unexpected_material_count = unexpected_material_count
+        self.material_click_delta = material_click_delta
+        self.material_count = 0
+        self.remaining_exp, self.after_exp = remaining_exp, after_exp
+        self.ce_cost, self.submit_result = ce_cost, submit_result
         self.storage_selections = []
         self.storage_selected = storage_selected
         self.storage_selection_delta = storage_selection_delta
@@ -144,6 +153,14 @@ class CeGameModel:
     def recognition(self, name, **kwargs):
         if name == "搓丸子整理-已选数量":
             return texts(f"{self.storage_selected}/1600")
+        if name == "搓丸子-素材已选数量":
+            return texts(f"{self.material_count}/20")
+        if name == "搓丸子-底卡选定复查":
+            return self.base is not None
+        if name == "搓丸子-强化页底卡剩余经验" and self.remaining_exp is not None:
+            return texts(f"{self.remaining_exp:,}")
+        if name == "搓丸子-强化页所需量子" and self.ce_cost is not None:
+            return texts(f"{self.ce_cost:,}")
         if name == "搓丸子-列表到底":
             return self.bottom_known and self.page >= len(self.pages[self.phase]) - 1
         return None
@@ -184,21 +201,35 @@ class CeGameModel:
             self.chosen_base_box = tuple(override[entry]["action"]["param"]["target"])
             self.chosen_base_page = self.page
             self.base = self.observations[self.chosen_base_box]
+            self.material_count = self.parent_prefill
             return "搓丸子-底卡选定"
+        if entry == "搓丸子-清除礼装预选素材":
+            self.cleared_prefills.append(self.material_count)
+            self.material_count = 0
+            return "搓丸子-礼装素材已清空"
         if entry == "搓丸子-打开素材列表":
             self.phase = "materials"
             self.page = 0
+            self.material_count += self.unexpected_material_count
             return "搓丸子-素材候选就绪"
         if entry == "搓丸子-选择素材":
             self.selected_materials.append(tuple(override[entry]["action"]["param"]["target"]))
             self.selected_material_pages.append(self.page)
+            self.material_count += self.material_click_delta
             return "搓丸子-选择素材完成"
         if entry == "搓丸子-确认素材":
             return "搓丸子-素材已选择"
         if entry == "搓丸子-提交强化":
+            if self.submit_result in ("搓丸子-QP不足", "搓丸子-强化费用复核失败"):
+                return self.submit_result
             if self.after is not None:
                 self.base = self.after
-            return "搓丸子-强化一批完成"
+                for box in self.selected_materials[-self.material_count:]:
+                    self.observations.pop(box)
+                self.material_count = self.parent_prefill
+            if self.after_exp is not None:
+                self.remaining_exp = self.after_exp
+            return self.submit_result
         if entry == "搓丸子-保护半成品":
             self.base = replace(self.base, locked=True)
             return "搓丸子-半成品保护完成"
@@ -241,11 +272,13 @@ class CeGameModel:
 class ExperienceGameModel:
     """Supply page contents and detail text without deciding their eligibility."""
     def __init__(self, runner, pages, *, bottom_known=True, initial_selected=0,
-                 selection_delta=1):
+                 selection_delta=1, sale_stock_change=1, sale_remaining_selection=0):
         self.pages, self.bottom_known, self.page = pages, bottom_known, 0
         self.events, self.selections, self.count_reads = [], [], []
         self.count_node = None
         self.selected, self.selection_delta = initial_selected, selection_delta
+        self.stock = 651
+        self.sale_stock_change, self.sale_remaining_selection = sale_stock_change, sale_remaining_selection
         runner.ctx.nodes["搓丸子整理-预览候选"] = {"attach": {"grid_centers": [[120, 248]]}}
         runner.frame = Mock(return_value="experience-screen")
         runner.task = Mock(side_effect=self.pipeline)
@@ -263,6 +296,12 @@ class ExperienceGameModel:
             return texts(f"{self.selected}/102") if name == self.count_node else None
         if name == "搓丸子整理-列表到底":
             return self.bottom_known and self.page >= len(self.pages) - 1
+        if name == "搓丸子整理-贩卖从者页签":
+            return self.count_node == "搓丸子整理-贩卖已选数量"
+        if name == "搓丸子整理-贩卖从者持有数量":
+            return texts(f"{self.stock}/1000")
+        if name == "搓丸子整理-贩卖已完成":
+            return self.selected == 0
         if name == "搓丸子整理-列表就绪": return True
         if self.card is None: return None
         if name == "搓丸子整理-四星经验值候选": return self.card.star == 4
@@ -284,12 +323,16 @@ class ExperienceGameModel:
         if entry == "搓丸子整理-选择候选":
             self.selections.append(self.page)
             self.selected += self.selection_delta
-        if entry in ("搓丸子整理-提交存储", "搓丸子整理-提交贩卖"):
+        if entry == "搓丸子整理-提交存储":
             self.selected = 0
+        if entry == "搓丸子整理-提交贩卖":
+            self.stock -= self.sale_stock_change
+            self.selected = self.sale_remaining_selection
         endpoints = {
             "搓丸子整理-导航保管室": "搓丸子整理-保管室就绪",
             "搓丸子整理-保管室切从者": "搓丸子整理-保管室从者就绪",
             "搓丸子整理-导航贩卖": "整理礼物盒-导航到灵基变还完成",
+            "搓丸子整理-切到贩卖从者": "搓丸子整理-贩卖从者页签",
             "搓丸子整理-筛选经验卡": "整理礼物盒-已在灵基图标大小检测",
             "搓丸子整理-预览候选": "搓丸子整理-详情就绪",
             "搓丸子整理-关闭详情": "搓丸子整理-列表就绪",
@@ -854,16 +897,143 @@ class ExpballRuntimeTests(unittest.TestCase):
         template = override["搓丸子-底卡只选丸子星级"]["recognition"]["param"]["template"]
         self.assertIn("2星", template)
 
+    def test_prefill_is_cleared_before_the_first_material_scan_and_on_return(self):
+        runner, _ = self.runner()
+        base = CardObservation("10", 1, 1, 10, False, False)
+        world = CeGameModel(runner, bases=[base], materials=[base],
+                            after=replace(base, current=4, maximum=20), parent_prefill=9)
+        self.assertEqual(runner.make_one(), "materials_exhausted")
+        self.assertEqual(world.cleared_prefills, [9, 9])
+        for entry in ("搓丸子-选定底卡", "搓丸子-提交强化"):
+            steps = [event[0] for event in world.events]
+            self.assertEqual(steps[steps.index(entry) + 1:steps.index(entry) + 3],
+                             ["搓丸子-清除礼装预选素材", "搓丸子-打开素材列表"])
+        self.assertEqual(len(world.called("搓丸子-提交强化")), 1)
+
+    def test_unplanned_material_count_never_reaches_confirmation(self):
+        base = CardObservation("10", 1, 1, 10, False, False)
+        for preselected, click_delta, picks in ((9, 1, 0), (0, 2, 1), (0, 0, 1)):
+            with self.subTest(preselected=preselected, click_delta=click_delta):
+                runner, _ = self.runner()
+                world = CeGameModel(runner, bases=[base], materials=[base],
+                                    unexpected_material_count=preselected, material_click_delta=click_delta)
+                with self.assertRaisesRegex(runtime.ExpballFailure, "本批应选"):
+                    runner.make_one()
+                self.assertEqual(len(world.called("搓丸子-选择素材")), picks)
+                self.assertFalse(world.called("搓丸子-确认素材"))
+                self.assertFalse(world.called("搓丸子-提交强化"))
+
+    def test_results_require_growth_of_actual_level_or_limit_from_this_batch(self):
+        runner, _ = self.runner()
+        before = CardObservation("10", 2, 1, 15, False, False)
+        override = runner.ce_result_overrides(before)
+        self.assertTrue(override["搓丸子-强化后底卡实际等级增长"]["enabled"])
+        patterns = override["搓丸子-底卡实际等级"]["recognition"]["param"]["expected"]
+        for text, matches in (("1/15", False), ("5/25", True), ("1/25", True), ("2/15", True),
+                              ("5/14", False), ("1/55", True), ("5/56", False), ("5415", False)):
+            with self.subTest(text=text):
+                self.assertEqual(any(re.search(pattern, text) for pattern in patterns), matches)
+
     def test_success_animation_without_growth_is_not_a_completed_ball(self):
         runner, _ = self.runner()
         base = CardObservation("10", 1, 1, 50, False, False)
         material = CardObservation("20", 2, 1, 55, False, False)
         world = CeGameModel(runner, bases=[base], materials=[material], after=base)
-        with self.assertRaisesRegex(runtime.ExpballFailure, "未确认等级或上限增长"):
+        with self.assertRaisesRegex(runtime.ExpballFailure, "未确认等级、上限或实际经验增长"):
             runner.make_one()
         self.assertEqual(len(world.called("搓丸子-提交强化")), 1)
         self.assertEqual(runner.material_batches, 0)
         self.assertEqual(runner.completed, 0)
+
+    def test_same_level_batch_counts_only_when_actual_remaining_experience_falls(self):
+        base = CardObservation("10", 1, 1, 50, False, False)
+        material = CardObservation("20", 2, 1, 55, False, False)
+        for after_exp in (1500, 0, 2000, 2200):
+            with self.subTest(after_exp=after_exp):
+                runner, _ = self.runner({"max_material_batches": 1})
+                world = CeGameModel(runner, bases=[base], materials=[material], after=base,
+                                    remaining_exp=2000, after_exp=after_exp)
+                if after_exp == 1500:
+                    self.assertEqual(runner.make_one(), "ce_batch_limit")
+                    self.assertEqual(runner.material_batches, 1)
+                else:
+                    with self.assertRaisesRegex(runtime.ExpballFailure, "未确认等级、上限或实际经验增长"):
+                        runner.make_one()
+                    self.assertEqual(runner.material_batches, 0)
+                self.assertEqual((runner.ce_submitted_batches, runner.ce_committed_qp), (1, 60))
+                expected = world.called("搓丸子-提交强化")[0][1]["搓丸子-强化页底卡剩余经验"]
+                patterns = expected["recognition"]["param"]["expected"]
+                for text, matches in (("1", True), ("1,999", True), ("1，500", True), ("1 000", True),
+                                      ("2000", False), ("2,001", False), ("1,50", False),
+                                      ("0", False), ("-1", False), ("15,000", False)):
+                    self.assertEqual(any(re.fullmatch(pattern, text) for pattern in patterns), matches, text)
+
+    def test_exp_and_cost_must_be_available_before_submitting(self):
+        base = CardObservation("10", 1, 1, 50, False, False)
+        for args, message in (({"remaining_exp": None}, "升级剩余"),
+                              ({"ce_cost": None}, "强化页的所需量子"),
+                              ({"ce_cost": 0}, "强化页的所需量子")):
+            with self.subTest(args=args):
+                runner, _ = self.runner()
+                world = CeGameModel(runner, bases=[base], materials=[base], **args)
+                with self.assertRaisesRegex(runtime.ExpballFailure, message):
+                    runner.make_one()
+                self.assertFalse(world.called("搓丸子-提交强化"))
+                self.assertEqual(runner.ce_submitted_batches, 0)
+                self.assertEqual(world.material_count, 0)
+
+    def test_each_zero_budget_stops_before_base_navigation(self):
+        for field, reason in (("max_material_batches", "ce_batch_limit"), ("max_ce_qp", "ce_qp_limit")):
+            with self.subTest(field=field):
+                runner, _ = self.runner({field: 0})
+                world = CeGameModel(runner)
+                self.assertEqual(runner.make_one(), reason)
+                self.assertEqual(world.events, [])
+
+    def test_qp_budget_applies_across_balls_and_exact_limit_still_finishes(self):
+        runner, _ = self.runner({"max_material_batches": 9, "max_ce_qp": 120})
+        base = CardObservation("10", 1, 1, 50, False, False)
+        complete = replace(base, current=50)
+        one = CeGameModel(runner, bases=[base], materials=[base], after=complete, finished=[complete])
+        self.assertEqual(runner.make_one(), "completed")
+        too_costly = CeGameModel(runner, bases=[base], materials=[base], ce_cost=61)
+        self.assertEqual(runner.make_one(), "ce_qp_limit")
+        self.assertFalse(too_costly.called("搓丸子-提交强化"))
+        self.assertEqual(too_costly.material_count, 0)
+        exact = CeGameModel(runner, bases=[base], materials=[base], after=complete, finished=[complete])
+        self.assertEqual(runner.make_one(), "completed")
+        self.assertEqual((runner.ce_submitted_batches, runner.ce_committed_qp, runner.completed), (2, 120, 2))
+        self.assertTrue(one.called("搓丸子-标记当前候选"))
+        self.assertTrue(exact.called("搓丸子-标记当前候选"))
+        exhausted = CeGameModel(runner)
+        self.assertEqual(runner.make_one(), "ce_qp_limit")
+        self.assertEqual(exhausted.events, [])
+
+    def test_rejected_confirmations_do_not_consume_budget(self):
+        base = CardObservation("10", 1, 1, 50, False, False)
+        for terminal in ("搓丸子-QP不足", "搓丸子-强化费用复核失败"):
+            with self.subTest(terminal=terminal):
+                runner, _ = self.runner()
+                world = CeGameModel(runner, bases=[base], materials=[base], submit_result=terminal)
+                if terminal == "搓丸子-QP不足":
+                    self.assertEqual(runner.make_one(), "qp_insufficient")
+                else:
+                    with self.assertRaisesRegex(runtime.ExpballFailure, "未点击「决定」"):
+                        runner.make_one()
+                self.assertEqual((runner.ce_submitted_batches, runner.ce_committed_qp), (0, 0))
+                submit = world.called("搓丸子-提交强化")[0][1]
+                patterns = submit["搓丸子-二次确认费用符合本批"]["recognition"]["param"]["expected"]
+                self.assertTrue(any(re.fullmatch(pattern, "60") for pattern in patterns))
+                self.assertFalse(any(re.fullmatch(pattern, "61") for pattern in patterns))
+
+    def test_warehouse_recovery_stops_the_draw_loop_when_ce_budget_is_reached(self):
+        runner, _ = self.runner({"draw_fp": True, "max_material_batches": 0})
+        runner.summon_once = Mock(return_value="equip_full")
+        world = CeGameModel(runner)
+        self.assertTrue(runner.run())
+        self.assertEqual(runner.reason, "ce_batch_limit")
+        runner.summon_once.assert_called_once()
+        self.assertEqual(world.events, [])
 
     def test_high_star_authorization_requires_actual_rechecked_high_star_materials(self):
         for rarity in (2, 3):
@@ -883,7 +1053,8 @@ class ExpballRuntimeTests(unittest.TestCase):
                     self.assertEqual(submit["搓丸子-高星材料确认"]["next"], ["搓丸子-高星材料授权确认"])
                 else:
                     self.assertEqual(confirm, {})
-                    self.assertEqual(submit, {})
+                    expected = runner.ce_result_overrides(base, world.remaining_exp)
+                    self.assertEqual({name: submit[name] for name in expected}, expected)
 
     def test_two_unmarked_same_id_finished_cards_are_not_marked_by_guessing(self):
         runner, _ = self.runner()
@@ -1040,7 +1211,7 @@ class ExpballRuntimeTests(unittest.TestCase):
                 submit = "搓丸子整理-提交存储" if store else "搓丸子整理-提交贩卖"
                 self.assertIn((submit, 1), world.events)
                 count_node = "搓丸子整理-已选数量" if store else "搓丸子整理-贩卖已选数量"
-                self.assertEqual(world.count_reads, [count_node, count_node])
+                self.assertEqual(world.count_reads, [count_node] * (2 if store else 3))
                 if store:
                     switch = world.events.index(("搓丸子整理-保管室切从者", 0))
                     prepare = world.events.index(("搓丸子整理-筛选经验卡", 0))
@@ -1087,7 +1258,10 @@ class ExpballRuntimeTests(unittest.TestCase):
                 runner.task.side_effect = fail_filter
                 with self.assertRaisesRegex(runtime.ExpballFailure, "经验值筛选未完成"):
                     runner.cleanup_experience_once(store=store)
-                runner.reco.assert_not_called()
+                if store:
+                    runner.reco.assert_not_called()
+                else:
+                    self.assertEqual(world.count_reads, ["搓丸子整理-贩卖已选数量"])
                 self.assertFalse(world.selections)
                 self.assertFalse(any(name in ("搓丸子整理-预览候选", "搓丸子整理-选择候选",
                                                "搓丸子整理-提交存储", "搓丸子整理-提交贩卖")
@@ -1130,7 +1304,7 @@ class ExpballRuntimeTests(unittest.TestCase):
                     self.assertEqual([event for event in world.events if event[0] == submit], [(submit, 1)])
                     self.assertFalse(any(entry == other_submit for entry, _page in world.events))
                     count_node = "搓丸子整理-已选数量" if store else "搓丸子整理-贩卖已选数量"
-                    self.assertEqual(world.count_reads, [count_node, count_node])
+                    self.assertEqual(world.count_reads, [count_node] * (2 if store else 3))
                     preview = world.events.index(("搓丸子整理-预览候选", 1))
                     close = world.events.index(("搓丸子整理-关闭详情", 1))
                     select = world.events.index(("搓丸子整理-选择候选", 1))
@@ -1196,9 +1370,37 @@ class ExpballRuntimeTests(unittest.TestCase):
                 with self.assertRaisesRegex(runtime.ExpballFailure, "已选对象总数不等于0"):
                     runner.cleanup_experience_once(store=store)
                 self.assertFalse(world.selections)
+                if not store:
+                    self.assertNotIn(("搓丸子整理-筛选经验卡", 0), world.events)
                 self.assertFalse(any(name in ("搓丸子整理-预览候选", "搓丸子整理-提交存储", "搓丸子整理-提交贩卖")
                                      for name, _page in world.events))
                 self.assertEqual(runner.stored + runner.sold, 0)
+
+    def test_experience_sale_requires_cleared_selection_and_exactly_one_less_card(self):
+        for stock_change, remaining in ((0, 0), (2, 0), (1, 1)):
+            with self.subTest(stock_change=stock_change, remaining=remaining):
+                runner, _ = self.runner({"make_ball": False, "sell4": True})
+                world = ExperienceGameModel(runner, [NS(star=4, name="睿智的猛火", locked=False)],
+                                            sale_stock_change=stock_change, sale_remaining_selection=remaining)
+                with self.assertRaisesRegex(runtime.ExpballFailure, "未能确认从者持有数量"):
+                    runner.cleanup_experience_once(store=False)
+                self.assertEqual(world.events.count(("搓丸子整理-提交贩卖", 0)), 1)
+                self.assertEqual(runner.sold, 0)
+
+    def test_experience_sale_rechecks_its_target_after_closing_detail(self):
+        runner, _ = self.runner({"make_ball": False, "sell4": True})
+        world = ExperienceGameModel(runner, [NS(star=4, name="睿智的猛火", locked=False)])
+
+        def recognition(name, **kwargs):
+            if name == "搓丸子整理-四星经验值候选" and ("搓丸子整理-关闭详情", 0) in world.events:
+                return None
+            return world.recognition(name, **kwargs)
+
+        runner.reco.side_effect = recognition
+        with self.assertRaisesRegex(runtime.ExpballFailure, "原位置"):
+            runner.cleanup_experience_once(store=False)
+        self.assertEqual(world.selections, [])
+        self.assertNotIn(("搓丸子整理-提交贩卖", 0), world.events)
 
     def test_experience_cleanup_unexpected_selection_count_never_submits(self):
         for store in (False, True):

@@ -94,7 +94,7 @@ class ExpballServantPipelineTests(unittest.TestCase):
                     text = name
                 elif node == P + "测试从者素材费用零" and state["scene"] == "selected":
                     text = state["cost"]
-                elif node == P + "执行清除测试从者素材" and state["scene"] == "selected":
+                elif node == P + "强化页清除按钮" and state["scene"] == "selected":
                     text = "清除"
                 elif state["scene"] == "profile":
                     texts = {P + "从者资料资料页签": "资料", P + "从者资料战斗页签": "战斗形象",

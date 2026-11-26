@@ -103,6 +103,8 @@ class ExpballConfig:
     ball_star: int
     eat3: bool
     eat4: bool
+    max_material_batches: int
+    max_ce_qp: int
     draw_fp: bool
     draw_batch: int
     direction: str
@@ -125,6 +127,7 @@ class ExpballConfig:
     @classmethod
     def parse(cls, attach):
         defaults = dict(mode="normal", make_ball=True, ball_star=1, eat3=False, eat4=False,
+                        max_material_batches=10, max_ce_qp=100000,
                         draw_fp=False, draw_batch=10, direction="left", max_draw_batches=50,
                         friend_points_reserve=0, max_cycles=200, stop_targets=False,
                         store4=False, store5=False, store_balls=False, sell_servants=False,
@@ -138,6 +141,8 @@ class ExpballConfig:
                                ("max_draw_batches", 1, 9999), ("friend_points_reserve", 0, 999999999),
                                ("max_cycles", 1, 9999), ("target_level", 0, 120)):
             values[key] = integer(values[key], key, low, high)
+        values["max_material_batches"] = integer(values["max_material_batches"], "「最多礼装强化批次」", 0, 9999)
+        values["max_ce_qp"] = integer(values["max_ce_qp"], "「礼装强化总QP上限」", 0, 999999999)
         if values["draw_batch"] not in (10, 100):
             raise ExpballConfigError("每批抽取数量只能为10或100")
         if values["mode"] not in ("normal", "test_servant") or values["direction"] not in ("left", "right"):

@@ -49,6 +49,11 @@ class FreeQuestBadge(CustomRecognition):
         for x, y, w, h in badge_candidates(argv.image):
             if context.tasker.stopping:
                 return None
+            dx, dy = params.get("click_offset_radius", [-1, 1])
+            cx, cy = round(x+w/2+dx*w/2), round(y+h/2+dy*h/2)
+            if any(abs(cx - px) <= 8 and abs(cy - py) <= 8
+                   for px, py in params.get("excluded_clicks", ())):
+                continue
             inset = float(params.get("digit_inset_ratio", .15))
             if not 0 <= inset <= .25:
                 raise ValueError("数字圆章内缩比例无效")
@@ -58,8 +63,6 @@ class FreeQuestBadge(CustomRecognition):
             })
             if not result or not result.hit:
                 continue
-            dx, dy = params.get("click_offset_radius", [-1, 1])
-            cx, cy = round(x+w/2+dx*w/2), round(y+h/2+dy*h/2)
             return CustomRecognition.AnalyzeResult(
                 box=[cx, cy, 1, 1],
                 detail={"badge_box": [x, y, w, h], "digit": result.raw_detail},

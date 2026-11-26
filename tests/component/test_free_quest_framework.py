@@ -189,13 +189,18 @@ class FreeQuestFrameworkTests(FrameworkResources, unittest.TestCase):
         image = np.zeros((720, 1280, 3), np.uint8)
         h, w = badge.shape[:2]
         image[200:200+h, 800:800+w] = badge
+        image[340:340+h, 910:910+w] = badge
         controller = ScreenController(image)
         self.assertTrue(controller.post_connection().wait().succeeded)
         results = []
 
         class Probe(CustomAction):
             def run(self, ctx, argv):
-                results.append(FreeQuestRunner(ctx.clone()).reco("Free-地图数字", image))
+                runner = FreeQuestRunner(ctx.clone())
+                first = runner.map_number(image, [])
+                results.append(first)
+                results.append(runner.map_number(image, [list(first.box)[:2]]))
+                results.append(runner.map_number(image, []))
                 return True
 
         resource.register_custom_action("free_digit_probe", Probe())
@@ -209,6 +214,8 @@ class FreeQuestFrameworkTests(FrameworkResources, unittest.TestCase):
             digit = results[0].raw_detail["best"]["detail"]["digit"]["best"]
             self.assertEqual(digit["text"], "1")
             self.assertGreater(digit["score"], .99)
+            self.assertEqual((results[1].box.x - results[0].box.x, results[1].box.y - results[0].box.y), (110, 140))
+            self.assertEqual(list(results[0].box), list(results[2].box))
             self.assertEqual(controller.clicks, [])
         finally:
             tasker.post_stop().wait()

@@ -23,6 +23,9 @@ class ExpballStopped(ExpballFailure):
     pass
 
 
+CE_BUDGET_STOPS = ("ce_batch_limit", "ce_qp_limit")
+
+
 def merge(base, patch):
     result = deepcopy(base)
     for key, value in patch.items():
@@ -44,6 +47,33 @@ def result_texts(detail):
     return [r.text for r in detail.filtered_results if getattr(r, "text", "").strip()]
 
 
+def decimal_ocr_pattern(digits):
+    plain = "".join(digits)
+    if len(digits) <= 3:
+        return plain
+    first_group = len(digits) % 3 or 3
+    groups = ["".join(digits[:first_group])]
+    groups.extend("".join(digits[i:i + 3]) for i in range(first_group, len(digits), 3))
+    grouped = r"[,， ]".join(groups)
+    return rf"(?:{plain}|{grouped})"
+
+
+def smaller_positive_ocr(value):
+    """生成可匹配 1 到 value-1 的 OCR 正则，允许标准千分组。"""
+    digits = str(value)
+    patterns = [decimal_ocr_pattern(["[1-9]", *("[0-9]" for _ in range(size - 1))])
+                for size in range(1, len(digits))]
+    for index, digit in enumerate(digits):
+        low = 1 if index == 0 else 0
+        high = int(digit) - 1
+        if high < low:
+            continue
+        choice = str(low) if low == high else f"[{low}-{high}]"
+        remaining = len(digits) - index - 1
+        patterns.append(decimal_ocr_pattern([*digits[:index], choice, *(["[0-9]"] * remaining)]))
+    return [rf"^\s*{pattern}\s*$" for pattern in patterns]
+
+
 class ExpballRunner:
     def __init__(self, context, attach, *, catalog=None):
         self.ctx = context
@@ -54,6 +84,7 @@ class ExpballRunner:
         self.equips = {str(e["id"]): e for e in self.catalog["equips"]}
         self.servants = {str(e["id"]): e for e in self.catalog["servants"]}
         self.completed = self.batches = self.material_batches = self.locked = 0
+        self.ce_submitted_batches = self.ce_committed_qp = 0
         self.sold = self.stored = 0
         self.protected = {t.identity for t in self.targets if t.kind == "equip"}
         self.reason = "not_started"
@@ -486,13 +517,100 @@ class ExpballRunner:
                 return base
         raise ExpballFailure("底卡连续取消选中，已停止；未提交强化")
 
+    def ce_result_overrides(self, base, remaining_exp=None):
+        limit = {1: 50, 2: 55}[base.rarity]
+
+        def levels_from(first):
+            return "|".join(str(level) for level in range(first, limit + 1))
+
+        prefix = r"^\s*(?:(?:Lv\.?|[级級])\s*)?"
+        suffix = r"\s*$"
+        patterns = []
+        if base.current < limit:
+            patterns.append(
+                prefix + rf"(?:{levels_from(base.current + 1)})\s*/\s*(?:{levels_from(base.maximum)})" + suffix)
+        if base.maximum < limit:
+            patterns.append(prefix + rf"{base.current}\s*/\s*(?:{levels_from(base.maximum + 1)})" + suffix)
+        overrides = {
+            "搓丸子-强化后底卡实际等级增长": {"enabled": True},
+            "搓丸子-底卡实际等级": {"recognition": {"param": {"expected": patterns}}},
+        }
+        if remaining_exp is not None and remaining_exp > 1:
+            overrides.update({
+                "搓丸子-强化后底卡同级经验增长": {"enabled": True},
+                "搓丸子-强化后底卡等级不变": {"recognition": {"param": {"expected": [
+                    prefix + rf"{base.current}\s*/\s*{base.maximum}" + suffix]}}},
+                "搓丸子-强化页底卡剩余经验": {"recognition": {"param": {
+                    "expected": smaller_positive_ocr(remaining_exp)}}},
+            })
+        return overrides
+
+    def ce_page_number(self, node):
+        image = self.frame()
+        if not self.reco("搓丸子-底卡选定复查", image=image):
+            return None
+        values = {read_number(line) for line in result_texts(self.reco(node, image=image))}
+        return next(iter(values)) if len(values) == 1 else None
+
+    def clear_ce_materials(self):
+        try:
+            self.task("搓丸子-清除礼装预选素材", ["搓丸子-礼装素材已清空"])
+        except ExpballFailure as exc:
+            self.check_stop()
+            raise ExpballFailure("未能确认礼装素材已清空，未提交本批强化。"
+                                 "请在概念礼装强化页点「清除」，确认素材槽为空且所需量子为0后重试。") from exc
+
+    def ce_budget_stop(self, next_cost=1):
+        if self.ce_submitted_batches >= self.config.max_material_batches:
+            mfaalog.info(f"[搓丸子] 已达到「最多礼装强化批次」的{self.config.max_material_batches}批，"
+                         "已停止继续强化礼装。")
+            return "ce_batch_limit"
+        if self.ce_committed_qp + next_cost > self.config.max_ce_qp:
+            mfaalog.info(f"[搓丸子] 礼装强化已用{self.ce_committed_qp:,} QP，"
+                         f"预算为{self.config.max_ce_qp:,} QP，已停止继续强化礼装。")
+            return "ce_qp_limit"
+        return None
+
+    def submit_ce_batch(self, base, remaining_exp, cost, high_star):
+        overrides = self.ce_result_overrides(base, remaining_exp)
+        overrides["搓丸子-二次确认费用符合本批"] = {"enabled": True, "recognition": {"param": {
+            "expected": [rf"^\s*{decimal_ocr_pattern(list(str(cost)))}\s*$"]}}}
+        if high_star:
+            overrides["搓丸子-高星材料确认"] = {"next": ["搓丸子-高星材料授权确认"]}
+        # 强化按钮可能直接进入结果。进入一次提交链即计入预算，除非明确未成交。
+        self.ce_submitted_batches += 1
+        self.ce_committed_qp += cost
+        try:
+            state = self.task("搓丸子-提交强化", [
+                "搓丸子-强化一批完成", "搓丸子-成品完成", "搓丸子-QP不足",
+                "搓丸子-强化费用复核失败", "搓丸子-识别失败"], overrides)
+        except ExpballFailure as exc:
+            self.check_stop()
+            raise ExpballFailure("未能确认本批礼装强化结果，已停止后续提交。"
+                                 "请先核对当前底卡、素材和持有量子，再决定是否重试。") from exc
+        if state in ("搓丸子-QP不足", "搓丸子-强化费用复核失败"):
+            self.ce_submitted_batches -= 1
+            self.ce_committed_qp -= cost
+        if state == "搓丸子-强化费用复核失败":
+            raise ExpballFailure(f"确认框的所需量子未能与强化页的{cost:,} QP核对一致，未点击「决定」。"
+                                 "请取消确认框，核对所需量子后重试。")
+        return state
+
+    def require_ce_material_count(self, expected):
+        count = self.selected_count("搓丸子-素材已选数量", operation="礼装强化")
+        if count != expected:
+            raise ExpballFailure(f"素材列表选中了{count}张，本批应选{expected}张，未提交强化。"
+                                 "请在礼装强化页点「清除」，确认素材槽清空后重试。")
+
     def make_one(self):
+        if reason := self.ce_budget_stop():
+            return reason
         base = self.select_base()
         if base is None:
             return "no_base"
         selected_identity = base.identity
         expected_base = base
-        for _ in range(60):
+        while True:
             self.check_stop()
             base = self.current_base()
             if (base != expected_base or base.identity != selected_identity or base.locked or base.marked
@@ -502,11 +620,20 @@ class ExpballRunner:
                 return self.finish_ball(base)
             if base.rarity != self.config.ball_star:
                 raise ExpballFailure("底卡星级与选择不一致")
+            self.clear_ce_materials()
+            if reason := self.ce_budget_stop():
+                return reason
+            exp_node = "搓丸子-强化页底卡剩余经验"
+            remaining_exp = self.ce_page_number(exp_node)
+            if base.current < base.maximum and (remaining_exp is None or remaining_exp <= 0):
+                raise ExpballFailure("未能读出左侧底卡的「升级剩余」或「NEXT」，无法核对本批强化结果。"
+                                     "请确认底卡等级及剩余经验完整显示后重试。")
             material_overrides = {}
             for star, enabled in ((3, self.config.eat3), (4, self.config.eat4)):
                 if enabled:
                     material_overrides[f"搓丸子-材料选择{star}星"] = {"next": [f"搓丸子-材料{star}星已选", f"搓丸子-材料点{star}星"]}
             self.task("搓丸子-打开素材列表", ["搓丸子-素材候选就绪", "搓丸子-素材不足", "搓丸子-识别失败"], material_overrides)
+            self.require_ce_material_count(0)
             planned = []
             for _page, boxes in self.visible_pages():
                 for box in boxes:
@@ -525,7 +652,7 @@ class ExpballRunner:
                 if protected.identity != base.identity or not protected.locked:
                     raise ExpballFailure("未能确认半成品保护状态")
                 return "materials_exhausted"
-            for box, planned_card in planned:
+            for count, (box, planned_card) in enumerate(planned, start=1):
                 # 列表重排或选择状态变化时取消本批，不能消耗旧坐标对应的新个体。
                 actual = self._preview(box, "材料")
                 if actual != planned_card or not material_allowed(actual, base, self.config, self.protected):
@@ -534,23 +661,42 @@ class ExpballRunner:
                     "搓丸子-选择素材": {"enabled": True, "action": {"param": {"target": box}}},
                     "搓丸子-素材已选中": {"recognition": {"param": {"roi": box}}},
                 })
+                self.require_ce_material_count(count)
             high_star = any(card.rarity in (3, 4) for _box, card in planned)
             # 只对本批已逐张核验并选中的实际高星素材授权，不因配置开关直接确认。
             confirm_override = {"搓丸子-高星素材决定确认": {"next": ["搓丸子-高星素材决定授权确认"]}} if high_star else {}
-            submit_override = {"搓丸子-高星材料确认": {"next": ["搓丸子-高星材料授权确认"]}} if high_star else {}
             self.task("搓丸子-确认素材", ["搓丸子-素材已选择", "搓丸子-识别失败"], confirm_override)
-            state = self.task("搓丸子-提交强化", ["搓丸子-强化一批完成", "搓丸子-成品完成", "搓丸子-QP不足", "搓丸子-识别失败"], submit_override)
+            cost = self.ce_page_number("搓丸子-强化页所需量子")
+            if cost is None or cost <= 0:
+                self.clear_ce_materials()
+                raise ExpballFailure("未能读出概念礼装强化页的所需量子，已清空本批素材。"
+                                     "请确认游戏显示完整的费用数字后重试。")
+            if reason := self.ce_budget_stop(cost):
+                mfaalog.info(f"[搓丸子] 本批需要{cost:,} QP，未提交本批素材。")
+                self.clear_ce_materials()
+                return reason
+            state = self.submit_ce_batch(base, remaining_exp, cost, high_star)
             if state == "搓丸子-QP不足":
                 return "qp_insufficient"
             if self.reco("搓丸子-当前底卡为空"):
                 # 占位不是满级证明；回列表核验已知身份和实际最终等级。
-                return self.finish_ball(base, empty_base=True)
+                result = self.finish_ball(base, empty_base=True)
+                self.material_batches += 1
+                return result
             after = self.current_base()
-            if after.identity != base.identity or (after.current, after.maximum) <= (base.current, base.maximum):
-                raise ExpballFailure("强化后未确认等级或上限增长")
+            if (after.identity, after.rarity, after.locked, after.marked) != (
+                    base.identity, base.rarity, base.locked, base.marked):
+                raise ExpballFailure("强化后未能确认是本批底卡，已停止后续提交。请核对当前礼装和强化结果。")
+            if (after.current, after.maximum) == (base.current, base.maximum):
+                after_remaining = self.ce_page_number(exp_node)
+                grew = remaining_exp is not None and after_remaining is not None and 0 < after_remaining < remaining_exp
+            else:
+                grew = after.current >= base.current and after.maximum >= base.maximum
+            if not grew:
+                raise ExpballFailure("已提交本批礼装强化，但未确认等级、上限或实际经验增长。"
+                                     "请先核对当前底卡和素材，再决定是否重试。")
             expected_base = after
             self.material_batches += 1
-        raise ExpballFailure("当前丸子达到强化批次上限")
 
     def run(self):
         # 开发阶段尚未接通的类别必须在任何游戏输入之前拒绝，而不是忽略开关。
@@ -582,16 +728,21 @@ class ExpballRunner:
                     return True
                 if state == "drawn":
                     continue
-                if not self.recover_capacity(state):
+                recovered = self.recover_capacity(state)
+                if self.reason in CE_BUDGET_STOPS:
+                    return True
+                if not recovered:
                     raise ExpballFailure("当前配置不能释放所需空间，已停止循环")
             elif self.config.make_ball:
                 state = self.make_one()
                 if state == "completed":
-                    continue
+                    state = self.ce_budget_stop()
+                    if state is None:
+                        continue
                 self.reason = state
                 if self.config.levelup:
                     self.level_servant()
-                return state in ("no_base", "materials_exhausted", "qp_insufficient")
+                return state in ("no_base", "materials_exhausted", "qp_insufficient", *CE_BUDGET_STOPS)
             else:
                 if self.config.levelup:
                     self.level_servant()
@@ -691,6 +842,10 @@ class ExpballRunner:
             before = self.material_batches
             state = self.make_one()
             progress = state == "completed" or self.material_batches > before
+            if state == "completed":
+                state = self.ce_budget_stop()
+            if state in CE_BUDGET_STOPS:
+                self.reason = state
         if kind in ("servant_full", "standalone"):
             if self.config.store4 or self.config.store5:
                 progress |= self.cleanup_experience_once(store=True)
@@ -745,7 +900,7 @@ class ExpballRunner:
             raise ExpballFailure("无法确认保管室容量，未提交存储")
         return values[0]
 
-    def selected_count(self, node="搓丸子整理-已选数量"):
+    def selected_count(self, node="搓丸子整理-已选数量", *, operation="整理"):
         values = []
         for text in result_texts(self.reco(node)):
             match = re.search(r"([\d,]+)\s*/\s*([\d,]+)", text)
@@ -754,17 +909,60 @@ class ExpballRunner:
                 if selected is not None and maximum is not None and 0 <= selected <= maximum:
                     values.append(selected)
         if len(set(values)) != 1:
-            raise ExpballFailure("无法确认已选对象总数，未提交整理")
+            raise ExpballFailure(f"无法确认已选对象总数，未提交{operation}。请在游戏中核对已选数量后重试。")
         return values[0]
 
     def require_selection(self, expected, node="搓丸子整理-已选数量"):
         if self.selected_count(node) != expected:
             raise ExpballFailure(f"已选对象总数不等于{expected}，未提交整理")
 
+    def sale_inventory(self, image):
+        values = set()
+        for line in result_texts(self.reco("搓丸子整理-贩卖从者持有数量", image=image)):
+            match = re.fullmatch(r"\s*([0-9,]+)\s*/\s*([0-9,]+)\s*", line)
+            if match:
+                used, capacity = (read_number(value) for value in match.groups())
+                if used is not None and capacity is not None and 0 <= used <= capacity:
+                    values.add((used, capacity))
+        return next(iter(values)) if len(values) == 1 else None
+
+    def sell_experience_card(self):
+        entry = "搓丸子整理-提交贩卖"
+        confirmed = "搓丸子整理-贩卖已完成"
+        qp_full = "搓丸子整理-QP已满"
+        image = self.frame()
+        before = self.sale_inventory(image) if self.reco("搓丸子整理-贩卖从者页签", image=image) else None
+        if before is None or before[0] == 0:
+            raise ExpballFailure("未能读出灵基变还页的从者持有数量，未提交变还。"
+                                 "请在「从者」页签核对持有数量后重试。")
+        overrides = {"搓丸子整理-确认贩卖": {"enabled": True}}
+        terminals = [confirmed, qp_full]
+        if self.config.aqf:
+            limit_override = (self.ctx.get_node_data(entry) or {}).get("attach", {}).get("aqf_override", {})
+            overrides = merge(overrides, limit_override)
+            terminals = [confirmed]
+        try:
+            terminal = self.task(entry, terminals, overrides)
+        except ExpballFailure as exc:
+            self.check_stop()
+            raise ExpballFailure("未能确认本次变还结果，已停止后续变还。"
+                                 "请先查看是否仍有确认框，并核对从者持有数量。") from exc
+        if terminal == qp_full:
+            raise ExpballFailure("游戏提示量子将超出持有上限，已按「贩卖时QP已满」的设置停止。"
+                                 "请检查持有量子后再继续。")
+        image = self.frame()
+        after = self.sale_inventory(image) if self.reco(confirmed, image=image) else None
+        if after != (before[0] - 1, before[1]):
+            raise ExpballFailure(f"未能确认从者持有数量从{before[0]}张减少为{before[0] - 1}张，"
+                                 "已停止后续变还。请检查灵基变还结果和当前持有数量。")
+        self.sold += 1
+        mfaalog.info(f"[搓丸子] 已确认变还1张经验值卡，从者持有数量{before[0]}→{after[0]}")
+
     def cleanup_experience_once(self, *, store):
         allowed = {star for star in (4, 5) if getattr(self.config, ("store" if store else "sell") + str(star))}
         if not allowed:
             return False
+        count_node = "搓丸子整理-已选数量" if store else "搓丸子整理-贩卖已选数量"
         if store:
             self.return_main()
             self.task("搓丸子整理-导航保管室", ["搓丸子整理-保管室就绪"])
@@ -773,6 +971,8 @@ class ExpballRunner:
                 raise ExpballFailure("保管室已满")
         else:
             self.task("搓丸子整理-导航贩卖", ["整理礼物盒-导航到灵基变还完成"])
+            self.require_selection(0, count_node)
+            self.task("搓丸子整理-切到贩卖从者", ["搓丸子整理-贩卖从者页签"])
         override = {
             "整理礼物盒-筛卖选3星": {"next": ["整理礼物盒-筛卖选4星"]},
             "整理礼物盒-筛卖选4星": {"next": ["整理礼物盒-筛卖点4星" if 4 in allowed else "整理礼物盒-筛卖选5星"]},
@@ -782,7 +982,6 @@ class ExpballRunner:
             filter_node = self.ctx.get_node_data("搓丸子整理-筛选经验卡") or {}
             override = merge(override, filter_node.get("attach", {}).get("sale_filter_override", {}))
         self.task("搓丸子整理-筛选经验卡", ["整理礼物盒-已在灵基图标大小检测"], override)
-        count_node = "搓丸子整理-已选数量" if store else "搓丸子整理-贩卖已选数量"
         self.require_selection(0, count_node)
         if self.reco("搓丸子整理-列表无对象"):
             return False
@@ -790,15 +989,15 @@ class ExpballRunner:
         if not centers:
             raise ExpballFailure("缺少整理列表网格，未选择对象")
         names = {4: {"睿智的猛火", "叡智の猛火"}, 5: {"睿智的业火", "叡智の業火"}}
+        markers = {4: "搓丸子整理-四星经验值候选", 5: "搓丸子整理-五星经验值候选"}
         boxes = [[max(0, x - 60), max(0, y - 65), 120, 130] for x, y in centers]
         for _page, current_boxes in self.visible_pages(boxes, prefix="搓丸子整理"):
             image = self.frame()
             if not self.reco("搓丸子整理-列表就绪", image=image):
                 raise ExpballFailure("未确认整理候选列表")
             for box in current_boxes:
-                matched = [star for star in allowed if self.reco(
-                    f"搓丸子整理-{'四' if star == 4 else '五'}星经验值候选", image=image, override={
-                        f"搓丸子整理-{'四' if star == 4 else '五'}星经验值候选": {"recognition": {"param": {"roi": box}}}})]
+                matched = [star for star in allowed if self.reco(markers[star], image=image, override={
+                    markers[star]: {"recognition": {"param": {"roi": box}}}})]
                 if len(matched) != 1:
                     continue
                 star = matched[0]
@@ -815,6 +1014,10 @@ class ExpballRunner:
                 if not identity_ok or locked:
                     image = self.frame()
                     continue
+                if not store and not self.reco(markers[star], override={
+                        markers[star]: {"recognition": {"param": {"roi": box}}}}):
+                    raise ExpballFailure("返回变还列表后，原位置已无法确认是刚核对的经验值卡。"
+                                         "请检查当前筛选及排序后重试。")
                 self.task("搓丸子整理-选择候选", ["搓丸子整理-候选已选择"], {
                     "搓丸子整理-选择候选": {"action": {"param": {"target": box}}},
                     "搓丸子整理-候选已选择": {"recognition": {"param": {"roi": [box[0], box[1], box[2], 5]}}},
@@ -826,12 +1029,7 @@ class ExpballRunner:
                         raise ExpballFailure("保管室已满")
                     self.stored += 1
                 else:
-                    aqf = (self.ctx.get_node_data("搓丸子整理-提交贩卖") or {}).get("attach", {}).get("aqf_override", {}) if self.config.aqf else {}
-                    terminals = ["搓丸子整理-贩卖已完成"] if self.config.aqf else ["搓丸子整理-贩卖已完成", "搓丸子整理-QP已满"]
-                    terminal = self.task("搓丸子整理-提交贩卖", terminals, aqf)
-                    if terminal.endswith("QP已满"):
-                        raise ExpballFailure("QP已满，按设置停止")
-                    self.sold += 1
+                    self.sell_experience_card()
                 return True
         return False
 
@@ -894,7 +1092,9 @@ class ExecuteExpball(CustomAction):
             runner = ExpballRunner(context, attach)
             result = runner.run()
             mfaalog.info(f"[搓丸子] 结束原因={runner.reason} 成品={runner.completed} "
-                         f"召唤批次={runner.batches} 新增锁定={runner.locked}")
+                         f"召唤批次={runner.batches} 新增锁定={runner.locked} "
+                         f"礼装强化={runner.ce_submitted_batches}批/{runner.ce_committed_qp:,} QP "
+                         f"变还经验值卡={runner.sold}张")
             return CustomAction.RunResult(success=result)
         except (ExpballFailure, ExpballConfigError) as exc:
             mfaalog.error(f"[搓丸子] {exc}")

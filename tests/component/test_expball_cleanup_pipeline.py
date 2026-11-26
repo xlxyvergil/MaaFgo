@@ -29,10 +29,11 @@ from maa.tasker import Tasker
 ROOT = Path(__file__).resolve().parents[2]
 P = "搓丸子整理-"
 N = "搓丸子网络-"
+SALE_AUTHORIZATION = {P + "确认贩卖": {"enabled": True}}
 TERMINALS = {
     P + name for name in ("详情就绪", "列表就绪", "候选已选择", "贩卖已完成",
                           "QP已满", "保管室就绪", "存储已完成", "保管室已满",
-                          "列表到底", "翻页完成", "保管室从者就绪")
+                          "列表到底", "翻页完成", "保管室从者就绪", "贩卖从者页签")
 } | {"整理礼物盒-导航到灵基变还完成", "整理礼物盒-已在灵基图标大小检测"}
 
 
@@ -44,13 +45,27 @@ class CleanupMemoryController(CustomController):
                  network_after=None, network_kind="download", network_body=True,
                  network_button=True, filter_window_visible=True,
                  filter_experience_visible=True, filter_experience_after_reposition=None,
-                 filter_experience_after_swipes=None):
+                 filter_experience_after_swipes=None, sale_count=1, sale_return_count=0,
+                 sale_tab="servant", sale_confirmation_body=True, sale_confirmation_button=True,
+                 sale_result_body=True, sale_result_button=True, sale_qp_body=True,
+                 sale_qp_button=True, sale_qp_continue_dismisses=True, sale_qp_warns_first=False):
         self.scene = scene
         self.list_scene = "store_list" if scene in ("store_list", "store_selected") else "sell_list"
         self.green_confirm = green_confirm
         self.qp_full = qp_full
         self.storage_full = storage_full
         self.sell_confirm = sell_confirm
+        self.sale_count = sale_count if scene == "selected" else 0
+        self.sale_return_count = sale_return_count
+        self.sale_tab = sale_tab
+        self.sale_confirmation_body = sale_confirmation_body
+        self.sale_confirmation_button = sale_confirmation_button
+        self.sale_result_body = sale_result_body
+        self.sale_result_button = sale_result_button
+        self.sale_qp_body = sale_qp_body
+        self.sale_qp_button = sale_qp_button
+        self.sale_qp_continue_dismisses = sale_qp_continue_dismisses
+        self.sale_qp_warns_first = sale_qp_warns_first
         self.store_context = store_context
         self.at_bottom = at_bottom
         self.page_after_swipe = page_after_swipe
@@ -103,6 +118,10 @@ class CleanupMemoryController(CustomController):
             if self.scene not in ("store_list", "store_selected") or self.storage_category != "equip":
                 return False
             self.storage_category = "servant"
+        elif name == P + "点击贩卖从者页签":
+            if self.scene != "sell_list" or self.sale_tab == "servant":
+                return False
+            self.sale_tab = "servant"
         elif name == P + "滑动下一页":
             if self.scene not in ("sell_list", "store_list") or self.at_bottom:
                 return False
@@ -118,19 +137,26 @@ class CleanupMemoryController(CustomController):
         elif name == P + "选择候选":
             if self.scene not in ("sell_list", "store_list"): return False
             self.scene = "selected" if self.list_scene == "sell_list" else "store_selected"
+            if self.scene == "selected":
+                self.sale_count = 1
         elif name == P + "提交贩卖":
             if self.scene != "selected": return False
-            self.scene = "sell_confirm" if self.sell_confirm else "unknown_confirm"
+            if self.qp_full and self.sale_qp_warns_first:
+                self.scene = "qp_full"
+            else:
+                self.scene = "sell_confirm" if self.sell_confirm else "unknown_confirm"
         elif name == P + "确认贩卖":
             if self.scene != "sell_confirm": return False
             self.confirmed_sales += 1
             self.scene = "qp_full" if self.qp_full else "sell_reward"
-        elif name == P + "QP已满" and self.scene == "qp_full":
-            # An action is installed here only by the production aqf override.
-            self.scene = "sell_reward"
+        elif name == P + "授权继续贩卖":
+            if self.scene != "qp_full": return False
+            if self.sale_qp_continue_dismisses:
+                self.scene = "sell_reward"
         elif name == P + "关闭贩卖结果":
             if self.scene != "sell_reward": return False
             self.scene = "sell_list"
+            self.sale_count = self.sale_return_count
         elif name == P + "提交存储":
             if self.scene != "store_selected": return False
             self.scene = "store_full" if self.storage_full else "store_confirm"
@@ -221,19 +247,39 @@ class CleanupPipelineTests(unittest.TestCase):
                     # Distinct boxes prove And returns the button (index 0),
                     # rather than the full-screen OCR identity context.
                     return (0, 0, 1280, 720) if leaf.endswith(".1") else (750, 550, 130, 40)
+                if name in (P + "贩卖列表标题", P + "贩卖已选数量"):
+                    return (710, 100, 175, 45) if state in ("sell_list", "selected") else None
+                if name == P + "贩卖只选一张":
+                    return (815, 112, 80, 30) if state == "selected" and controller.sale_count == 1 else None
+                if name == P + "贩卖选择为空":
+                    return (815, 112, 80, 30) if state == "sell_list" and controller.sale_count == 0 else None
+                if name == P + "贩卖从者页签":
+                    return (24, 105, 39, 44) if controller.sale_tab == "servant" else None
+                if name == P + "贩卖确认框":
+                    if state != "sell_confirm": return None
+                    if leaf.endswith(".0"):
+                        return (570, 30, 144, 36)
+                    return (531, 435, 204, 28) if controller.sale_confirmation_body else None
+                if name == P + "确认贩卖":
+                    return (800, 612, 79, 36) if state == "sell_confirm" and controller.sale_confirmation_button else None
+                if name == P + "贩卖结果弹窗":
+                    return (458, 195, 340, 48) if state == "sell_reward" and controller.sale_result_body else None
+                if name == P + "关闭贩卖结果":
+                    return (574, 587, 116, 44) if state == "sell_reward" and controller.sale_result_button else None
+                if name == P + "QP上限警告":
+                    return (280, 288, 725, 70) if state == "qp_full" and controller.sale_qp_body else None
+                if name == P + "授权继续贩卖":
+                    return (807, 535, 182, 48) if state == "qp_full" and controller.sale_qp_button else None
                 if name == "整理礼物盒-筛卖点经验值":
                     return (600, 250, 100, 40) if state == "filter" and controller.filter_experience_visible else None
                 if name == "整理礼物盒-筛卖点决定":
                     return (800, 600, 100, 40) if state == "filter" and controller.filter_window_visible else None
                 allowed = {
-                    "sell_list": {P + "列表就绪", P + "贩卖已完成", "整理礼物盒-已在灵基变还", "整理礼物盒-已在灵基图标大小检测"},
+                    "sell_list": {P + "列表就绪", "整理礼物盒-已在灵基变还", "整理礼物盒-已在灵基图标大小检测"},
                     "store_list": {P + "列表就绪", P + "保管室就绪", P + "存储已完成", "整理礼物盒-已在灵基图标大小检测"},
                     "detail": {P + "详情就绪", P + "执行关闭详情", P + "候选未锁定", P + "候选名称"},
                     "selected": {P + "候选已选择"} if controller.green_confirm else set(),
                     "store_selected": {P + "候选已选择"} if controller.green_confirm else set(),
-                    "sell_confirm": {P + "确认贩卖"},
-                    "sell_reward": {P + "关闭贩卖结果"},
-                    "qp_full": {P + "QP已满"},
                     "store_full": {P + "保管室已满"},
                     "store_reward": {P + "关闭存储结果"},
                     "filter": {"整理礼物盒-筛卖重置筛选", "整理礼物盒-筛卖点4星", "整理礼物盒-筛卖点5星",
@@ -297,7 +343,8 @@ class CleanupPipelineTests(unittest.TestCase):
             tasker = Tasker()
             self.assertTrue(tasker.bind(resource, controller))
             monitored = ["整理礼物盒-导航到灵基变还", "整理礼物盒-筛卖选4星", "整理礼物盒-筛卖选5星",
-                         "整理礼物盒-筛卖找经验值", P + "经验筛选滚动定位", P + "QP已满"]
+                         "整理礼物盒-筛卖找经验值", P + "经验筛选滚动定位", P + "QP已满",
+                         P + "确认贩卖", P + "授权继续贩卖"]
             baseline = {name: copy.deepcopy(resource.get_node_data(name)) for name in monitored}
 
             def run(entry, override=None):
@@ -440,31 +487,91 @@ class CleanupPipelineTests(unittest.TestCase):
                 self.assertEqual(seen, [P + "候选已选择"] if green else [])
                 self.assertEqual(c.confirmed_sales, 0)
 
+    def test_sale_opens_confirmation_only_on_servant_tab_with_one_selected(self):
+        for config in ({"sale_count": 0}, {"sale_count": 2}, {"sale_tab": "equip"}, {"sale_tab": "code"}):
+            with self.subTest(config=config), self.harness("selected", **config) as (c, seen, run):
+                self.assertFalse(run("提交贩卖", SALE_AUTHORIZATION))
+                self.assertEqual(c.steps, [])
+                self.assertEqual(seen, [])
+                self.assertEqual(c.confirmed_sales, 0)
+
+    def test_switches_into_servant_sale_tab_only_from_empty_sale_list(self):
+        for scene, tab, succeeds, steps in (
+            ("sell_list", "servant", True, []),
+            ("sell_list", "equip", True, [P + "点击贩卖从者页签"]),
+            ("selected", "equip", False, []),
+            ("store_list", "equip", False, []),
+        ):
+            with self.subTest(scene=scene, tab=tab), self.harness(scene, sale_tab=tab) as (c, seen, run):
+                self.assertEqual(run("切到贩卖从者"), succeeds)
+                self.assertEqual(c.steps, steps)
+                self.assertEqual(seen, [P + "贩卖从者页签"] if succeeds else [])
+                self.assertEqual(c.confirmed_sales, 0)
+
     def test_sell_requires_second_confirmation_and_returns_to_list(self):
         with self.harness("selected") as (c, seen, run):
-            self.assertTrue(run("提交贩卖"))
+            self.assertTrue(run("提交贩卖", SALE_AUTHORIZATION))
             self.assertEqual(c.confirmed_sales, 1)
+            self.assertEqual(c.action_boxes[P + "确认贩卖"], (800, 612, 79, 36))
+            self.assertEqual(c.action_boxes[P + "关闭贩卖结果"], (574, 587, 116, 44))
             self.assertEqual(seen, [P + "贩卖已完成"])
-        with self.harness("selected", sell_confirm=False) as (c, seen, run):
-            self.assertFalse(run("提交贩卖"))
-            self.assertEqual(c.confirmed_sales, 0)
-            self.assertNotIn(P + "确认贩卖", c.steps)
+        for config, override in (
+            ({}, None), ({"sell_confirm": False}, SALE_AUTHORIZATION),
+            ({"sale_confirmation_body": False}, SALE_AUTHORIZATION),
+            ({"sale_confirmation_button": False}, SALE_AUTHORIZATION),
+        ):
+            with self.subTest(config=config, authorized=bool(override)), self.harness("selected", **config) as (c, seen, run):
+                self.assertFalse(run("提交贩卖", override))
+                self.assertEqual(c.confirmed_sales, 0)
+                self.assertEqual(c.steps, [P + "提交贩卖"])
+                self.assertEqual(seen, [])
+
+    def test_sale_result_requires_reward_modal_then_cleared_selection(self):
+        for config, end_scene, closed in (
+            ({"sale_result_body": False}, "sell_reward", False),
+            ({"sale_result_button": False}, "sell_reward", False),
+            ({"sale_return_count": 1}, "sell_list", True),
+        ):
+            with self.subTest(config=config), self.harness("selected", **config) as (c, seen, run):
+                self.assertFalse(run("提交贩卖", SALE_AUTHORIZATION))
+                self.assertEqual(c.confirmed_sales, 1)
+                self.assertEqual(c.scene, end_scene)
+                self.assertEqual(P + "关闭贩卖结果" in c.steps, closed)
+                self.assertEqual(seen, [])
 
     def test_qp_full_stops_by_default(self):
-        with self.harness("selected", qp_full=True) as (c, seen, run):
-            self.assertTrue(run("提交贩卖"))
-            self.assertEqual(seen, [P + "QP已满"])
-            self.assertEqual(c.scene, "qp_full")
-            self.assertNotIn(P + "QP已满", c.steps)
-            self.assertNotIn(P + "关闭贩卖结果", c.steps)
+        for warns_first in (True, False):
+            with self.subTest(warns_first=warns_first), self.harness(
+                    "selected", qp_full=True, sale_qp_warns_first=warns_first) as (c, seen, run):
+                self.assertTrue(run("提交贩卖", SALE_AUTHORIZATION))
+                self.assertEqual(seen, [P + "QP已满"])
+                self.assertEqual(c.scene, "qp_full")
+                self.assertEqual(c.steps.count(P + "确认贩卖"), 0 if warns_first else 1)
+                self.assertNotIn(P + "授权继续贩卖", c.steps)
+                self.assertNotIn(P + "关闭贩卖结果", c.steps)
 
     def test_qp_continue_is_per_call_override(self):
+        patch = SALE_AUTHORIZATION | self.cleanup[P + "提交贩卖"]["attach"]["aqf_override"]
         with self.harness("selected", qp_full=True) as (c, seen, run):
-            patch = self.cleanup[P + "提交贩卖"]["attach"]["aqf_override"]
             self.assertTrue(run("提交贩卖", patch))
-            self.assertEqual(seen, [P + "贩卖已完成"])
-            self.assertIn(P + "QP已满", c.steps)
+            self.assertEqual(seen, [P + "QP已满", P + "贩卖已完成"])
+            self.assertEqual(c.steps.count(P + "授权继续贩卖"), 1)
+            self.assertEqual(c.action_boxes[P + "授权继续贩卖"], (807, 535, 182, 48))
             self.assertEqual(c.scene, "sell_list")
+
+    def test_qp_continue_requires_warning_and_button_and_never_repeats(self):
+        patch = SALE_AUTHORIZATION | self.cleanup[P + "提交贩卖"]["attach"]["aqf_override"]
+        for config, expected_clicks, terminals in (
+            ({"sale_qp_body": False}, 0, []),
+            ({"sale_qp_button": False}, 0, [P + "QP已满"]),
+            ({"sale_qp_continue_dismisses": False}, 1, [P + "QP已满"]),
+        ):
+            with self.subTest(config=config), self.harness("selected", qp_full=True, **config) as (c, seen, run):
+                self.assertFalse(run("提交贩卖", patch))
+                self.assertEqual(c.steps.count(P + "确认贩卖"), 1)
+                self.assertEqual(c.steps.count(P + "授权继续贩卖"), expected_clicks)
+                self.assertEqual(seen, terminals)
+                self.assertEqual(c.scene, "qp_full")
 
     def test_storage_full_does_not_confirm_transfer(self):
         with self.harness("store_selected", storage_full=True) as (c, seen, run):
@@ -506,7 +613,8 @@ class CleanupPipelineTests(unittest.TestCase):
                 for kind in ("download", "normal"):
                     with self.subTest(entry=entry, blocked=blocked, kind=kind), self.harness(
                             scene, network_after={P + blocked: 1}, network_kind=kind) as (c, seen, run):
-                        self.assertTrue(run(entry))
+                        override = SALE_AUTHORIZATION if entry == "提交贩卖" else None
+                        self.assertTrue(run(entry, override))
                         self.assertEqual(getattr(c, counter), 1)
                         self.assertEqual(c.steps.count(P + entry), 1)
                         self.assertEqual(c.steps.count(P + final), 1)
@@ -523,7 +631,8 @@ class CleanupPipelineTests(unittest.TestCase):
                 ("store_selected", "提交存储", "确认存储", "confirmed_stores")):
             with self.subTest(entry=entry), self.harness(
                     scene, network_after={P + action: 4}) as (c, seen, run):
-                run(entry)  # StopTask may report handled completion; no business terminal is success.
+                override = SALE_AUTHORIZATION if entry == "提交贩卖" else None
+                run(entry, override)  # StopTask may report handled completion; no business terminal is success.
                 self.assertEqual(c.steps.count(N + "重试"), 3)
                 self.assertEqual(c.network_remaining, 1)
                 self.assertEqual(c.steps.count(P + action), 1)

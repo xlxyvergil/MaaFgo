@@ -72,6 +72,7 @@ class CeBombPipelineTests(unittest.TestCase):
         cls.ce = json.loads((ROOT / "assets/resource/base/pipeline/搓丸子.json").read_text("utf-8"))
         cls.shared = json.loads((ROOT / "assets/resource/base/pipeline/强化从者.json").read_text("utf-8"))
         cls.shared.update(json.loads((ROOT / "assets/resource/base/pipeline/搓丸子网络.json").read_text("utf-8")))
+        cls.shared.update(json.loads((ROOT / "assets/resource/base/pipeline/搓丸子从者.json").read_text("utf-8")))
 
     def test_qp_shortage_requires_an_explicit_negative_phrase(self):
         patterns = self.ce[PREFIX + "QP不足提示"]["recognition"]["param"]["expected"]
@@ -416,6 +417,22 @@ class CeBombPipelineTests(unittest.TestCase):
         self.assertNotIn(PREFIX + "强化二次确认", seen)
         self.assertNotIn(PREFIX + "强化一批完成", seen)
 
+    def test_unverified_confirmation_fee_keeps_final_confirmation_unclicked(self):
+        guard = PREFIX + "二次确认费用符合本批"
+        confirm = PREFIX + "强化二次确认"
+        rejected = PREFIX + "强化费用复核失败"
+        self.assertFalse(self.ce[guard]["enabled"])
+        self.assertEqual(self.ce[confirm]["recognition"]["param"]["all_of"],
+                         [PREFIX + "强化确认框", guard])
+        routes = self.ce[PREFIX + "强化确认分派"]["next"]
+        self.assertLess(routes.index(confirm), routes.index(rejected))
+        ok, seen, actions, _, _ = self.run_graph(
+            PREFIX + "提交强化", {"提交强化", "强化费用复核失败", "强化结果页"})
+        self.assertTrue(ok)
+        self.assertIn(rejected, seen)
+        self.assertNotIn(PREFIX + "强化一批完成", seen)
+        self.assertEqual(actions, [(PREFIX + "提交强化执行", "Click")])
+
     def test_next_and_error_routes_are_distinct_and_high_star_rejection_keeps_one_failure_terminal(self):
         # maa-tools 1.1.3 treats next/on_error as a shared set of routes.
         for name, node in self.ce.items():
@@ -673,6 +690,7 @@ class CeBombPipelineTests(unittest.TestCase):
             "保护半成品退出素材列表": "强化从者/返回强化菜单按钮.png",
             "保护半成品关闭详情执行": "友情召唤/详情关闭按钮.png",
             "保护成品关闭详情执行": "友情召唤/详情关闭按钮.png",
+            "执行清除礼装预选素材": PREFIX + "强化页清除按钮",
         }
         composite_clicks = {name for name, node in self.ce.items()
             if node.get("action", {}).get("type") == "Click"
@@ -691,19 +709,24 @@ class CeBombPipelineTests(unittest.TestCase):
                 received.append((argv.node_name, list(argv.box)))
                 return True
 
-        def preserve_composites(recognition, wanted_template):
+        def preserve_composites(recognition, wanted_template, referenced_node=None):
+            if isinstance(recognition, str):
+                source = (self.ce.get(recognition) or self.shared[recognition])["recognition"]
+                return preserve_composites(source, wanted_template, referenced_node=recognition)
             source = deepcopy(recognition)
             kind = source["type"]
             if kind in ("And", "Or"):
                 field = "all_of" if kind == "And" else "any_of"
-                for child in source["param"][field]:
-                    self.assertIsInstance(child, dict)
-                    child["recognition"] = preserve_composites(child["recognition"], wanted_template)
+                source["param"][field] = [
+                    {"recognition": preserve_composites(
+                        child["recognition"] if isinstance(child, dict) else child, wanted_template)}
+                    for child in source["param"][field]
+                ]
                 return source
             templates = source.get("param", {}).get("template", [])
             if isinstance(templates, str):
                 templates = [templates]
-            box = expected_box if wanted_template in templates else guard_box
+            box = expected_box if wanted_template in templates or wanted_template == referenced_node else guard_box
             return {"type": "Custom", "param": {"custom_recognition": "ce_box",
                     "custom_recognition_param": {"box": box}}}
 
@@ -809,29 +832,51 @@ class CeBombPipelineTests(unittest.TestCase):
                 self.assertIn(PREFIX + ("翻页完成" if hits else "识别失败"), seen)
 
     def test_local_ce_navigation_override_does_not_change_original_servant_flow(self):
-        state = {"selected": False}
-        hits = {"强化从者-点从者强化条"} | {PREFIX + x for x in (
-            "详情判定", "打开底卡列表", "底卡列表已打开", "底卡筛选准备", "底卡筛选重置",
+        menu = "强化从者-点从者强化条"
+        hits = {PREFIX + x for x in (
+            "打开底卡列表", "底卡列表已打开", "底卡筛选准备", "底卡筛选重置",
             "底卡星级区就绪", "底卡只选丸子星级", "底卡筛选确认", "底卡图标正常", "底卡打开排序", "底卡确认排序", "底卡列表固定完成")}
-
-        def hit(name, state, source):
-            return state["selected"] if name == PREFIX + "底卡星级已选" else name in hits
-
-        def acted(name, state):
-            if name == PREFIX + "底卡只选丸子星级":
-                state["selected"] = True
-
         override = self.ce[PREFIX + "制作一轮"]["attach"]["ce_navigation_override"]
-        ok, seen, _, _, nested = self.run_graph("强化从者-点从者强化条", hit,
-                            on_action=acted, state=state, nested_override=override)
-        self.assertTrue(ok)
-        self.assertIn(PREFIX + "底卡候选就绪", seen)
-        self.assertEqual(len(nested), 1)
-        succeeded, before, after = nested[0]
-        self.assertTrue(succeeded)
-        self.assertEqual(before["next"], after["next"])
-        self.assertEqual(before["recognition"], after["recognition"])
-        self.assertNotEqual(before["next"], override["强化从者-点从者强化条"]["next"])
+        self.assertEqual(override[menu]["action"]["param"]["target_offset"], [92, 22, -184, -44])
+
+        for enters_on in (1, 2, None):
+            with self.subTest(enters_on=enters_on):
+                def hit(name, state, source):
+                    entered = enters_on is not None and state["clicks"] >= enters_on
+                    if name == menu:
+                        return not entered
+                    if name == PREFIX + "详情判定":
+                        return entered
+                    if name == PREFIX + "底卡星级已选":
+                        return state["selected"]
+                    return name in hits
+
+                def acted(name, state):
+                    if name == menu:
+                        state["clicks"] += 1
+                    if name == PREFIX + "底卡只选丸子星级":
+                        state["selected"] = True
+
+                ok, seen, actions, _, nested = self.run_graph(menu, hit,
+                    on_action=acted, state={"clicks": 0, "selected": False}, nested_override=override)
+                self.assertEqual(ok, enters_on is not None)
+                self.assertEqual(PREFIX + "底卡候选就绪" in seen, ok)
+                self.assertEqual(actions.count((menu, "Click")), enters_on or 2)
+                self.assertEqual(len(nested), 1)
+                succeeded, before, after = nested[0]
+                self.assertEqual(succeeded, ok)
+                self.assertEqual(before, after)
+                self.assertNotEqual(before["next"], override[menu]["next"])
+
+    def test_card_header_accepts_observed_partial_level_labels(self):
+        patterns = self.ce[PREFIX + "候选等级标志"]["recognition"]["param"]["expected"]
+        for text, expected in (
+            ("N级1/10", True), ("级1/15", True), ("級 1 / 15", True),
+            ("Lv.MAX", True), ("等级1/10", True),
+            ("级1/", False), ("1/10", False), ("5", False), ("级1/10ATK", False),
+        ):
+            with self.subTest(text=text):
+                self.assertEqual(any(re.search(pattern, text) for pattern in patterns), expected)
 
     def test_filter_reset_is_bounded_and_never_swipes_an_unknown_modal(self):
         for initial_ready, modal_known, expected_swipes, terminal in (
@@ -863,7 +908,82 @@ class CeBombPipelineTests(unittest.TestCase):
         self.assertIn(PREFIX + "识别失败", seen)
         self.assertEqual(actions, [(PREFIX + "底卡筛选向上复位", "Swipe")] * 9)
 
+    def test_single_page_material_end_requires_positioned_grid_and_background(self):
+        scroll_end = PREFIX + "列表滚动到底"
+        single_page = PREFIX + "国服单页素材列表到底"
+        list_marker, end_paths = self.ce[PREFIX + "列表到底"]["recognition"]["param"]["all_of"]
+        self.assertEqual(list_marker, PREFIX + "列表标志")
+        self.assertEqual(end_paths["recognition"]["param"]["any_of"], [scroll_end, single_page])
+
+        guards = self.ce[single_page]["recognition"]["param"]["all_of"]
+        self.assertIn(PREFIX + "候选等级标志", guards)
+        templates = {guard["recognition"]["param"].get("template")
+                     for guard in guards if isinstance(guard, dict)}
+        self.assertTrue({"整理礼物盒/图标缩放按钮小.png", "搓丸子/国服素材列表第三行空位.png",
+                         "搓丸子/国服素材列表第四行空位.png", "搓丸子/国服素材列表无滚动栏.png"} <= templates)
+        self.assertTrue(any(guard["recognition"]["type"] == "OCR" for guard in guards if isinstance(guard, dict)))
+
+    def test_ce_clear_verifies_empty_slots_and_does_not_repeat_the_clear(self):
+        entry = PREFIX + "清除礼装预选素材"
+        clear = PREFIX + "执行清除礼装预选素材"
+        empty = PREFIX + "礼装素材已清空"
+        self.assertEqual(self.ce[empty]["recognition"]["param"]["all_of"],
+                         [PREFIX + "底卡选定复查", PREFIX + "强化素材均为空"])
+        shared = self.shared[PREFIX + "强化素材均为空"]["recognition"]["param"]["all_of"]
+        self.assertEqual(shared[0], PREFIX + "测试从者素材费用零")
+        self.assertEqual(len({tuple(slot["recognition"]["param"]["roi"]) for slot in shared[1:]}), 20)
+        for initially_empty, clear_works, selected_page in (
+            (True, True, True), (False, True, True), (False, False, True), (False, False, False),
+        ):
+            with self.subTest(initially_empty=initially_empty, clear_works=clear_works, selected_page=selected_page):
+                state = {"empty": initially_empty}
+
+                def hit(name, state, _):
+                    return selected_page and ((name == empty and state["empty"]) or name == clear)
+
+                def acted(name, state):
+                    if name == clear and clear_works:
+                        state["empty"] = True
+
+                ok, seen, actions, _, _ = self.run_graph(entry, hit, on_action=acted, state=state)
+                self.assertEqual(ok, selected_page and (initially_empty or clear_works))
+                self.assertEqual(empty in seen, ok)
+                self.assertEqual(actions, [(clear, "Click")] if selected_page and not initially_empty else [])
+
+    def test_refilled_result_route_is_local_to_an_authorized_batch(self):
+        for branch in ("强化后底卡实际等级增长", "强化后底卡同级经验增长"):
+            progress = PREFIX + branch
+            self.assertFalse(self.ce[progress]["enabled"])
+            self.assertIn(progress, self.ce[PREFIX + "强化确认分派"]["next"])
+            for enabled in (False, True):
+                with self.subTest(branch=branch, enabled=enabled):
+                    ok, seen, actions, _, _ = self.run_graph(PREFIX + "强化结果等待", {progress},
+                        overrides={progress: {"enabled": enabled}})
+                    self.assertTrue(ok)
+                    self.assertEqual(PREFIX + "强化一批完成" in seen, enabled)
+                    self.assertEqual(PREFIX + "识别失败" in seen, not enabled)
+                    self.assertEqual(actions, [])
+
+    def test_same_level_experience_route_uses_actual_left_values(self):
+        branch = self.ce[PREFIX + "强化后底卡同级经验增长"]
+        level, remaining = PREFIX + "强化后底卡等级不变", PREFIX + "强化页底卡剩余经验"
+        self.assertEqual(branch["recognition"]["param"]["all_of"], [PREFIX + "详情判定", level, remaining])
+        self.assertEqual(self.ce[level]["recognition"]["param"]["roi"],
+                         self.ce[PREFIX + "底卡实际等级"]["recognition"]["param"]["roi"])
+        params = self.ce[remaining]["recognition"]["param"]
+        self.assertEqual(params["roi"], [660, 459, 151, 34])
+        self.assertTrue(params["only_rec"])
+        for text in ("100", "500", "1,000", "1,500", "12，345", "12 345"):
+            self.assertTrue(any(re.search(pattern, text) for pattern in params["expected"]))
+        for text in ("100/500", "1,50", "4O0", "-20", "NEXT 500"):
+            self.assertFalse(any(re.search(pattern, text) for pattern in params["expected"]))
+
     def test_no_matching_base_cancels_filter_without_selecting_or_submitting(self):
+        guard = self.ce[PREFIX + "底卡筛选无对象"]["recognition"]["param"]["all_of"][1]
+        patterns = guard["recognition"]["param"]["expected"]
+        for text, matched in (("对象不存在", True), ("対象がありません", True), ("决定", False)):
+            with self.subTest(text=text):
+                self.assertEqual(any(re.search(pattern, text) for pattern in patterns), matched)
         for hits, expected in (
             ({"底卡筛选无对象", "底卡无对象取消筛选", "底卡无对象返回列表"}, "无底卡"),
             (set(), "识别失败"),
