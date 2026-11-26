@@ -4,7 +4,7 @@ from pathlib import Path
 import sys
 import unittest
 from types import SimpleNamespace as NS
-from unittest.mock import patch
+from unittest.mock import call, patch
 
 import cv2
 import numpy as np
@@ -15,10 +15,11 @@ from free_quest_action import FreeQuestRunner
 from free_quest_recognition import badge_candidates
 from main_story_action import StoryStopped
 from test_main_story import Context
+from test_main_story_restricted_formation import CloneContext
 
 
 def runner(frames=(), config=None):
-    ctx = Context(frames)
+    ctx = CloneContext(frames) if config and config.get("clear_interludes") else Context(frames)
     ctx.nodes["Free-配置"]["attach"].update(config or {})
     clock = [0.0]
     def sleep(seconds):
@@ -27,6 +28,9 @@ def runner(frames=(), config=None):
 
 
 ROW = NS(box=NS(x=650, y=157, w=98, h=70))
+MAP = {"主线-地图菜单", "主线-地图控件"}
+POINT = {"主线-列表后退", "幕间-关闭按钮地图"}
+INTERLUDE_NODE = "幕间-地图关卡"
 
 
 class RoutingTests(unittest.TestCase):
@@ -195,6 +199,100 @@ class BadgeTests(unittest.TestCase):
         boxes = badge_candidates(image)
         self.assertEqual(len(boxes), 1)
         self.assertAlmostEqual(boxes[0][0]+boxes[0][2]/2, 800, delta=1)
+
+
+class MixedMapTests(unittest.TestCase):
+    def test_switch_defaults_off_and_changes_only_free_configuration(self):
+        task = json.loads((ROOT / "assets/tasks/自动清free本.json").read_text("utf-8"))["task"][0]
+        options = json.loads((ROOT / "assets/options/自动清free本.json").read_text("utf-8"))["option"]
+        key = "Free-同时清理幕间副本"
+        self.assertIn(key, task["option"])
+        self.assertEqual(options[key]["default_case"], "No")
+        self.assertEqual([case["pipeline_override"] for case in options[key]["cases"]], [
+            {"Free-配置": {"attach": {"clear_interludes": True}}},
+            {"Free-配置": {"attach": {"clear_interludes": False}}},
+        ])
+        r, c = runner()
+        self.assertFalse(r.panel(POINT | {INTERLUDE_NODE}))
+        self.assertNotIn("幕间-关闭按钮地图", c.recognitions)
+
+    def test_interlude_below_visible_free_clear_is_found_after_scroll(self):
+        point = POINT | {"Free-列表标记"}
+        r, c = runner([point, point, point, POINT | {INTERLUDE_NODE}], {"clear_interludes": True})
+        with patch.object(r, "rows", side_effect=lambda frame: iter(((ROW, True),))), \
+             patch("interlude_action.same_list", return_value=True):
+            node, result = r.locate()
+        self.assertEqual(node, INTERLUDE_NODE)
+        self.assertTrue(result.hit)
+        self.assertEqual([name for name, _ in c.actions], ["幕间-地图列表复位", "幕间-地图列表向下滑动"])
+
+    def test_scanned_point_is_skipped_while_next_badge_in_same_view_is_checked(self):
+        r, _ = runner([MAP, POINT, MAP, POINT | {INTERLUDE_NODE}], {"clear_interludes": True})
+        first = NS(box=[700, 200, 1, 1])
+        second = NS(box=[900, 200, 1, 1])
+        skipped = []
+
+        def map_number(image, excluded):
+            skipped.append(list(excluded))
+            return second if excluded else first
+
+        with patch.object(r, "map_number", side_effect=map_number), patch.object(r, "open_panel") as opened, \
+             patch.object(r, "find_map_target", side_effect=[None, (INTERLUDE_NODE, ROW)]), \
+             patch.object(r, "back_to_map") as back:
+            self.assertEqual(r.locate(), (INTERLUDE_NODE, ROW))
+        self.assertEqual(skipped, [[], [[700, 200]]])
+        self.assertEqual(opened.call_args_list, [call(first, "Free-地图数字"), call(second, "Free-地图数字")])
+        back.assert_called_once()
+
+    def test_interlude_return_to_chapter_reopens_previous_point(self):
+        r, c = runner([MAP | {"Free-地图前回", "Free-地图数字"}, POINT], {"clear_interludes": True})
+        r.record_interlude()
+        with patch.object(r, "open_panel") as opened, patch.object(r, "find_map_target", return_value=ROW):
+            self.assertIs(r.locate(), ROW)
+        self.assertEqual(opened.call_args.args[1], "Free-地图前回")
+        self.assertNotIn("Free-地图数字", c.recognitions)
+        self.assertFalse(r.pending_clear)
+        self.assertFalse(r.reopen_interlude_point)
+
+    def test_interlude_entry_defaults_to_restricted_native_battle_even_with_bbc_free(self):
+        point = POINT | {INTERLUDE_NODE}
+        formation = {"进本-队伍确认", "进本-队伍确认页可开始"}
+        r, c = runner([point, formation | {"主线限制-单骑出击"}, point, formation],
+                      {"clear_interludes": True, "battle_mode": "bbc"})
+        interludes = r.interludes
+        self.assertEqual(r.mode, "bbc")
+        self.assertEqual(interludes.mode, "native")
+        with patch.object(interludes, "_story_visible", return_value=False), \
+             patch.object(interludes, "reach_formation"), patch.object(interludes, "_start_formation_battle"):
+            self.assertEqual(interludes.enter((INTERLUDE_NODE, ROW)), "battle")
+            self.assertTrue(interludes.current_restricted)
+            self.assertTrue(interludes._restriction_direct_start)
+            interludes.fight()
+            self.assertEqual(interludes.enter((INTERLUDE_NODE, ROW)), "battle")
+            self.assertFalse(interludes.current_restricted)
+            interludes.fight()
+        self.assertEqual([name for name, _ in c.actions], [INTERLUDE_NODE, INTERLUDE_NODE])
+        first, second = [options["原生自动战斗入口"] for _, options in c.tasks]
+        self.assertTrue(first["attach"]["native_battle_formation_restricted"])
+        self.assertTrue(json.loads(first["action"]["param"]["custom_action_param"])["native_battle_formation_reset"])
+        self.assertNotIn("native_battle_formation_restricted", second["attach"])
+
+    def test_interlude_and_free_share_limit_and_story_does_not_consume_a_battle(self):
+        r, _ = runner(config={"clear_interludes": True, "battle_limit": 2})
+        interlude = (INTERLUDE_NODE, ROW)
+        with patch.object(r, "locate", side_effect=[interlude, interlude, ROW]), \
+             patch.object(r.interludes, "enter", side_effect=["story", "battle"]), \
+             patch.object(r.interludes, "fight") as interlude_fight, patch.object(r.interludes, "settle"), \
+             patch.object(r, "enter"), patch.object(r, "fight") as free_fight, patch.object(r, "settle"), \
+             patch("free_quest_action.bond_stops.battle_started") as started:
+            message = r.run()
+        self.assertEqual(started.call_args_list, [call(12345, 1, another_battle_planned=True),
+                                                   call(12345, 2, another_battle_planned=False)])
+        interlude_fight.assert_called_once()
+        free_fight.assert_called_once()
+        self.assertTrue(r.pending_clear)
+        self.assertEqual((r.completed, r.completed_interludes, r.battles), (0, 2, 2))
+        self.assertIn("完成 2 个幕间小关，完成战斗 2 场", message)
 
 
 if __name__ == "__main__":

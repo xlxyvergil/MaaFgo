@@ -1,4 +1,4 @@
-"""Free Quest 独立调度；只复用通用助战、单场战斗和结算，不处理主线限制。"""
+"""在当前章节清理 Free Quest，可同时挑战已打开地图点中的幕间。"""
 import html
 import time
 
@@ -12,7 +12,33 @@ import mfaalog
 from battle.runtime.formation_session import session_override, sessions
 from battle.runtime.bond_stop_state import bond_stops
 from bond_stop_action import BondStopReached
+from interlude_action import InterludeRunner
 from main_story_action import StoryRunner, StoryStopped, _BATTLE_RESET, map_swipes, next_names
+
+
+class _MapInterludeRunner(InterludeRunner):
+    task_name = "自动清free本"
+
+    def __init__(self, free):
+        super().__init__(free.ctx, config={"transition_timeout": free.timeout, "auto_handle_restrictions": True},
+                         clock=free.clock, sleep=free.sleep)
+        self.point_panel = free.panel
+
+    def on_map(self, image):
+        return self.point_panel(image)
+
+    def panel(self, image):
+        return self.on_map(image) or StoryRunner.on_map(self, image)
+
+    def enter(self, target):
+        self.reset_restriction_state()
+        self._dialogue_choices.clear()
+        node, _ = target
+        image = self.frame()
+        result = self.reco(node, image) if self.on_map(image) else None
+        if not result:
+            raise StoryStopped("点击前未确认可挑战的幕间关卡")
+        return super().enter((node, result))
 
 
 class FreeQuestRunner:
@@ -46,11 +72,17 @@ class FreeQuestRunner:
         self.battles = self.completed = 0
         self.pending_clear = False
         self.current_title = None
+        self.interludes = _MapInterludeRunner(self) if config.get("clear_interludes") is True else None
+        self.completed_interludes = 0
+        self.reopen_interlude_point = False
 
     def panel(self, image):
-        return bool(self.reco("主线-列表后退", image) and (
-            any(self.reco(name, image) for name in self.label_nodes)
-            or self.reco("主线-副本列表信息", image)))
+        if not self.reco("主线-列表后退", image):
+            return False
+        if any(self.reco(name, image) for name in self.label_nodes) or self.reco("主线-副本列表信息", image):
+            return True
+        return bool(self.interludes and self.reco("幕间-关闭按钮地图", image)
+                    and not self.reco("幕间-列表界面", image))
 
     def interrupt(self, image, *, entering=False, forming=False):
         if entering and self.reco("全局-战前吃体力", image):
@@ -145,6 +177,26 @@ class FreeQuestRunner:
             raise StoryStopped("战后未找到原 Free Quest 或 CLEAR 标记，保留现场")
         return None
 
+    def find_map_target(self, image):
+        if not self.interludes:
+            return self.find_in_panel(image)
+        if self.pending_clear:
+            result = self.find_in_panel(image)
+            if result:
+                return result
+            image = self.frame()
+
+        def visible_target(frame):
+            for result, cleared in self.rows(frame):
+                if not cleared:
+                    return result
+            node = "幕间-地图关卡"
+            result = self.interludes.reco(node, frame)
+            return (node, result) if result else None
+
+        return visible_target(image) or self.interludes.scan_entries(
+            image, map_mode=True, find_target=visible_target)
+
     def title_patch(self, image, result):
         box = result.box
         node = self.ctx.get_node_data(getattr(result, "name", "Free-列表标记")) or {}
@@ -191,12 +243,23 @@ class FreeQuestRunner:
             self.pause(.5)
             if self.panel(self.frame()):
                 return
-        raise StoryStopped("点击数字地图点后未确认副本详情")
+        raise StoryStopped("点击地图点后未确认副本详情")
+
+    def map_number(self, image, skipped_badges):
+        node = "Free-地图数字"
+        if not skipped_badges:
+            return self.reco(node, image)
+        result = self.ctx.run_recognition(node, image, {node: {"recognition": {"param": {
+            "custom_recognition_param": {"excluded_clicks": skipped_badges},
+        }}}})
+        return result if result and result.hit else None
 
     def locate(self):
         swipes = iter(self.patrol())
         deadline = self.clock() + self.timeout
         opened = 0
+        opened_badge = None
+        skipped_badges = []
         while self.clock() < deadline:
             image = self.frame()
             if self.interrupt(image, forming=True):
@@ -204,30 +267,42 @@ class FreeQuestRunner:
             if any(self.reco(n, image) for n in ("主线-助战界面", "进本-队伍确认", "进本-战斗主界面已出现")):
                 return None
             if self.panel(image):
-                result = self.find_in_panel(image)
+                self.reopen_interlude_point = False
+                result = self.find_map_target(image)
                 if result:
                     return result
                 self.back_to_map()
-                # 数字可能属于非 Free 关卡或过渡动画；有限退出，不反复点同一个标记。
-                opened += 1
-                if opened >= 3:
-                    raise StoryStopped("数字节点反复没有未完成 Free Quest，请检查地图")
+                if self.interludes:
+                    # 数字可能还包含主线或未开启的幕间；继续找同一视野中的其他点。
+                    if opened_badge is not None:
+                        skipped_badges.append(opened_badge)
+                        opened_badge = None
+                else:
+                    opened += 1
+                    if opened >= 3:
+                        raise StoryStopped("数字节点反复没有未完成 Free Quest，请检查地图")
                 deadline = self.clock() + self.timeout
                 continue
             if self.on_map(image):
                 # 隠者の逃げ道 首通会解锁新点并直接回地图。必须先按前回复核
                 # 原关卡 CLEAR，不能带着上一关 pending 状态点击新数字点。
-                node = "Free-地图前回" if self.pending_clear else "Free-地图数字"
-                result = self.reco(node, image)
-                if result:
-                    self.open_panel(result, node)
-                    continue
+                if self.pending_clear or self.reopen_interlude_point:
+                    node = "Free-地图前回"
+                    if result := self.reco(node, image):
+                        self.open_panel(result, node)
+                        continue
+                if not self.pending_clear:
+                    if result := self.map_number(image, skipped_badges):
+                        opened_badge = list(result.box)[:2] if self.interludes else None
+                        self.open_panel(result, "Free-地图数字")
+                        continue
                 name = next(swipes, None)
                 if name is None:
                     if self.pending_clear:
                         raise StoryStopped("战后返回地图，但遍历未找到前回标记，无法复核原 Free Quest")
                     return False
                 self.swipe_map(name)
+                skipped_badges.clear()
                 self.pause(1)
                 deadline = self.clock() + self.timeout
                 continue
@@ -297,24 +372,42 @@ class FreeQuestRunner:
         while self.battles < self.limit:
             target = self.locate()
             if target is False:
-                return f"地图遍历完成，未找到未完成数字标记；本次确认 CLEAR {self.completed} 个 Free 本，完成战斗 {self.battles} 场"
-            if target is not None:
+                return f"地图遍历完成，未找到可挑战目标；本次{self.summary()}"
+            is_interlude = isinstance(target, tuple)
+            if is_interlude:
+                kind = self.interludes.enter(target)
+                if kind == "story":
+                    self.record_interlude()
+                    continue
+            elif target is not None:
                 self.enter(target)
             bond_stops.battle_started(self.ctx.get_task_job().job_id, self.battles + 1,
                                       another_battle_planned=self.battles + 1 < self.limit)
-            self.fight()
-            self.settle()
+            runner = self.interludes if is_interlude else self
+            runner.fight()
+            runner.settle()
             self.battles += 1
-            self.pending_clear = True
-            mfaalog.info(f"[自动清free本] 已完成战斗 {self.battles}/{self.limit} 场，返回详情复查 CLEAR")
+            if is_interlude:
+                self.record_interlude()
+            else:
+                self.pending_clear = True
+                mfaalog.info(f"[自动清free本] 已完成战斗 {self.battles}/{self.limit} 场，返回详情复查 CLEAR")
         # 到上限也复核当前行；上限按实际战斗次数，不按三次猜完成。
-        image = self.frame()
-        if self.panel(image):
+        if self.pending_clear and self.panel(image := self.frame()):
             rows = list(self.rows(image))
             if (self.current_title is not None or len(rows) == 1) and any(
                     cleared and self.same_quest(image, row) for row, cleared in rows):
                 self.completed += 1
-        return f"达到战斗上限：确认 CLEAR {self.completed} 个 Free 本，完成战斗 {self.battles} 场"
+        return f"达到战斗上限：{self.summary()}"
+
+    def record_interlude(self):
+        self.completed_interludes += 1
+        self.reopen_interlude_point = True
+        mfaalog.info(f"[自动清free本] 已完成 {self.completed_interludes} 个幕间小关，战斗 {self.battles}/{self.limit} 场")
+
+    def summary(self):
+        interludes = f"，完成 {self.completed_interludes} 个幕间小关" if self.interludes else ""
+        return f"确认 CLEAR {self.completed} 个 Free 本{interludes}，完成战斗 {self.battles} 场"
 
 
 @AgentServer.custom_action("auto_free_quest")
@@ -341,7 +434,7 @@ class FreeQuestAction(CustomAction):
         except Exception as exc:
             message = f"自动清free本中断：{exc}"
             if runner:
-                message += f"（确认 CLEAR {runner.completed} 个，战斗 {runner.battles} 场）"
+                message += f"（{runner.summary()}）"
             mfaalog.error(message)
             ok = False
         if not context.tasker.stopping:

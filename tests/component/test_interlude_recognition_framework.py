@@ -12,6 +12,7 @@ from maa.tasker import Tasker
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path[:0] = [str(ROOT / "agent"), str(ROOT / "agent/custom")]
+from free_quest_action import FreeQuestRunner
 from interlude_action import InterludeRunner
 from interlude_recognition import InterludeEntry, InterludeMap, InterludeQuest, InterludeScan
 from test_main_story_framework import FrameworkResources, ScreenController
@@ -171,6 +172,27 @@ class InterludeRecognitionFrameworkTests(FrameworkResources, unittest.TestCase):
             return True
 
         self.assertTrue(self.probe(image, callback))
+
+    def test_free_task_finds_first_row_interlude_above_completed_free(self):
+        image = self.fixture("cn_map_without_interlude_return.png")
+        interlude_only = image.copy()
+        interlude_only[295:] = 0
+
+        def callback(context):
+            self.assertFalse(FreeQuestRunner(context).panel(interlude_only))
+            self.assertTrue(context.override_pipeline({"Free-配置": {"attach": {"clear_interludes": True}}}))
+            runtime = FreeQuestRunner(context)
+            [(free_row, cleared)] = list(runtime.rows(image))
+            self.assertTrue(cleared)
+            targets = []
+            for frame in (image, interlude_only):
+                self.assertTrue(runtime.panel(frame))
+                node, result = runtime.find_map_target(frame)
+                self.assertLess(result.box.y, free_row.box.y)
+                targets.append((node, detail(result)["title"]))
+            return targets
+
+        self.assertEqual(self.probe(image, callback), [("幕间-地图关卡", "龙之圣女，海边圣女")] * 2)
 
     def test_close_map_rejects_missing_button_and_non_map_pages(self):
         image = self.fixture("cn_map_without_interlude_return.png")

@@ -219,6 +219,7 @@ class BattleBudgetTests(unittest.TestCase):
                 self.addCleanup(bond_stops.finish, ctx.root)
                 runner = object.__new__(FreeQuestRunner)
                 runner.ctx, runner.limit, runner.battles, runner.completed = ctx, limit, 0, 0
+                runner.interludes = None
                 runner.pending_clear = False
                 runner.locate = lambda: None
                 runner.settle = Mock()
