@@ -32,6 +32,8 @@ _GENERIC_FORMATION_POPUPS = ("主线-编队弹窗关闭保底", "进本-普通�
 # 补点前的二次确认超过此时间即丢弃，不能把慢识别期间的旧坐标点到助战页。
 _QUEST_RETRY_FRAME_MAX_AGE = 2.0
 _POST_FORMATION_DECIDE_TIMEOUT = 60
+_FORMATION_POPUP_RETRY_TIMEOUT = 30
+_FORMATION_CLOSE_FALLBACK = "主线限制-关闭弹窗保底"
 
 
 class StoryStopped(RuntimeError):
@@ -104,6 +106,7 @@ class StoryRunner:
         self._restriction_needs_decide = False
         self._restriction_action_counts = {}
         self._post_formation_decide_deadline = 0
+        self._restriction_close_recovered = False
 
     def _mark_restricted(self, reason):
         if not self.current_restricted:
@@ -126,6 +129,19 @@ class StoryRunner:
             if sessions.valid(root, token):
                 sessions.invalidate(root, token, "")
         self.pause()
+
+    def _recover_restricted_formation_popup(self):
+        if (not self.auto_handle_restrictions or not self.current_restricted
+            or self._restriction_close_recovered):
+            return False
+        result = self.reco(_FORMATION_CLOSE_FALLBACK, self.frame())
+        if not result:
+            return False
+        self.action(_FORMATION_CLOSE_FALLBACK, result)
+        self._restriction_close_recovered = True
+        mfaalog.info("[编队限制] 编队未能继续，已点击弹窗的‘关闭’，重新识别当前编队。")
+        self.pause()
+        return True
 
     def _handle_restricted_formation(self, image, *, formation_confirmed=False, allow_auto_open=True):
         """每帧最多操作一次；叶子节点只点击，不执行其后续开战链。"""
@@ -155,13 +171,26 @@ class StoryRunner:
         if self.current_restricted and self.reco("进本-战斗主界面已出现", image):
             self._restriction_needs_auto = self._restriction_needs_decide = False
             return False
-        if self.current_restricted and (result := self.reco("主线限制-关闭职阶相性", image)):
-            self._restriction_action("主线限制-关闭职阶相性", result)
+        settings_notice = "主线限制-关闭确认设定"
+        if result := self.reco(settings_notice, image):
+            self._mark_restricted("编队确认设定")
+            self._restriction_action(settings_notice, result)
             return True
-        if self.current_restricted and (result := self.reco("主线限制-编队决定", image)):
-            self._restriction_action("主线限制-编队决定", result)
-            self._restriction_needs_decide = False
-            return True
+        if self.current_restricted:
+            if result := self.reco("主线限制-关闭职阶相性", image):
+                self._restriction_action("主线限制-关闭职阶相性", result)
+                return True
+            decide = "主线限制-编队决定"
+            if result := self.reco(decide, image):
+                if self._restriction_action_counts.get(decide, 0) >= 3:
+                    if self._recover_restricted_formation_popup():
+                        self._restriction_action_counts.pop(decide)
+                        self._post_formation_decide_deadline = self.clock() + _FORMATION_POPUP_RETRY_TIMEOUT
+                        return True
+                    raise StoryStopped("多次点击“决定”后仍停在限制编队界面，无法开始任务。请处理当前提示，确认编队后重新启动任务。")
+                self._restriction_action(decide, result)
+                self._restriction_needs_decide = False
+                return True
         # 卡位文字仅在编队确认页检查，地图/战斗背景上的类似文字不能标记本关。
         formation_confirmed = formation_confirmed or bool(self.reco("进本-队伍确认", image))
         if formation_confirmed:
@@ -666,7 +695,13 @@ class StoryRunner:
         support_clicks = 0
         formation_since = None
         # 限制编队确认后留出时间重新截图并确认开始按钮；普通助战仍使用原超时。
-        while self.clock() < max(deadline, getattr(self, "_post_formation_decide_deadline", 0)):
+        while True:
+            if self.clock() >= max(deadline, getattr(self, "_post_formation_decide_deadline", 0)):
+                # 普通 Free 本也复用此交接流程，只有受限编队执行器才有兜底。
+                if not getattr(self, "current_restricted", False) or not self._recover_restricted_formation_popup():
+                    raise StoryStopped("助战后未确认进入编队或战斗画面。请处理当前提示，回到队伍确认页后重新启动任务。")
+                deadline = self.clock() + _FORMATION_POPUP_RETRY_TIMEOUT
+                formation_since = None
             image = self.frame()
             confirmed_page = None
             # 已保存限制编队且看到开始按钮时，只检查限制编队自身的弹窗和卡位。
@@ -710,7 +745,6 @@ class StoryRunner:
                 self.pause(1.5)
                 continue
             self.pause()
-        raise StoryStopped("助战后未确认进入编队或战斗画面")
 
     def fight(self):
         # Context 深合并覆盖只影响当前关；即使限制在 locate 阶段识别，也不能清掉标志。
@@ -733,7 +767,11 @@ class StoryRunner:
                 override["进本-队伍确认"]["next"] = ["进本-已标记限制编队", "进本-限制编队直接开战"]
             elif self.current_restricted:
                 override["进本-编队处理"] = {"next": ["进本-点击队伍确认"]}
-            self.task("进本流程", override)
+            try:
+                self.task("进本流程", override)
+            except StoryStopped:
+                if not self._recover_restricted_formation_popup():
+                    raise
             if self.auto_handle_restrictions and not self.current_restricted:
                 root, token = context_session(self.ctx)
                 if sessions.valid(root, token) and sessions.restricted(root, token):
@@ -741,7 +779,12 @@ class StoryRunner:
                     self._restriction_direct_start = True
             deadline = self.clock() + BATTLE_ENTRY_TIMEOUT_S
             formation_since = None
-            while self.clock() < deadline:
+            while True:
+                if self.clock() >= deadline:
+                    if not self._recover_restricted_formation_popup():
+                        raise StoryStopped("等待超时，未确认进入战斗。请检查游戏画面，处理当前提示后重新启动任务。")
+                    deadline = self.clock() + _FORMATION_POPUP_RETRY_TIMEOUT
+                    formation_since = None
                 image = self.frame()
                 self.failure(image)
                 # 不让通用进本链在主线状态机之外自动重编并丢失本关限制标志。
@@ -758,8 +801,6 @@ class StoryRunner:
                 else:
                     formation_since = None
                 self.pause()
-            else:
-                raise StoryStopped("等待超时，未确认进入战斗。请检查游戏画面，处理当前提示后重新启动任务。")
         raise StoryStopped("已重试3次，仍停在队伍确认页。请检查当前队伍是否能点击“开始任务”或“战斗开始”，处理后重新启动任务。")
 
     def _fight_current(self):

@@ -236,17 +236,57 @@ class RestrictedStateTests(unittest.TestCase):
         self.assertFalse(runtime._restriction_needs_decide)
         self.assertEqual([name for name, _ in context.actions], ["主线限制-自动编成确认"])
 
-    def test_class_affinity_notice_closes_before_visible_decide(self):
-        runtime, context = runner()
+    def test_known_notices_close_before_visible_decide(self):
+        decide = "主线限制-编队决定"
+        for notice in ("主线限制-关闭职阶相性", "主线限制-关闭确认设定"):
+            with self.subTest(notice=notice):
+                runtime, context = runner()
+                runtime.current_restricted = True
+                runtime._restriction_needs_decide = True
+                self.assertTrue(runtime._handle_restricted_formation({notice, decide}))
+                self.assertEqual([name for name, _ in context.actions], [notice])
+                self.assertTrue(runtime._restriction_needs_decide)
+                self.assertTrue(runtime._handle_restricted_formation({decide}))
+                self.assertEqual([name for name, _ in context.actions], [notice, decide])
+
+    def test_resume_on_settings_notice_recovers_restricted_formation(self):
+        notice, decide, formation = "主线限制-关闭确认设定", "主线限制-编队决定", "进本-队伍确认"
+        runtime, context = runner([{notice, decide}, {decide}, {formation}])
+        self.assertIsNone(runtime.locate())
+        self.assertTrue(runtime.current_restricted)
+        self.assertEqual([name for name, _ in context.actions], [notice, decide])
+
+    def test_repeated_decide_checks_fresh_frame_and_tries_decide_again(self):
+        decide, close = "主线限制-编队决定", "主线限制-关闭弹窗保底"
+        runtime, context = runner([{close}])
         runtime.current_restricted = True
-        runtime._restriction_needs_decide = True
-        self.assertTrue(runtime._handle_restricted_formation({
-            "主线限制-关闭职阶相性", "主线限制-编队决定"}))
-        self.assertEqual([name for name, _ in context.actions], ["主线限制-关闭职阶相性"])
-        self.assertTrue(runtime._restriction_needs_decide)
-        self.assertTrue(runtime._handle_restricted_formation({"主线限制-编队决定"}))
-        self.assertEqual([name for name, _ in context.actions], [
-            "主线限制-关闭职阶相性", "主线限制-编队决定"])
+        for _ in range(4):
+            self.assertTrue(runtime._handle_restricted_formation({decide}))
+        self.assertTrue(runtime._handle_restricted_formation({decide}))
+        self.assertEqual([name for name, _ in context.actions], [decide] * 3 + [close, decide])
+        self.assertEqual(context.frames, [])
+
+    def test_formation_wait_timeout_closes_once_and_resumes_handoff(self):
+        close, formation = "主线限制-关闭弹窗保底", "进本-队伍确认"
+        for page in (formation, close):
+            with self.subTest(page=page):
+                runtime, context = runner([set()] * 20 + [{close}, {page}], {"transition_timeout": 10})
+                runtime.current_restricted = True
+                if page == formation:
+                    runtime.reach_formation()
+                else:
+                    with self.assertRaisesRegex(StoryStopped, "未确认进入编队"):
+                        runtime.reach_formation()
+                self.assertEqual([name for name, _ in context.actions], [close])
+
+    def test_battle_entry_wait_recovers_popup_and_retries_start(self):
+        close, formation, battle = "主线限制-关闭弹窗保底", "进本-队伍确认", "进本-战斗主界面已出现"
+        runtime, context = runner([set()] * 2 + [{close}] + [{formation}] * 3 + [{battle}])
+        runtime.current_restricted = True
+        with patch("main_story_action.BATTLE_ENTRY_TIMEOUT_S", 1):
+            runtime._start_formation_battle()
+        self.assertEqual([name for name, _ in context.tasks], ["进本流程"] * 2)
+        self.assertEqual([name for name, _ in context.actions], [close])
 
     def test_bbc_does_not_probe_native_formation_restrictions(self):
         runtime, context = runner(config={"battle_mode": "bbc"})
