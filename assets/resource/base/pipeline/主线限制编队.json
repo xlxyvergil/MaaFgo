@@ -121,6 +121,24 @@
     ], "box_index": 1}},
     "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
   },
+  "主线限制-关闭确认设定": {
+    "doc": "国服主线的灵衣设定提示会覆盖编队编辑页。标题、底部关闭与背景决定同时命中时，只点击关闭，支持从该弹窗直接启动任务并接回编队。",
+    "recognition": {"type": "And", "param": {"all_of": [
+      {"sub_name": "base/主线限制编队/主线限制-关闭确认设定/OCR1", "recognition": {"type": "OCR", "param": {
+        "roi": [450, 65, 380, 70], "expected": ["^确认设定$"], "threshold": 0.8
+      }}},
+      "主线限制-关闭弹窗保底",
+      "主线限制-编队决定"
+    ], "box_index": 1}},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
+  "主线限制-关闭弹窗保底": {
+    "doc": "受限编队超时后重新截图，识别弹窗底部居中或偏左的完整关闭按钮文字。避开编队页左上角的关闭和右下角的决定。",
+    "recognition": {"type": "OCR", "param": {
+      "roi": [330, 510, 460, 140], "expected": ["^(?:关闭|閉じる)$"], "threshold": 0.8
+    }},
+    "action": {"type": "Click"}, "post_delay": 500, "next": [], "on_error": []
+  },
   "主线限制-编队决定": {
     "doc": "只在主线受限编队状态下调用，保存游戏自动编队的编辑结果；模板和决定/決定OCR同时命中右下角，不误点开始任务。参考自动编队-检测编辑决定，但此叶子只点击一次，不继续开战。",
     "recognition": {"type": "And", "param": {"all_of": [
